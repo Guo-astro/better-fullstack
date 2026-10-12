@@ -29,6 +29,19 @@ declare module "virtual:guides-raw" {
   export const rawGuidePages: Record<string, string>;
 }
 
+declare module "virtual:changelog-meta" {
+  import type { ChangelogFrontmatter } from "@/lib/changelog/source";
+
+  export const changelogMeta: ReadonlyArray<{
+    filePath: string;
+    frontmatter: ChangelogFrontmatter;
+  }>;
+}
+
+declare module "virtual:changelog-raw" {
+  export const rawChangelogPages: Record<string, string>;
+}
+
 declare module "virtual:localized-content" {
   import type { BlogMdxModule } from "@/lib/blog/mdx-loaders";
   import type { DocMdxModule, RawMdxModule } from "@/lib/docs/mdx-loaders";
