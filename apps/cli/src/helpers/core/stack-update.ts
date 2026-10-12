@@ -1435,6 +1435,7 @@ function diffJsonSection(
     values[name] =
       previousSection[name] === undefined &&
       section !== "scripts" &&
+      section !== "engines" &&
       familyVersion !== undefined &&
       isRegistrySemverSpec(String(proposedValue))
         ? applyVersionPrefix(String(proposedValue), familyVersion)
@@ -1486,7 +1487,7 @@ export function mergePackageJson(
   const dependencyChanges: Record<string, Record<string, string>> = {};
   const scriptChanges: string[] = [];
 
-  for (const section of PACKAGE_JSON_SECTIONS) {
+  for (const section of [...PACKAGE_JSON_SECTIONS, "engines"]) {
     const diff = diffJsonSection(
       existing,
       previous,
@@ -1510,7 +1511,7 @@ export function mergePackageJson(
     summary.push(`${section}: ${changedNames.join(", ")}`);
     if (section === "scripts") {
       scriptChanges.push(...changedNames);
-    } else {
+    } else if (section !== "engines") {
       dependencyChanges[section] = {
         ...diff.values,
         ...Object.fromEntries(diff.removals.map((name) => [name, "removed"])),

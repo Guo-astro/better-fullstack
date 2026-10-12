@@ -64,6 +64,25 @@ async function compatibilityReason(category: string, option: string) {
 }
 
 describe("explain command", () => {
+  it("rejects a selected server when explaining an incompatible Python framework", async () => {
+    const result = await explain([
+      "pythonWebFramework:streamlit",
+      "--with",
+      "pythonServer:gunicorn",
+    ]);
+    expect(result.evaluation.allowed).toBe(false);
+    expect(result.evaluation.failures.some((failure) => failure.reason.includes("Gunicorn"))).toBe(
+      true,
+    );
+  });
+
+  it("keeps invalid base selections in the verdict for an unrelated option", async () => {
+    const result = await explain(["logging:pino", "--with", "database:mongodb", "orm:drizzle"]);
+    expect(result.evaluation.allowed).toBe(false);
+    expect(result.evaluation.failures.some((failure) => failure.reason.includes("MongoDB"))).toBe(
+      true,
+    );
+  });
   it("lists a requirement and an exclusion with the reasons the compatibility command gives", async () => {
     const result = await explain(["postgres"]);
 

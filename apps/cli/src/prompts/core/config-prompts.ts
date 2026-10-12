@@ -707,8 +707,16 @@ const SERVER_ECOSYSTEMS = new Set<Ecosystem>(["rust", "python", "go", "java", "d
 export function resolveDatabaseFlagForEcosystem(
   ecosystem: Ecosystem | undefined,
   database: Database | undefined,
+  go?: Partial<Pick<ProjectConfig, "goMessageQueue" | "goMigrations">>,
 ): Database | undefined {
   if (ecosystem === undefined || ecosystem === "typescript") return undefined;
+  if (
+    ecosystem === "go" &&
+    database === undefined &&
+    go &&
+    (go.goMessageQueue === "river" || (go.goMigrations && go.goMigrations !== "none"))
+  )
+    return undefined;
   if (SERVER_ECOSYSTEMS.has(ecosystem)) return database ?? "none";
   return "none";
 }
@@ -984,7 +992,7 @@ export async function gatherConfig(
       return getRuntimeChoice(flags.runtime, results.backend, flags.jobQueue, flags.vectorDb);
     },
     database: ({ results }) => {
-      const database = resolveDatabaseFlagForEcosystem(results.ecosystem, flags.database);
+      const database = resolveDatabaseFlagForEcosystem(results.ecosystem, flags.database, flags);
       if (database !== undefined) return Promise.resolve(database);
       return getDatabaseChoice(
         flags.database,
@@ -993,6 +1001,13 @@ export async function gatherConfig(
         flags.jobQueue,
         flags.auth,
         flags.orm,
+        results.ecosystem === "go"
+          ? {
+              goMessageQueue: flags.goMessageQueue,
+              goMigrations: flags.goMigrations,
+              goOrm: flags.goOrm,
+            }
+          : undefined,
       );
     },
     orm: ({ results }) => {
@@ -1262,11 +1277,7 @@ export async function gatherConfig(
         return Promise.resolve("none" as Search);
       }
       const javaLanguage = getSharedPromptJavaLanguage(results, flags);
-      if (
-        results.ecosystem === "java" &&
-        javaLanguage === "kotlin" &&
-        flags.search === undefined
-      ) {
+      if (results.ecosystem === "java" && javaLanguage === "kotlin" && flags.search === undefined) {
         return Promise.resolve("none" as Search);
       }
       return getSearchChoice(flags.search, results.backend, results.ecosystem, javaLanguage);
@@ -1517,7 +1528,10 @@ export async function gatherConfig(
     // Go ecosystem prompts (skip if not Go)
     goWebFramework: ({ results }) => {
       if (results.ecosystem !== "go") return Promise.resolve("none" as GoWebFramework);
-      return getGoWebFrameworkChoice(flags.goWebFramework);
+      return getGoWebFrameworkChoice(flags.goWebFramework, {
+        goMessageQueue: flags.goMessageQueue,
+        database: results.database,
+      });
     },
     goOrm: ({ results }) => {
       if (results.ecosystem !== "go") return Promise.resolve("none" as GoOrm);

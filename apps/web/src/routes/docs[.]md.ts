@@ -4,11 +4,8 @@ export const Route = createFileRoute("/docs.md")({
   server: {
     handlers: {
       GET: async () => {
-        const [{ rawDocsPages }, { markdownResponse }] = await Promise.all([
-          import("virtual:docs-raw"),
-          import("@/lib/content/markdown-response"),
-        ]);
-        return markdownResponse(rawDocsPages[""], "/docs");
+        const { docsMarkdownResponse } = await import("@/lib/docs/markdown.server");
+        return docsMarkdownResponse("");
       },
     },
   },

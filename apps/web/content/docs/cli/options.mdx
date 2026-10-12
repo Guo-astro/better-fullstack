@@ -15,14 +15,14 @@ Without a category, `list` prints every option category with its flag and option
 `--ecosystem` keeps only the categories that ecosystem uses:
 
 ```bash
-npx create-better-fullstack@latest list --ecosystem go
+bunx create-better-fullstack@latest list --ecosystem go
 ```
 
 With a category ID, `list` prints that category's options. Each row shows the option ID, its
 label, the exact argument that selects it, and any legacy IDs:
 
 ```bash
-npx create-better-fullstack@latest list goAuth --ecosystem go
+bunx create-better-fullstack@latest list goAuth --ecosystem go
 ```
 
 ```text
@@ -51,7 +51,7 @@ flag name such as `go-auth`.
 first, then prefix matches, then other substring matches:
 
 ```bash
-npx create-better-fullstack@latest search drizzle
+bunx create-better-fullstack@latest search drizzle
 ```
 
 ```text

@@ -7,6 +7,11 @@ import {
   getAuthIncompatibility,
   getDatabaseOrmIncompatibility,
   getJobQueueIncompatibility,
+  getGoMessageQueueIncompatibility,
+  getGoMigrationsIncompatibility,
+  type GoMessageQueue,
+  type GoMigrations,
+  type GoOrm,
   type Auth,
   type Backend,
   type Database,
@@ -22,12 +27,13 @@ type DatabasePromptContext = {
   jobQueue?: JobQueue;
   auth?: Auth;
   orm?: ORM;
+  go?: { goMessageQueue?: GoMessageQueue; goMigrations?: GoMigrations; goOrm?: GoOrm };
 };
 
 export function resolveDatabasePrompt(
   context: DatabasePromptContext = {},
 ): PromptSingleResolution<Database> {
-  if (context.backend === "convex" || context.backend === "none") {
+  if (!context.go && (context.backend === "convex" || context.backend === "none")) {
     return {
       shouldPrompt: false,
       mode: "single",
@@ -90,19 +96,27 @@ export function resolveDatabasePrompt(
     });
   }
 
-  const options = databaseOptions.filter(
-    (option) =>
-      !getJobQueueIncompatibility(
-        context.jobQueue,
-        { database: option.value },
-        { partial: true },
-      ) &&
-      !getAuthIncompatibility(
-        context.auth,
-        { ecosystem: "typescript", database: option.value },
-        { partial: true },
-      ) &&
-      !getDatabaseOrmIncompatibility(option.value, context.orm),
+  const options = databaseOptions.filter((option) =>
+    context.go
+      ? !getGoMessageQueueIncompatibility(context.go.goMessageQueue, {
+          database: option.value,
+          partial: true,
+        }) &&
+        !getGoMigrationsIncompatibility(context.go.goMigrations, {
+          database: option.value,
+          goOrm: context.go.goOrm,
+        })
+      : !getJobQueueIncompatibility(
+          context.jobQueue,
+          { database: option.value },
+          { partial: true },
+        ) &&
+        !getAuthIncompatibility(
+          context.auth,
+          { ecosystem: "typescript", database: option.value },
+          { partial: true },
+        ) &&
+        !getDatabaseOrmIncompatibility(option.value, context.orm),
   );
 
   return {
@@ -122,8 +136,9 @@ export async function getDatabaseChoice(
   jobQueue?: JobQueue,
   auth?: Auth,
   orm?: ORM,
+  go?: DatabasePromptContext["go"],
 ) {
-  const resolution = resolveDatabasePrompt({ database, backend, runtime, jobQueue, auth, orm });
+  const resolution = resolveDatabasePrompt({ database, backend, runtime, jobQueue, auth, orm, go });
   if (!resolution.shouldPrompt) {
     return resolution.autoValue ?? "none";
   }

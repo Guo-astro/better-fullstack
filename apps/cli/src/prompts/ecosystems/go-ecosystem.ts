@@ -19,7 +19,6 @@ import type {
   GoWebFramework,
 } from "@/types";
 
-import { getGoMessageQueueIncompatibility, getGoMigrationsIncompatibility } from "@/types";
 import { exitCancelled } from "@/presentation/errors";
 import { isCancel, navigableMultiselect, navigableSelect } from "@/prompts/core/navigable";
 import {
@@ -27,6 +26,7 @@ import {
   createStaticSinglePromptResolution,
   type PromptOption,
 } from "@/prompts/core/prompt-contract";
+import { getGoMessageQueueIncompatibility, getGoMigrationsIncompatibility } from "@/types";
 
 const GO_WEB_FRAMEWORK_PROMPT_OPTIONS: PromptOption<GoWebFramework>[] = [
   {
@@ -221,12 +221,26 @@ const GO_AUTH_PROMPT_OPTIONS: PromptOption<GoAuth>[] = [
   },
 ];
 
-export function resolveGoWebFrameworkPrompt(goWebFramework?: GoWebFramework) {
-  return createStaticSinglePromptResolution(GO_WEB_FRAMEWORK_PROMPT_OPTIONS, "gin", goWebFramework);
+export function resolveGoWebFrameworkPrompt(
+  goWebFramework?: GoWebFramework,
+  selection?: { goMessageQueue?: GoMessageQueue; database?: string },
+) {
+  const options = GO_WEB_FRAMEWORK_PROMPT_OPTIONS.filter(
+    (option) =>
+      !getGoMessageQueueIncompatibility(selection?.goMessageQueue, {
+        database: selection?.database,
+        goWebFramework: option.value,
+        partial: true,
+      }),
+  );
+  return createStaticSinglePromptResolution(options, "gin", goWebFramework);
 }
 
-export async function getGoWebFrameworkChoice(goWebFramework?: GoWebFramework) {
-  const resolution = resolveGoWebFrameworkPrompt(goWebFramework);
+export async function getGoWebFrameworkChoice(
+  goWebFramework?: GoWebFramework,
+  selection?: { goMessageQueue?: GoMessageQueue; database?: string },
+) {
+  const resolution = resolveGoWebFrameworkPrompt(goWebFramework, selection);
   if (!resolution.shouldPrompt) {
     return resolution.autoValue ?? "none";
   }
@@ -738,10 +752,7 @@ export async function getGoQualityChoice(goQuality?: GoQuality) {
   return response;
 }
 
-export function resolveGoMigrationsPrompt(
-  goMigrations?: GoMigrations,
-  selection?: GoJobSelection,
-) {
+export function resolveGoMigrationsPrompt(goMigrations?: GoMigrations, selection?: GoJobSelection) {
   return createStaticSinglePromptResolution(
     selection
       ? GO_MIGRATIONS_PROMPT_OPTIONS.filter(

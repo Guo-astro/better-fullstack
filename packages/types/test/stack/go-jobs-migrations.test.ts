@@ -30,12 +30,24 @@ function graphIssues(specs: string[]) {
 }
 
 describe("Go background jobs and migrations compatibility", () => {
+  it("uses the owning backend database for jobs and migrations", () => {
+    expect(
+      graphIssues([
+        "backend:go:gin",
+        "backend.database:universal:postgres",
+        "backend.jobQueue:go:river",
+        "backend.migrations:go:goose",
+      ]),
+    ).toEqual([]);
+  });
   it("restricts River to PostgreSQL and both job options to wired HTTP servers", () => {
     expect(getGoMessageQueueIncompatibility("river", GO_STACK)).toBeNull();
     expect(getGoMessageQueueIncompatibility("river", { ...GO_STACK, database: "sqlite" })).toBe(
       RIVER_REASON,
     );
-    expect(getGoMessageQueueIncompatibility("gocron", { ...GO_STACK, database: "mysql" })).toBeNull();
+    expect(
+      getGoMessageQueueIncompatibility("gocron", { ...GO_STACK, database: "mysql" }),
+    ).toBeNull();
     for (const goWebFramework of ["go-zero", "kratos", "httprouter", "none"]) {
       expect(getGoMessageQueueIncompatibility("gocron", { ...GO_STACK, goWebFramework })).toBe(
         "gocron is wired for Gin, Echo, Fiber, Chi, and net/http servers",
@@ -56,7 +68,9 @@ describe("Go background jobs and migrations compatibility", () => {
     for (const goOrm of ["gorm", "ent", "bun", "sqlx", "none"]) {
       expect(getGoMigrationsIncompatibility("atlas", { database: "mysql", goOrm })).toBeNull();
     }
-    expect(getGoMigrationsIncompatibility("goose", { database: "sqlite", goOrm: "sqlc" })).toBeNull();
+    expect(
+      getGoMigrationsIncompatibility("goose", { database: "sqlite", goOrm: "sqlc" }),
+    ).toBeNull();
   });
 
   it("gives the builder the same reasons in both selection directions", () => {

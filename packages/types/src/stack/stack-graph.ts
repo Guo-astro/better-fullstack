@@ -1659,6 +1659,15 @@ function createTypeScriptBackendCompatibilityIssue(
   }
 
   if (part.role === "vectorDb" && part.ecosystem === "typescript") {
+    if (context.ownerToolId === "convex") {
+      return createStackGraphIssue({
+        code: "INCOMPATIBLE_OWNER_TOOL",
+        partId: part.id,
+        role: part.role,
+        toolId: part.toolId,
+        message: "External vector databases are not generated for Convex backends.",
+      });
+    }
     const deployTools = context.selectedToolIdsByRoleList?.deploy ?? [];
     const reason = getVectorDbIncompatibility(part.toolId, {
       backend: context.ownerToolId,
@@ -2908,9 +2917,10 @@ const GO_BACKGROUND_JOB_LABELS: Partial<Record<string, string>> = {
 
 export function getGoMigrationsIncompatibility(
   goMigrations: string | undefined,
-  selection: { database?: string; goOrm?: string },
+  selection: { database?: string; goOrm?: string; partial?: boolean },
 ): string | null {
   if (!goMigrations || goMigrations === "none") return null;
+  if (selection.partial && selection.database === undefined) return null;
   if (!GO_MIGRATION_DATABASES.has(selection.database ?? "none")) {
     return "Go migrations require SQLite, PostgreSQL, or MySQL";
   }
@@ -2922,14 +2932,21 @@ export function getGoMigrationsIncompatibility(
 
 export function getGoMessageQueueIncompatibility(
   goMessageQueue: string | undefined,
-  selection: { database?: string; goWebFramework?: string },
+  selection: { database?: string; goWebFramework?: string; partial?: boolean },
 ): string | null {
   const label = goMessageQueue ? GO_BACKGROUND_JOB_LABELS[goMessageQueue] : undefined;
   if (!label) return null;
-  if (goMessageQueue === "river" && selection.database !== "postgres") {
+  if (
+    goMessageQueue === "river" &&
+    selection.database !== "postgres" &&
+    !(selection.partial && selection.database === undefined)
+  ) {
     return "River requires PostgreSQL";
   }
-  if (!GO_BACKGROUND_JOB_WEB_FRAMEWORKS.has(selection.goWebFramework ?? "none")) {
+  if (
+    !GO_BACKGROUND_JOB_WEB_FRAMEWORKS.has(selection.goWebFramework ?? "none") &&
+    !(selection.partial && selection.goWebFramework === undefined)
+  ) {
     return `${label} is wired for Gin, Echo, Fiber, Chi, and net/http servers`;
   }
   return null;
@@ -2997,7 +3014,11 @@ function getStackPartCompatibilityIssue(
 
   if (part.ecosystem === "go" && (part.role === "migrations" || part.role === "jobQueue")) {
     const selection = {
-      database: context.primaryToolIdsByRole?.database ?? "none",
+      database:
+        getDataLayerDatabase({
+          standalone: context.primaryToolIdsByRole?.database,
+          backend: context.siblingToolIdsByRole?.database,
+        }) ?? "none",
       goOrm: context.siblingToolIdsByRole?.orm,
       goWebFramework: context.ownerToolId,
     };

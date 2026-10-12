@@ -9,7 +9,6 @@ import {
   getCategoryDisplayName,
   getDisabledReason,
   type CompatibilityInput,
-  type CompatibilityIssue,
   type OptionCategory,
   type OptionCategoryEcosystem,
 } from "@better-fullstack/types";
@@ -188,9 +187,6 @@ function addRule(
   }
 }
 
-const issueKey = (issue: CompatibilityIssue) =>
-  `${issue.category}:${issue.optionId}:${issue.message}`;
-
 function resolveSelections(values: readonly string[], ecosystem: OptionCategoryEcosystem) {
   const selections = values.map((value) => resolveCatalogOption(value, ecosystem));
   for (const [index, { category, id }] of selections.entries()) {
@@ -250,19 +246,25 @@ export function explainOption(input: {
     }
   }
 
-  const known = new Set(evaluateCompatibility(withoutOption).issues.map(issueKey));
   const failuresFor = (optionId: string) => {
     const candidate = select(stack, option.category, optionId);
-    const failures = evaluateCompatibility(candidate)
-      .issues.filter((issue) => !known.has(issueKey(issue)))
-      .map((issue) => ({
-        category: issue.category ?? null,
-        optionId: issue.optionId ?? null,
-        reason: issue.message,
-      }));
-    const disabled = getDisabledReason(candidate, option.category, optionId);
-    if (disabled && !failures.some((failure) => failure.reason === disabled)) {
-      failures.push({ category: option.category, optionId, reason: disabled });
+    const failures = evaluateCompatibility(candidate).issues.map((issue) => ({
+      category: issue.category ?? null,
+      optionId: issue.optionId ?? null,
+      reason: issue.message,
+    }));
+    for (const category of ecosystemCategories(ecosystem)) {
+      const key = STACK_KEY_BY_CATEGORY.get(category);
+      if (!key) continue;
+      const value: unknown = candidate[key];
+      const selected = Array.isArray(value) ? value : [value];
+      for (const id of selected) {
+        if (typeof id !== "string") continue;
+        const disabled = getDisabledReason(candidate, category, id);
+        if (disabled && !failures.some((failure) => failure.reason === disabled)) {
+          failures.push({ category, optionId: id, reason: disabled });
+        }
+      }
     }
     return failures;
   };

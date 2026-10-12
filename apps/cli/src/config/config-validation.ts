@@ -1399,7 +1399,7 @@ export function validatePythonExpansionConstraints(config: Partial<ProjectConfig
   }
 }
 
-export function validateGoExpansionConstraints(config: Partial<ProjectConfig>) {
+export function validateGoExpansionConstraints(config: Partial<ProjectConfig>, partial = false) {
   const goConfig =
     config.ecosystem === "go"
       ? config
@@ -1428,7 +1428,10 @@ export function validateGoExpansionConstraints(config: Partial<ProjectConfig>) {
     });
   }
 
-  const messageQueueReason = getGoMessageQueueIncompatibility(goConfig.goMessageQueue, goConfig);
+  const messageQueueReason = getGoMessageQueueIncompatibility(goConfig.goMessageQueue, {
+    ...goConfig,
+    partial,
+  });
   if (messageQueueReason) {
     incompatibilityError({
       message: `${messageQueueReason}.`,
@@ -1445,7 +1448,10 @@ export function validateGoExpansionConstraints(config: Partial<ProjectConfig>) {
     });
   }
 
-  const migrationsReason = getGoMigrationsIncompatibility(goConfig.goMigrations, goConfig);
+  const migrationsReason = getGoMigrationsIncompatibility(goConfig.goMigrations, {
+    ...goConfig,
+    partial,
+  });
   if (migrationsReason) {
     incompatibilityError({
       message: `${migrationsReason}.`,
@@ -1564,7 +1570,7 @@ export function validateFullConfig(
   validatePythonApiConstraints(config);
   validatePythonExpansionConstraints(config);
   validatePythonLoggingConstraints(config);
-  validateGoExpansionConstraints(config);
+  validateGoExpansionConstraints(config, partial);
   validateRustExpansionCompatibility(config);
   validateEmailConstraints(config);
   validateObservabilityConstraints(config);
