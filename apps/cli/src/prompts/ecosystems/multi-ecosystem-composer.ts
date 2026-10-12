@@ -170,6 +170,7 @@ import { getObservabilityChoice } from "@/prompts/services/observability";
 import { getPaymentsChoice } from "@/prompts/services/payments";
 import { getRateLimitChoice } from "@/prompts/services/rate-limit";
 import { getRealtimeChoice } from "@/prompts/services/realtime";
+import { getServerDeploymentOptions } from "@/prompts/services/server-deploy";
 import { getDeploymentChoice } from "@/prompts/services/web-deploy";
 import { getWebMcpChoice } from "@/prompts/services/web-mcp";
 import {
@@ -312,18 +313,29 @@ export async function selectKotlinMobileLibraries(
   return response.filter((library) => library !== "none");
 }
 
-async function selectServerDeployment(deployment?: ServerDeploy): Promise<ServerDeploy> {
+export function getMultiEcosystemServerDeploymentOptions(jobQueue?: ProjectConfig["jobQueue"]) {
+  const permitted = new Set(
+    getServerDeploymentOptions(undefined, jobQueue).map(({ value }) => value),
+  );
+  const options = [
+    { value: "none", label: "None", hint: "Skip server deployment setup" },
+    { value: "railway", label: "Railway", hint: "Deploy a standalone backend service" },
+    { value: "docker", label: "Docker", hint: "Containerize the backend service" },
+    { value: "fly", label: "Fly", hint: "Deploy close to users" },
+    { value: "vercel", label: "Vercel", hint: "Deploy from the backend workspace" },
+  ] satisfies { value: ServerDeploy; label: string; hint: string }[];
+  return options.filter(({ value }) => permitted.has(value));
+}
+
+async function selectServerDeployment(
+  deployment?: ServerDeploy,
+  jobQueue?: ProjectConfig["jobQueue"],
+): Promise<ServerDeploy> {
   if (deployment !== undefined) return deployment;
 
   const response = await navigableSelect<ServerDeploy>({
     message: "Select server deployment",
-    options: [
-      { value: "none", label: "None", hint: "Skip server deployment setup" },
-      { value: "railway", label: "Railway", hint: "Deploy a standalone backend service" },
-      { value: "docker", label: "Docker", hint: "Containerize the backend service" },
-      { value: "fly", label: "Fly", hint: "Deploy close to users" },
-      { value: "vercel", label: "Vercel", hint: "Deploy from the backend workspace" },
-    ],
+    options: getMultiEcosystemServerDeploymentOptions(jobQueue),
     initialValue: "none",
   });
 
@@ -659,7 +671,7 @@ export async function gatherMultiEcosystemConfig(
       backend === "none"
         ? "none"
         : await scopedPromptValue("typescript", "jobQueue", configScope, backendSections, () =>
-            getJobQueueChoice(flags.jobQueue, backend, runtime, database),
+            getJobQueueChoice(flags.jobQueue, backend, runtime, database, flags.serverDeploy),
           );
     const caching =
       backend === "none"
@@ -1613,7 +1625,7 @@ export async function gatherMultiEcosystemConfig(
     backendEcosystem === "typescript" &&
     backendChoices.backend !== "none" &&
     shouldAskConfigPromptKey("typescript", "serverDeploy", configScope, typeScriptSections)
-      ? await selectServerDeployment(flags.serverDeploy)
+      ? await selectServerDeployment(flags.serverDeploy, backendChoices.jobQueue)
       : (getDefaultPromptValue("serverDeploy") as ServerDeploy);
   const aiDocs = promptValue(await getAiDocsChoice(flags.aiDocs));
   const git = promptValue(await getGitChoice(flags.git));
