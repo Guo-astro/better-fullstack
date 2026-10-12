@@ -154,6 +154,28 @@ async function scaffoldDefaultProject() {
 }
 
 describe("generated job queues", () => {
+  test("refuses worker queues on deployment profiles without a worker service", async () => {
+    for (const jobQueue of ["pg-boss", "hatchet"] as const) {
+      for (const serverDeploy of ["fly", "railway", "render"] as const) {
+        const result = await createVirtual({
+          backend: "hono",
+          runtime: "bun",
+          database: "postgres",
+          orm: "drizzle",
+          jobQueue,
+          serverDeploy,
+        });
+        expect(result.success).toBe(false);
+        expect(result.error).toContain(`generated ${serverDeploy} deployments do not start one`);
+      }
+    }
+    expect(
+      promptValues({ backend: "hono", runtime: "bun", database: "postgres", serverDeploy: "fly" }),
+    ).not.toContain("pg-boss");
+    expect(
+      promptValues({ backend: "hono", runtime: "bun", database: "postgres", serverDeploy: "fly" }),
+    ).not.toContain("hatchet");
+  });
   test("pg-boss generates a Postgres queue, producer, and long-running worker", async () => {
     const result = await runTRPCTest(
       createCustomConfig({

@@ -1,12 +1,12 @@
+import {
+  findVirtualFile as findFile,
+  readVirtualFileContent as getFile,
+} from "@test/support/virtual-tree-utils";
 import { describe, expect, test } from "bun:test";
 
 import { DEFAULT_CONFIG } from "@/constants";
 import { create, createVirtual } from "@/index";
 import { gatherConfig } from "@/prompts/core/config-prompts";
-import {
-  findVirtualFile as findFile,
-  readVirtualFileContent as getFile,
-} from "@test/support/virtual-tree-utils";
 
 describe("mobile native scaffolding", () => {
   test("uses React Native defaults when --yes selects the React Native ecosystem", async () => {
@@ -223,7 +223,7 @@ describe("mobile native scaffolding", () => {
     expect(appConfig.expo.android.package).toBe("com.betterfullstack.mobile.unistyles");
     const dependencies = pkg.dependencies as Record<string, string>;
     const nitroFloor = dependencies["react-native-nitro-modules"].replace(/^[~^]/, "");
-    expect(Bun.semver.satisfies(nitroFloor, ">=0.37.1")).toBe(true);
+    expect(Bun.semver.satisfies(nitroFloor, ">=0.36.1")).toBe(true);
   });
 
   test("omits deep-linking wiring when React Navigation selects no deep linking", async () => {

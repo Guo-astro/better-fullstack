@@ -157,8 +157,8 @@ test("CLI flag descriptions and controls follow the selected locale", async ({
 });
 
 for (const [slug, path] of [
-  ["/ai/mcp", "ai/mcp.mdx"],
-  ["/cli", "cli/index.mdx"],
+  ["/cli/create", "cli/create.mdx"],
+  ["/cli/add", "cli/add.mdx"],
 ] as const) {
   test(`viewing Markdown preserves the selected locale for /docs${slug}`, async ({
     page,

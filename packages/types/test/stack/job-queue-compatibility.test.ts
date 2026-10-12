@@ -69,6 +69,34 @@ const REJECTED = [
 ] as const;
 
 describe("generated job queue compatibility", () => {
+  for (const jobQueue of ["pg-boss", "hatchet"] as const) {
+    for (const serverDeploy of ["fly", "railway", "render", "vercel", "netlify", "sst"] as const) {
+      it(`rejects ${jobQueue} when ${serverDeploy} does not generate its worker`, () => {
+        const input = compatibilityInput({
+          backend: "hono",
+          runtime: "node",
+          database: "postgres",
+          jobQueue,
+          serverDeploy,
+        });
+        const reason = `${jobQueue === "hatchet" ? "Hatchet" : "pg-boss"} requires a separate worker process; generated ${serverDeploy} deployments do not start one. Choose Docker or no server deployment`;
+        expect(getDisabledReason(input, "jobQueue", jobQueue)).toBe(reason);
+        expect(
+          getDisabledReason({ ...input, serverDeploy: "none" }, "serverDeploy", serverDeploy),
+        ).toBe(`${reason}.`);
+        expect(
+          graphIssues({
+            backend: "hono",
+            runtime: "node",
+            database: "postgres",
+            jobQueue,
+            serverDeploy,
+          }),
+        ).toContain(`${reason}.`);
+      });
+    }
+  }
+
   for (const { jobQueue, stack, reason } of REJECTED) {
     it(`rejects ${jobQueue} on ${stack.backend}/${stack.runtime}/${stack.database} everywhere with one reason`, () => {
       const input = compatibilityInput({ ...stack, jobQueue });

@@ -1685,15 +1685,22 @@ function createTypeScriptBackendCompatibilityIssue(
     }
   }
 
-  if (part.role === "jobQueue" && part.ecosystem === "typescript") {
-    const reason = getJobQueueIncompatibility(part.toolId, {
-      backend: context.ownerToolId,
-      runtime: context.siblingToolIdsByRole?.runtime,
-      database: getDataLayerDatabase({
-        standalone: context.primaryToolIdsByRole?.database,
-        backend: context.siblingToolIdsByRole?.database,
-      }),
-    });
+  if (
+    part.ecosystem === "typescript" &&
+    (part.role === "jobQueue" || (part.role === "deploy" && context.ownerRole === "backend"))
+  ) {
+    const reason = getJobQueueIncompatibility(
+      part.role === "jobQueue" ? part.toolId : context.siblingToolIdsByRole?.jobQueue,
+      {
+        backend: context.ownerToolId,
+        runtime: context.siblingToolIdsByRole?.runtime,
+        serverDeploy: part.role === "deploy" ? part.toolId : context.siblingToolIdsByRole?.deploy,
+        database: getDataLayerDatabase({
+          standalone: context.primaryToolIdsByRole?.database,
+          backend: context.siblingToolIdsByRole?.database,
+        }),
+      },
+    );
     if (reason) {
       return createStackGraphIssue({
         code: "INCOMPATIBLE_GRAPH_SELECTION",

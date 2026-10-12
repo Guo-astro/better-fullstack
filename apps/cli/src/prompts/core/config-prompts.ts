@@ -1143,6 +1143,7 @@ export async function gatherConfig(
         results.runtime,
         results.backend,
         results.webDeploy,
+        flags.jobQueue,
       );
     },
     // TypeScript-specific prompts
@@ -1186,7 +1187,13 @@ export async function gatherConfig(
     },
     jobQueue: ({ results }) => {
       if (results.ecosystem !== "typescript") return Promise.resolve("none" as JobQueue);
-      return getJobQueueChoice(flags.jobQueue, results.backend, results.runtime, results.database);
+      return getJobQueueChoice(
+        flags.jobQueue,
+        results.backend,
+        results.runtime,
+        results.database,
+        results.serverDeploy,
+      );
     },
     fileUpload: ({ results }) => {
       if (results.ecosystem !== "typescript") return Promise.resolve("none" as FileUpload);

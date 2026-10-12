@@ -1,8 +1,14 @@
-import type { Backend, Runtime, ServerDeploy, WebDeploy } from "@/types";
-
 import { DEFAULT_CONFIG } from "@/constants";
 import { exitCancelled } from "@/presentation/errors";
 import { isCancel, navigableSelect } from "@/prompts/core/navigable";
+import {
+  getJobQueueIncompatibility,
+  type Backend,
+  type JobQueue,
+  type Runtime,
+  type ServerDeploy,
+  type WebDeploy,
+} from "@/types";
 
 type DeploymentOption = {
   value: ServerDeploy;
@@ -43,6 +49,7 @@ export async function getServerDeploymentChoice(
   runtime?: Runtime,
   backend?: Backend,
   _webDeploy?: WebDeploy,
+  jobQueue?: JobQueue,
 ) {
   if (deployment !== undefined) return deployment;
 
@@ -59,7 +66,7 @@ export async function getServerDeploymentChoice(
     return "cloudflare";
   }
 
-  const options = getServerDeploymentOptions(runtime);
+  const options = getServerDeploymentOptions(runtime, jobQueue);
 
   const response = await navigableSelect<ServerDeploy>({
     message: "Select server deployment",
@@ -72,8 +79,11 @@ export async function getServerDeploymentChoice(
   return response;
 }
 
-export function getServerDeploymentOptions(runtime?: Runtime): DeploymentOption[] {
-  return [
+export function getServerDeploymentOptions(
+  runtime?: Runtime,
+  jobQueue?: JobQueue,
+): DeploymentOption[] {
+  const options = [
     { value: "none", label: "None", hint: "Skip server deployment setup" },
     { value: "railway", label: "Railway", hint: "Deploy with Railway cloud development platform" },
     { value: "fly", label: "Fly.io", hint: "Deploy globally with Fly.io edge platform" },
@@ -90,7 +100,11 @@ export function getServerDeploymentOptions(runtime?: Runtime): DeploymentOption[
     { value: "docker", label: "Docker", hint: "Container-based deployment with Dockerfile" },
     { value: "sst", label: "SST", hint: "Deploy to AWS with SST (Serverless Stack)" },
     { value: "vercel", label: "Vercel", hint: "Deploy to Vercel's edge network with zero config" },
-  ];
+  ] satisfies DeploymentOption[];
+  return options.filter(
+    (option) =>
+      !getJobQueueIncompatibility(jobQueue, { serverDeploy: option.value }, { partial: true }),
+  );
 }
 
 export async function getServerDeploymentToAdd(

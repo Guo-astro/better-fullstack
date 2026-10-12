@@ -865,11 +865,10 @@ describe("generated server production start", () => {
         ).toBe(true);
       }
       if (serverDeploy === "fly") {
-        // fly deploy --config apps/server/fly.toml resolves the Dockerfile next to fly.toml.
         const dockerfile = read(generated, "apps/server/fly.toml").match(
           /dockerfile = "([^"]+)"/,
         )![1]!;
-        expect(generated.files.has(posix.join("apps/server", dockerfile))).toBe(true);
+        expect(generated.files.has(dockerfile)).toBe(true);
       }
       if (serverDeploy === "railway") {
         const railway = read(generated, "apps/server/railway.toml");

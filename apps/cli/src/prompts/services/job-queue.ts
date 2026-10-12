@@ -8,6 +8,7 @@ import {
   type Database,
   type JobQueue,
   type Runtime,
+  type ServerDeploy,
 } from "@/types";
 
 const JOB_QUEUE_PROMPT_OPTIONS = [
@@ -58,6 +59,7 @@ type JobQueuePromptContext = {
   backend?: Backend;
   runtime?: Runtime;
   database?: Database;
+  serverDeploy?: ServerDeploy;
 };
 
 export function resolveJobQueuePrompt(
@@ -96,8 +98,9 @@ export async function getJobQueueChoice(
   backend?: Backend,
   runtime?: Runtime,
   database?: Database,
+  serverDeploy?: ServerDeploy,
 ) {
-  const resolution = resolveJobQueuePrompt({ jobQueue, backend, runtime, database });
+  const resolution = resolveJobQueuePrompt({ jobQueue, backend, runtime, database, serverDeploy });
   if (!resolution.shouldPrompt) {
     return resolution.autoValue ?? "none";
   }

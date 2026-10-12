@@ -76,7 +76,7 @@ const GENERATED = [
     runtime: "node",
     dependency: "weaviate-client",
     client: ["weaviate.connectToWeaviateCloud(", "weaviate.connectToLocal("],
-    upsert: ".data.insertMany(",
+    upsert: "collection.data.replace(object)",
     query: ".query.nearVector(vector",
     env: ["WEAVIATE_URL=http://localhost:8080", "WEAVIATE_API_KEY="],
     readme: "## Vector database (Weaviate)",

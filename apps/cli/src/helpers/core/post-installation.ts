@@ -1072,7 +1072,7 @@ function getGoJobAndMigrationGuidance(
       [
         "Set DATABASE_URL to PostgreSQL; the server runs River's rivermigrate step before starting the client",
         'Run the River migration on its own: go run github.com/riverqueue/river/cmd/river@v0.49.0 migrate-up --database-url "$DATABASE_URL"',
-        'Enqueue a job: curl -X POST http://localhost:8080/api/jobs/welcome-email -d \'{"email":"you@example.com"}\'',
+        "Mount jobRunner.EnqueueWelcomeEmail from internal/jobs/river.go in an authenticated application route to enqueue jobs",
       ],
     ]);
   }
