@@ -2757,6 +2757,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "python:--python-caching": m.docsCliSummaryPythonPythonCaching,
   "python:--python-realtime": m.docsCliSummaryPythonPythonRealtime,
   "python:--python-observability": m.docsCliSummaryPythonPythonObservability,
+  "python:--python-logging": m.docsCliSummaryPythonPythonLogging,
   "python:--python-cli": m.docsCliSummaryPythonPythonCli,
   "python:--python-cloud-sdk": m.docsCliSummaryPythonPythonCloudSdk,
   "python:--python-http-client": m.docsCliSummaryPythonPythonHttpClient,

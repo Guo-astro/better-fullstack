@@ -11990,7 +11990,7 @@ export default nextConfig;
     "@trpc/server": "catalog:",
     "@trpc/client": "catalog:",
     "@trpc/tanstack-react-query": "^11.19.0",
-    "@tanstack/react-query": "^5.104.0",
+    "@tanstack/react-query": "^5.104.1",
     "@clerk/nextjs": "catalog:",
     "lucide-react": "^1.21.0"
   },
@@ -12204,7 +12204,7 @@ export const trpc = createTRPCOptionsProxy<AppRouter>({
       "libsql": "^0.5.29",
       "@trpc/server": "^11.19.0",
       "@trpc/client": "^11.19.0",
-      "@clerk/nextjs": "^7.9.7"
+      "@clerk/nextjs": "^7.9.10"
     }
   },
   "scripts": {
@@ -12949,7 +12949,7 @@ export default defineConfig({
       "@orpc/client": "^1.15.4",
       "@orpc/openapi": "^1.15.4",
       "@orpc/zod": "^1.15.4",
-      "@clerk/tanstack-react-start": "^1.6.1"
+      "@clerk/tanstack-react-start": "^1.6.4"
     }
   },
   "scripts": {
@@ -20765,7 +20765,7 @@ fontWeight: "bold",
     "@react-navigation/native": "^7.4.1",
     "@react-navigation/native-stack": "^7.19.2",
     "@tanstack/react-form": "^1.33.0",
-    "@tanstack/react-query": "^5.104.0",
+    "@tanstack/react-query": "^5.104.1",
     "expo": "~56.0.23",
     "expo-constants": "~56.0.27",
     "expo-crypto": "~56.0.5",
@@ -21523,7 +21523,7 @@ registerRootComponent(App);
     "@gluestack-ui/themed": "~1.1.73",
     "@types/react-native": "0.73.0",
     "react-native-svg": "15.15.4",
-    "@tanstack/react-query": "^5.104.0",
+    "@tanstack/react-query": "^5.104.1",
     "expo": "~56.0.23",
     "expo-constants": "~56.0.27",
     "expo-device": "~56.0.4",

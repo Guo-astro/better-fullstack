@@ -1,13 +1,15 @@
 import { readVirtualFileContent } from "@test/support/virtual-tree-utils";
 import { describe, expect, it } from "bun:test";
 
-import { validateFullConfig } from "@/config/config-validation";
+import { validateFullConfig, validateGoExpansionConstraints } from "@/config/config-validation";
 import { createVirtual } from "@/index";
 import { planProjectOperation } from "@/operations/project-create";
 import { runWithContext } from "@/presentation/context";
+import { resolveDatabasePrompt } from "@/prompts/data/database";
 import {
   resolveGoMessageQueuePrompt,
   resolveGoMigrationsPrompt,
+  resolveGoWebFrameworkPrompt,
 } from "@/prompts/ecosystems/go-ecosystem";
 import { parseStackPartSpecs } from "@/types";
 
@@ -48,7 +50,41 @@ const RIVER_ROUTES = [
 ] as const;
 
 describe("Go background jobs", () => {
-  it("wires River's worker, client, migration, and enqueue route into every supported server", async () => {
+  it("defers unanswered dependencies while still rejecting explicitly invalid Go choices", () => {
+    expect(() =>
+      runWithContext({ silent: true }, () =>
+        validateGoExpansionConstraints({ ecosystem: "go", goMessageQueue: "river" }, true),
+      ),
+    ).not.toThrow();
+    expect(() =>
+      runWithContext({ silent: true }, () =>
+        validateGoExpansionConstraints(
+          { ecosystem: "go", goMessageQueue: "river", database: "sqlite" },
+          true,
+        ),
+      ),
+    ).toThrow("River requires PostgreSQL");
+    expect(() =>
+      runWithContext({ silent: true }, () =>
+        validateGoExpansionConstraints({ ecosystem: "go", goMigrations: "goose" }, true),
+      ),
+    ).not.toThrow();
+  });
+
+  it("lets an explicit River selection constrain the remaining prompts", () => {
+    expect(
+      resolveDatabasePrompt({ backend: "none", go: { goMessageQueue: "river" } }).options.map(
+        (option) => option.value,
+      ),
+    ).toEqual(["postgres"]);
+    expect(
+      resolveGoWebFrameworkPrompt(undefined, {
+        goMessageQueue: "river",
+        database: "postgres",
+      }).options.map((option) => option.value),
+    ).toEqual(["gin", "echo", "fiber", "chi", "stdlib"]);
+  });
+  it("starts River workers without exposing an unauthenticated producer route", async () => {
     for (const [goWebFramework, route] of RIVER_ROUTES) {
       const [main, river, goMod] = await generatedFiles(
         { goWebFramework, goMessageQueue: "river" },
@@ -57,7 +93,7 @@ describe("Go background jobs", () => {
         "go.mod",
       );
       expect(main).toContain("jobRunner, err := jobs.Start()");
-      expect(main).toContain(route);
+      expect(main).not.toContain(route);
       expect(river).toContain("river.AddWorker(workers, &WelcomeEmailWorker{})");
       expect(river).toContain("migrator.Migrate(ctx, rivermigrate.DirectionUp, nil)");
       expect(river).toContain("r.client.Insert(req.Context(), args, nil)");
@@ -133,7 +169,9 @@ describe("Go migrations", () => {
       expect(command).toContain(driverImport);
       expect(command).toContain(open);
       expect(command).toContain('os.Getenv("DATABASE_URL")');
-      expect(command).toContain('goose.RunContext(context.Background(), command, db, ".", args...)');
+      expect(command).toContain(
+        'goose.RunContext(context.Background(), command, db, ".", args...)',
+      );
       expect(migration).toContain("-- +goose Up");
       expect(migration).toContain("-- +goose Down");
       expect(migration).toContain(sql);
@@ -238,11 +276,16 @@ describe("Go job and migration rejections", () => {
       expect(graphResult.success).toBe(false);
       expect(graphResult.error).toContain(reason);
 
-      await expect(planProjectOperation.invoke({ ecosystem: "go", part: [...part] })).rejects.toThrow(
-        reason,
-      );
       await expect(
-        planProjectOperation.invoke({ ecosystem: "go", goWebFramework: "gin", goOrm: "gorm", ...flat }),
+        planProjectOperation.invoke({ ecosystem: "go", part: [...part] }),
+      ).rejects.toThrow(reason);
+      await expect(
+        planProjectOperation.invoke({
+          ecosystem: "go",
+          goWebFramework: "gin",
+          goOrm: "gorm",
+          ...flat,
+        }),
       ).rejects.toThrow(reason);
     }
   });

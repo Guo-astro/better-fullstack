@@ -585,6 +585,7 @@
   "docsCliSummaryPythonPythonCaching": "Python caching.",
   "docsCliSummaryPythonPythonRealtime": "Python realtime.",
   "docsCliSummaryPythonPythonObservability": "Python observability.",
+  "docsCliSummaryPythonPythonLogging": "Python logging library.",
   "docsCliSummaryPythonPythonCli": "Python CLI tooling.",
   "docsCliSummaryPythonPythonCloudSdk": "Python cloud SDK.",
   "docsCliSummaryPythonPythonHttpClient": "Python HTTP client.",

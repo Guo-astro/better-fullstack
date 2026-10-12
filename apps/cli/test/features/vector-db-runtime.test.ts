@@ -8,11 +8,18 @@ type VectorRecord = {
   id: string;
   vector: number[];
   attributes?: Record<string, string | number | boolean>;
+  properties?: Record<string, string | number | boolean>;
 };
 
 type VectorModule = {
   getVectorClient: () => Promise<unknown>;
   upsertVectors: (records: VectorRecord[], name?: string) => Promise<void>;
+};
+
+type WeaviateObject = {
+  id: string;
+  vectors: number[];
+  properties: Record<string, string | number | boolean>;
 };
 
 async function loadVectorModule(
@@ -68,7 +75,10 @@ for (const vectorDb of ["weaviate", "lancedb"] as const) {
   });
 }
 
-function weaviateBindings(insertMany: (rows: VectorRecord[]) => Promise<unknown>) {
+function weaviateBindings(
+  insertMany: (rows: WeaviateObject[]) => Promise<unknown>,
+  records = new Map<string, WeaviateObject>(),
+) {
   const collections = new Set<string>();
   return {
     generateUuid5: (id: string) => id,
@@ -82,7 +92,31 @@ function weaviateBindings(insertMany: (rows: VectorRecord[]) => Promise<unknown>
             if (collections.has(name)) throw new Error("already exists");
             collections.add(name);
           },
-          get: () => ({ data: { insertMany } }),
+          get: () => ({
+            data: {
+              insertMany,
+              exists: async (id: string) => records.has(id),
+              insert: async (row: WeaviateObject) => {
+                if (records.has(row.id)) throw new Error("duplicate object");
+                const result = await insertMany([row]);
+                if (
+                  result &&
+                  typeof result === "object" &&
+                  "hasErrors" in result &&
+                  result.hasErrors
+                ) {
+                  throw new Error("Rejected vector", {
+                    cause: "errors" in result ? result.errors : undefined,
+                  });
+                }
+                records.set(row.id, row);
+              },
+              replace: async (row: WeaviateObject) => {
+                if (!records.has(row.id)) throw new Error("object not found");
+                records.set(row.id, row);
+              },
+            },
+          }),
         },
       }),
     },
@@ -159,4 +193,22 @@ test("Weaviate write failures retain the server error and failed record", async 
     .catch((failure: unknown) => failure);
   expect(error).toBeInstanceOf(Error);
   expect((error as Error).cause).toEqual(errors);
+});
+
+test("Weaviate upserts replace the embedding and properties of an existing record", async () => {
+  const records = new Map<string, WeaviateObject>();
+  const module = await loadVectorModule(
+    "weaviate",
+    weaviateBindings(async () => ({ hasErrors: false }), records),
+  );
+  await module.upsertVectors([
+    { id: "document-1", vector: [1, 0], properties: { obsolete: true } },
+  ]);
+  await module.upsertVectors([{ id: "document-1", vector: [0, 1], properties: { updated: true } }]);
+  expect(records.size).toBe(1);
+  expect(records.get("document-1")).toEqual({
+    id: "document-1",
+    vectors: [0, 1],
+    properties: { updated: true, recordId: "document-1" },
+  });
 });

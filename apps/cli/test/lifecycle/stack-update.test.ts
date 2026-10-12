@@ -39,6 +39,7 @@ import {
 import { applyPartRemoval, planPartRemoval } from "@/helpers/core/remove-handler";
 import {
   applyStackUpdate,
+  mergePackageJson,
   planStackUpdate,
   SUPPORTED_STACK_UPDATE_KEYS,
 } from "@/helpers/core/stack-update";
@@ -52,6 +53,34 @@ import { MCP_STACK_UPDATE_SCHEMA } from "@/mcp";
 import { getCapabilityAdditions } from "@/prompts/developer/addons";
 
 const TEMP_ROOTS: string[] = [];
+
+describe("package runtime requirements", () => {
+  it("adds an engine requirement while preserving user-owned package keys", () => {
+    const baseline = JSON.stringify({ name: "server" });
+    const result = mergePackageJson(
+      JSON.stringify({ name: "server", private: true }),
+      baseline,
+      JSON.stringify({ name: "server", engines: { node: ">=22.12.0" } }),
+    );
+    expect(result.blockers).toEqual([]);
+    expect(JSON.parse(result.content ?? "{}")).toEqual({
+      name: "server",
+      private: true,
+      engines: { node: ">=22.12.0" },
+    });
+    expect(result.dependencyChanges).toEqual({});
+  });
+
+  it("blocks an engine change that conflicts with the user's runtime selection", () => {
+    const result = mergePackageJson(
+      JSON.stringify({ engines: { node: ">=24" } }),
+      JSON.stringify({ engines: { node: ">=20" } }),
+      JSON.stringify({ engines: { node: ">=22.12.0" } }),
+    );
+    expect(result.blockers).toContain("engines.node");
+    expect(result.content).toBeUndefined();
+  });
+});
 
 async function makeTempRoot(prefix: string): Promise<string> {
   const root = await mkdtemp(join(tmpdir(), prefix));
@@ -3321,7 +3350,10 @@ describe("stack update planner", () => {
         ],
         assertions: [
           { path: "apps/server/mix.exs", content: ":guardian" },
-          { path: "apps/server/config/config.exs", content: "config :app,\n       App.Auth.Guardian" },
+          {
+            path: "apps/server/config/config.exs",
+            content: "config :app,\n       App.Auth.Guardian",
+          },
           { path: "apps/server/lib/app/auth/guardian.ex", content: "use Guardian, otp_app: :app" },
           {
             path: "apps/server/lib/app_web/controllers/token_controller.ex",

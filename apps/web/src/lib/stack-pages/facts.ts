@@ -281,6 +281,16 @@ export function deriveCompatibilityConstraints(
   seed: PublishedStackSeed,
 ): string[] {
   const constraints: string[] = [];
+  if (
+    selection.ecosystem === "java" &&
+    selection.javaWebFramework === "spring-boot" &&
+    selection.javaOrm === "spring-data-jpa" &&
+    selection.database === "postgres"
+  ) {
+    constraints.push(
+      "The generated local datasource uses H2 in PostgreSQL compatibility mode. Before deploying to PostgreSQL, add its JDBC driver and configure spring.datasource.url, username, password, and driver-class-name.",
+    );
+  }
   for (const key of Object.keys(seed.selection) as StackSelectionKey[]) {
     const category = categoryForKey(key);
     const value = selection[key];

@@ -40,6 +40,8 @@ import structlog
 {{#if (eq pythonWebFramework "aiohttp")}}
 from aiohttp import web
 from aiohttp.typedefs import Handler
+
+REQUEST_ID_KEY = web.AppKey("bfs_request_id", str)
 {{/if}}
 {{#if (eq pythonWebFramework "django")}}
 from django.utils.log import log_response
@@ -442,8 +444,6 @@ class DevServerRequestHandler(WSGIRequestHandler):
 
 
 def request_logging_middleware(get_response: Callable[[Any], Any]) -> Callable[[Any], Any]:
-    """Django middleware that logs each request once and tags its log lines with a request id."""
-
     def middleware(request: Any) -> Any:
         request_id = _request_id(request.headers.get(REQUEST_ID_HEADER))
         started = time.perf_counter()
@@ -451,8 +451,6 @@ def request_logging_middleware(get_response: Callable[[Any], Any]) -> Callable[[
             response = get_response(request)
             response[REQUEST_ID_HEADER] = request_id
             if response.status_code >= 400:
-                # Django logs error responses after the middleware returns, without the
-                # request id; logging them here marks them so Django skips its copy.
                 log_response(
                     "%s: %s",
                     response.reason_phrase,
@@ -460,7 +458,59 @@ def request_logging_middleware(get_response: Callable[[Any], Any]) -> Callable[[
                     response=response,
                     request=request,
                 )
-            _log_request(request.method or "", request.path, response.status_code, started)
+        status_code = response.status_code
+        logged = False
+
+        def log_completion() -> None:
+            nonlocal logged
+            if not logged:
+                logged = True
+                _log_request(request.method or "", request.path, status_code, started)
+
+        if response.streaming:
+            content = response.streaming_content
+            close_response = response.close
+
+            def close() -> None:
+                with request_context(request_id):
+                    try:
+                        close_response()
+                    finally:
+                        log_completion()
+
+            response.close = close
+            if response.is_async:
+                async def async_stream() -> Any:
+                    nonlocal status_code
+                    with request_context(request_id):
+                        try:
+                            async for chunk in content:
+                                yield chunk
+                        except Exception:
+                            status_code = 500
+                            logger.exception("Streaming response failed")
+                            raise
+                        finally:
+                            log_completion()
+
+                response.streaming_content = async_stream()
+            else:
+                def stream() -> Generator[bytes, None, None]:
+                    nonlocal status_code
+                    with request_context(request_id):
+                        try:
+                            yield from content
+                        except Exception:
+                            status_code = 500
+                            logger.exception("Streaming response failed")
+                            raise
+                        finally:
+                            log_completion()
+
+                response.streaming_content = stream()
+        else:
+            with request_context(request_id):
+                log_completion()
         return response
 
     return middleware
@@ -468,10 +518,17 @@ def request_logging_middleware(get_response: Callable[[Any], Any]) -> Callable[[
 {{#if (eq pythonWebFramework "aiohttp")}}
 
 
+async def add_request_id_header(request: web.Request, response: web.StreamResponse) -> None:
+    request_id = request.get(REQUEST_ID_KEY)
+    if request_id is not None:
+        response.headers[REQUEST_ID_HEADER] = request_id
+
+
 @web.middleware
 async def request_logging_middleware(request: web.Request, handler: Handler) -> web.StreamResponse:
     """Log each request once and tag its log lines with a request id."""
     request_id = _request_id(request.headers.get(REQUEST_ID_HEADER))
+    request[REQUEST_ID_KEY] = request_id
     status_code = 500
     started = time.perf_counter()
     with request_context(request_id):

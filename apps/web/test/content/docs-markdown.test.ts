@@ -14,7 +14,7 @@ it("serves request-local Markdown without sharing cached translations", async ()
     configFile: false,
     root: webRoot,
     logLevel: "silent",
-    ssr: { noExternal: ["yaml"] },
+    ssr: { noExternal: true },
     resolve: { alias: { "@": path.join(webRoot, "src") } },
     plugins: [
       contentMetaPlugin(),
@@ -33,13 +33,14 @@ it("serves request-local Markdown without sharing cached translations", async ()
             import { localizedDocsRawMdxLoaders } from "virtual:localized-content";
             import { parse } from "yaml";
             const cases = [
-              ["ai/mcp", "de", "MCP-Server"],
-              ["ai/mcp", "en", "MCP Server"],
-              ["", "de", "Better Fullstack"],
-              ["cli", "de", "CLI"],
+              ["ai/mcp", "de", "MCP Server", "en"],
+              ["ai/mcp", "en", "MCP Server", "en"],
+              ["", "de", "Better Fullstack", "de"],
+              ["cli", "de", "CLI", "en"],
+              ["cli/create", "de", "Befehl create", "de"],
             ];
             export async function verify() {
-              await Promise.all(cases.map(async ([slug, locale, title]) => {
+              await Promise.all(cases.map(async ([slug, locale, title, contentLanguage]) => {
                 const request = new Request("https://example.test/docs/" + slug + ".md", {
                   headers: { Cookie: "BFS_LOCALE=" + locale, "Accept-Language": "fr" },
                 });
@@ -48,13 +49,13 @@ it("serves request-local Markdown without sharing cached translations", async ()
                 if (response.status !== 200 || !source.includes(title)) {
                   throw new Error("Missing localized Markdown for " + slug + ": " + locale);
                 }
-                if (response.headers.get("content-language") !== locale ||
+                if (response.headers.get("content-language") !== contentLanguage ||
                     response.headers.get("cache-control") !== "private, no-store" ||
                     response.headers.get("vary") !== "Cookie, Accept-Language") {
                   throw new Error("Incorrect localized response headers");
                 }
-                if (locale === "de" && slug === "ai/mcp" && !source.includes("Mit einem Befehl verbinden")) {
-                  throw new Error("German Markdown returned the English body");
+                if (response.headers.get("link") !== "<https://better-fullstack.dev/docs" + (slug ? "/" + slug : "") + '>; rel="canonical"') {
+                  throw new Error("Markdown response lost its canonical URL");
                 }
                 const filePath = "/content/docs/" + (slug === "" ? "index" : slug === "cli" ? "cli/index" : slug) + ".mdx";
                 const canonical = docsMeta.find(page => page.filePath === filePath).frontmatter;
@@ -64,7 +65,7 @@ it("serves request-local Markdown without sharing cached translations", async ()
                     throw new Error("Localized Markdown lost canonical " + key + " for " + slug);
                   }
                 }
-                if (locale !== "en" && source !== await localizedDocsRawMdxLoaders[locale + ":" + filePath]()) {
+                if (contentLanguage !== "en" && source !== await localizedDocsRawMdxLoaders[locale + ":" + filePath]()) {
                   throw new Error("Markdown response differs from Copy MD source");
                 }
               }));

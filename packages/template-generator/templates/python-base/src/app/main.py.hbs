@@ -26,7 +26,7 @@ from app.logging_config import DevServerRequestHandler, RequestLoggingMiddleware
 {{else if (or (eq pythonWebFramework "fastapi") (eq pythonWebFramework "starlette") (eq pythonWebFramework "litestar"))}}
 from app.logging_config import RequestLoggingMiddleware, configure_logging
 {{else if (eq pythonWebFramework "aiohttp")}}
-from app.logging_config import configure_logging, request_logging_middleware
+from app.logging_config import configure_logging, request_logging_middleware{{#if (eq pythonWebFramework "aiohttp")}}, add_request_id_header{{/if}}
 {{else}}
 from app.logging_config import configure_logging
 {{/if}}
@@ -1615,6 +1615,9 @@ async def metrics(request: web.Request) -> web.Response:
 def create_app() -> web.Application:
     """Build the aiohttp application and register routes."""
     application = web.Application({{#if (ne pythonLogging "none")}}middlewares=[request_logging_middleware]{{/if}})
+{{#if (ne pythonLogging "none")}}
+    application.on_response_prepare.append(add_request_id_header)
+{{/if}}
     application.router.add_get("/", index)
     application.router.add_get("/health", health)
 {{#if (eq pythonObservability "prometheus-client")}}

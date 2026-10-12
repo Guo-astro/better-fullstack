@@ -137,7 +137,8 @@ describe("programmatic stack pages", () => {
   it("includes selected Java libraries in the derived page facts", () => {
     const seed = PUBLISHED_STACK_SEEDS.find(
       (candidate) =>
-        "javaLibraries" in candidate.selection && candidate.selection.javaLibraries.includes("flyway"),
+        "javaLibraries" in candidate.selection &&
+        candidate.selection.javaLibraries.includes("flyway"),
     );
     if (!seed || !("javaLibraries" in seed.selection)) throw new Error("Missing Flyway seed");
     const { canonicalParts } = deriveSeedFacts(seed.slug);
@@ -151,6 +152,20 @@ describe("programmatic stack pages", () => {
   it("keeps copied commands faithful to the selected database", () => {
     for (const page of pages.filter((candidate) => candidate.ecosystem !== "typescript")) {
       expect(page.command).toContain(`--database ${page.selection.database}`);
+    }
+  });
+
+  it("discloses the local H2 datasource before deploying Spring starters to PostgreSQL", () => {
+    const springPages = pages.filter(
+      (page) =>
+        page.selection.javaWebFramework === "spring-boot" &&
+        page.selection.javaOrm === "spring-data-jpa" &&
+        page.selection.database === "postgres",
+    );
+    expect(springPages.length).toBeGreaterThan(0);
+    for (const page of springPages) {
+      expect(page.compatibility.constraints.join(" ")).toContain("local datasource uses H2");
+      expect(page.compatibility.constraints.join(" ")).toContain("JDBC driver");
     }
   });
 

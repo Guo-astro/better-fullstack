@@ -756,6 +756,24 @@ describe("stack graph", () => {
     );
   });
 
+  it("rejects external vector databases owned by Convex", () => {
+    for (const toolId of ["weaviate", "pgvector", "pinecone"]) {
+      expect(
+        validateStackParts(
+          parseStackPartSpecs([
+            "backend:typescript:convex",
+            `backend.vectorDb:typescript:${toolId}`,
+          ]),
+        ).issues,
+      ).toContainEqual(
+        expect.objectContaining({
+          code: "INCOMPATIBLE_OWNER_TOOL",
+          toolId,
+        }),
+      );
+    }
+  });
+
   it("rejects Nango graph selections that cannot generate its Node SDK", () => {
     const unsupportedSpecs = [
       ["backend:typescript:none", "backend.integrations:typescript:nango"],
@@ -1785,6 +1803,7 @@ describe("stack graph structural round-trip (phase 0)", () => {
       "graphql-codegen": { api: "graphql-yoga" },
       "apollo-client": { api: "graphql-yoga" },
       "openapi-typescript": { api: "openapi" },
+      "shadcn-lint": { addons: ["eslint", "prettier", "shadcn-lint"], cssFramework: "tailwind" },
       electron: { frontend: ["react-vite"] },
       capacitor: { frontend: ["react-vite"] },
     };

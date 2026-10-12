@@ -101,7 +101,12 @@ function buildStack(
   const { stackMode: _mode, stackPartSpecs: _specs, ...defaults } = cloneDefaultStackSelection();
   const applySelections = (stack: CompatibilityInput) =>
     selections.reduce((next, { category, id }) => select(next, category, id), stack);
-  const chosen = applySelections({ ...defaults, ecosystem });
+  const activeCategories = new Set(ecosystemCategories(ecosystem));
+  const ecosystemDefaults = CATEGORY_ORDER.reduce(
+    (stack, category) => (activeCategories.has(category) ? stack : select(stack, category, "none")),
+    { ...defaults, ecosystem } as CompatibilityInput,
+  );
+  const chosen = applySelections(ecosystemDefaults);
   const { adjustedStack } = analyzeStackCompatibility(chosen);
   return applySelections(adjustedStack ? { ...chosen, ...adjustedStack } : chosen);
 }

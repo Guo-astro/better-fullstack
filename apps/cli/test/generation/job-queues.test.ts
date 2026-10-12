@@ -491,36 +491,41 @@ describe("generated job queues", () => {
   ] as const;
 
   for (const { jobQueue, runtime, command } of builtWorkers) {
-    test(`${jobQueue} builds its worker into the server image and runs it from there`, async () => {
-      const result = await createVirtual({
-        projectName: `jobs-built-${jobQueue}`,
-        backend: "hono",
-        runtime,
-        database: "postgres",
-        orm: "drizzle",
-        jobQueue,
-        addons: ["docker-compose"],
-      });
-      expect(result.error).toBeUndefined();
-      const root = result.tree!.root;
-      const tsdown = readVirtualFileContent(root, "apps/server/tsdown.config.ts");
-      const dockerfile = readVirtualFileContent(root, "apps/server/Dockerfile");
-      const compose = readVirtualFileContent(root, "docker-compose.yml");
-      const readme = readVirtualFileContent(root, "README.md");
-      const pkg: ServerPackageJson = JSON.parse(
-        readVirtualFileContent(root, "apps/server/package.json"),
-      );
+    for (const deployment of ["addon", "server"] as const) {
+      test(`${jobQueue} builds its worker for Docker ${deployment} deployment`, async () => {
+        const result = await createVirtual({
+          projectName: `jobs-built-${jobQueue}`,
+          backend: "hono",
+          runtime,
+          database: "postgres",
+          orm: "drizzle",
+          jobQueue,
+          addons: deployment === "addon" ? ["docker-compose"] : [],
+          serverDeploy: deployment === "server" ? "docker" : "none",
+        });
+        expect(result.error).toBeUndefined();
+        const root = result.tree!.root;
+        const tsdown = readVirtualFileContent(root, "apps/server/tsdown.config.ts");
+        const dockerfile = readVirtualFileContent(root, "apps/server/Dockerfile");
+        const compose = readVirtualFileContent(root, "docker-compose.yml");
+        const readme = readVirtualFileContent(root, "README.md");
+        const pkg: ServerPackageJson = JSON.parse(
+          readVirtualFileContent(root, "apps/server/package.json"),
+        );
 
-      // tsdown emits each entry key under outDir, so this entry builds dist/jobs/worker.mjs.
-      expect(tsdown).toMatch(/['"]jobs\/worker['"]: ['"]\.\/src\/jobs\/worker\.ts['"]/);
-      expect(tsdown).toContain("outDir: './dist'");
-      // The image keeps the built dist next to package.json and runs from apps/server.
-      expect(dockerfile).toContain("COPY --from=builder /app/apps/server/dist ./apps/server/dist");
-      expect(dockerfile).toContain("WORKDIR /app/apps/server");
-      expect(pkg.scripts["jobs:worker:start"]).toBe(command.join(" "));
-      expect(compose).toContain("  worker:\n");
-      expect(compose).toContain(`command: ${JSON.stringify(command).replaceAll(",", ", ")}`);
-      expect(readme).toContain("jobs:worker:start");
-    });
+        // tsdown emits each entry key under outDir, so this entry builds dist/jobs/worker.mjs.
+        expect(tsdown).toMatch(/['"]jobs\/worker['"]: ['"]\.\/src\/jobs\/worker\.ts['"]/);
+        expect(tsdown).toContain("outDir: './dist'");
+        // The image keeps the built dist next to package.json and runs from apps/server.
+        expect(dockerfile).toContain(
+          "COPY --from=builder /app/apps/server/dist ./apps/server/dist",
+        );
+        expect(dockerfile).toContain("WORKDIR /app/apps/server");
+        expect(pkg.scripts["jobs:worker:start"]).toBe(command.join(" "));
+        expect(compose).toContain("  worker:\n");
+        expect(compose).toContain(`command: ${JSON.stringify(command).replaceAll(",", ", ")}`);
+        expect(readme).toContain("jobs:worker:start");
+      });
+    }
   }
 });

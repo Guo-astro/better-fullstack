@@ -63,18 +63,24 @@ export async function upsertVectors(
 ): Promise<void> {
   await ensureCollection(collectionName);
   const client = await getVectorClient();
-  const result = await client.collections.get(collectionName).data.insertMany(
-    records.map((record) => ({
+  const collection = client.collections.get(collectionName);
+  await Promise.all(records.map(async (record) => {
+    const object = {
       id: generateUuid5(record.id),
       properties: { ...record.properties, recordId: record.id },
       vectors: record.vector,
-    })),
-  );
-  if (result.hasErrors) {
-    throw new Error(`Weaviate rejected ${Object.keys(result.errors).length} vector(s)`, {
-      cause: result.errors,
-    });
-  }
+    };
+    if (await collection.data.exists(object.id)) {
+      await collection.data.replace(object);
+      return;
+    }
+    try {
+      await collection.data.insert(object);
+    } catch (error) {
+      if (!(await collection.data.exists(object.id))) throw error;
+      await collection.data.replace(object);
+    }
+  }));
 }
 
 export async function queryVectors(

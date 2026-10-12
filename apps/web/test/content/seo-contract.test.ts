@@ -114,6 +114,9 @@ describe("SEO contracts", () => {
     for (const comparison of COMPETITOR_COMPARISONS) {
       expect(xml).toContain(canonicalUrl(`/compare/${comparison.slug}`));
     }
+    expect(new Set(COMPETITOR_COMPARISONS.map((comparison) => comparison.slug)).size).toBe(
+      COMPETITOR_COMPARISONS.length,
+    );
     expect(xml).toContain(canonicalUrl("/docs/cli/create"));
     expect(xml).toContain(canonicalUrl("/guides/typescript/create-tanstack-start-project"));
     expect(xml).toContain(canonicalUrl("/stack/nextjs-hono-drizzle-better-auth"));
