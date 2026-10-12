@@ -76,7 +76,7 @@ function headingToParagraph(line: string): string {
 function normalizeProse(lines: string[]): string {
   return lines
     .join("\n")
-    .replace(HTML_COMMENT, "")
+    .replace(HTML_COMMENT, " ")
     .replace(EM_DASH, "-")
     .split("\n")
     .map((line) => {

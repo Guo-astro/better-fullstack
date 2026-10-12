@@ -242,6 +242,12 @@ describe("changelog page contract", () => {
     );
   });
 
+  it("does not assemble new HTML comment markers when removing a comment", async () => {
+    const source = "<!<!-- internal -->--><script>alert(1)</script>";
+    expect(normalizeReleaseNotes(source)).not.toContain("<!--");
+    expect(await renderReleaseNotes(source)).not.toContain("<script>");
+  });
+
   it("closes an unterminated fence before the next release section", () => {
     expect(normalizeReleaseNotes("````text\n{name}\n```\n  ")).toBe(
       "````text\n{name}\n```\n  \n````",
