@@ -3,6 +3,7 @@ import { describe, expect, it } from "bun:test";
 import type { StackSelectionInput } from "@/stack/stack-translation";
 
 import { isToolingOverlayPart } from "@/capabilities/tooling-capabilities";
+import { validateStackParts } from "@/stack/stack-graph";
 import {
   patchGraphScopedSelections,
   projectGraphScopedSelections,
@@ -163,6 +164,31 @@ describe("stack selection translation", () => {
     expect(command).not.toContain("frontend.webMcp:typescript:enabled");
     expect(config.webMcp).toBe("none");
     expect(config.stackParts?.some((part) => part.role === "webMcp")).toBe(false);
+  });
+
+  it("puts CLI graph flags on the same owners as the builder", () => {
+    const config = cliInputToProjectConfigPartial({
+      part: [
+        "frontend:typescript:tanstack-router",
+        "backend:typescript:hono",
+        "backend:java:spring-boot",
+      ],
+      validation: "valibot",
+      testing: "vitest",
+      javaLanguage: "kotlin",
+    });
+
+    const specs = config.stackParts?.map((part) => {
+      const owner = config.stackParts?.find((candidate) => candidate.id === part.ownerPartId);
+      return owner
+        ? `${owner.role}:${owner.ecosystem}.${part.role}:${part.ecosystem}:${part.toolId}`
+        : `${part.role}:${part.ecosystem}:${part.toolId}`;
+    });
+
+    expect(specs).toContain("backend:typescript.validation:typescript:valibot");
+    expect(specs).toContain("backend:typescript.testing:typescript:vitest");
+    expect(specs).toContain("backend:java.language:java:kotlin");
+    expect(validateStackParts(config.stackParts ?? []).issues).toEqual([]);
   });
 
   it("promotes explicit CLI graph feature flags into scoped stack parts", () => {
