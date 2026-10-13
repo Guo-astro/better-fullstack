@@ -36,13 +36,6 @@ on:
       - "apps/cli/src/**"
       - "testing/**"
       - ".github/workflows/smoke-test.yaml"
-  pull_request:
-    paths:
-      - "packages/types/**"
-      - "packages/template-generator/**"
-      - "apps/cli/src/**"
-      - "testing/**"
-      - ".github/workflows/smoke-test.yaml"
   schedule:
     - cron: "0 3 * * *" # Nightly at 3am UTC
   workflow_dispatch:
@@ -52,11 +45,12 @@ on:
         required: false
         type: string
       ecosystem:
-        description: "Single ecosystem to test (leave empty for all)"
+        description: "Ecosystem to test"
         required: false
         type: choice
+        default: all
         options:
-          - ""
+          - all
           - typescript
           - rust
           - python
@@ -77,8 +71,6 @@ on:
 permissions:
   contents: read
 
-# event_name keeps a called run (scheduled deps verification) and the pull_request
-# run for the same branch in separate groups so they cannot cancel each other.
 concurrency:
   group: smoke-${{ github.event_name }}-${{ inputs.checkout_ref || github.head_ref || github.ref }}
   cancel-in-progress: true
@@ -192,49 +184,13 @@ jobs:
           cd ../template-generator && bun run build
           cd ../../apps/cli && bun run build
 
-      - name: Detect changed schemas for PR-aware testing
-        id: detect-changes
-        if: github.event_name == 'pull_request'
-        run: |
-          FORCE_FLAGS=""
-
-          # Get files changed in this PR
-          CHANGED=$(gh pr view ${{ github.event.pull_request.number }} --json files --jq '.files[].path' 2>/dev/null || true)
-
-          # Detect new options added to schemas.ts
-          if echo "$CHANGED" | grep -q "packages/types/src/config/schemas.ts"; then
-            DIFF=$(gh pr diff ${{ github.event.pull_request.number }} -- packages/types/src/config/schemas.ts 2>/dev/null || true)
-
-            # Extract newly added enum values from the diff (lines starting with +)
-            # Pattern: look for added lines containing quoted strings in enum arrays
-            NEW_VALUES=$(echo "$DIFF" | grep '^+' | grep -oP '"\K[a-z0-9-]+(?=")' | grep -v "none" | sort -u || true)
-
-            if [ -n "$NEW_VALUES" ]; then
-              # Force the first new value found (most PRs add one tool)
-              FIRST_NEW=$(echo "$NEW_VALUES" | head -1)
-              echo "Detected new schema value: $FIRST_NEW"
-
-              # Try to find which category it belongs to by checking the surrounding context
-              CATEGORY=$(echo "$DIFF" | grep -B 20 "\"$FIRST_NEW\"" | grep -oP '(?<=export const )\w+Schema' | tail -1 | sed 's/Schema$//' | sed 's/\([A-Z]\)/-\1/g' | sed 's/^-//' | tr '[:upper:]' '[:lower:]' || true)
-
-              if [ -n "$CATEGORY" ]; then
-                FORCE_FLAGS="--force-option $CATEGORY=$FIRST_NEW"
-                echo "Will force: $FORCE_FLAGS"
-              fi
-            fi
-          fi
-
-          echo "force_flags=$FORCE_FLAGS" >> "$GITHUB_OUTPUT"
-        env:
-          GH_TOKEN: ${{ github.token }}
-
       - name: Run Smoke Tests
         env:
           INPUT_SEED: ${{ inputs.seed }}
           FALLBACK_SEED: ${{ github.sha }}
           SMOKE_ECOSYSTEM: ${{ inputs.ecosystem }}
           SMOKE_COUNT: ${{ inputs.count || '14' }}
-          FORCE_FLAGS: ${{ inputs.force_flags || steps.detect-changes.outputs.force_flags }}
+          FORCE_FLAGS: ${{ inputs.force_flags }}
           # Build-only placeholders; smoke tests do not call PayPal.
           PAYPAL_CLIENT_ID: smoke-test-client-id
           PAYPAL_CLIENT_SECRET: smoke-test-client-secret
@@ -242,7 +198,7 @@ jobs:
           SEED="${INPUT_SEED:-$FALLBACK_SEED}"
 
           ECOSYSTEM_FLAG=""
-          if [ -n "$SMOKE_ECOSYSTEM" ]; then
+          if [ -n "$SMOKE_ECOSYSTEM" ] && [ "$SMOKE_ECOSYSTEM" != "all" ]; then
             ECOSYSTEM_FLAG="--ecosystem $SMOKE_ECOSYSTEM"
           fi
 

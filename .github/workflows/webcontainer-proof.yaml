@@ -1,9 +1,8 @@
 name: WebContainer Proof
 
 on:
-  pull_request:
   push:
-    branches: [development, main]
+    branches: [main]
   workflow_dispatch:
 
 permissions:

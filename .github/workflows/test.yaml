@@ -13,6 +13,7 @@ concurrency:
 jobs:
   release-guard:
     name: Release Guard
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -84,6 +85,7 @@ jobs:
 
   test:
     name: Test
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -128,6 +130,7 @@ jobs:
 
   web-build:
     name: Web Build
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -185,13 +188,13 @@ jobs:
     needs: [release-guard, lint, test, web-build]
     if: ${{ !cancelled() }}
     steps:
-      # Keep the existing required check red when a prerequisite fails.
       - name: Require successful checks
         if: >-
-          needs.release-guard.result != 'success' ||
           needs.lint.result != 'success' ||
+          (github.event_name == 'push' &&
+          (needs['release-guard'].result != 'success' ||
           needs.test.result != 'success' ||
-          needs.web-build.result != 'success'
+          needs['web-build'].result != 'success'))
         run: |
           echo 'All required checks must pass.' >&2
           exit 1

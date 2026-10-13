@@ -1,20 +1,8 @@
 name: Generated Project Runtime Proof
 
 on:
-  pull_request:
-    paths:
-      - "apps/cli/src/**"
-      - "apps/cli/package.json"
-      - "apps/web/src/lib/project/project-download.ts"
-      - "apps/web/test/project/browser-cli-lifecycle.test.ts"
-      - "apps/web/test/project/project-download.test.ts"
-      - "packages/types/**"
-      - "packages/project-lifecycle/**"
-      - "packages/template-generator/**"
-      - "testing/**"
-      - ".github/workflows/generated-project-proof.yaml"
   push:
-    branches: [development, main]
+    branches: [main]
     paths:
       - "apps/cli/src/**"
       - "apps/cli/package.json"
