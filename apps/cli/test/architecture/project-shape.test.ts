@@ -31,6 +31,8 @@ describe("project shape flags", () => {
     expect(shapeFlagsForEcosystem("frontend", "rust")).toEqual({
       ecosystem: "rust",
       rustWebFramework: "none",
+      rustOrm: "none",
+      database: "none",
     });
     expect(shapeFlagsForEcosystem("frontend", "dotnet")).toMatchObject({
       ecosystem: "dotnet",
@@ -75,6 +77,8 @@ describe("project shape flags", () => {
     expect(shapeFlagsForEcosystem("frontend", "rust", { withoutPrompts: true })).toEqual({
       ecosystem: "rust",
       rustWebFramework: "none",
+      rustOrm: "none",
+      database: "none",
       rustFrontend: "leptos",
     });
     expect(shapeFlagsForEcosystem("frontend", "typescript", { withoutPrompts: true })).toEqual(
@@ -119,6 +123,7 @@ describe("project shape flags", () => {
       "dotnetWebFramework",
       "orm",
       "runtime",
+      "rustOrm",
       "rustWebFramework",
     ]);
     expect(Object.keys(shapeControlledFlags("backend")).sort()).toEqual([
@@ -420,6 +425,22 @@ describe("project shape scaffolding", () => {
     expect(result.success).toBe(true);
     expect(result.projectConfig.rustFrontend).toBe("leptos");
     expect(result.projectConfig.rustWebFramework).toBe("none");
+    expect(result.projectConfig.rustOrm).toBe("none");
+    expect(result.projectConfig.database).toBe("none");
+  });
+
+  test("disabled Rust backend does not inherit the SeaORM default", async () => {
+    const result = await create("rust-no-backend", {
+      ...baseOptions,
+      ecosystem: "rust",
+      rustWebFramework: "none",
+      rustFrontend: "leptos",
+      yes: true,
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.projectConfig.rustOrm).toBe("none");
+    expect(result.projectConfig.database).toBe("none");
   });
 
   test("rejects shapes that contradict the rest of the input", async () => {

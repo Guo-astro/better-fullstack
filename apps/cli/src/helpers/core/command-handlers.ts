@@ -227,6 +227,11 @@ function getYesBaseConfig(flagConfig: Partial<ProjectConfig>): ProjectConfig {
     );
   }
 
+  // A disabled Rust backend must not inherit the SeaORM backend default.
+  if (flagConfig.ecosystem === "rust" && flagConfig.rustWebFramework === "none") {
+    return { ...baseConfig, rustOrm: "none", database: "none" };
+  }
+
   if (flagConfig.ecosystem !== "react-native") {
     return baseConfig;
   }
