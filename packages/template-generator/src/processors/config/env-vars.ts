@@ -2392,6 +2392,12 @@ export function processEnvVariables(vfs: VirtualFileSystem, config: ProjectConfi
         databaseVariable.value = `root:password@tcp(localhost:3306)/${config.projectName}?parseTime=true`;
       }
     }
+    if (config.ecosystem === "rust" && databaseVariable && database === "sqlite") {
+      // SeaORM and SQLx parse sqlite URLs, not the libSQL-style file: path.
+      if (config.rustOrm === "sea-orm" || config.rustOrm === "sqlx") {
+        databaseVariable.value = "sqlite://local.db?mode=rwc";
+      }
+    }
     if (!serverVars.some((variable) => variable.condition)) return;
     writeEnvFile(vfs, ".env.example", serverVars);
   } else if (backend === "self") {
