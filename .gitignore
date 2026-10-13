@@ -52,7 +52,6 @@ yarn.lock
 .smoke-manifest.json
 testing/.release-guard/
 testing/.published-package/
-testing/.tmp-scaffbench-*/
 reports/
 artifacts/demos/
 COMPARISON-PLAN.md
@@ -82,3 +81,4 @@ testing/llm-benchmarks/
 # Erlang/Elixir crash dumps (never commit)
 erl_crash.dump
 *.dump
+packages/deps-report.md
