@@ -747,7 +747,6 @@ export const PUBLISHED_STACK_SEEDS = [
       uiLibrary: "none",
       api: "orpc",
     },
-    guideUrl: "/guides/typescript/sveltekit-hono-drizzle",
     updated: ECOSYSTEM_EXPANSION_PUBLICATION_DATE,
   },
   {
