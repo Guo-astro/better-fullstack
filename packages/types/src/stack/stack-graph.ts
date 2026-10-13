@@ -190,6 +190,7 @@ import {
   hasTauriCompatibleFrontend,
   isBackendUtilsCompatibleBackend,
   isExampleAIAllowed,
+  isExampleTanstackShowcaseAllowed,
   isExampleChatSdkAllowed,
   requiresChatSdkVercelAIForExamples,
   UI_LIBRARY_COMPATIBILITY,
@@ -2714,6 +2715,20 @@ function createAddonCompatibilityIssue(
         role: part.role,
         toolId: part.toolId,
         message: "AI example is not compatible with the selected graph stack.",
+      });
+    }
+
+    if (
+      part.toolId === "tanstack-showcase" &&
+      !isExampleTanstackShowcaseAllowed(frontendTools as ProjectConfig["frontend"])
+    ) {
+      return createStackGraphIssue({
+        code: "INCOMPATIBLE_GRAPH_SELECTION",
+        partId: part.id,
+        role: part.role,
+        toolId: part.toolId,
+        message:
+          "The TanStack showcase example requires TanStack Router, TanStack Start, SolidStart, or TanStack Start (Solid).",
       });
     }
 

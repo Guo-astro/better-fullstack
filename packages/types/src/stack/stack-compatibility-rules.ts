@@ -490,6 +490,17 @@ export function getBetterAuthDatabaseIncompatibility(
   return null;
 }
 
+const EXAMPLE_TANSTACK_SHOWCASE_FRONTENDS: readonly Frontend[] = [
+  "tanstack-router",
+  "tanstack-start",
+  "solid-start",
+  "tanstack-start-solid",
+];
+
+export function isExampleTanstackShowcaseAllowed(frontends: Frontend[] = []) {
+  return frontends.some((frontend) => EXAMPLE_TANSTACK_SHOWCASE_FRONTENDS.includes(frontend));
+}
+
 export function isExampleAIAllowed(backend?: Backend, frontends: Frontend[] = []) {
   const includesSolid = frontends.includes("solid");
   const includesSolidStart =

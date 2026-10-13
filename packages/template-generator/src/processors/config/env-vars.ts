@@ -1820,7 +1820,7 @@ function buildServerVars(
     },
     {
       key: "QSTASH_WEBHOOK_URL",
-      value: "http://localhost:3000/api/jobs/welcome-email",
+      value: `${backend === "self" ? webOrigin : "http://localhost:3000"}/api/jobs/welcome-email`,
       condition: jobQueue === "upstash-qstash",
       comment: "Public URL QStash calls for the welcome email job (use a tunnel in development)",
     },

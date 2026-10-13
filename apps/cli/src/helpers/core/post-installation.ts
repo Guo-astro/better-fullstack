@@ -4,6 +4,7 @@ import {
   getOptionMetadata,
   hasJavaScriptWorkspaceRoot,
   isToolingOverlayOnly,
+  type OptionCategory,
 } from "@better-fullstack/types";
 import { consola } from "consola";
 import pc from "picocolors";
@@ -977,7 +978,7 @@ function displayRustInstructions(config: ProjectConfig & { depsInstalled: boolea
       warp: "Warp",
       salvo: "Salvo",
     };
-    output += `${pc.cyan("•")} Web Framework: ${frameworkNames[rustWebFramework] || rustWebFramework}\n`;
+    output += `${pc.cyan("•")} Web Framework: ${frameworkNames[rustWebFramework] ?? optionLabel("rustWebFramework", rustWebFramework)}\n`;
   }
 
   if (rustFrontend && rustFrontend !== "none") {
@@ -986,7 +987,7 @@ function displayRustInstructions(config: ProjectConfig & { depsInstalled: boolea
       dioxus: "Dioxus",
       yew: "Yew",
     };
-    output += `${pc.cyan("•")} Frontend: ${frontendNames[rustFrontend] || rustFrontend}\n`;
+    output += `${pc.cyan("•")} Frontend: ${frontendNames[rustFrontend] ?? optionLabel("rustFrontend", rustFrontend)}\n`;
   }
 
   if (rustOrm && rustOrm !== "none") {
@@ -998,7 +999,7 @@ function displayRustInstructions(config: ProjectConfig & { depsInstalled: boolea
       rusqlite: "rusqlite",
       "tokio-postgres": "tokio-postgres",
     };
-    output += `${pc.cyan("•")} Database: ${ormNames[rustOrm] || rustOrm}\n`;
+    output += `${pc.cyan("•")} Database: ${ormNames[rustOrm] ?? optionLabel("rustOrm", rustOrm)}\n`;
   }
 
   if (rustApi && rustApi !== "none") {
@@ -1007,7 +1008,7 @@ function displayRustInstructions(config: ProjectConfig & { depsInstalled: boolea
       tonic: "Tonic",
       jsonrpsee: "jsonrpsee",
     };
-    output += `${pc.cyan("•")} API: ${apiNames[rustApi] || rustApi}\n`;
+    output += `${pc.cyan("•")} API: ${apiNames[rustApi] ?? optionLabel("rustApi", rustApi)}\n`;
   }
 
   if (rustCli && rustCli !== "none") {
@@ -1015,7 +1016,7 @@ function displayRustInstructions(config: ProjectConfig & { depsInstalled: boolea
       clap: "Clap",
       ratatui: "Ratatui",
     };
-    output += `${pc.cyan("•")} CLI: ${cliNames[rustCli] || rustCli}\n`;
+    output += `${pc.cyan("•")} CLI: ${cliNames[rustCli] ?? optionLabel("rustCli", rustCli)}\n`;
   }
 
   const { rustLogging } = config;
@@ -1024,7 +1025,7 @@ function displayRustInstructions(config: ProjectConfig & { depsInstalled: boolea
       tracing: "Tracing",
       "env-logger": "env_logger",
     };
-    output += `${pc.cyan("•")} Logging: ${loggingNames[rustLogging] || rustLogging}\n`;
+    output += `${pc.cyan("•")} Logging: ${loggingNames[rustLogging] ?? optionLabel("rustLogging", rustLogging)}\n`;
   }
 
   const { rustErrorHandling } = config;
@@ -1033,7 +1034,7 @@ function displayRustInstructions(config: ProjectConfig & { depsInstalled: boolea
       "anyhow-thiserror": "anyhow + thiserror",
       eyre: "eyre + color-eyre",
     };
-    output += `${pc.cyan("•")} Error Handling: ${errorHandlingNames[rustErrorHandling] || rustErrorHandling}\n`;
+    output += `${pc.cyan("•")} Error Handling: ${errorHandlingNames[rustErrorHandling] ?? optionLabel("rustErrorHandling", rustErrorHandling)}\n`;
   }
 
   const { rustCaching } = config;
@@ -1042,7 +1043,7 @@ function displayRustInstructions(config: ProjectConfig & { depsInstalled: boolea
       moka: "Moka",
       redis: "Redis",
     };
-    output += `${pc.cyan("•")} Caching: ${cachingNames[rustCaching] || rustCaching}\n`;
+    output += `${pc.cyan("•")} Caching: ${cachingNames[rustCaching] ?? optionLabel("rustCaching", rustCaching)}\n`;
   }
 
   const { rustAuth } = config;
@@ -1050,7 +1051,7 @@ function displayRustInstructions(config: ProjectConfig & { depsInstalled: boolea
     const authNames: Record<string, string> = {
       oauth2: "OAuth2",
     };
-    output += `${pc.cyan("•")} Auth: ${authNames[rustAuth] || rustAuth}\n`;
+    output += `${pc.cyan("•")} Auth: ${authNames[rustAuth] ?? optionLabel("rustAuth", rustAuth)}\n`;
   }
 
   output += `\n${pc.bold("Common Cargo commands:")}\n`;
@@ -1115,6 +1116,10 @@ function getGoJobAndMigrationGuidance(
   return sections;
 }
 
+function optionLabel(category: OptionCategory, value: string): string {
+  return getOptionMetadata(category, value)?.label ?? value;
+}
+
 function displayDotnetInstructions(config: ProjectConfig & { depsInstalled: boolean }) {
   const hasTests = config.dotnetTesting?.some((library) => library !== "none") ?? false;
   const steps = [
@@ -1127,8 +1132,9 @@ function displayDotnetInstructions(config: ProjectConfig & { depsInstalled: bool
     (category) => {
       const value = config[category];
       if (!value || value === "none") return [];
-      const label = getOptionMetadata(category, value)?.label ?? value;
-      return [`${pc.cyan("•")} ${getCategoryDisplayName(category)}: ${label}`];
+      return [
+        `${pc.cyan("•")} ${getCategoryDisplayName(category)}: ${optionLabel(category, value)}`,
+      ];
     },
   );
 
@@ -1189,7 +1195,7 @@ function displayGoInstructions(config: ProjectConfig & { depsInstalled: boolean 
       kratos: "Kratos",
       httprouter: "HttpRouter",
     };
-    output += `${pc.cyan("•")} Web Framework: ${frameworkNames[goWebFramework] || goWebFramework}\n`;
+    output += `${pc.cyan("•")} Web Framework: ${frameworkNames[goWebFramework] ?? optionLabel("goWebFramework", goWebFramework)}\n`;
   }
 
   if (goOrm && goOrm !== "none") {
@@ -1200,7 +1206,7 @@ function displayGoInstructions(config: ProjectConfig & { depsInstalled: boolean 
       bun: "Bun",
       sqlx: "sqlx",
     };
-    output += `${pc.cyan("•")} Database: ${ormNames[goOrm] || goOrm}\n`;
+    output += `${pc.cyan("•")} Database: ${ormNames[goOrm] ?? optionLabel("goOrm", goOrm)}\n`;
   }
 
   if (goApi && goApi !== "none") {
@@ -1210,7 +1216,7 @@ function displayGoInstructions(config: ProjectConfig & { depsInstalled: boolean 
       "connect-go": "Connect-Go",
       "oapi-codegen": "oapi-codegen",
     };
-    output += `${pc.cyan("•")} API: ${apiNames[goApi] || goApi}\n`;
+    output += `${pc.cyan("•")} API: ${apiNames[goApi] ?? optionLabel("goApi", goApi)}\n`;
   }
 
   if (goCli && goCli !== "none") {
@@ -1219,7 +1225,7 @@ function displayGoInstructions(config: ProjectConfig & { depsInstalled: boolean 
       bubbletea: "Bubble Tea",
       "urfave-cli": "urfave/cli",
     };
-    output += `${pc.cyan("•")} CLI: ${cliNames[goCli] || goCli}\n`;
+    output += `${pc.cyan("•")} CLI: ${cliNames[goCli] ?? optionLabel("goCli", goCli)}\n`;
   }
 
   if (goLogging && goLogging !== "none") {
@@ -1228,7 +1234,7 @@ function displayGoInstructions(config: ProjectConfig & { depsInstalled: boolean 
       zerolog: "Zerolog",
       slog: "slog",
     };
-    output += `${pc.cyan("•")} Logging: ${loggingNames[goLogging] || goLogging}\n`;
+    output += `${pc.cyan("•")} Logging: ${loggingNames[goLogging] ?? optionLabel("goLogging", goLogging)}\n`;
   }
 
   if (goAuth && goAuth !== "none") {
@@ -1238,7 +1244,7 @@ function displayGoInstructions(config: ProjectConfig & { depsInstalled: boolean 
       goth: "Goth",
       oauth2: "x/oauth2",
     };
-    output += `${pc.cyan("•")} Auth: ${authNames[goAuth] || goAuth}\n`;
+    output += `${pc.cyan("•")} Auth: ${authNames[goAuth] ?? optionLabel("goAuth", goAuth)}\n`;
   }
 
   const extras: Array<[string, string | string[]]> = [
@@ -1467,7 +1473,7 @@ function displayJavaInstructions(config: ProjectConfig & { depsInstalled: boolea
       "spring-boot": "Spring Boot",
       quarkus: "Quarkus",
     };
-    output += `${pc.cyan("•")} Web Framework: ${frameworkNames[javaWebFramework] || javaWebFramework}\n`;
+    output += `${pc.cyan("•")} Web Framework: ${frameworkNames[javaWebFramework] ?? optionLabel("javaWebFramework", javaWebFramework)}\n`;
   } else {
     output += `${pc.cyan("•")} Scaffold: Plain Java\n`;
   }
@@ -1477,7 +1483,7 @@ function displayJavaInstructions(config: ProjectConfig & { depsInstalled: boolea
       maven: "Maven Wrapper",
       gradle: "Gradle Wrapper",
     };
-    output += `${pc.cyan("•")} Build Tool: ${buildToolNames[javaBuildTool] || javaBuildTool}\n`;
+    output += `${pc.cyan("•")} Build Tool: ${buildToolNames[javaBuildTool] ?? optionLabel("javaBuildTool", javaBuildTool)}\n`;
   } else {
     output += `${pc.cyan("•")} Build Tool: None\n`;
   }
@@ -1486,14 +1492,14 @@ function displayJavaInstructions(config: ProjectConfig & { depsInstalled: boolea
     const ormNames: Record<string, string> = {
       "spring-data-jpa": "Spring Data JPA",
     };
-    output += `${pc.cyan("•")} ORM: ${ormNames[javaOrm] || javaOrm}\n`;
+    output += `${pc.cyan("•")} ORM: ${ormNames[javaOrm] ?? optionLabel("javaOrm", javaOrm)}\n`;
   }
 
   if (isSpringBoot && javaAuth && javaAuth !== "none") {
     const authNames: Record<string, string> = {
       "spring-security": "Spring Security",
     };
-    output += `${pc.cyan("•")} Auth: ${authNames[javaAuth] || javaAuth}\n`;
+    output += `${pc.cyan("•")} Auth: ${authNames[javaAuth] ?? optionLabel("javaAuth", javaAuth)}\n`;
   }
 
   if (effectiveJavaLibraries.length > 0) {
@@ -1528,7 +1534,7 @@ function displayJavaInstructions(config: ProjectConfig & { depsInstalled: boolea
       "spring-restclient": "Spring REST Client",
     };
     const libraryList = effectiveJavaLibraries
-      .map((library) => libraryNames[library] || library)
+      .map((library) => libraryNames[library] ?? optionLabel("javaLibraries", library))
       .join(", ");
     output += `${pc.cyan("•")} Libraries: ${libraryList}\n`;
   }
@@ -1546,7 +1552,7 @@ function displayJavaInstructions(config: ProjectConfig & { depsInstalled: boolea
       jqwik: "jqwik",
     };
     const testingList = effectiveJavaTestingLibraries
-      .map((library) => testingNames[library] || library)
+      .map((library) => testingNames[library] ?? optionLabel("javaTestingLibraries", library))
       .join(", ");
     output += `${pc.cyan("•")} Testing: ${testingList}\n`;
   }
@@ -1645,7 +1651,7 @@ function displayPythonInstructions(config: ProjectConfig & { depsInstalled: bool
       aiohttp: "aiohttp",
       streamlit: "Streamlit",
     };
-    output += `${pc.cyan("•")} Web Framework: ${frameworkNames[pythonWebFramework] || pythonWebFramework}\n`;
+    output += `${pc.cyan("•")} Web Framework: ${frameworkNames[pythonWebFramework] ?? optionLabel("pythonWebFramework", pythonWebFramework)}\n`;
   }
 
   if (pythonOrm && pythonOrm !== "none") {
@@ -1656,14 +1662,14 @@ function displayPythonInstructions(config: ProjectConfig & { depsInstalled: bool
       peewee: "Peewee",
       pymongo: "PyMongo",
     };
-    output += `${pc.cyan("•")} ORM: ${ormNames[pythonOrm] || pythonOrm}\n`;
+    output += `${pc.cyan("•")} ORM: ${ormNames[pythonOrm] ?? optionLabel("pythonOrm", pythonOrm)}\n`;
   }
 
   if (pythonValidation && pythonValidation !== "none") {
     const validationNames: Record<string, string> = {
       pydantic: "Pydantic",
     };
-    output += `${pc.cyan("•")} Validation: ${validationNames[pythonValidation] || pythonValidation}\n`;
+    output += `${pc.cyan("•")} Validation: ${validationNames[pythonValidation] ?? optionLabel("pythonValidation", pythonValidation)}\n`;
   }
 
   if (pythonAi && pythonAi.length > 0 && !pythonAi.includes("none")) {
@@ -1682,7 +1688,7 @@ function displayPythonInstructions(config: ProjectConfig & { depsInstalled: bool
     };
     const aiList = pythonAi
       .filter((ai) => ai !== "none")
-      .map((ai) => aiNames[ai] || ai)
+      .map((ai) => aiNames[ai] ?? optionLabel("pythonAi", ai))
       .join(", ");
     output += `${pc.cyan("•")} AI: ${aiList}\n`;
   }
@@ -1692,14 +1698,14 @@ function displayPythonInstructions(config: ProjectConfig & { depsInstalled: bool
       "django-rest-framework": "Django REST Framework",
       "django-ninja": "Django Ninja",
     };
-    output += `${pc.cyan("•")} API Framework: ${apiNames[pythonApi] || pythonApi}\n`;
+    output += `${pc.cyan("•")} API Framework: ${apiNames[pythonApi] ?? optionLabel("pythonApi", pythonApi)}\n`;
   }
 
   if (pythonTaskQueue && pythonTaskQueue !== "none") {
     const taskQueueNames: Record<string, string> = {
       celery: "Celery",
     };
-    output += `${pc.cyan("•")} Task Queue: ${taskQueueNames[pythonTaskQueue] || pythonTaskQueue}\n`;
+    output += `${pc.cyan("•")} Task Queue: ${taskQueueNames[pythonTaskQueue] ?? optionLabel("pythonTaskQueue", pythonTaskQueue)}\n`;
   }
 
   if (pythonQuality && pythonQuality !== "none") {
@@ -1708,7 +1714,7 @@ function displayPythonInstructions(config: ProjectConfig & { depsInstalled: bool
       mypy: "mypy",
       pyright: "Pyright",
     };
-    output += `${pc.cyan("•")} Code Quality: ${qualityNames[pythonQuality] || pythonQuality}\n`;
+    output += `${pc.cyan("•")} Code Quality: ${qualityNames[pythonQuality] ?? optionLabel("pythonQuality", pythonQuality)}\n`;
   }
 
   if (pythonObservability && pythonObservability !== "none") {
