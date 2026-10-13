@@ -160,7 +160,7 @@ describe("Go background jobs", () => {
       resolveGoMigrationsPrompt(undefined, { database: "mysql", goOrm: "sqlc" }).options.map(
         (option) => option.value,
       ),
-    ).toEqual(["golang-migrate", "goose", "none"]);
+    ).toEqual(["none"]);
   });
 });
 
@@ -189,13 +189,21 @@ describe("Go migrations", () => {
       ["sqlite", '_ "github.com/mattn/go-sqlite3"', 'sql.Open("sqlite3"', "AUTOINCREMENT"],
     ] as const;
     for (const [database, driverImport, open, sql] of cases) {
-      const [command, migration, embed, goMod] = await generatedFiles(
+      const [command, migration, embed, goMod, env] = await generatedFiles(
         { database, goOrm: database === "mysql" ? "sqlx" : "gorm", goMigrations: "goose" },
         "cmd/migrate/main.go",
         "migrations/00001_create_users.sql",
         "migrations/migrations.go",
         "go.mod",
+        ".env.example",
       );
+      const databaseUrl =
+        database === "postgres"
+          ? "postgresql://postgres:password@localhost:5432/postgres"
+          : database === "mysql"
+            ? "root:password@tcp(localhost:3306)/go-jobs?parseTime=true"
+            : "app.db";
+      expect(env).toContain(`DATABASE_URL=${databaseUrl}`);
       expect(command).toContain(driverImport);
       expect(command).toContain(open);
       expect(command).toContain('os.Getenv("DATABASE_URL")');
@@ -255,6 +263,28 @@ describe("Go migrations", () => {
 
 describe("Go job and migration rejections", () => {
   const rejected = [
+    ...(["ent", "bun"] as const).flatMap((goOrm) =>
+      (["goose", "atlas"] as const).map((goMigrations) => ({
+        reason: `${goOrm === "ent" ? "Ent" : "Bun"} is only wired for PostgreSQL and SQLite, so MySQL migrations would target a different database`,
+        flat: { database: "mysql" as const, goOrm, goMigrations },
+        part: [
+          "backend:go:gin",
+          `backend.orm:go:${goOrm}`,
+          `backend.migrations:go:${goMigrations}`,
+          "database:universal:mysql",
+        ],
+      })),
+    ),
+    ...(["sqlite", "mysql"] as const).map((database) => ({
+      reason: "Go migrations with sqlc require PostgreSQL because the generated server uses pgx",
+      flat: { database, goOrm: "sqlc" as const, goMigrations: "goose" as const },
+      part: [
+        "backend:go:gin",
+        "backend.orm:go:sqlc",
+        "backend.migrations:go:goose",
+        `database:universal:${database}`,
+      ],
+    })),
     ...(["goose", "atlas"] as const).map((goMigrations) => ({
       reason:
         "GORM is only wired for PostgreSQL and SQLite, so MySQL migrations would target a different database",

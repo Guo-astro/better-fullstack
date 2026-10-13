@@ -2385,6 +2385,13 @@ export function processEnvVariables(vfs: VirtualFileSystem, config: ProjectConfi
   );
 
   if (config.ecosystem !== "typescript") {
+    const databaseVariable = serverVars.find((variable) => variable.key === "DATABASE_URL");
+    if (config.ecosystem === "go" && databaseVariable) {
+      if (database === "sqlite") databaseVariable.value = "app.db";
+      if (database === "mysql") {
+        databaseVariable.value = `root:password@tcp(localhost:3306)/${config.projectName}?parseTime=true`;
+      }
+    }
     if (!serverVars.some((variable) => variable.condition)) return;
     writeEnvFile(vfs, ".env.example", serverVars);
   } else if (backend === "self") {

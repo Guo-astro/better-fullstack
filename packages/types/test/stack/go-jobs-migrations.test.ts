@@ -65,7 +65,7 @@ describe("Go background jobs and migrations compatibility", () => {
     expect(getGoMigrationsIncompatibility("atlas", { database: "mysql", goOrm: "sqlc" })).toBe(
       ATLAS_SQLC_REASON,
     );
-    for (const goOrm of ["ent", "bun", "sqlx", "none"]) {
+    for (const goOrm of ["sqlx", "none"]) {
       expect(getGoMigrationsIncompatibility("atlas", { database: "mysql", goOrm })).toBeNull();
     }
     for (const goMigrations of ["goose", "atlas"]) {
@@ -75,7 +75,7 @@ describe("Go background jobs and migrations compatibility", () => {
     }
     expect(
       getGoMigrationsIncompatibility("goose", { database: "sqlite", goOrm: "sqlc" }),
-    ).toBeNull();
+    ).toContain("sqlc require PostgreSQL");
   });
 
   it("gives the builder the same reasons in both selection directions", () => {

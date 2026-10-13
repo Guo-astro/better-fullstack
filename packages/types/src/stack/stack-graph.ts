@@ -2916,6 +2916,11 @@ export function getPythonLoggingIncompatibility(
 }
 
 const GO_MIGRATION_DATABASES = new Set(["sqlite", "postgres", "mysql"]);
+const GO_POSTGRES_SQLITE_ORM_LABELS: Partial<Record<string, string>> = {
+  gorm: "GORM",
+  ent: "Ent",
+  bun: "Bun",
+};
 const GO_BACKGROUND_JOB_WEB_FRAMEWORKS = new Set(["gin", "echo", "fiber", "chi", "stdlib"]);
 const GO_BACKGROUND_JOB_LABELS: Partial<Record<string, string>> = {
   river: "River",
@@ -2931,11 +2936,15 @@ export function getGoMigrationsIncompatibility(
   if (!GO_MIGRATION_DATABASES.has(selection.database ?? "none")) {
     return "Go migrations require SQLite, PostgreSQL, or MySQL";
   }
-  if (selection.database === "mysql" && selection.goOrm === "gorm") {
-    return "GORM is only wired for PostgreSQL and SQLite, so MySQL migrations would target a different database";
+  const ormLabel = GO_POSTGRES_SQLITE_ORM_LABELS[selection.goOrm ?? "none"];
+  if (selection.database === "mysql" && ormLabel) {
+    return `${ormLabel} is only wired for PostgreSQL and SQLite, so MySQL migrations would target a different database`;
   }
   if (goMigrations === "atlas" && selection.goOrm === "sqlc" && selection.database !== "postgres") {
     return "Atlas loads the sqlc schema, which is PostgreSQL-only";
+  }
+  if (selection.goOrm === "sqlc" && selection.database !== "postgres") {
+    return "Go migrations with sqlc require PostgreSQL because the generated server uses pgx";
   }
   return null;
 }
