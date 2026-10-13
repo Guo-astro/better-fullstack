@@ -4,6 +4,7 @@ import {
   validateReleaseWorkflow,
 } from "@scripts/release/validate-release-workflow";
 import { describe, expect, test } from "bun:test";
+import { runInNewContext } from "node:vm";
 
 type WorkflowDocument = Record<string, unknown>;
 
@@ -22,10 +23,65 @@ async function fixtures() {
   };
 }
 
+function evaluateCondition(condition: unknown, context: Record<string, unknown>) {
+  if (typeof condition !== "string") return true;
+  const result: unknown = runInNewContext(condition.replace(/^\$\{\{\s*|\s*\}\}$/g, ""), context);
+  if (typeof result !== "boolean") throw new Error("Workflow condition must return a boolean");
+  return result;
+}
+
 describe("release workflow contract", () => {
   test("the repository workflow satisfies the release contract", async () => {
     const { release, requiredCi } = await fixtures();
     expect(validateReleaseWorkflow(release, requiredCi)).toEqual([]);
+  });
+
+  test("pull requests need only successful lint", async () => {
+    const { requiredCi } = await fixtures();
+    const ciJobs = jobs(requiredCi);
+    const github = { event_name: "pull_request" };
+    expect(evaluateCondition(ciJobs.lint.if, { github })).toBe(true);
+    for (const job of ["release-guard", "test", "web-build"]) {
+      expect(evaluateCondition(ciJobs[job].if, { github })).toBe(false);
+    }
+
+    const gate = (ciJobs.build.steps as Array<Record<string, unknown>>).find(
+      (step) => step.name === "Require successful checks",
+    );
+    expect(gate).toBeDefined();
+    for (const result of ["success", "failure", "cancelled", "skipped"]) {
+      const needs = Object.fromEntries(
+        ["release-guard", "test", "web-build"].map((job) => [job, { result: "skipped" }]),
+      );
+      needs.lint = { result };
+      expect(evaluateCondition(gate?.if, { github, needs })).toBe(result !== "success");
+    }
+  });
+
+  test("main pushes still require every CI prerequisite", async () => {
+    const { requiredCi } = await fixtures();
+    const ciJobs = jobs(requiredCi);
+    const github = { event_name: "push" };
+    const prerequisiteJobs = ["release-guard", "lint", "test", "web-build"];
+    expect(ciJobs.build.needs).toEqual(prerequisiteJobs);
+    for (const job of prerequisiteJobs) {
+      expect(evaluateCondition(ciJobs[job].if, { github })).toBe(true);
+    }
+
+    const gate = (ciJobs.build.steps as Array<Record<string, unknown>>).find(
+      (step) => step.name === "Require successful checks",
+    );
+    expect(gate).toBeDefined();
+    const successfulNeeds = Object.fromEntries(
+      prerequisiteJobs.map((job) => [job, { result: "success" }]),
+    );
+    expect(evaluateCondition(gate?.if, { github, needs: successfulNeeds })).toBe(false);
+    for (const job of prerequisiteJobs) {
+      for (const result of ["failure", "cancelled", "skipped"]) {
+        const needs = { ...successfulNeeds, [job]: { result } };
+        expect(evaluateCondition(gate?.if, { github, needs })).toBe(true);
+      }
+    }
   });
 
   test("rejects publication after CI for a different SHA or failed CI", async () => {

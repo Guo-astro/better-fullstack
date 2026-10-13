@@ -40,12 +40,16 @@ Additional focused release-facing checks:
 - `apps/web` route changes can require a build to regenerate `routeTree.gen.ts` before type checks settle.
 - CLI parity and generator tests exercise built workspace packages in a few places. After changing `packages/types/src/*` or `packages/template-generator/src/*`, rebuild those packages before trusting CLI builder-sync, ecosystem generator tests, or scaffold output.
 - `packages/template-generator/tsconfig.json` includes `src/**/*`; tests under `packages/template-generator/test/` need their own TypeScript coverage or an expanded include set.
-- The broad legacy runtime matrix in `apps/cli/test/e2e/e2e.e2e.ts` is not the PR-stable runtime contract. PR runtime confidence should come from `testing/smoke-test.ts --dev-check --strict`, Playwright builder tests, and `apps/cli/test/e2e/web-command-roundtrip.test.ts`.
+- Runtime verification runs after pushes to main, on schedule, or through manual dispatch.
+  The strict smoke suites, Playwright builder tests, and web-command roundtrip tests validate
+  generated projects separately from PR lint.
 
 ## Release workflow expectations
 
-- `.github/workflows/test.yaml` runs `Release Guard`, lint, tests, and the web build in parallel.
-  The final `Build Check` preserves the required check name and fails when any prerequisite fails.
+- Pull requests run lint. The final `Build Check` preserves the required check name and follows
+  the lint result without requiring tests or builds.
+- After pushes to main, `.github/workflows/test.yaml` runs `Release Guard`, lint, tests, and the web
+  build in parallel. `Build Check` fails when any prerequisite fails.
   Release Guard owns the core package and CLI builds; Web Build owns the Vercel-parity web build.
 - `.github/workflows/release.yaml` starts after successful required CI on the exact main-branch
   release commit. It packs artifacts, runs generated-project proof, captures upgrade fixtures,

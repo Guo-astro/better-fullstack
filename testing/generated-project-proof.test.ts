@@ -114,13 +114,15 @@ describe("generated project runtime proof matrix", () => {
     expect(lifecycleTests).toBeGreaterThan(cliBuild);
   });
 
-  it("runs when CLI or lifecycle package inputs change", async () => {
+  it("runs on main when CLI or lifecycle package inputs change", async () => {
     const workflow = await readFile(
       new URL("../.github/workflows/generated-project-proof.yaml", import.meta.url),
       "utf8",
     );
 
-    expect(workflow.match(/- "apps\/cli\/package\.json"/g)).toHaveLength(2);
-    expect(workflow.match(/- "packages\/project-lifecycle\/\*\*"/g)).toHaveLength(2);
+    expect(workflow).toContain("branches: [main]");
+    expect(workflow).not.toContain("pull_request:");
+    expect(workflow.match(/- "apps\/cli\/package\.json"/g)).toHaveLength(1);
+    expect(workflow.match(/- "packages\/project-lifecycle\/\*\*"/g)).toHaveLength(1);
   });
 });
