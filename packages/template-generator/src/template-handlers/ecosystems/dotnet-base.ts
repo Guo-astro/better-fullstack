@@ -1,8 +1,9 @@
 import type { ProjectConfig } from "@better-fullstack/types";
 
 import type { VirtualFileSystem } from "@/core/virtual-fs";
-import { isBinaryFile, processTemplateString, transformFilename } from "@/core/template-processor";
-import { isEmptyTemplateOutput, type TemplateData } from "@/template-handlers/core/utils";
+
+import { transformFilename } from "@/core/template-processor";
+import { renderTemplateTree, type TemplateData } from "@/template-handlers/core/utils";
 
 const DOTNET_DOCKER_DEPLOY_TARGETS = new Set<ProjectConfig["dotnetDeploy"]>([
   "docker",
@@ -130,32 +131,18 @@ export async function processDotnetBaseTemplate(
   const prefix = "dotnet-base/";
   const context = createDotnetTemplateContext(config);
 
-  for (const [templatePath, content] of templates) {
-    if (!templatePath.startsWith(prefix)) continue;
-    if (!context.dotnetHasDocker && templatePath.includes("Dockerfile")) continue;
-    if (!context.dotnetHasAzureDeploy && templatePath.includes("azure.yaml")) continue;
-    if (!context.dotnetHasAwsDeploy && templatePath.includes("copilot/")) continue;
-    if (!context.dotnetHasTests && templatePath.includes(".Tests/")) continue;
-
-    const relativePath = templatePath.slice(prefix.length);
-    const outputPath = transformFilename(relativePath).replace(
-      /__dotnetProjectName__/g,
-      context.dotnetProjectName,
-    );
-    const destPath = targetPath ? `${targetPath}/${outputPath}` : outputPath;
-
-    let processedContent: string;
-    if (isBinaryFile(templatePath)) {
-      processedContent = "[Binary file]";
-    } else if (templatePath.endsWith(".hbs")) {
-      processedContent = processTemplateString(content, context);
-    } else {
-      processedContent = content;
-    }
-
-    if (isEmptyTemplateOutput(templatePath, processedContent)) continue;
-
-    const sourcePath = isBinaryFile(templatePath) ? templatePath : undefined;
-    vfs.writeFile(destPath, processedContent, sourcePath);
-  }
+  renderTemplateTree(vfs, templates, {
+    prefix,
+    targetPath,
+    context: context,
+    skip: (templatePath) => {
+      if (!context.dotnetHasDocker && templatePath.includes("Dockerfile")) return true;
+      if (!context.dotnetHasAzureDeploy && templatePath.includes("azure.yaml")) return true;
+      if (!context.dotnetHasAwsDeploy && templatePath.includes("copilot/")) return true;
+      if (!context.dotnetHasTests && templatePath.includes(".Tests/")) return true;
+      return false;
+    },
+    outputPath: (relativePath) =>
+      transformFilename(relativePath).replace(/__dotnetProjectName__/g, context.dotnetProjectName),
+  });
 }

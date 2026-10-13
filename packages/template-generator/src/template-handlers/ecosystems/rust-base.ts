@@ -1,8 +1,8 @@
 import type { ProjectConfig } from "@better-fullstack/types";
 
 import type { VirtualFileSystem } from "@/core/virtual-fs";
-import { isBinaryFile, processTemplateString, transformFilename } from "@/core/template-processor";
-import { isEmptyTemplateOutput, type TemplateData } from "@/template-handlers/core/utils";
+
+import { renderTemplateTree, type TemplateData } from "@/template-handlers/core/utils";
 
 export async function processRustBaseTemplate(
   vfs: VirtualFileSystem,
@@ -43,94 +43,79 @@ export async function processRustBaseTemplate(
   // handler self-contained so it type-checks before that schema change lands.
   const hasLoco = config.rustWebFramework === "loco";
 
-  for (const [templatePath, content] of templates) {
-    if (!templatePath.startsWith(prefix)) continue;
+  renderTemplateTree(vfs, templates, {
+    prefix,
+    targetPath,
+    context: renderConfig,
+    skip: (templatePath) => {
+      // A Rust frontend can be paired with a backend from another ecosystem. In
+      // that shape this workspace is a client-only app and must not contain an
+      // empty, unbuildable server crate.
+      if (!hasServer && templatePath.includes("crates/server/")) return true;
 
-    // A Rust frontend can be paired with a backend from another ecosystem. In
-    // that shape this workspace is a client-only app and must not contain an
-    // empty, unbuildable server crate.
-    if (!hasServer && templatePath.includes("crates/server/")) continue;
+      // Skip client crate templates if Leptos is not selected
+      if (!hasLeptos && templatePath.includes("crates/client/")) return true;
 
-    // Skip client crate templates if Leptos is not selected
-    if (!hasLeptos && templatePath.includes("crates/client/")) continue;
+      // Skip dioxus-client crate templates if Dioxus is not selected
+      if (!hasDioxus && templatePath.includes("crates/dioxus-client/")) return true;
 
-    // Skip dioxus-client crate templates if Dioxus is not selected
-    if (!hasDioxus && templatePath.includes("crates/dioxus-client/")) continue;
+      // Skip yew-client crate templates if Yew is not selected
+      if (!hasYew && templatePath.includes("crates/yew-client/")) return true;
 
-    // Skip yew-client crate templates if Yew is not selected
-    if (!hasYew && templatePath.includes("crates/yew-client/")) continue;
+      // Skip proto crate templates if Tonic is not selected
+      if (!hasTonic && templatePath.includes("crates/proto/")) return true;
 
-    // Skip proto crate templates if Tonic is not selected
-    if (!hasTonic && templatePath.includes("crates/proto/")) continue;
+      // Skip grpc.rs if Tonic is not selected
+      if (!hasTonic && templatePath.includes("crates/server/src/grpc.rs")) return true;
 
-    // Skip grpc.rs if Tonic is not selected
-    if (!hasTonic && templatePath.includes("crates/server/src/grpc.rs")) continue;
+      // Skip graphql.rs if async-graphql is not selected
+      if (!hasAsyncGraphql && templatePath.includes("crates/server/src/graphql.rs")) return true;
 
-    // Skip graphql.rs if async-graphql is not selected
-    if (!hasAsyncGraphql && templatePath.includes("crates/server/src/graphql.rs")) continue;
+      // Skip Loco-only files (app module, controllers, config) unless Loco is the
+      // selected web framework. Loco is an opinionated framework with its own
+      // Hooks/AppRoutes structure, so these files only make sense for it.
+      if (!hasLoco && templatePath.includes("crates/server/src/app.rs")) return true;
+      if (!hasLoco && templatePath.includes("crates/server/src/controllers/")) return true;
+      if (!hasLoco && templatePath.includes("crates/server/config/")) return true;
 
-    // Skip Loco-only files (app module, controllers, config) unless Loco is the
-    // selected web framework. Loco is an opinionated framework with its own
-    // Hooks/AppRoutes structure, so these files only make sense for it.
-    if (!hasLoco && templatePath.includes("crates/server/src/app.rs")) continue;
-    if (!hasLoco && templatePath.includes("crates/server/src/controllers/")) continue;
-    if (!hasLoco && templatePath.includes("crates/server/config/")) continue;
+      // Skip optional capability modules when their option is not selected
+      if (
+        config.rustRealtime === "none" &&
+        templatePath.includes("crates/server/src/realtime.rs")
+      ) {
+        return true;
+      }
+      if (
+        config.rustMessageQueue === "none" &&
+        templatePath.includes("crates/server/src/messaging.rs")
+      ) {
+        return true;
+      }
+      if (
+        config.rustObservability === "none" &&
+        templatePath.includes("crates/server/src/otel.rs")
+      ) {
+        return true;
+      }
+      if (
+        config.rustTemplating === "none" &&
+        templatePath.includes("crates/server/src/templating.rs")
+      ) {
+        return true;
+      }
+      if (
+        config.rustTemplating !== "askama" &&
+        templatePath.includes("crates/server/templates/hello.html")
+      ) {
+        return true;
+      }
 
-    // Skip optional capability modules when their option is not selected
-    if (
-      config.rustRealtime === "none" &&
-      templatePath.includes("crates/server/src/realtime.rs")
-    ) {
-      continue;
-    }
-    if (
-      config.rustMessageQueue === "none" &&
-      templatePath.includes("crates/server/src/messaging.rs")
-    ) {
-      continue;
-    }
-    if (
-      config.rustObservability === "none" &&
-      templatePath.includes("crates/server/src/otel.rs")
-    ) {
-      continue;
-    }
-    if (
-      config.rustTemplating === "none" &&
-      templatePath.includes("crates/server/src/templating.rs")
-    ) {
-      continue;
-    }
-    if (
-      config.rustTemplating !== "askama" &&
-      templatePath.includes("crates/server/templates/hello.html")
-    ) {
-      continue;
-    }
+      // Skip cli crate templates if Clap is not selected
+      if (!hasClap && templatePath.includes("crates/cli/")) return true;
 
-    // Skip cli crate templates if Clap is not selected
-    if (!hasClap && templatePath.includes("crates/cli/")) continue;
-
-    // Skip tui crate templates if Ratatui is not selected
-    if (!hasRatatui && templatePath.includes("crates/tui/")) continue;
-
-    const relativePath = templatePath.slice(prefix.length);
-    const outputPath = transformFilename(relativePath);
-    const destPath = targetPath ? `${targetPath}/${outputPath}` : outputPath;
-
-    let processedContent: string;
-    if (isBinaryFile(templatePath)) {
-      processedContent = "[Binary file]";
-    } else if (templatePath.endsWith(".hbs")) {
-      processedContent = processTemplateString(content, renderConfig);
-    } else {
-      processedContent = content;
-    }
-
-    if (isEmptyTemplateOutput(templatePath, processedContent)) continue;
-
-    // Pass original template path for binary files
-    const sourcePath = isBinaryFile(templatePath) ? templatePath : undefined;
-    vfs.writeFile(destPath, processedContent, sourcePath);
-  }
+      // Skip tui crate templates if Ratatui is not selected
+      if (!hasRatatui && templatePath.includes("crates/tui/")) return true;
+      return false;
+    },
+  });
 }
