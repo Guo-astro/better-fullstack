@@ -57,12 +57,3 @@ export async function planPackBtsConfig(
 
   return content;
 }
-
-export async function recordPackInBtsConfig(
-  projectDir: string,
-  manifest: CapabilityPackManifest,
-): Promise<void> {
-  const content = await planPackBtsConfig(projectDir, manifest);
-  if (content === null) return;
-  await fs.writeFile(path.join(projectDir, BTS_CONFIG_FILE), content, "utf-8");
-}

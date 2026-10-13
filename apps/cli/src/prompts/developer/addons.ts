@@ -277,28 +277,6 @@ export function getCapabilityAdditions(selected: readonly Addons[], existing: re
   );
 }
 
-export async function getAddonsToAdd(
-  frontend: Frontend[],
-  existingAddons: Addons[] = [],
-  auth?: Auth,
-  backend?: Backend,
-  runtime?: Runtime,
-  api?: API,
-  config: Partial<ProjectConfig> = { ecosystem: "typescript" },
-) {
-  const selected = await promptCapabilities({
-    frontends: frontend,
-    existing: existingAddons,
-    auth,
-    backend,
-    runtime,
-    api,
-    config,
-    additionsOnly: true,
-  });
-  return getCapabilityAdditions(selected, existingAddons);
-}
-
 export async function getCapabilityPartSpecsToAdd(config: Partial<ProjectConfig>) {
   const parts = (
     config.stackParts?.length ? config.stackParts : legacyProjectConfigToStackParts(config)
