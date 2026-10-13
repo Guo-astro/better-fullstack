@@ -1670,7 +1670,6 @@ const TechResourceButtons = memo(function TechResourceButtons({
   );
 });
 
-/** "None"-style options: a small chip after the grid instead of a full card. */
 function OptOutChip({
   tech,
   category,
@@ -1687,24 +1686,20 @@ function OptOutChip({
   onSelect: (category: keyof typeof TECH_OPTIONS, techId: string) => void;
 }) {
   return (
-    <button
+    <Button
       type="button"
+      size="xxs"
+      variant="subtle"
+      disabled={isDisabled}
       data-testid={`option-${category}-${tech.id}`}
       aria-pressed={isSelected}
-      title={disabledReason || undefined}
+      title={disabledReason ?? getLocalizedTechOption(tech).description}
       onClick={() => onSelect(category, tech.id)}
-      className={cn(
-        "inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 font-mono text-[11px] transition-colors",
-        isSelected
-          ? "border-ink bg-ink/[0.05] text-foreground dark:border-brand/80 dark:bg-brand/[0.08]"
-          : isDisabled
-            ? "border-dashed border-foreground/10 text-muted-foreground opacity-55 hover:opacity-90"
-            : "border-foreground/10 text-muted-foreground hover:border-foreground/25 hover:text-foreground",
-      )}
+      className="cursor-pointer"
     >
-      {isSelected && <Check className="size-3" aria-hidden />}
+      {isSelected && <Check className="size-2.5" aria-hidden />}
       {tech.name}
-    </button>
+    </Button>
   );
 }
 
@@ -5479,6 +5474,17 @@ const StackBuilderInner = ({ initialStack }: { initialStack?: StackState }) => {
                                       builderSearchData.groupsByCategory.get(categoryKey) ?? [];
                                     const categoryNotes = getCategoryNotes(categoryKey);
                                     const categoryCollapsed = collapsedCategories.has(categoryKey);
+                                    const toggleCategory = () =>
+                                      setCollapsedCategories((current) => {
+                                        const next = new Set(current);
+                                        if (!next.delete(categoryKey)) next.add(categoryKey);
+                                        return next;
+                                      });
+                                    const optOutOptions = categoryOptionGroups.flatMap((group) =>
+                                      group.options
+                                        .filter((option) => OPT_OUT_IDS.has(option.id))
+                                        .map((option) => ({ category: group.category, option })),
+                                    );
 
                                     return (
                                       <div
@@ -5489,42 +5495,77 @@ const StackBuilderInner = ({ initialStack }: { initialStack?: StackState }) => {
                                         data-testid={`category-${categoryKey}`}
                                         className="scroll-mt-16"
                                       >
-                                        <button
-                                          type="button"
-                                          data-testid={`category-toggle-${categoryKey}`}
-                                          aria-expanded={!categoryCollapsed}
-                                          onClick={() =>
-                                            setCollapsedCategories((current) => {
-                                              const next = new Set(current);
-                                              if (!next.delete(categoryKey)) next.add(categoryKey);
-                                              return next;
-                                            })
-                                          }
-                                          className="mb-2 flex w-full cursor-pointer items-center gap-2 text-left transition-opacity hover:opacity-80"
-                                        >
-                                          <h3 className="shrink-0 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-                                            {categoryDisplayName}
-                                          </h3>
-                                          {/* A closed category still says what it holds. */}
-                                          <span className="min-w-0 flex-1 truncate text-muted-foreground text-xs">
-                                            {categoryCollapsed &&
-                                              (getSelectedOptionNames(
-                                                categoryKey as keyof typeof TECH_OPTIONS,
-                                                stack,
-                                              ).join(" · ") ||
-                                                m.builderNone())}
-                                          </span>
-                                          {categoryNotes?.hasIssue && (
-                                            <InfoIcon className="h-3.5 w-3.5 shrink-0 text-amber-500" />
-                                          )}
-                                          <ChevronDown
-                                            className={cn(
-                                              "size-3.5 shrink-0 text-muted-foreground transition-transform",
-                                              !categoryCollapsed && "rotate-180",
+                                        <div className="mb-2 flex flex-wrap items-center gap-2">
+                                          <button
+                                            type="button"
+                                            data-testid={`category-toggle-${categoryKey}`}
+                                            aria-expanded={!categoryCollapsed}
+                                            onClick={toggleCategory}
+                                            className="cursor-pointer text-left transition-opacity hover:opacity-80"
+                                          >
+                                            <h3 className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+                                              {categoryDisplayName}
+                                            </h3>
+                                          </button>
+                                          {optOutOptions.map(({ category, option }) => {
+                                            const compatibilityStack =
+                                              getCompatibilityStackForCategory(category);
+                                            const isDisabled = !isOptionCompatible(
+                                              compatibilityStack,
+                                              category,
+                                              option.id,
+                                            );
+                                            return (
+                                              <OptOutChip
+                                                key={`${category}-${option.id}`}
+                                                tech={option}
+                                                category={category}
+                                                isSelected={isSelectedCheck(
+                                                  stack,
+                                                  category,
+                                                  option.id,
+                                                )}
+                                                isDisabled={isDisabled}
+                                                disabledReason={
+                                                  isDisabled
+                                                    ? getDisabledReason(
+                                                        compatibilityStack,
+                                                        category,
+                                                        option.id,
+                                                      )
+                                                    : null
+                                                }
+                                                onSelect={selectTech}
+                                              />
+                                            );
+                                          })}
+                                          <button
+                                            type="button"
+                                            aria-label={categoryDisplayName}
+                                            aria-expanded={!categoryCollapsed}
+                                            onClick={toggleCategory}
+                                            className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-left transition-opacity hover:opacity-80"
+                                          >
+                                            <span className="min-w-0 flex-1 truncate text-muted-foreground text-xs">
+                                              {categoryCollapsed &&
+                                                (getSelectedOptionNames(
+                                                  categoryKey as keyof typeof TECH_OPTIONS,
+                                                  stack,
+                                                ).join(" · ") ||
+                                                  m.builderNone())}
+                                            </span>
+                                            {categoryNotes?.hasIssue && (
+                                              <InfoIcon className="h-3.5 w-3.5 shrink-0 text-amber-500" />
                                             )}
-                                            aria-hidden
-                                          />
-                                        </button>
+                                            <ChevronDown
+                                              className={cn(
+                                                "size-3.5 shrink-0 text-muted-foreground transition-transform",
+                                                !categoryCollapsed && "rotate-180",
+                                              )}
+                                              aria-hidden
+                                            />
+                                          </button>
+                                        </div>
                                         <AnimatePresence initial={false}>
                                           {!categoryCollapsed && (
                                             <motion.div
@@ -5653,50 +5694,6 @@ const StackBuilderInner = ({ initialStack }: { initialStack?: StackState }) => {
                                                         </motion.button>
                                                       )}
                                                     </OptionGrid>
-                                                    {getQuietOptions(group).shown.some((tech) =>
-                                                      OPT_OUT_IDS.has(tech.id),
-                                                    ) && (
-                                                      <div className="mt-2 flex flex-wrap gap-2">
-                                                        {getQuietOptions(group)
-                                                          .shown.filter((tech) =>
-                                                            OPT_OUT_IDS.has(tech.id),
-                                                          )
-                                                          .map((tech) => {
-                                                            const compatibilityStack =
-                                                              getCompatibilityStackForCategory(
-                                                                group.category,
-                                                              );
-                                                            const isDisabled = !isOptionCompatible(
-                                                              compatibilityStack,
-                                                              group.category,
-                                                              tech.id,
-                                                            );
-                                                            return (
-                                                              <OptOutChip
-                                                                key={tech.id}
-                                                                tech={tech}
-                                                                category={group.category}
-                                                                isSelected={isSelectedCheck(
-                                                                  stack,
-                                                                  group.category,
-                                                                  tech.id,
-                                                                )}
-                                                                isDisabled={isDisabled}
-                                                                disabledReason={
-                                                                  isDisabled
-                                                                    ? getDisabledReason(
-                                                                        compatibilityStack,
-                                                                        group.category,
-                                                                        tech.id,
-                                                                      )
-                                                                    : null
-                                                                }
-                                                                onSelect={selectTech}
-                                                              />
-                                                            );
-                                                          })}
-                                                      </div>
-                                                    )}
                                                   </div>
                                                 ))}
                                               </div>
