@@ -1,6 +1,5 @@
 import type { ComponentType } from "react";
 
-import { BenchBarChart } from "@/components/docs/mdx/bench-bar-chart";
 import { BrowserTelemetryControls } from "@/components/docs/mdx/browser-telemetry-controls";
 import { Callout } from "@/components/docs/mdx/callout";
 import { CliFlagTable } from "@/components/docs/mdx/cli-flags-table";
@@ -33,7 +32,6 @@ export const mdxComponents: Record<string, ComponentType<any>> = {
   pre: CodeBlock,
   table: DocsTable,
 
-  BenchBarChart,
   BrowserTelemetryControls,
   Callout,
   CategoryCount,
