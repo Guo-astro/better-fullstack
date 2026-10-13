@@ -18,20 +18,15 @@ export function processJobQueueDeps(vfs: VirtualFileSystem, config: ProjectConfi
   // Skip if no backend to support job queues (convex has its own background jobs)
   if (backend === "none" || backend === "convex") return;
 
-  // Add server-side job queue dependencies
-  const serverPath = "apps/server/package.json";
-  if (vfs.exists(serverPath)) {
-    const deps = getJobQueueDeps(jobQueue);
-    if (deps.length > 0) {
-      addPackageDependency({
-        vfs,
-        packagePath: serverPath,
-        dependencies: deps,
-      });
-    }
-    addJobQueueScripts(vfs, serverPath, config);
-    addJobQueueEngines(vfs, serverPath, config);
+  const packagePath = backend === "self" ? "apps/web/package.json" : "apps/server/package.json";
+  if (!vfs.exists(packagePath)) return;
+
+  const deps = getJobQueueDeps(jobQueue);
+  if (deps.length > 0) {
+    addPackageDependency({ vfs, packagePath, dependencies: deps });
   }
+  addJobQueueScripts(vfs, packagePath, config);
+  addJobQueueEngines(vfs, packagePath, config);
 }
 
 const PG_BOSS_MIN_NODE = ">=22.12.0";
@@ -78,17 +73,25 @@ function getJobQueueDeps(jobQueue: ProjectConfig["jobQueue"]): AvailableDependen
   return deps;
 }
 
-function addJobQueueScripts(vfs: VirtualFileSystem, serverPath: string, config: ProjectConfig) {
-  const runner =
-    config.runtime === "bun" ? "bun run" : config.runtime === "node" ? "tsx" : undefined;
+function getScriptRunner(config: ProjectConfig): string | undefined {
+  if (config.backend === "self") return config.packageManager === "bun" ? "bun run" : "tsx";
+  if (config.runtime === "bun") return "bun run";
+  if (config.runtime === "node") return "tsx";
+  return undefined;
+}
+
+function addJobQueueScripts(vfs: VirtualFileSystem, packagePath: string, config: ProjectConfig) {
+  const runner = getScriptRunner(config);
   if (!runner) return;
 
   const scripts: Record<string, string> = {};
   if (config.jobQueue === "pg-boss" || config.jobQueue === "hatchet") {
     scripts["jobs:worker"] = `${runner} src/jobs/worker.ts`;
-    // `build` emits the worker next to the server entry, so built images can run it.
-    scripts["jobs:worker:start"] =
-      config.runtime === "bun" ? "bun run dist/jobs/worker.mjs" : "node dist/jobs/worker.mjs";
+    if (config.backend !== "self") {
+      // `build` emits the worker next to the server entry, so built images can run it.
+      scripts["jobs:worker:start"] =
+        config.runtime === "bun" ? "bun run dist/jobs/worker.mjs" : "node dist/jobs/worker.mjs";
+    }
     scripts["jobs:enqueue"] = `${runner} src/jobs/enqueue.ts`;
   } else if (config.jobQueue === "upstash-qstash") {
     scripts["jobs:enqueue"] = `${runner} src/jobs/enqueue.ts`;
@@ -96,8 +99,11 @@ function addJobQueueScripts(vfs: VirtualFileSystem, serverPath: string, config: 
     return;
   }
 
-  const pkgJson = vfs.readJson<PackageJson>(serverPath);
+  if (config.backend === "self" && runner === "tsx") {
+    addPackageDependency({ vfs, packagePath, devDependencies: ["tsx"] });
+  }
+  const pkgJson = vfs.readJson<PackageJson>(packagePath);
   if (!pkgJson) return;
   pkgJson.scripts = { ...pkgJson.scripts, ...scripts };
-  vfs.writeJson(serverPath, pkgJson);
+  vfs.writeJson(packagePath, pkgJson);
 }

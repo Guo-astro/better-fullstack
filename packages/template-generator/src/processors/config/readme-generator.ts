@@ -92,6 +92,8 @@ export function processReadme(vfs: VirtualFileSystem, config: ProjectConfig): vo
     content = generateJavaReadmeContent(config);
   } else if (config.ecosystem === "elixir") {
     content = generateElixirReadmeContent(config);
+  } else if (config.ecosystem === "dotnet" && vfs.exists("README.md")) {
+    return;
   } else {
     content = generateReadmeContent(config);
   }
@@ -936,7 +938,7 @@ ${signInSetup}
 }
 
 const PASSPORT_SAME_SITE_NOTE =
-  "The Passport session cookie is `SameSite=Lax`, so the browser sends it to the API only when the web app and the API are on the same site, such as `app.example.com` and `api.example.com` (`localhost` on different ports also counts). If they are on different sites, serve the API from the web app's domain or proxy it there; setting the cookie to `sameSite: \"none\"` with `secure: true` in `apps/server/src/index.ts` also works but lets every site send it.";
+  'The Passport session cookie is `SameSite=Lax`, so the browser sends it to the API only when the web app and the API are on the same site, such as `app.example.com` and `api.example.com` (`localhost` on different ports also counts). If they are on different sites, serve the API from the web app\'s domain or proxy it there; setting the cookie to `sameSite: "none"` with `secure: true` in `apps/server/src/index.ts` also works but lets every site send it.';
 
 function generatePassportSetup(): string {
   return `

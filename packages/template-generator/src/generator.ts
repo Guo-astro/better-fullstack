@@ -67,6 +67,7 @@ import {
   processLoggingTemplates,
   processObservabilityTemplates,
   processRateLimitTemplates,
+  processCachingTemplates,
   processBotProtectionTemplates,
   processFeatureFlagsTemplates,
   processIntegrationsTemplates,
@@ -419,6 +420,7 @@ async function processTypeScriptWorkspaceTemplates(
   await processLoggingTemplates(vfs, templates, config);
   await processObservabilityTemplates(vfs, templates, config);
   await processRateLimitTemplates(vfs, templates, config);
+  await processCachingTemplates(vfs, templates, config);
   await processBotProtectionTemplates(vfs, templates, config);
   await processFeatureFlagsTemplates(vfs, templates, config);
   await processIntegrationsTemplates(vfs, templates, config);

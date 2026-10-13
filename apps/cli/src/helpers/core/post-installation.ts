@@ -1,5 +1,7 @@
 import {
+  getCategoryDisplayName,
   getLocalWebDevPort,
+  getOptionMetadata,
   hasJavaScriptWorkspaceRoot,
   isToolingOverlayOnly,
 } from "@better-fullstack/types";
@@ -91,6 +93,11 @@ export async function displayPostInstallInstructions(
 
   if (ecosystem === "elixir") {
     displayElixirInstructions(config);
+    return;
+  }
+
+  if (ecosystem === "dotnet") {
+    displayDotnetInstructions(config);
     return;
   }
 
@@ -1106,6 +1113,35 @@ function getGoJobAndMigrationGuidance(
     ]);
   }
   return sections;
+}
+
+function displayDotnetInstructions(config: ProjectConfig & { depsInstalled: boolean }) {
+  const hasTests = config.dotnetTesting?.some((library) => library !== "none") ?? false;
+  const steps = [
+    `cd ${config.relativePath}`,
+    ...(config.depsInstalled ? [] : ["dotnet restore"]),
+    "dotnet run",
+    ...(hasTests ? ["dotnet test"] : []),
+  ];
+  const stack = (["dotnetWebFramework", "dotnetOrm", "dotnetAuth", "dotnetApi"] as const).flatMap(
+    (category) => {
+      const value = config[category];
+      if (!value || value === "none") return [];
+      const label = getOptionMetadata(category, value)?.label ?? value;
+      return [`${pc.cyan("•")} ${getCategoryDisplayName(category)}: ${label}`];
+    },
+  );
+
+  let output = `${pc.bold("Next steps")}\n`;
+  output += steps.map((step, index) => `${pc.cyan(`${index + 1}.`)} ${step}`).join("\n");
+  if (stack.length > 0) {
+    output += `\n\n${pc.bold("Your .NET project includes:")}\n${stack.join("\n")}`;
+  }
+  output += `\n\n${pc.bold("Enjoying Better Fullstack?")} Help us grow - star the repo!\n`;
+  output += `${pc.cyan("https://github.com/Marve10s/Better-Fullstack")}\n`;
+  output += pc.dim("Your star helps other developers discover the project.");
+
+  consola.box(output);
 }
 
 function displayGoInstructions(config: ProjectConfig & { depsInstalled: boolean }) {

@@ -1546,8 +1546,7 @@ function buildServerVars(
       key: "OTEL_EXPORTER_OTLP_HEADERS",
       value: "",
       condition: observability === "signoz",
-      comment:
-        "SigNoz Cloud: signoz-ingestion-key=<your-key>; leave empty for self-hosted SigNoz",
+      comment: "SigNoz Cloud: signoz-ingestion-key=<your-key>; leave empty for self-hosted SigNoz",
     },
     {
       key: "SENTRY_DSN",
@@ -2040,6 +2039,37 @@ function buildServerVars(
       value: "uploads",
       condition: fileStorage === "supabase-storage",
       comment: "Supabase Storage bucket name",
+    },
+    {
+      key: "PINECONE_API_KEY",
+      value: "",
+      condition: vectorDb === "pinecone",
+      comment: "Pinecone API key - get it at https://app.pinecone.io",
+    },
+    {
+      key: "PINECONE_INDEX",
+      value: "embeddings",
+      condition: vectorDb === "pinecone",
+      comment: "Pinecone index name used by the vector helpers",
+    },
+    {
+      key: "QDRANT_URL",
+      value: "http://localhost:6333",
+      condition: vectorDb === "qdrant",
+      comment: "Qdrant URL - local Docker default; add QDRANT_API_KEY for Qdrant Cloud",
+    },
+    {
+      key: "CHROMA_URL",
+      value: "http://localhost:8000",
+      condition: vectorDb === "chroma",
+      comment: "Chroma server URL - local default",
+    },
+    {
+      key: "PGVECTOR_DATABASE_URL",
+      value: "postgresql://postgres:password@localhost:5432/postgres",
+      condition: vectorDb === "pgvector" && database !== "postgres",
+      comment:
+        "Postgres database with the pgvector extension (falls back to DATABASE_URL on Postgres stacks)",
     },
     {
       key: "WEAVIATE_URL",
