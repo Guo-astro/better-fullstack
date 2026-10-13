@@ -1,3 +1,4 @@
+import { COMPETITOR_COMPARISONS } from "@/lib/builder/compare-tools";
 import { ECOSYSTEM_COUNT_LABEL, ECOSYSTEM_NAMES, OPTION_COUNT_LABEL } from "@/lib/project/project-stats";
 import { SITE_NAME, SITE_URL, canonicalUrl } from "@/lib/seo/seo";
 
@@ -23,6 +24,10 @@ function pageLine(title: string | undefined, url: string, description?: string) 
   const suffix = description ? ` - ${description}` : "";
   return `- [${label}](${canonicalUrl(url)})${suffix}`;
 }
+
+const comparisonLines = COMPETITOR_COMPARISONS.map((comparison) =>
+  pageLine(comparison.heading, `/compare/${comparison.slug}`, comparison.description),
+);
 
 export function generateLlmsTxt({
   docsPages,
@@ -107,6 +112,11 @@ export function generateLlmsTxt({
     pageLine("Markdown sitemap", "/sitemap.md", "Semantic index of public content"),
     pageLine("Guides", "/guides", "Stack-specific starter guides"),
     pageLine("Blog", "/blog", "Engineering write-ups"),
+    pageLine("Changelog", "/changelog", "Release notes for every published version"),
+    "",
+    "## Comparisons",
+    "",
+    ...comparisonLines,
     "",
     "## Important Docs",
     "",
@@ -215,31 +225,36 @@ export function generateLlmsFullTxt({
   docsPages,
   guidePages,
   blogPages,
+  changelogPages = [],
   rawDocsPages,
   rawGuidePages,
   rawBlogPosts,
+  rawChangelogPages = {},
   cliVersion,
   generatedAt,
 }: {
   docsPages: LlmsPage[];
   guidePages: LlmsPage[];
   blogPages: LlmsPage[];
+  changelogPages?: LlmsPage[];
   rawDocsPages: RawContent;
   rawGuidePages: RawContent;
   rawBlogPosts: RawContent;
+  rawChangelogPages?: RawContent;
   cliVersion?: string;
   generatedAt?: string;
 }): string {
   return [
     `# ${SITE_NAME}: Full Documentation`,
     "",
-    "> Canonical English product documentation, guides, and engineering articles in one corpus.",
+    "> Canonical English product documentation, guides, engineering articles, and release notes in one corpus.",
     "",
     ...(cliVersion ? [`CLI version: ${cliVersion}`, ""] : []),
     ...(generatedAt ? [`Generated: ${generatedAt}`, ""] : []),
     ...docsPages.flatMap((page) => fullPageSection("Documentation", page, rawDocsPages)),
     ...guidePages.flatMap((page) => fullPageSection("Guide", page, rawGuidePages)),
     ...blogPages.flatMap((page) => fullPageSection("Article", page, rawBlogPosts)),
+    ...changelogPages.flatMap((page) => fullPageSection("Changelog", page, rawChangelogPages)),
   ].join("\n");
 }
 
@@ -247,17 +262,20 @@ export function generateMarkdownSitemap({
   docsPages,
   guidePages,
   blogPages,
+  changelogPages = [],
   stackPages = [],
 }: {
   docsPages: LlmsPage[];
   guidePages: LlmsPage[];
   blogPages: LlmsPage[];
+  changelogPages?: LlmsPage[];
   stackPages?: LlmsStackPage[];
 }): string {
   const sections = [
     ["Documentation", docsPages] as const,
     ["Guides", guidePages] as const,
     ["Articles", blogPages] as const,
+    ["Changelog", changelogPages] as const,
   ];
   return [
     `# ${SITE_NAME} Sitemap`,
@@ -276,6 +294,10 @@ export function generateMarkdownSitemap({
       ),
       "",
     ]),
+    "## Comparisons",
+    "",
+    ...comparisonLines,
+    "",
     ...(stackPages.length
       ? [
           "## Generated Stack Pages",

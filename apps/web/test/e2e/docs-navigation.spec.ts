@@ -112,9 +112,9 @@ test("guide navigation and the pack overview remain accessible on mobile", async
 test("quickstart copy labels follow the selected locale", async ({ page, context, baseURL }) => {
   await context.addCookies([{ name: "BFS_LOCALE", value: "de", url: baseURL! }]);
   await gotoAppPage(page, "/docs/ai/mcp");
-  await expect(page.getByRole("heading", { name: "MCP-Server", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "MCP Server", exact: true })).toBeVisible();
   const quickstart = page.locator("section").filter({
-    has: page.getByRole("heading", { name: "Mit einem Befehl verbinden", exact: true }),
+    has: page.getByRole("heading", { name: "Connect in one command", exact: true }),
   });
   await expect(quickstart.getByRole("button", { name: "Kopieren", exact: true })).toBeVisible();
   await expect(quickstart.getByRole("button", { name: "Copy code", exact: true })).toHaveCount(0);
@@ -157,8 +157,8 @@ test("CLI flag descriptions and controls follow the selected locale", async ({
 });
 
 for (const [slug, path] of [
-  ["/ai/mcp", "ai/mcp.mdx"],
-  ["/cli", "cli/index.mdx"],
+  ["/cli/create", "cli/create.mdx"],
+  ["/cli/add", "cli/add.mdx"],
 ] as const) {
   test(`viewing Markdown preserves the selected locale for /docs${slug}`, async ({
     page,

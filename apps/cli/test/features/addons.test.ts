@@ -1443,7 +1443,7 @@ describe("Addon Configurations", () => {
             backend: "adonisjs" as const,
             runtime: "node" as const,
             output: "/app/apps/server/build ./apps/server/build",
-            command: 'CMD ["node", "bin/server.js"]',
+            command: 'CMD ["node", "--import", "tsx", "bin/server.js"]',
           },
           {
             backend: "nitro" as const,
@@ -2067,7 +2067,7 @@ describe("Addon Configurations", () => {
         const dockerfile = readFileSync(join(result.projectDir!, "Dockerfile"), "utf8");
         const compose = readFileSync(join(result.projectDir!, "docker-compose.yml"), "utf8");
 
-        expect(dockerfile).toContain("FROM golang:1.25-alpine AS builder");
+        expect(dockerfile).toContain("FROM golang:1.26-alpine AS builder");
         expect(dockerfile).toContain("go build -o /out/server ./cmd/server");
         expect(compose).toContain('      - "8080:8080"');
         expect(compose).toContain(

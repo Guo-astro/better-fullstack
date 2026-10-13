@@ -120,6 +120,7 @@ import {
   PythonCachingSchema,
   PythonRealtimeSchema,
   PythonObservabilitySchema,
+  PythonLoggingSchema,
   PythonCliSchema,
   PythonCloudSdkSchema,
   PythonDataSchema,
@@ -235,7 +236,7 @@ export const CreateCommandOptionsSchema = z.object({
   i18n: I18nSchema.optional().describe("Internationalization (i18n) library"),
   search: SearchSchema.optional().describe("Search engine solution"),
   vectorDb: VectorDbSchema.optional().describe(
-    "Vector database for AI embeddings (pgvector, qdrant, chroma, pinecone)",
+    "Vector database for AI embeddings (pgvector, qdrant, chroma, pinecone, weaviate, upstash-vector, turbopuffer, lancedb)",
   ),
   fileStorage: FileStorageSchema.optional().describe("File storage solution (S3, R2)"),
   mobileNavigation: MobileNavigationSchema.optional().describe(
@@ -363,6 +364,7 @@ export const CreateCommandOptionsSchema = z.object({
   pythonObservability: PythonObservabilitySchema.optional().describe(
     "Python observability (opentelemetry, signoz)",
   ),
+  pythonLogging: PythonLoggingSchema.optional().describe("Python logging (loguru, structlog)"),
   pythonCli: z
     .array(PythonCliSchema)
     .optional()

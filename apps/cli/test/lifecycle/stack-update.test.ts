@@ -39,6 +39,7 @@ import {
 import { applyPartRemoval, planPartRemoval } from "@/helpers/core/remove-handler";
 import {
   applyStackUpdate,
+  mergePackageJson,
   planStackUpdate,
   SUPPORTED_STACK_UPDATE_KEYS,
 } from "@/helpers/core/stack-update";
@@ -52,6 +53,34 @@ import { MCP_STACK_UPDATE_SCHEMA } from "@/mcp";
 import { getCapabilityAdditions } from "@/prompts/developer/addons";
 
 const TEMP_ROOTS: string[] = [];
+
+describe("package runtime requirements", () => {
+  it("adds an engine requirement while preserving user-owned package keys", () => {
+    const baseline = JSON.stringify({ name: "server" });
+    const result = mergePackageJson(
+      JSON.stringify({ name: "server", private: true }),
+      baseline,
+      JSON.stringify({ name: "server", engines: { node: ">=22.12.0" } }),
+    );
+    expect(result.blockers).toEqual([]);
+    expect(JSON.parse(result.content ?? "{}")).toEqual({
+      name: "server",
+      private: true,
+      engines: { node: ">=22.12.0" },
+    });
+    expect(result.dependencyChanges).toEqual({});
+  });
+
+  it("blocks an engine change that conflicts with the user's runtime selection", () => {
+    const result = mergePackageJson(
+      JSON.stringify({ engines: { node: ">=24" } }),
+      JSON.stringify({ engines: { node: ">=20" } }),
+      JSON.stringify({ engines: { node: ">=22.12.0" } }),
+    );
+    expect(result.blockers).toContain("engines.node");
+    expect(result.content).toBeUndefined();
+  });
+});
 
 async function makeTempRoot(prefix: string): Promise<string> {
   const root = await mkdtemp(join(tmpdir(), prefix));
@@ -184,6 +213,7 @@ const PYTHON_BASE_CONFIG: Partial<ProjectConfig> = {
   pythonCaching: "none",
   pythonRealtime: "none",
   pythonObservability: "none",
+  pythonLogging: "none",
   pythonAi: [],
   pythonTesting: [],
   pythonCli: [],
@@ -1252,6 +1282,50 @@ describe("stack update planner", () => {
         }),
       ]),
     );
+  });
+
+  it("keeps a Go backend-owned database when planning replacement or removal", async () => {
+    const root = await makeTempRoot("bfs-stack-update-go-database-");
+    const projectDir = join(root, "app");
+    await scaffoldGeneratedProject(
+      makeConfig(projectDir, {
+        ecosystem: "go",
+        backend: "none",
+        runtime: "none",
+        frontend: ["none"],
+        auth: "none",
+        orm: "none",
+        database: "postgres",
+        goWebFramework: "gin",
+        goOrm: "gorm",
+        stackParts: parseStackPartSpecs([
+          "backend:go:gin",
+          "backend.database:universal:postgres",
+          "backend.orm:go:gorm",
+        ]),
+      }),
+    );
+    const replacement = await planStackUpdate(projectDir, { database: "sqlite" });
+    expect(replacement.success).toBe(true);
+    if (!replacement.success) return;
+    expect(replacement.requiresArchitectureAck).toBe(true);
+    expect(replacement.architectureChanges).toContainEqual({
+      key: "database",
+      from: "postgres",
+      to: "sqlite",
+    });
+    expect(replacement.stackPartSpecs).toContain("backend.database:universal:sqlite");
+    const unacknowledged = await applyStackUpdate(projectDir, { database: "sqlite" });
+    expect(unacknowledged.success).toBe(false);
+    if (!unacknowledged.success)
+      expect(unacknowledged.error).toContain("acknowledgeArchitectureChange");
+    expect((await readJsonc(join(projectDir, "bts.jsonc"))).database).toBe("postgres");
+    const removal = await planStackUpdate(projectDir, { database: "none", goOrm: "none" });
+    expect(removal.success).toBe(true);
+    if (!removal.success) return;
+    expect(removal.requiresArchitectureAck).toBe(true);
+    expect(removal.proposedConfig.database).toBe("none");
+    expect(removal.stackPartSpecs).not.toContain("backend.database:universal:postgres");
   });
 
   it("preserves graph-only metadata during unrelated stack updates", async () => {
@@ -2819,6 +2893,13 @@ describe("stack update planner", () => {
           expected: "opentelemetry",
         },
         {
+          name: "python-logging-structlog",
+          config: PYTHON_BASE_CONFIG,
+          update: { pythonLogging: "structlog" },
+          field: "pythonLogging",
+          expected: "structlog",
+        },
+        {
           name: "python-cli-typer",
           config: PYTHON_BASE_CONFIG,
           update: { pythonCli: ["typer"] },
@@ -3313,7 +3394,10 @@ describe("stack update planner", () => {
         ],
         assertions: [
           { path: "apps/server/mix.exs", content: ":guardian" },
-          { path: "apps/server/config/config.exs", content: "config :app, App.Auth.Guardian" },
+          {
+            path: "apps/server/config/config.exs",
+            content: "config :app,\n       App.Auth.Guardian",
+          },
           { path: "apps/server/lib/app/auth/guardian.ex", content: "use Guardian, otp_app: :app" },
           {
             path: "apps/server/lib/app_web/controllers/token_controller.ex",
@@ -3780,7 +3864,7 @@ describe("stack update planner", () => {
     await expectFileContains(join(projectDir, "apps/server/lib/app/application.ex"), "App.Cache");
     await expectFileContains(
       join(projectDir, "apps/server/config/config.exs"),
-      "config :app, App.Cache",
+      "config :app,\n       App.Cache",
     );
   });
 
@@ -3818,7 +3902,7 @@ describe("stack update planner", () => {
         ],
         assertions: [
           { path: "apps/server/mix.exs", content: ":prom_ex" },
-          { path: "apps/server/config/config.exs", content: "config :app, App.PromEx" },
+          { path: "apps/server/config/config.exs", content: "config :app,\n       App.PromEx" },
           { path: "apps/server/lib/app/application.ex", content: "App.PromEx" },
           { path: "apps/server/lib/app_web/endpoint.ex", content: "PromEx.Plug" },
           { path: "apps/server/lib/app/prom_ex.ex", content: "use PromEx, otp_app: :app" },
@@ -4553,7 +4637,7 @@ describe("stack update planner", () => {
     expect(await pathExists(join(projectDir, "apps/docs/package.json"))).toBe(false);
   });
 
-  it("records channel-resolved generated content as the manifest baseline", async () => {
+  it("records generated content, not channel-resolved versions, as the manifest baseline", async () => {
     const root = await makeTempRoot("bfs-stack-update-channel-baseline-");
     const projectDir = join(root, "app");
     await scaffoldGeneratedProject(makeConfig(projectDir));
@@ -4621,7 +4705,8 @@ describe("stack update planner", () => {
     const serverBaseline = manifest?.baselines?.["apps/server/package.json"];
     expect(serverBaseline).toBeDefined();
     expect(serverBaseline).not.toContain("manifest-user-dep");
-    expect(serverBaseline).toContain("9.9.9");
+    expect(serverBaseline).toContain('"resend"');
+    expect(serverBaseline).not.toContain("9.9.9");
   });
 
   it("does not re-resolve a failed version-channel rewrite during apply", async () => {
@@ -4939,9 +5024,10 @@ describe("stack update planner", () => {
       makeConfig(projectDir, {
         stackParts: parseStackPartSpecs([
           "backend:typescript:hono:api",
-          "mobile:react-native:native-bare:mobile",
+          "backend:go:gin:admin",
+          "database:universal:sqlite:main-db",
           "api.database:universal:sqlite:api-db",
-          "mobile.database:universal:sqlite:mobile-db",
+          "admin.database:universal:sqlite:admin-db",
         ]),
         ecosystem: "typescript",
         database: "sqlite",
@@ -4954,8 +5040,8 @@ describe("stack update planner", () => {
     expect(plan.proposedConfig.stackParts?.some((part) => part.id === "api-db")).toBe(false);
     expect(plan.proposedConfig.stackParts).toContainEqual(
       expect.objectContaining({
-        id: "mobile-db",
-        ownerPartId: "mobile",
+        id: "admin-db",
+        ownerPartId: "admin",
         role: "database",
         toolId: "sqlite",
       }),

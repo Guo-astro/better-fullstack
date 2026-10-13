@@ -1,3 +1,4 @@
+import { COMPETITOR_COMPARISONS } from "@/lib/builder/compare-tools";
 import { canonicalUrl } from "@/lib/seo/seo";
 
 type SitemapEntry = {
@@ -23,8 +24,13 @@ const staticSitemapEntries: SitemapEntry[] = [
   { path: "/", changefreq: "daily", priority: 1 },
   { path: "/new", changefreq: "daily", priority: 0.9 },
   { path: "/compare", changefreq: "weekly", priority: 0.8 },
-  { path: "/compare/create-t3-app", changefreq: "weekly", priority: 0.7 },
-  { path: "/compare/better-t-stack", changefreq: "weekly", priority: 0.7 },
+  ...COMPETITOR_COMPARISONS.map(
+    (comparison): SitemapEntry => ({
+      path: `/compare/${comparison.slug}`,
+      changefreq: "weekly",
+      priority: 0.7,
+    }),
+  ),
   { path: "/mcp", changefreq: "weekly", priority: 0.7 },
   { path: "/run-before-you-clone", changefreq: "weekly", priority: 0.9 },
   { path: "/templates", changefreq: "weekly", priority: 0.9 },
@@ -55,11 +61,13 @@ export function getSitemapEntriesFromPages({
   docsPages,
   guidePages,
   blogPages = [],
+  changelogPages = [],
   stackPages = [],
 }: {
   docsPages: SitemapContentPage[];
   guidePages: SitemapContentPage[];
   blogPages?: SitemapContentPage[];
+  changelogPages?: SitemapContentPage[];
   stackPages?: SitemapStackPage[];
 }): SitemapEntry[] {
   const docsEntries = docsPages.map((page): SitemapEntry => {
@@ -92,6 +100,15 @@ export function getSitemapEntriesFromPages({
     ),
   ];
 
+  const changelogEntries = changelogPages.map(
+    (page): SitemapEntry => ({
+      path: "/changelog",
+      changefreq: "weekly",
+      lastmod: page.frontmatter.updated,
+      priority: 0.6,
+    }),
+  );
+
   const stackEntries = stackPages.map(
     (page): SitemapEntry => ({
       path: `/stack/${page.slug}`,
@@ -107,6 +124,7 @@ export function getSitemapEntriesFromPages({
     ...docsEntries,
     ...guideEntries,
     ...blogEntries,
+    ...changelogEntries,
     ...stackEntries,
   ]) {
     entriesByUrl.set(canonicalUrl(entry.path), entry);

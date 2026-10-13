@@ -870,6 +870,7 @@ function buildServerVars(
   caching: ProjectConfig["caching"],
   search: ProjectConfig["search"],
   fileStorage: ProjectConfig["fileStorage"],
+  vectorDb: ProjectConfig["vectorDb"],
 ): EnvVariable[] {
   const hasChatSdkExample = examples?.includes("chat-sdk") || false;
   const isChatSdkSlackSelf =
@@ -1795,6 +1796,42 @@ function buildServerVars(
       comment: "Temporal task queue name (defaults to project name if not set)",
     },
     {
+      key: "QSTASH_URL",
+      value: "https://qstash.upstash.io",
+      condition: jobQueue === "upstash-qstash",
+      comment: "QStash API URL (use http://127.0.0.1:8080 with the local QStash dev server)",
+    },
+    {
+      key: "QSTASH_TOKEN",
+      value: "",
+      condition: jobQueue === "upstash-qstash",
+      comment: "QStash token (from console.upstash.com/qstash)",
+    },
+    {
+      key: "QSTASH_CURRENT_SIGNING_KEY",
+      value: "",
+      condition: jobQueue === "upstash-qstash",
+      comment: "QStash current signing key, used to verify incoming job requests",
+    },
+    {
+      key: "QSTASH_NEXT_SIGNING_KEY",
+      value: "",
+      condition: jobQueue === "upstash-qstash",
+      comment: "QStash next signing key, used during key rotation",
+    },
+    {
+      key: "QSTASH_WEBHOOK_URL",
+      value: "http://localhost:3000/api/jobs/welcome-email",
+      condition: jobQueue === "upstash-qstash",
+      comment: "Public URL QStash calls for the welcome email job (use a tunnel in development)",
+    },
+    {
+      key: "HATCHET_CLIENT_TOKEN",
+      value: "",
+      condition: jobQueue === "hatchet",
+      comment: "Hatchet API token (from Hatchet Cloud or your self-hosted Hatchet dashboard)",
+    },
+    {
       key: "UPSTASH_REDIS_REST_URL",
       value: "https://your-upstash-redis.upstash.io",
       condition: caching === "upstash-redis" || rateLimit === "upstash-ratelimit",
@@ -2003,6 +2040,48 @@ function buildServerVars(
       value: "uploads",
       condition: fileStorage === "supabase-storage",
       comment: "Supabase Storage bucket name",
+    },
+    {
+      key: "WEAVIATE_URL",
+      value: "http://localhost:8080",
+      condition: vectorDb === "weaviate",
+      comment: "Weaviate URL - local Docker default, or your Weaviate Cloud cluster URL",
+    },
+    {
+      key: "WEAVIATE_API_KEY",
+      value: "",
+      condition: vectorDb === "weaviate",
+      comment: "Weaviate Cloud API key - leave empty for a local Weaviate without authentication",
+    },
+    {
+      key: "UPSTASH_VECTOR_REST_URL",
+      value: "https://your-index.upstash.io",
+      condition: vectorDb === "upstash-vector",
+      comment: "Upstash Vector REST URL - get it at https://console.upstash.com/vector",
+    },
+    {
+      key: "UPSTASH_VECTOR_REST_TOKEN",
+      value: "",
+      condition: vectorDb === "upstash-vector",
+      comment: "Upstash Vector REST token - get it at https://console.upstash.com/vector",
+    },
+    {
+      key: "TURBOPUFFER_API_KEY",
+      value: "",
+      condition: vectorDb === "turbopuffer",
+      comment: "turbopuffer API key - create one at https://turbopuffer.com/dashboard",
+    },
+    {
+      key: "TURBOPUFFER_REGION",
+      value: "gcp-us-central1",
+      condition: vectorDb === "turbopuffer",
+      comment: "turbopuffer region that hosts your namespaces",
+    },
+    {
+      key: "LANCEDB_URI",
+      value: "./.lancedb",
+      condition: vectorDb === "lancedb",
+      comment: "LanceDB storage path or object store URI (for example s3://bucket/path)",
     },
   ];
 }
@@ -2302,9 +2381,17 @@ export function processEnvVariables(vfs: VirtualFileSystem, config: ProjectConfi
     config.caching,
     config.search,
     config.fileStorage,
+    config.vectorDb,
   );
 
   if (config.ecosystem !== "typescript") {
+    const databaseVariable = serverVars.find((variable) => variable.key === "DATABASE_URL");
+    if (config.ecosystem === "go" && databaseVariable) {
+      if (database === "sqlite") databaseVariable.value = "app.db";
+      if (database === "mysql") {
+        databaseVariable.value = `root:password@tcp(localhost:3306)/${config.projectName}?parseTime=true`;
+      }
+    }
     if (!serverVars.some((variable) => variable.condition)) return;
     writeEnvFile(vfs, ".env.example", serverVars);
   } else if (backend === "self") {

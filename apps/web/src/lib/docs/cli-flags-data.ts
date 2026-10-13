@@ -131,6 +131,7 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "values": [
           "ai",
           "chat-sdk",
+          "tanstack-showcase",
           "none"
         ],
         "valueHint": null,
@@ -575,6 +576,9 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
           "trigger-dev",
           "inngest",
           "temporal",
+          "pg-boss",
+          "upstash-qstash",
+          "hatchet",
           "none"
         ],
         "valueHint": null,
@@ -724,6 +728,10 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
           "qdrant",
           "chroma",
           "pinecone",
+          "weaviate",
+          "upstash-vector",
+          "turbopuffer",
+          "lancedb",
           "none"
         ],
         "valueHint": null,
@@ -1657,6 +1665,18 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "multiple": false
       },
       {
+        "flag": "--python-logging",
+        "summary": "Python logging.",
+        "values": [
+          "loguru",
+          "structlog",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
+      },
+      {
         "flag": "--python-cli",
         "summary": "Python CLI tooling.",
         "values": [
@@ -1880,6 +1900,8 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
           "watermill",
           "kafka-go",
           "asynq",
+          "river",
+          "gocron",
           "none"
         ],
         "valueHint": null,
@@ -1950,6 +1972,8 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "summary": "Go database migrations.",
         "values": [
           "golang-migrate",
+          "goose",
+          "atlas",
           "none"
         ],
         "valueHint": null,
@@ -2733,6 +2757,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "python:--python-caching": m.docsCliSummaryPythonPythonCaching,
   "python:--python-realtime": m.docsCliSummaryPythonPythonRealtime,
   "python:--python-observability": m.docsCliSummaryPythonPythonObservability,
+  "python:--python-logging": m.docsCliSummaryPythonPythonLogging,
   "python:--python-cli": m.docsCliSummaryPythonPythonCli,
   "python:--python-cloud-sdk": m.docsCliSummaryPythonPythonCloudSdk,
   "python:--python-http-client": m.docsCliSummaryPythonPythonHttpClient,

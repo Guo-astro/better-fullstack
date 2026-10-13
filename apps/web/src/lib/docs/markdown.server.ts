@@ -2,6 +2,7 @@ import { docsMeta } from "virtual:content-meta";
 import { rawDocsPages } from "virtual:docs-raw";
 import { localizedDocsRawMdxLoaders } from "virtual:localized-content";
 
+import { canonicalUrl } from "@/lib/seo/seo";
 import { getLocale } from "@/paraglide/runtime.js";
 
 export async function docsMarkdownResponse(slug: string): Promise<Response> {
@@ -28,6 +29,7 @@ export async function docsMarkdownResponse(slug: string): Promise<Response> {
       "content-language": localizedLoader ? locale : "en",
       "cache-control": "private, no-store",
       vary: "Cookie, Accept-Language",
+      link: `<${canonicalUrl(slug ? `/docs/${slug}` : "/docs")}>; rel="canonical"`,
     },
   });
 }

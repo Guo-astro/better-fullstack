@@ -1,20 +1,39 @@
-import type { Backend, Database, Runtime } from "@/types";
+import type { PromptSingleResolution } from "@/prompts/core/prompt-contract";
 
 import { DEFAULT_CONFIG } from "@/constants";
 import { exitCancelled } from "@/presentation/errors";
-import type { PromptSingleResolution } from "@/prompts/core/prompt-contract";
 import { isCancel, navigableSelect } from "@/prompts/core/navigable";
+import {
+  getAuthIncompatibility,
+  getDatabaseOrmIncompatibility,
+  getJobQueueIncompatibility,
+  getGoMessageQueueIncompatibility,
+  getGoMigrationsIncompatibility,
+  type GoMessageQueue,
+  type GoMigrations,
+  type GoOrm,
+  type Auth,
+  type Backend,
+  type Database,
+  type JobQueue,
+  type ORM,
+  type Runtime,
+} from "@/types";
 
 type DatabasePromptContext = {
   database?: Database;
   backend?: Backend;
   runtime?: Runtime;
+  jobQueue?: JobQueue;
+  auth?: Auth;
+  orm?: ORM;
+  go?: { goMessageQueue?: GoMessageQueue; goMigrations?: GoMigrations; goOrm?: GoOrm };
 };
 
 export function resolveDatabasePrompt(
   context: DatabasePromptContext = {},
 ): PromptSingleResolution<Database> {
-  if (context.backend === "convex" || context.backend === "none") {
+  if (!context.go && (context.backend === "convex" || context.backend === "none")) {
     return {
       shouldPrompt: false,
       mode: "single",
@@ -77,16 +96,49 @@ export function resolveDatabasePrompt(
     });
   }
 
+  const options = databaseOptions.filter((option) =>
+    context.go
+      ? !getGoMessageQueueIncompatibility(context.go.goMessageQueue, {
+          database: option.value,
+          partial: true,
+        }) &&
+        !getGoMigrationsIncompatibility(context.go.goMigrations, {
+          database: option.value,
+          goOrm: context.go.goOrm,
+        })
+      : !getJobQueueIncompatibility(
+          context.jobQueue,
+          { database: option.value },
+          { partial: true },
+        ) &&
+        !getAuthIncompatibility(
+          context.auth,
+          { ecosystem: "typescript", database: option.value },
+          { partial: true },
+        ) &&
+        !getDatabaseOrmIncompatibility(option.value, context.orm),
+  );
+
   return {
     shouldPrompt: true,
     mode: "single",
-    options: databaseOptions,
-    initialValue: DEFAULT_CONFIG.database,
+    options,
+    initialValue: options.some((option) => option.value === DEFAULT_CONFIG.database)
+      ? DEFAULT_CONFIG.database
+      : options[0]?.value,
   };
 }
 
-export async function getDatabaseChoice(database?: Database, backend?: Backend, runtime?: Runtime) {
-  const resolution = resolveDatabasePrompt({ database, backend, runtime });
+export async function getDatabaseChoice(
+  database?: Database,
+  backend?: Backend,
+  runtime?: Runtime,
+  jobQueue?: JobQueue,
+  auth?: Auth,
+  orm?: ORM,
+  go?: DatabasePromptContext["go"],
+) {
+  const resolution = resolveDatabasePrompt({ database, backend, runtime, jobQueue, auth, orm, go });
   if (!resolution.shouldPrompt) {
     return resolution.autoValue ?? "none";
   }

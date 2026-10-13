@@ -11,9 +11,13 @@ import {
   TbBrandTypescript as TypeScript,
   TbBuildingStore as Store,
   TbCoffee as Coffee,
+  TbDeviceDesktop as Desktop,
   TbDeviceMobile as Mobile,
+  TbDroplet as Droplet,
   TbPackage as Package,
+  TbPuzzle as Puzzle,
   TbRobot as Robot,
+  TbShoppingCart as ShoppingCart,
   TbSparkles as Sparkles,
   TbTool as Tool,
 } from "react-icons/tb";
@@ -35,6 +39,7 @@ const CATEGORY_ORDER = [
   "Go",
   "Java",
   ".NET",
+  "Elixir",
   "AI Tools",
 ] as const;
 
@@ -47,6 +52,7 @@ const CATEGORY_ICONS: Record<string, IconType> = {
   Go: Golang,
   Java: Coffee,
   ".NET": CSharp,
+  Elixir: Droplet,
   "AI Tools": Sparkles,
 };
 
@@ -58,6 +64,9 @@ const PACK_ICONS: Record<string, IconType> = {
   "create-rust-backend": Rust,
   "create-mobile-app": Mobile,
   "create-internal-tool": Tool,
+  "create-ecommerce-store": ShoppingCart,
+  "create-browser-extension": Puzzle,
+  "create-desktop-app": Desktop,
 };
 
 export type GuideCategory = {
