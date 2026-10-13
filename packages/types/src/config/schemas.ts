@@ -289,7 +289,9 @@ export const VersionChannelSchema = z
 
 export const WorkspaceShapeSchema = z
   .enum(["monorepo", "single-app"])
-  .describe("Workspace layout: monorepo (apps/* + packages/*) or single-app (flat root app)");
+  .describe(
+    "Workspace layout: monorepo (apps/* + packages/*) or single-app (flat root app; only for a thin self app)",
+  );
 
 export const DatabaseSetupSchema = z
   .enum([
@@ -1226,9 +1228,9 @@ const STACK_CONFIG_FIELDS = {
   orm: ORMSchema,
   backend: BackendSchema,
   runtime: RuntimeSchema,
-  frontend: z.array(FrontendSchema),
-  addons: z.array(AddonsSchema),
-  examples: z.array(ExamplesSchema),
+  frontend: z.array(FrontendSchema).describe("Frontend frameworks (web and React Native)"),
+  addons: z.array(AddonsSchema).describe("Deprecated alias for tooling part bindings"),
+  examples: z.array(ExamplesSchema).describe("Example templates"),
   auth: AuthSchema,
   payments: PaymentsSchema,
   git: z.boolean(),
@@ -1283,19 +1285,22 @@ const STACK_CONFIG_FIELDS = {
   mobilePush: MobilePushSchema,
   mobileOTA: MobileOTASchema,
   mobileDeepLinking: MobileDeepLinkingSchema,
-  mobileLibraries: z.array(MobileLibrariesSchema),
+  mobileLibraries: z.array(MobileLibrariesSchema).describe("Mobile application libraries"),
   // Rust ecosystem options
   rustWebFramework: RustWebFrameworkSchema,
   rustFrontend: RustFrontendSchema,
   dotnetFrontend: DotnetFrontendSchema.optional(),
   kotlinMobile: KotlinMobileSchema.optional(),
-  kotlinMobileLibraries: z.array(KotlinMobileLibrariesSchema).optional(),
+  kotlinMobileLibraries: z
+    .array(KotlinMobileLibrariesSchema)
+    .optional()
+    .describe("Kotlin mobile libraries"),
   swiftMobile: SwiftMobileSchema.optional(),
   dartMobile: DartMobileSchema.optional(),
   rustOrm: RustOrmSchema,
   rustApi: RustApiSchema,
   rustCli: RustCliSchema,
-  rustLibraries: z.array(RustLibrariesSchema),
+  rustLibraries: z.array(RustLibrariesSchema).describe("Rust core libraries"),
   rustLogging: RustLoggingSchema,
   rustErrorHandling: RustErrorHandlingSchema,
   rustCaching: RustCachingSchema,
@@ -1308,21 +1313,21 @@ const STACK_CONFIG_FIELDS = {
   pythonWebFramework: PythonWebFrameworkSchema,
   pythonOrm: PythonOrmSchema,
   pythonValidation: PythonValidationSchema,
-  pythonAi: z.array(PythonAiSchema),
+  pythonAi: z.array(PythonAiSchema).describe("Python AI/ML frameworks"),
   pythonAuth: PythonAuthSchema,
   pythonApi: PythonApiSchema,
   pythonTaskQueue: PythonTaskQueueSchema,
   pythonGraphql: PythonGraphqlSchema,
   pythonQuality: PythonQualitySchema,
-  pythonTesting: z.array(PythonTestingSchema),
+  pythonTesting: z.array(PythonTestingSchema).describe("Python testing libraries"),
   pythonCaching: PythonCachingSchema,
   pythonRealtime: PythonRealtimeSchema,
   pythonObservability: PythonObservabilitySchema,
   pythonLogging: PythonLoggingSchema,
-  pythonCli: z.array(PythonCliSchema),
+  pythonCli: z.array(PythonCliSchema).describe("Python CLI tooling"),
   pythonCloudSdk: PythonCloudSdkSchema,
   pythonHttpClient: PythonHttpClientSchema,
-  pythonData: z.array(PythonDataSchema),
+  pythonData: z.array(PythonDataSchema).describe("Python data and scientific libraries"),
   pythonMedia: PythonMediaSchema,
   pythonServer: PythonServerSchema,
   pythonPackageManager: PythonPackageManagerSchema,
@@ -1334,7 +1339,7 @@ const STACK_CONFIG_FIELDS = {
   goCli: GoCliSchema,
   goLogging: GoLoggingSchema,
   goAuth: GoAuthSchema,
-  goTesting: z.array(GoTestingSchema),
+  goTesting: z.array(GoTestingSchema).describe("Go testing libraries"),
   goRealtime: GoRealtimeSchema,
   goMessageQueue: GoMessageQueueSchema,
   goCaching: GoCachingSchema,
@@ -1354,21 +1359,23 @@ const STACK_CONFIG_FIELDS = {
   javaAuth: JavaAuthSchema,
   javaApi: JavaApiSchema,
   javaLogging: JavaLoggingSchema,
-  javaLibraries: z.array(JavaLibrariesSchema),
-  javaTestingLibraries: z.array(JavaTestingLibrariesSchema),
+  javaLibraries: z.array(JavaLibrariesSchema).describe("Java application libraries"),
+  javaTestingLibraries: z.array(JavaTestingLibrariesSchema).describe("Java testing libraries"),
   // .NET ecosystem options
   dotnetWebFramework: DotnetWebFrameworkSchema,
   dotnetOrm: DotnetOrmSchema,
   dotnetAuth: DotnetAuthSchema,
   dotnetApi: DotnetApiSchema,
-  dotnetTesting: z.array(DotnetTestingSchema),
+  dotnetTesting: z.array(DotnetTestingSchema).describe(".NET testing libraries"),
   dotnetJobQueue: DotnetJobQueueSchema,
   dotnetRealtime: DotnetRealtimeSchema,
-  dotnetObservability: z.array(DotnetObservabilitySchema),
+  dotnetObservability: z
+    .array(DotnetObservabilitySchema)
+    .describe(".NET observability and logging libraries"),
   dotnetValidation: DotnetValidationSchema,
   dotnetCaching: DotnetCachingSchema,
   dotnetDeploy: DotnetDeploySchema,
-  dotnetLibraries: z.array(DotnetLibrariesSchema),
+  dotnetLibraries: z.array(DotnetLibrariesSchema).describe(".NET application libraries"),
   // Elixir ecosystem options
   elixirWebFramework: ElixirWebFrameworkSchema,
   elixirOrm: ElixirOrmSchema,
@@ -1390,9 +1397,9 @@ const STACK_CONFIG_FIELDS = {
   elixirDocumentation: ElixirDocumentationSchema,
   elixirClustering: ElixirClusteringSchema,
   elixirDeploy: ElixirDeploySchema,
-  elixirLibraries: z.array(ElixirLibrariesSchema),
+  elixirLibraries: z.array(ElixirLibrariesSchema).describe("Elixir libraries"),
   // AI documentation files
-  aiDocs: z.array(AiDocsSchema),
+  aiDocs: z.array(AiDocsSchema).describe("AI documentation files"),
 };
 
 type OptionalInputField<Schema> =
@@ -1429,7 +1436,10 @@ export const CreateInputSchema = z.object({
   renderTitle: z.boolean().optional(),
   disableAnalytics: z.boolean().optional(),
   manualDb: z.boolean().optional(),
-  part: z.array(z.string()).optional(),
+  part: z
+    .array(z.string())
+    .optional()
+    .describe("Stack graph part binding, e.g. frontend:typescript:next or backend.orm:go:gorm"),
 });
 
 export const AddInputSchema = CreateInputSchema.omit({
