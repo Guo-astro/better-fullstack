@@ -1,13 +1,9 @@
 import type { ProjectConfig } from "@better-fullstack/types";
 
 import type { VirtualFileSystem } from "@/core/virtual-fs";
-import {
-  isBinaryFile,
-  normalizeElixirAppName,
-  processTemplateString,
-  transformFilename,
-} from "@/core/template-processor";
-import { isEmptyTemplateOutput, type TemplateData } from "@/template-handlers/core/utils";
+
+import { normalizeElixirAppName, transformFilename } from "@/core/template-processor";
+import { renderTemplateTree, type TemplateData } from "@/template-handlers/core/utils";
 
 export async function processElixirBaseTemplate(
   vfs: VirtualFileSystem,
@@ -44,64 +40,56 @@ export async function processElixirBaseTemplate(
   const hasBypass = config.elixirTesting === "bypass";
   const hasWallaby = hasPhoenix && config.elixirTesting === "wallaby";
 
-  for (const [templatePath, content] of templates) {
-    if (!templatePath.startsWith(prefix)) continue;
-    if (!hasPhoenix && templatePath.includes("___web")) continue;
-    if (!hasPhoenix && templatePath.includes("test/support/conn_case")) continue;
-    if (!hasLiveViewStreams && templatePath.includes("/live/")) continue;
-    if (!hasEctoSql && (templatePath.includes("/repo.ex") || templatePath.includes("/migrations/")))
-      continue;
-    if (!hasEctoSql && templatePath.includes("priv/repo/seeds.exs")) continue;
-    const isEctoCatalogTemplate =
-      templatePath.includes("/catalog.ex") || templatePath.includes("/catalog/");
-    if (!hasEcto && (isEctoCatalogTemplate || templatePath.includes("/item_controller")))
-      continue;
-    if (!hasAuth && templatePath.includes("/accounts")) continue;
-    if (!hasAuth && templatePath.includes("create_users")) continue;
-    if (!hasAuth && templatePath.includes("/user_session_controller")) continue;
-    if (!hasGuardian && templatePath.includes("/auth/guardian.ex")) continue;
-    if (!hasGuardian && templatePath.includes("/token_controller")) continue;
-    if (!hasUeberauth && templatePath.includes("/oauth_controller")) continue;
-    if (!hasChannels && templatePath.includes("/channels/user_socket")) continue;
-    if (!hasChannels && templatePath.includes("/channels/room_channel")) continue;
-    if (!hasPresence && templatePath.includes("/channels/presence")) continue;
-    if (!hasOban && templatePath.includes("/workers/")) continue;
-    if (!hasOban && templatePath.includes("_oban_jobs")) continue;
-    if (!hasQuantum && templatePath.includes("/scheduler.ex")) continue;
-    if (!hasAbsinthe && templatePath.includes("/graphql/")) continue;
-    if (!hasCacheModule && templatePath.includes("/cache.ex")) continue;
-    if (!hasPromEx && templatePath.includes("/prom_ex.ex")) continue;
-    if (!hasNimbleOptions && templatePath.includes("/item_options.ex")) continue;
-    if (!hasMox && templatePath.includes("/external_service.ex")) continue;
-    if (!hasMox && templatePath.includes("/mocks.ex")) continue;
-    if (!hasMox && templatePath.includes("/external_service_mox_test.exs")) continue;
-    if (!hasBypass && templatePath.includes("/bypass_test.exs")) continue;
-    if (!hasWallaby && templatePath.includes("/features/")) continue;
-    if (!hasEmail && templatePath.includes("/mailer.ex")) continue;
-    if (!hasDocker && templatePath.includes("Dockerfile")) continue;
-    if (!hasFlyDeploy && templatePath.includes("fly.toml")) continue;
-    if (!hasGigalixirDeploy && templatePath.includes("Procfile")) continue;
-    if (!hasHttpClient && templatePath.includes("/http_client.ex")) continue;
-
-    const relativePath = templatePath.slice(prefix.length);
-    const outputPath = transformFilename(relativePath).replace(
-      /__elixirAppName__/g,
-      normalizeElixirAppName(config.projectName),
-    );
-    const destPath = targetPath ? `${targetPath}/${outputPath}` : outputPath;
-
-    let processedContent: string;
-    if (isBinaryFile(templatePath)) {
-      processedContent = "[Binary file]";
-    } else if (templatePath.endsWith(".hbs")) {
-      processedContent = processTemplateString(content, config);
-    } else {
-      processedContent = content;
-    }
-
-    if (isEmptyTemplateOutput(templatePath, processedContent)) continue;
-
-    const sourcePath = isBinaryFile(templatePath) ? templatePath : undefined;
-    vfs.writeFile(destPath, processedContent, sourcePath);
-  }
+  renderTemplateTree(vfs, templates, {
+    prefix,
+    targetPath,
+    context: config,
+    skip: (templatePath) => {
+      if (!hasPhoenix && templatePath.includes("___web")) return true;
+      if (!hasPhoenix && templatePath.includes("test/support/conn_case")) return true;
+      if (!hasLiveViewStreams && templatePath.includes("/live/")) return true;
+      if (
+        !hasEctoSql &&
+        (templatePath.includes("/repo.ex") || templatePath.includes("/migrations/"))
+      )
+        return true;
+      if (!hasEctoSql && templatePath.includes("priv/repo/seeds.exs")) return true;
+      const isEctoCatalogTemplate =
+        templatePath.includes("/catalog.ex") || templatePath.includes("/catalog/");
+      if (!hasEcto && (isEctoCatalogTemplate || templatePath.includes("/item_controller")))
+        return true;
+      if (!hasAuth && templatePath.includes("/accounts")) return true;
+      if (!hasAuth && templatePath.includes("create_users")) return true;
+      if (!hasAuth && templatePath.includes("/user_session_controller")) return true;
+      if (!hasGuardian && templatePath.includes("/auth/guardian.ex")) return true;
+      if (!hasGuardian && templatePath.includes("/token_controller")) return true;
+      if (!hasUeberauth && templatePath.includes("/oauth_controller")) return true;
+      if (!hasChannels && templatePath.includes("/channels/user_socket")) return true;
+      if (!hasChannels && templatePath.includes("/channels/room_channel")) return true;
+      if (!hasPresence && templatePath.includes("/channels/presence")) return true;
+      if (!hasOban && templatePath.includes("/workers/")) return true;
+      if (!hasOban && templatePath.includes("_oban_jobs")) return true;
+      if (!hasQuantum && templatePath.includes("/scheduler.ex")) return true;
+      if (!hasAbsinthe && templatePath.includes("/graphql/")) return true;
+      if (!hasCacheModule && templatePath.includes("/cache.ex")) return true;
+      if (!hasPromEx && templatePath.includes("/prom_ex.ex")) return true;
+      if (!hasNimbleOptions && templatePath.includes("/item_options.ex")) return true;
+      if (!hasMox && templatePath.includes("/external_service.ex")) return true;
+      if (!hasMox && templatePath.includes("/mocks.ex")) return true;
+      if (!hasMox && templatePath.includes("/external_service_mox_test.exs")) return true;
+      if (!hasBypass && templatePath.includes("/bypass_test.exs")) return true;
+      if (!hasWallaby && templatePath.includes("/features/")) return true;
+      if (!hasEmail && templatePath.includes("/mailer.ex")) return true;
+      if (!hasDocker && templatePath.includes("Dockerfile")) return true;
+      if (!hasFlyDeploy && templatePath.includes("fly.toml")) return true;
+      if (!hasGigalixirDeploy && templatePath.includes("Procfile")) return true;
+      if (!hasHttpClient && templatePath.includes("/http_client.ex")) return true;
+      return false;
+    },
+    outputPath: (relativePath) =>
+      transformFilename(relativePath).replace(
+        /__elixirAppName__/g,
+        normalizeElixirAppName(config.projectName),
+      ),
+  });
 }

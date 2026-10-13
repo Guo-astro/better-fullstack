@@ -1,8 +1,8 @@
 import type { ProjectConfig } from "@better-fullstack/types";
 
 import type { VirtualFileSystem } from "@/core/virtual-fs";
-import { isBinaryFile, processTemplateString, transformFilename } from "@/core/template-processor";
-import { isEmptyTemplateOutput, type TemplateData } from "@/template-handlers/core/utils";
+
+import { renderTemplateTree, type TemplateData } from "@/template-handlers/core/utils";
 
 export async function processPythonBaseTemplate(
   vfs: VirtualFileSystem,
@@ -22,26 +22,9 @@ export async function processPythonBaseTemplate(
     pythonLogging: config.pythonLogging ?? "none",
   };
 
-  for (const [templatePath, content] of templates) {
-    if (!templatePath.startsWith(prefix)) continue;
-
-    const relativePath = templatePath.slice(prefix.length);
-    const outputPath = transformFilename(relativePath);
-    const destPath = targetPath ? `${targetPath}/${outputPath}` : outputPath;
-
-    let processedContent: string;
-    if (isBinaryFile(templatePath)) {
-      processedContent = "[Binary file]";
-    } else if (templatePath.endsWith(".hbs")) {
-      processedContent = processTemplateString(content, templateContext);
-    } else {
-      processedContent = content;
-    }
-
-    if (isEmptyTemplateOutput(templatePath, processedContent)) continue;
-
-    // Pass original template path for binary files
-    const sourcePath = isBinaryFile(templatePath) ? templatePath : undefined;
-    vfs.writeFile(destPath, processedContent, sourcePath);
-  }
+  renderTemplateTree(vfs, templates, {
+    prefix,
+    targetPath,
+    context: templateContext,
+  });
 }
