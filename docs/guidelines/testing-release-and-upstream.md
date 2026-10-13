@@ -19,16 +19,19 @@ For changes that affect stack options, generated output, compatibility, or previ
 bun run test:release
 ```
 
-The root `package.json` is authoritative for the lane's exact composition. It builds core packages
-and checks CLI startup, docs/plugin/workflow contracts, public evidence, capability claims,
-recommendations, update qualification, lifecycle/MCP contracts, template output, and builder parity.
+The root `package.json` is authoritative for the lane's exact composition. It builds core packages,
+runs `bun run test:scripts` (every test under `scripts/` and `testing/`), and runs the release-only
+validators: agent docs, plugin bundle, preview and release workflows, public evidence claims,
+capability evidence, recommendations, update qualification and actions, mutation contracts, the
+built MCP protocol, and tech links. Package tests, including template output and builder parity,
+run in `bun run test`, which CI runs on every pull request.
 Runtime and published-package proof have separate commands; passing structural tests does not
 establish that a generated application runs.
 
 Additional focused release-facing checks:
 
 - `bun run test:plugin-bundle` validates the local installable agent plugin manifest, marketplace entry, MCP command, icon paths, and bundled skills.
-- `bun run test:ai-examples` runs the CLI AI/chat example suite from the `apps/cli` package context so workspace package resolution matches local package scripts.
+- `bun test test/generation/examples.test.ts` from `apps/cli` runs the CLI AI/chat example suite with the package's own workspace resolution.
 - `bun test apps/cli/test/lifecycle/add-history-commands.test.ts` covers the user-facing `add` command, including stack-update dry-runs and apply flows.
 - `bun test apps/cli/test/lifecycle/stack-update.test.ts` covers the lower-level planner/apply conflict model and create-time stack-field coverage.
 - `bun run test:published-package -- --specifier <npm-tag-or-version>` validates the already-published npm package through Bun, npm, and pnpm scaffold runs. Use this only after a package has been published to npm.

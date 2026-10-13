@@ -10,7 +10,7 @@ import type {
 import {
   EVIDENCE_SCHEMA_VERSION,
   type SmokeEvidenceEnvelope,
-} from "@scripts/verified-combinations/evidence";
+} from "@scripts/evidence/smoke-evidence";
 import { ensureBuiltCliBinary } from "@testing/lib/cli-binary";
 import {
   formatCliScaffoldFailure,
