@@ -26,7 +26,9 @@ import {
 import {
   CATEGORY_ORDER,
   getCategoryDisplayName,
+  getCategoryOrderForEcosystem,
   isMultiEcosystemMobileCategory,
+  OPTION_CATEGORY_METADATA,
   type OptionCategory,
 } from "@/catalog/option-metadata";
 import { ANALYTICS_VALUES } from "@/config/schemas";
@@ -6053,226 +6055,82 @@ export function getCompatibleFormLibraries(frontends: Frontend[] = []): Forms[] 
   return all;
 }
 
+const EVALUATED_ADDON_INPUT_KEYS: ReadonlySet<string> = new Set([
+  "codeQuality",
+  "documentation",
+  "appPlatforms",
+]);
+
+const COMPATIBILITY_INPUT_CATEGORY_RENAMES: Readonly<Record<string, OptionCategory>> = {
+  aiSdk: "ai",
+};
+
+const ISSUE_CODE_BY_CATEGORY: Partial<Record<OptionCategory, string>> = {
+  webFrontend: "INCOMPATIBLE_FRONTEND",
+  appPlatforms: "INCOMPATIBLE_ADDON",
+  examples: "INCOMPATIBLE_ADDON",
+  javaLibraries: "INCOMPATIBLE_JAVA_LIBRARY",
+  javaTestingLibraries: "INCOMPATIBLE_JAVA_TESTING_LIBRARY",
+  mobileLibraries: "INCOMPATIBLE_MOBILE_LIBRARY",
+  kotlinMobileLibraries: "INCOMPATIBLE_KOTLIN_MOBILE_LIBRARY",
+  dotnetTesting: "INCOMPATIBLE_DOTNET_TESTING_LIBRARY",
+  dotnetObservability: "INCOMPATIBLE_DOTNET_OBSERVABILITY",
+  dotnetLibraries: "INCOMPATIBLE_DOTNET_LIBRARY",
+};
+
+const SERVER_ECOSYSTEMS = ["rust", "python", "go", "java", "dotnet", "elixir"] as const;
+
+const typeScriptCategories: ReadonlySet<OptionCategory> = new Set(
+  getCategoryOrderForEcosystem("typescript"),
+);
+
+const SERVER_ECOSYSTEM_BY_CATEGORY: ReadonlyMap<OptionCategory, CompatibilityInput["ecosystem"]> =
+  new Map(
+    SERVER_ECOSYSTEMS.flatMap((ecosystem) =>
+      getCategoryOrderForEcosystem(ecosystem)
+        .filter((category) => !typeScriptCategories.has(category))
+        .map((category) => [category, ecosystem] as const),
+    ),
+  );
+
+function getEvaluatedSelections(input: CompatibilityInput): Array<[OptionCategory, string]> {
+  return Object.entries(input).flatMap(([key, value]) => {
+    const category = EVALUATED_ADDON_INPUT_KEYS.has(key)
+      ? "appPlatforms"
+      : (COMPATIBILITY_INPUT_CATEGORY_RENAMES[key] ?? key);
+    if (!Object.hasOwn(OPTION_CATEGORY_METADATA, category)) return [];
+    const optionCategory = category as OptionCategory;
+    const owner = SERVER_ECOSYSTEM_BY_CATEGORY.get(optionCategory);
+    if (owner && owner !== input.ecosystem) return [];
+    const values: unknown[] = Array.isArray(value) ? value : [value];
+    return values
+      .filter((optionId): optionId is string => typeof optionId === "string")
+      .map((optionId): [OptionCategory, string] => [optionCategory, optionId]);
+  });
+}
+
 export function evaluateCompatibility(input: CompatibilityInput): CompatibilityEvaluation {
-  const issues: CompatibilityIssue[] = [];
+  const frontends = [...input.webFrontend, ...input.nativeFrontend] as Frontend[];
+  const issues: CompatibilityIssue[] = [
+    getApiFrontendCompatibilityIssue(
+      input.api as API | undefined,
+      frontends,
+      input.astroIntegration as AstroIntegration | undefined,
+    ),
+    getAIFrontendCompatibilityIssue(input.aiSdk as AI | undefined, frontends),
+  ].filter((issue): issue is CompatibilityIssue => issue !== undefined);
 
-  const scalarChecks: Array<[CompatibilityCategory, string]> = [
-    ["runtime", input.runtime],
-    ["backend", input.backend],
-    ["database", input.database],
-    ["orm", input.orm],
-    ["dbSetup", input.dbSetup],
-    ["auth", input.auth],
-    ["payments", input.payments],
-    ["email", input.email],
-    ["fileUpload", input.fileUpload],
-    ["logging", input.logging],
-    ["observability", input.observability],
-    ["realtime", input.realtime],
-    ["jobQueue", input.jobQueue],
-    ["validation", input.validation],
-    ["testing", input.testing],
-    ["ai", input.aiSdk],
-    ["caching", input.caching],
-    ["rateLimit", input.rateLimit],
-    ["i18n", input.i18n],
-    ["search", input.search],
-    ["vectorDb", input.vectorDb],
-    ["fileStorage", input.fileStorage],
-    ["analytics", input.analytics],
-    ["webMcp", input.webMcp],
-    ["cssFramework", input.cssFramework],
-    ["uiLibrary", input.uiLibrary],
-    ["webDeploy", input.webDeploy],
-    ["serverDeploy", input.serverDeploy],
-    ["forms", input.forms],
-    ["stateManagement", input.stateManagement],
-    ["animation", input.animation],
-    ["cms", input.cms],
-    ["featureFlags", input.featureFlags],
-    ["integrations", input.integrations],
-    ["ecommerce", input.ecommerce],
-    ["botProtection", input.botProtection],
-    ["pythonApi", input.pythonApi],
-    ["javaWebFramework", input.javaWebFramework],
-    ["javaBuildTool", input.javaBuildTool],
-    ["javaOrm", input.javaOrm],
-    ["javaAuth", input.javaAuth],
-    ["dotnetWebFramework", input.dotnetWebFramework],
-    ["dotnetOrm", input.dotnetOrm],
-    ["dotnetAuth", input.dotnetAuth],
-    ["dotnetApi", input.dotnetApi],
-    ["dotnetJobQueue", input.dotnetJobQueue],
-    ["dotnetRealtime", input.dotnetRealtime],
-    ["dotnetCaching", input.dotnetCaching],
-    ["dotnetDeploy", input.dotnetDeploy],
-    ["elixirWebFramework", input.elixirWebFramework],
-    ["elixirOrm", input.elixirOrm],
-    ["elixirAuth", input.elixirAuth],
-    ["elixirApi", input.elixirApi],
-    ["elixirRealtime", input.elixirRealtime],
-    ["elixirJobs", input.elixirJobs],
-    ["elixirValidation", input.elixirValidation],
-    ["elixirHttp", input.elixirHttp],
-    ["elixirJson", input.elixirJson],
-    ["elixirEmail", input.elixirEmail],
-    ["elixirCaching", input.elixirCaching],
-    ["elixirObservability", input.elixirObservability],
-    ["elixirTesting", input.elixirTesting],
-    ["elixirQuality", input.elixirQuality],
-    ["elixirI18n", input.elixirI18n],
-    ["elixirHttpServer", input.elixirHttpServer],
-    ["elixirApplicationFramework", input.elixirApplicationFramework],
-    ["elixirDocumentation", input.elixirDocumentation],
-    ["elixirClustering", input.elixirClustering],
-    ["elixirDeploy", input.elixirDeploy],
-  ];
-
-  for (const [category, optionId] of scalarChecks) {
+  for (const [category, optionId] of getEvaluatedSelections(input)) {
+    if (issues.some((issue) => issue.category === category && issue.optionId === optionId)) {
+      continue;
+    }
     const reason = getDisabledReason(input, category, optionId);
     if (reason) {
       issues.push({
-        code: `INCOMPATIBLE_${category.toUpperCase()}`,
+        code: ISSUE_CODE_BY_CATEGORY[category] ?? `INCOMPATIBLE_${category.toUpperCase()}`,
         message: reason,
         category,
         optionId,
-      });
-    }
-  }
-
-  const apiFrontendIssue = getApiFrontendCompatibilityIssue(
-    input.api as API | undefined,
-    [...input.webFrontend, ...input.nativeFrontend] as Frontend[],
-    input.astroIntegration as AstroIntegration | undefined,
-  );
-  if (apiFrontendIssue) {
-    issues.push(apiFrontendIssue);
-  }
-
-  const aiFrontendIssue = getAIFrontendCompatibilityIssue(
-    input.aiSdk as AI | undefined,
-    [...input.webFrontend, ...input.nativeFrontend] as Frontend[],
-  );
-  if (aiFrontendIssue) {
-    issues.push(aiFrontendIssue);
-  }
-
-  for (const frontend of input.webFrontend) {
-    const reason = getDisabledReason(input, "webFrontend", frontend);
-    if (reason) {
-      issues.push({
-        code: "INCOMPATIBLE_FRONTEND",
-        message: reason,
-        category: "webFrontend",
-        optionId: frontend,
-      });
-    }
-  }
-
-  for (const addon of [...input.codeQuality, ...input.documentation, ...input.appPlatforms]) {
-    const reason = getDisabledReason(input, "appPlatforms", addon);
-    if (reason) {
-      issues.push({
-        code: "INCOMPATIBLE_ADDON",
-        message: reason,
-        category: "appPlatforms",
-        optionId: addon,
-      });
-    }
-  }
-
-  for (const addon of input.examples) {
-    const reason = getDisabledReason(input, "examples", addon);
-    if (reason) {
-      issues.push({
-        code: "INCOMPATIBLE_ADDON",
-        message: reason,
-        category: "examples",
-        optionId: addon,
-      });
-    }
-  }
-
-  for (const javaLibrary of input.javaLibraries) {
-    const reason = getDisabledReason(input, "javaLibraries", javaLibrary);
-    if (reason) {
-      issues.push({
-        code: "INCOMPATIBLE_JAVA_LIBRARY",
-        message: reason,
-        category: "javaLibraries",
-        optionId: javaLibrary,
-      });
-    }
-  }
-
-  for (const mobileLibrary of input.mobileLibraries ?? []) {
-    const reason = getDisabledReason(input, "mobileLibraries", mobileLibrary);
-    if (reason) {
-      issues.push({
-        code: "INCOMPATIBLE_MOBILE_LIBRARY",
-        message: reason,
-        category: "mobileLibraries",
-        optionId: mobileLibrary,
-      });
-    }
-  }
-
-  for (const kotlinLibrary of input.kotlinMobileLibraries ?? []) {
-    const reason = getDisabledReason(input, "kotlinMobileLibraries", kotlinLibrary);
-    if (reason) {
-      issues.push({
-        code: "INCOMPATIBLE_KOTLIN_MOBILE_LIBRARY",
-        message: reason,
-        category: "kotlinMobileLibraries",
-        optionId: kotlinLibrary,
-      });
-    }
-  }
-
-  for (const testingLibrary of input.javaTestingLibraries) {
-    const reason = getDisabledReason(input, "javaTestingLibraries", testingLibrary);
-    if (reason) {
-      issues.push({
-        code: "INCOMPATIBLE_JAVA_TESTING_LIBRARY",
-        message: reason,
-        category: "javaTestingLibraries",
-        optionId: testingLibrary,
-      });
-    }
-  }
-
-  for (const testingLibrary of input.dotnetTesting) {
-    const reason = getDisabledReason(input, "dotnetTesting", testingLibrary);
-    if (reason) {
-      issues.push({
-        code: "INCOMPATIBLE_DOTNET_TESTING_LIBRARY",
-        message: reason,
-        category: "dotnetTesting",
-        optionId: testingLibrary,
-      });
-    }
-  }
-
-  for (const observabilityLibrary of input.dotnetObservability) {
-    const reason = getDisabledReason(input, "dotnetObservability", observabilityLibrary);
-    if (reason) {
-      issues.push({
-        code: "INCOMPATIBLE_DOTNET_OBSERVABILITY",
-        message: reason,
-        category: "dotnetObservability",
-        optionId: observabilityLibrary,
-      });
-    }
-  }
-
-  for (const dotnetLibrary of input.dotnetLibraries ?? []) {
-    const reason = getDisabledReason(input, "dotnetLibraries", dotnetLibrary);
-    if (reason) {
-      issues.push({
-        code: "INCOMPATIBLE_DOTNET_LIBRARY",
-        message: reason,
-        category: "dotnetLibraries",
-        optionId: dotnetLibrary,
       });
     }
   }

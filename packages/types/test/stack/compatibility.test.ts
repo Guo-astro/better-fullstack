@@ -988,7 +988,11 @@ describe("compatibility issue helpers", () => {
       getDisabledReason({ ...baseStack, database: "postgres" }, "goMigrations", "golang-migrate"),
     ).toBeNull();
     expect(
-      getDisabledReason({ ...baseStack, database: "mysql" }, "goMigrations", "golang-migrate"),
+      getDisabledReason(
+        { ...baseStack, database: "mysql", goOrm: "sqlx" },
+        "goMigrations",
+        "golang-migrate",
+      ),
     ).toBeNull();
     expect(
       getDisabledReason({ ...baseStack, database: "mongodb" }, "goMigrations", "golang-migrate"),
@@ -2004,5 +2008,25 @@ describe("compatibility issue helpers", () => {
         "salvo",
       ),
     ).toBe("tower-sessions requires the generated Axum middleware stack");
+  });
+});
+
+describe("evaluateCompatibility", () => {
+  it("reports conflicts in ecosystem-specific categories", () => {
+    const issues = evaluateCompatibility({
+      ...DEFAULT_STACK_SELECTION,
+      ecosystem: "rust",
+      auth: "none",
+      rustAuth: "torii",
+      rustOrm: "rusqlite",
+    }).issues;
+
+    expect(issues.map((issue) => `${issue.category}:${issue.optionId}`)).toContain(
+      "rustOrm:rusqlite",
+    );
+  });
+
+  it("ignores options that belong to another ecosystem", () => {
+    expect(evaluateCompatibility(DEFAULT_STACK_SELECTION).issues).toEqual([]);
   });
 });
