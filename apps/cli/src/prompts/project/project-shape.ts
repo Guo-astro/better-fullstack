@@ -41,7 +41,7 @@ const FRONTEND_ONLY_FLAGS: Partial<Record<Ecosystem, Partial<ProjectConfig>>> = 
     orm: "none",
     auth: "none",
   },
-  rust: { rustWebFramework: "none" },
+  rust: { rustWebFramework: "none", rustOrm: "none", database: "none" },
   dotnet: {
     dotnetWebFramework: "none",
     dotnetOrm: "none",
