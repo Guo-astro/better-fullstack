@@ -271,14 +271,6 @@ async function processGraphTemplates(
   }
 
   if (hasJavaScriptWorkspaceRoot(config.stackParts)) {
-    await processFrontendTemplates(vfs, templates, tsConfig);
-    await processBackendTemplates(vfs, templates, tsConfig);
-    await processApiTemplates(vfs, templates, tsConfig);
-    await processConfigPackage(vfs, templates, tsConfig);
-    await processEnvPackage(vfs, templates, tsConfig);
-    await processAuthTemplates(vfs, templates, tsConfig);
-    await processPaymentsTemplates(vfs, templates, tsConfig);
-    await processEmailTemplates(vfs, templates, tsConfig);
     const initialTsAddonConfig = hasCrossEcosystemWebBackend
       ? {
           ...tsConfig,
@@ -288,36 +280,9 @@ async function processGraphTemplates(
           addons: tsConfig.addons.filter((addon) => !crossEcosystemInfrastructureAddons.has(addon)),
         }
       : tsConfig;
-    await processAddonTemplates(vfs, templates, withCiTemplateFlags(initialTsAddonConfig));
-    await processExampleTemplates(vfs, templates, tsConfig);
-    await processExtrasTemplates(vfs, templates, tsConfig);
-    await processDeployTemplates(vfs, templates, tsConfig);
-    await processLoggingTemplates(vfs, templates, tsConfig);
-    await processObservabilityTemplates(vfs, templates, tsConfig);
-    await processRateLimitTemplates(vfs, templates, tsConfig);
-    await processBotProtectionTemplates(vfs, templates, tsConfig);
-    await processFeatureFlagsTemplates(vfs, templates, tsConfig);
-    await processIntegrationsTemplates(vfs, templates, tsConfig);
-    await processEcommerceTemplates(vfs, templates, tsConfig);
-    await processAnalyticsTemplates(vfs, templates, tsConfig);
-    await processWebMcpTemplates(vfs, templates, tsConfig);
-    await processAITemplates(vfs, templates, tsConfig);
-    await processRealtimeTemplates(vfs, templates, tsConfig);
-    await processJobQueueTemplates(vfs, templates, tsConfig);
-    await processCMSTemplates(vfs, templates, tsConfig);
-    await processI18nTemplates(vfs, templates, tsConfig);
-    await processSearchTemplates(vfs, templates, tsConfig);
-    await processVectorDbTemplates(vfs, templates, tsConfig);
-    await processFileStorageTemplates(vfs, templates, tsConfig);
-    await processTestingTemplates(vfs, templates, tsConfig);
-    processPackageConfigs(vfs, tsConfig);
-    processDependencies(vfs, tsConfig);
-    processEnvVariables(vfs, tsConfig);
-    await processAuthPlugins(vfs, tsConfig);
-    await processAlchemyPlugins(vfs, tsConfig);
-    await processParaglidePlugins(vfs, tsConfig);
-    await processPwaPlugins(vfs, tsConfig);
-    processCatalogs(vfs, tsConfig);
+    await processTypeScriptWorkspaceTemplates(vfs, templates, tsConfig, {
+      addonConfig: initialTsAddonConfig,
+    });
   }
 
   const databasePart =
@@ -432,6 +397,53 @@ async function processGraphTemplates(
   processNativeGraphCommands(vfs, config);
 }
 
+async function processTypeScriptWorkspaceTemplates(
+  vfs: VirtualFileSystem,
+  templates: TemplateData,
+  config: ProjectConfig,
+  options: { addonConfig: ProjectConfig; includeDatabaseTemplates?: boolean },
+): Promise<void> {
+  await processFrontendTemplates(vfs, templates, config);
+  await processBackendTemplates(vfs, templates, config);
+  if (options.includeDatabaseTemplates) await processDbTemplates(vfs, templates, config);
+  await processApiTemplates(vfs, templates, config);
+  await processConfigPackage(vfs, templates, config);
+  await processEnvPackage(vfs, templates, config);
+  await processAuthTemplates(vfs, templates, config);
+  await processPaymentsTemplates(vfs, templates, config);
+  await processEmailTemplates(vfs, templates, config);
+  await processAddonTemplates(vfs, templates, withCiTemplateFlags(options.addonConfig));
+  await processExampleTemplates(vfs, templates, config);
+  await processExtrasTemplates(vfs, templates, config);
+  await processDeployTemplates(vfs, templates, config);
+  await processLoggingTemplates(vfs, templates, config);
+  await processObservabilityTemplates(vfs, templates, config);
+  await processRateLimitTemplates(vfs, templates, config);
+  await processBotProtectionTemplates(vfs, templates, config);
+  await processFeatureFlagsTemplates(vfs, templates, config);
+  await processIntegrationsTemplates(vfs, templates, config);
+  await processEcommerceTemplates(vfs, templates, config);
+  await processAnalyticsTemplates(vfs, templates, config);
+  await processWebMcpTemplates(vfs, templates, config);
+  await processAITemplates(vfs, templates, config);
+  await processRealtimeTemplates(vfs, templates, config);
+  await processJobQueueTemplates(vfs, templates, config);
+  await processCMSTemplates(vfs, templates, config);
+  await processI18nTemplates(vfs, templates, config);
+  await processSearchTemplates(vfs, templates, config);
+  await processVectorDbTemplates(vfs, templates, config);
+  await processFileStorageTemplates(vfs, templates, config);
+  await processTestingTemplates(vfs, templates, config);
+  processPackageConfigs(vfs, config);
+  processDependencies(vfs, config);
+  processEnvVariables(vfs, config);
+  await processAuthPlugins(vfs, config);
+  await processAlchemyPlugins(vfs, config);
+  await processParaglidePlugins(vfs, config);
+  await processPwaPlugins(vfs, config);
+  processCatalogs(vfs, config);
+}
+
 export async function generateVirtualProject(options: GeneratorOptions): Promise<GeneratorResult> {
   try {
     const { config, templates } = options;
@@ -520,46 +532,10 @@ export async function generateVirtualProject(options: GeneratorOptions): Promise
     } else {
       // TypeScript and React Native ecosystems use package.json and TS project structure.
       await processBaseTemplate(vfs, templates, config);
-      await processFrontendTemplates(vfs, templates, config);
-      await processBackendTemplates(vfs, templates, config);
-      await processDbTemplates(vfs, templates, config);
-      await processApiTemplates(vfs, templates, config);
-      await processConfigPackage(vfs, templates, config);
-      await processEnvPackage(vfs, templates, config);
-      await processAuthTemplates(vfs, templates, config);
-      await processPaymentsTemplates(vfs, templates, config);
-      await processEmailTemplates(vfs, templates, config);
-      await processAddonTemplates(vfs, templates, withCiTemplateFlags(config));
-      await processExampleTemplates(vfs, templates, config);
-      await processExtrasTemplates(vfs, templates, config);
-      await processDeployTemplates(vfs, templates, config);
-      await processLoggingTemplates(vfs, templates, config);
-      await processObservabilityTemplates(vfs, templates, config);
-      await processRateLimitTemplates(vfs, templates, config);
-      await processBotProtectionTemplates(vfs, templates, config);
-      await processFeatureFlagsTemplates(vfs, templates, config);
-      await processIntegrationsTemplates(vfs, templates, config);
-      await processEcommerceTemplates(vfs, templates, config);
-      await processAnalyticsTemplates(vfs, templates, config);
-      await processWebMcpTemplates(vfs, templates, config);
-      await processAITemplates(vfs, templates, config);
-      await processRealtimeTemplates(vfs, templates, config);
-      await processJobQueueTemplates(vfs, templates, config);
-      await processCMSTemplates(vfs, templates, config);
-      await processI18nTemplates(vfs, templates, config);
-      await processSearchTemplates(vfs, templates, config);
-      await processVectorDbTemplates(vfs, templates, config);
-      await processFileStorageTemplates(vfs, templates, config);
-      await processTestingTemplates(vfs, templates, config);
-
-      processPackageConfigs(vfs, config);
-      processDependencies(vfs, config);
-      processEnvVariables(vfs, config);
-      await processAuthPlugins(vfs, config);
-      await processAlchemyPlugins(vfs, config);
-      await processParaglidePlugins(vfs, config);
-      await processPwaPlugins(vfs, config);
-      processCatalogs(vfs, config);
+      await processTypeScriptWorkspaceTemplates(vfs, templates, config, {
+        addonConfig: config,
+        includeDatabaseTemplates: true,
+      });
 
       // Collapse the monorepo layout into a flat single-app repo when the stack
       // qualifies (thin self app). Runs last so it operates on the complete,

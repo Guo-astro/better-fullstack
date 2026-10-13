@@ -7,8 +7,12 @@ import {
 
 import type { VirtualFileSystem } from "@/core/virtual-fs";
 
-import { isBinaryFile, processTemplateString, transformFilename } from "@/core/template-processor";
-import { isEmptyTemplateOutput, type TemplateData } from "@/template-handlers/core/utils";
+import { processTemplateString, transformFilename } from "@/core/template-processor";
+import {
+  isEmptyTemplateOutput,
+  renderTemplateTree,
+  type TemplateData,
+} from "@/template-handlers/core/utils";
 
 type JavaTemplateContext = ProjectConfig & {
   javaArtifactId: string;
@@ -313,8 +317,7 @@ function createJavaTemplateContext(config: ProjectConfig): JavaTemplateContext {
     hasJavaSaml2: javaLibraries.includes("spring-saml2"),
     hasJavaRestclient: javaLibraries.includes("spring-restclient"),
     hasJavaJdbcInfrastructure:
-      javaLibraries.includes("spring-data-jdbc") ||
-      javaLibraries.includes("spring-session-jdbc"),
+      javaLibraries.includes("spring-data-jdbc") || javaLibraries.includes("spring-session-jdbc"),
     hasJavaAnnotationProcessors:
       javaLibraries.includes("lombok") || javaLibraries.includes("mapstruct"),
     hasJavaMockito,
@@ -414,9 +417,7 @@ function shouldSkipJavaTemplate(templatePath: string, context: JavaTemplateConte
   // config file when javaLogging === "log4j2" and there is a build tool to
   // wire the log4j2 dependencies (a source-only scaffold has no classpath).
   const isPlainJavaLog4j2Config =
-    context.hasJavaLog4j2 &&
-    context.hasJavaBuildTool &&
-    templatePath.endsWith("/log4j2.xml.hbs");
+    context.hasJavaLog4j2 && context.hasJavaBuildTool && templatePath.endsWith("/log4j2.xml.hbs");
   if (
     context.isJavaPlainJava &&
     !isPlainJavaLog4j2Config &&
@@ -490,25 +491,22 @@ function shouldSkipJavaTemplate(templatePath: string, context: JavaTemplateConte
   if (!context.hasJavaSecurity && templatePath.endsWith("/config/SecurityConfig.java.hbs")) {
     return true;
   }
-  if (
-    !context.hasJavaKeycloak &&
-    templatePath.endsWith("/config/ResourceServerConfig.java.hbs")
-  ) {
+  if (!context.hasJavaKeycloak && templatePath.endsWith("/config/ResourceServerConfig.java.hbs")) {
     return true;
   }
   if (!context.hasJavaGraphql && templatePath.includes("/graphql/")) {
     return true;
   }
-  if (
-    !context.hasJavaGraphql &&
-    templatePath.endsWith("/controller/GraphqlController.java.hbs")
-  ) {
+  if (!context.hasJavaGraphql && templatePath.endsWith("/controller/GraphqlController.java.hbs")) {
     return true;
   }
   // gRPC surface: the .proto contract (src/main/proto) is the protoc codegen
   // input and the /grpc/ Java sources are the service impl + server lifecycle.
   // Emit them only when the gRPC API layer is selected (Spring Boot only).
-  if (!context.hasJavaGrpc && (templatePath.includes("/proto/") || templatePath.includes("/grpc/"))) {
+  if (
+    !context.hasJavaGrpc &&
+    (templatePath.includes("/proto/") || templatePath.includes("/grpc/"))
+  ) {
     return true;
   }
   // The OpenAPI spec is the codegen input; emit it only when the OpenAPI
@@ -630,7 +628,8 @@ function processKtorTemplates(
   for (const [templatePath, content] of templates) {
     if (!templatePath.startsWith(prefix)) continue;
     if (config.javaBuildTool === "maven" && templatePath.endsWith("build.gradle.kts.hbs")) continue;
-    if (config.javaBuildTool === "maven" && templatePath.endsWith("settings.gradle.kts.hbs")) continue;
+    if (config.javaBuildTool === "maven" && templatePath.endsWith("settings.gradle.kts.hbs"))
+      continue;
     if (config.javaBuildTool === "gradle" && templatePath.endsWith("pom.xml.hbs")) continue;
 
     const relativePath = templatePath.slice(prefix.length);
@@ -682,26 +681,11 @@ export async function processJavaBaseTemplate(
   const prefix = "java-base/";
   const context = createJavaTemplateContext(config);
 
-  for (const [templatePath, content] of templates) {
-    if (!templatePath.startsWith(prefix)) continue;
-    if (shouldSkipJavaTemplate(templatePath, context)) continue;
-
-    const relativePath = templatePath.slice(prefix.length);
-    const outputPath = transformJavaOutputPath(relativePath, context);
-    const destPath = targetPath ? `${targetPath}/${outputPath}` : outputPath;
-
-    let processedContent: string;
-    if (isBinaryFile(templatePath)) {
-      processedContent = "[Binary file]";
-    } else if (templatePath.endsWith(".hbs")) {
-      processedContent = processTemplateString(content, context as ProjectConfig);
-    } else {
-      processedContent = content;
-    }
-
-    if (isEmptyTemplateOutput(templatePath, processedContent)) continue;
-
-    const sourcePath = isBinaryFile(templatePath) ? templatePath : undefined;
-    vfs.writeFile(destPath, processedContent, sourcePath);
-  }
+  renderTemplateTree(vfs, templates, {
+    prefix,
+    targetPath,
+    context: context as ProjectConfig,
+    skip: (templatePath) => shouldSkipJavaTemplate(templatePath, context),
+    outputPath: (relativePath) => transformJavaOutputPath(relativePath, context),
+  });
 }

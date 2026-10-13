@@ -51,6 +51,36 @@ export function processSingleTemplate(
   vfs.writeFile(destPath, processedContent, sourcePath);
 }
 
+export function renderTemplateTree(
+  vfs: VirtualFileSystem,
+  templates: TemplateData,
+  options: {
+    prefix: string;
+    targetPath?: string;
+    context: ProjectConfig;
+    skip?: (templatePath: string) => boolean;
+    outputPath?: (relativePath: string) => string;
+  },
+): void {
+  const { prefix, targetPath, context, skip, outputPath = transformFilename } = options;
+  for (const [templatePath, content] of templates) {
+    if (!templatePath.startsWith(prefix) || skip?.(templatePath)) continue;
+
+    const relativeOutputPath = outputPath(templatePath.slice(prefix.length));
+    const destPath = targetPath ? `${targetPath}/${relativeOutputPath}` : relativeOutputPath;
+    const isBinary = isBinaryFile(templatePath);
+    const processedContent = isBinary
+      ? "[Binary file]"
+      : templatePath.endsWith(".hbs")
+        ? processTemplateString(content, context)
+        : content;
+
+    if (isEmptyTemplateOutput(templatePath, processedContent)) continue;
+
+    vfs.writeFile(destPath, processedContent, isBinary ? templatePath : undefined);
+  }
+}
+
 export function processTemplatesFromPrefix(
   vfs: VirtualFileSystem,
   templates: TemplateData,
@@ -59,33 +89,11 @@ export function processTemplatesFromPrefix(
   config: ProjectConfig,
   excludePrefixes: string[] = [],
 ): void {
-  const normalizedPrefix = prefix.endsWith("/") ? prefix : `${prefix}/`;
   const normalizedExcludes = excludePrefixes.map((p) => (p.endsWith("/") ? p : `${p}/`));
-
-  for (const [templatePath, content] of templates) {
-    if (!templatePath.startsWith(normalizedPrefix)) continue;
-
-    // Skip if path matches any exclusion prefix
-    if (normalizedExcludes.some((exclude) => templatePath.startsWith(exclude))) continue;
-
-    const relativePath = templatePath.slice(normalizedPrefix.length);
-    const outputPath = transformFilename(relativePath);
-    const destPath = destPrefix ? `${destPrefix}/${outputPath}` : outputPath;
-
-    let processedContent: string;
-    if (isBinaryFile(templatePath)) {
-      processedContent = "[Binary file]";
-    } else if (templatePath.endsWith(".hbs")) {
-      processedContent = processTemplateString(content, config);
-    } else {
-      processedContent = content;
-    }
-
-    // Skip writing conditional templates whose selected branches emitted nothing.
-    if (isEmptyTemplateOutput(templatePath, processedContent)) continue;
-
-    // Pass original template path for binary files
-    const sourcePath = isBinaryFile(templatePath) ? templatePath : undefined;
-    vfs.writeFile(destPath, processedContent, sourcePath);
-  }
+  renderTemplateTree(vfs, templates, {
+    prefix: prefix.endsWith("/") ? prefix : `${prefix}/`,
+    targetPath: destPrefix,
+    context: config,
+    skip: (templatePath) => normalizedExcludes.some((exclude) => templatePath.startsWith(exclude)),
+  });
 }
