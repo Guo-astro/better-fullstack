@@ -32,10 +32,33 @@ function gradientArtwork(): ChangelogRelease["image"] {
 
 export const changelogReleases: ChangelogRelease[] = [
   {
+    version: "v2.8.0",
+    publishedAt: "2026-10-13T17:54:51Z",
+    displayDate: "October 13, 2026",
+    isLatest: true,
+    href: "/changelog#v280",
+    title: "CLI discovery, jobs, and vector search",
+    summary:
+      "New CLI commands, jobs, vector search, Go migrations, and Python logging, plus fixes across generated apps.",
+    highlights: [
+      "CLI list, search, explain, and shell completion",
+      "Jobs with pg-boss, QStash, Hatchet, River, and gocron",
+      "Four vector databases, Go migrations, and Python logging",
+      "Auth, AI endpoint, deployment, Expo, and Phoenix fixes",
+      "New starter pages, guides, comparisons, and translated docs",
+    ],
+    cta: { label: "Build a stack", href: "/new" },
+    image: {
+      src: "/changelog/v2.8.0.webp",
+      alt: "Better Fullstack 2.8.0 artwork with terminal, background job, and vector search tiles",
+      credit: "Better Fullstack",
+      creditHref: `${RELEASE_BASE_URL}/v2.8.0`,
+    },
+  },
+  {
     version: "v2.7.0",
     publishedAt: "2026-10-01T22:29:31Z",
     displayDate: "October 1, 2026",
-    isLatest: true,
     href: `${RELEASE_BASE_URL}/v2.7.0`,
     title: "Future Stack preset",
     summary:

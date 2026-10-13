@@ -161,6 +161,15 @@ export function renderChangelog(releases: GitHubRelease[]): string {
 
 if (import.meta.main) {
   const releases = await fetchReleases();
+  await Promise.all(
+    releases.map(async (release) => {
+      if (!/^v\d+\.\d+\.\d+$/.test(release.tag_name)) return;
+      const notes = Bun.file(
+        path.resolve(import.meta.dir, `../content/changelog-notes/${release.tag_name}.md`),
+      );
+      if (await notes.exists()) release.body = await notes.text();
+    }),
+  );
   await mkdir(path.dirname(OUTPUT_FILE), { recursive: true });
   await writeFile(OUTPUT_FILE, renderChangelog(releases));
   console.log(`Wrote ${path.relative(process.cwd(), OUTPUT_FILE)}`);

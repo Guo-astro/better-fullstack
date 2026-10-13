@@ -42,11 +42,11 @@ export function ChangelogModal({ open, onOpenChange }: ChangelogModalProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[min(90vh,48rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl">
         {latestRelease.image ? (
-          <div className="h-40 shrink-0 overflow-hidden border-border border-b sm:h-52">
+          <div className="shrink-0 overflow-hidden border-border border-b">
             <img
               src={latestRelease.image.src}
               alt={latestRelease.image.alt}
-              className="h-full w-full object-cover"
+              className="block h-auto w-full"
             />
           </div>
         ) : null}
