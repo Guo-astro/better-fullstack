@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StackShareRouteImport } from './routes/$stackShare'
-import { Route as BenchmarkRouteImport } from './routes/benchmark'
 import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as ChangelogDotmdRouteImport } from './routes/changelog[.]md'
 import { Route as CompareRouteImport } from './routes/compare'
@@ -21,7 +20,6 @@ import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as NewRouteImport } from './routes/new'
-import { Route as RunRouteImport } from './routes/run'
 import { Route as RunBeforeYouCloneRouteImport } from './routes/run-before-you-clone'
 import { Route as SitemapDotmdRouteImport } from './routes/sitemap[.]md'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -53,11 +51,6 @@ const IndexRoute = IndexRouteImport.update({
 const StackShareRoute = StackShareRouteImport.update({
   id: '/$stackShare',
   path: '/$stackShare',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BenchmarkRoute = BenchmarkRouteImport.update({
-  id: '/benchmark',
-  path: '/benchmark',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChangelogRoute = ChangelogRouteImport.update({
@@ -103,11 +96,6 @@ const McpRoute = McpRouteImport.update({
 const NewRoute = NewRouteImport.update({
   id: '/new',
   path: '/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RunRoute = RunRouteImport.update({
-  id: '/run',
-  path: '/run',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RunBeforeYouCloneRoute = RunBeforeYouCloneRouteImport.update({
@@ -226,7 +214,6 @@ const StackComboSlugRoute = StackComboSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$stackShare': typeof StackShareRoute
-  '/benchmark': typeof BenchmarkRoute
   '/changelog': typeof ChangelogRoute
   '/changelog.md': typeof ChangelogDotmdRoute
   '/compare': typeof CompareRoute
@@ -236,7 +223,6 @@ export interface FileRoutesByFullPath {
   '/llms.txt': typeof LlmsDottxtRoute
   '/mcp': typeof McpRoute
   '/new': typeof NewRoute
-  '/run': typeof RunRoute
   '/run-before-you-clone': typeof RunBeforeYouCloneRoute
   '/sitemap.md': typeof SitemapDotmdRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -263,7 +249,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$stackShare': typeof StackShareRoute
-  '/benchmark': typeof BenchmarkRoute
   '/changelog': typeof ChangelogRoute
   '/changelog.md': typeof ChangelogDotmdRoute
   '/compare': typeof CompareRoute
@@ -273,7 +258,6 @@ export interface FileRoutesByTo {
   '/llms.txt': typeof LlmsDottxtRoute
   '/mcp': typeof McpRoute
   '/new': typeof NewRoute
-  '/run': typeof RunRoute
   '/run-before-you-clone': typeof RunBeforeYouCloneRoute
   '/sitemap.md': typeof SitemapDotmdRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -301,7 +285,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$stackShare': typeof StackShareRoute
-  '/benchmark': typeof BenchmarkRoute
   '/changelog': typeof ChangelogRoute
   '/changelog.md': typeof ChangelogDotmdRoute
   '/compare': typeof CompareRoute
@@ -311,7 +294,6 @@ export interface FileRoutesById {
   '/llms.txt': typeof LlmsDottxtRoute
   '/mcp': typeof McpRoute
   '/new': typeof NewRoute
-  '/run': typeof RunRoute
   '/run-before-you-clone': typeof RunBeforeYouCloneRoute
   '/sitemap.md': typeof SitemapDotmdRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -340,7 +322,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$stackShare'
-    | '/benchmark'
     | '/changelog'
     | '/changelog.md'
     | '/compare'
@@ -350,7 +331,6 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/mcp'
     | '/new'
-    | '/run'
     | '/run-before-you-clone'
     | '/sitemap.md'
     | '/sitemap.xml'
@@ -377,7 +357,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/$stackShare'
-    | '/benchmark'
     | '/changelog'
     | '/changelog.md'
     | '/compare'
@@ -387,7 +366,6 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/mcp'
     | '/new'
-    | '/run'
     | '/run-before-you-clone'
     | '/sitemap.md'
     | '/sitemap.xml'
@@ -414,7 +392,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/$stackShare'
-    | '/benchmark'
     | '/changelog'
     | '/changelog.md'
     | '/compare'
@@ -424,7 +401,6 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/mcp'
     | '/new'
-    | '/run'
     | '/run-before-you-clone'
     | '/sitemap.md'
     | '/sitemap.xml'
@@ -452,7 +428,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   StackShareRoute: typeof StackShareRoute
-  BenchmarkRoute: typeof BenchmarkRoute
   ChangelogRoute: typeof ChangelogRoute
   ChangelogDotmdRoute: typeof ChangelogDotmdRoute
   CompareRoute: typeof CompareRoute
@@ -462,7 +437,6 @@ export interface RootRouteChildren {
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   McpRoute: typeof McpRoute
   NewRoute: typeof NewRoute
-  RunRoute: typeof RunRoute
   RunBeforeYouCloneRoute: typeof RunBeforeYouCloneRoute
   SitemapDotmdRoute: typeof SitemapDotmdRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -501,13 +475,6 @@ declare module '@tanstack/react-router' {
       path: '/$stackShare'
       fullPath: '/$stackShare'
       preLoaderRoute: typeof StackShareRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/benchmark': {
-      id: '/benchmark'
-      path: '/benchmark'
-      fullPath: '/benchmark'
-      preLoaderRoute: typeof BenchmarkRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/changelog': {
@@ -571,13 +538,6 @@ declare module '@tanstack/react-router' {
       path: '/new'
       fullPath: '/new'
       preLoaderRoute: typeof NewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/run': {
-      id: '/run'
-      path: '/run'
-      fullPath: '/run'
-      preLoaderRoute: typeof RunRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/run-before-you-clone': {
@@ -740,7 +700,6 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   StackShareRoute: StackShareRoute,
-  BenchmarkRoute: BenchmarkRoute,
   ChangelogRoute: ChangelogRoute,
   ChangelogDotmdRoute: ChangelogDotmdRoute,
   CompareRoute: CompareRoute,
@@ -750,7 +709,6 @@ const rootRouteChildren: RootRouteChildren = {
   LlmsDottxtRoute: LlmsDottxtRoute,
   McpRoute: McpRoute,
   NewRoute: NewRoute,
-  RunRoute: RunRoute,
   RunBeforeYouCloneRoute: RunBeforeYouCloneRoute,
   SitemapDotmdRoute: SitemapDotmdRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

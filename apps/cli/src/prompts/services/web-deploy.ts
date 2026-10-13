@@ -1,7 +1,7 @@
 import type { Backend, Frontend, Runtime, WebDeploy } from "@/types";
 
-import { DEFAULT_CONFIG } from "@/constants";
 import { isWebFrontend } from "@/config/compatibility-rules";
+import { DEFAULT_CONFIG } from "@/constants";
 import { exitCancelled } from "@/presentation/errors";
 import { isCancel, navigableSelect } from "@/prompts/core/navigable";
 
@@ -58,58 +58,6 @@ export async function getDeploymentChoice(
       hint,
     };
   });
-
-  const response = await navigableSelect<WebDeploy>({
-    message: "Select web deployment",
-    options,
-    initialValue: DEFAULT_CONFIG.webDeploy,
-  });
-
-  if (isCancel(response)) return exitCancelled("Operation cancelled");
-
-  return response;
-}
-
-export async function getDeploymentToAdd(frontend: Frontend[], existingDeployment?: WebDeploy) {
-  if (!hasWebFrontend(frontend)) {
-    return "none";
-  }
-
-  const options: DeploymentOption[] = [];
-
-  if (existingDeployment !== "cloudflare") {
-    const { label, hint } = getDeploymentDisplay("cloudflare");
-    options.push({
-      value: "cloudflare",
-      label,
-      hint,
-    });
-  }
-
-  if (existingDeployment !== "vercel") {
-    const { label, hint } = getDeploymentDisplay("vercel");
-    options.push({
-      value: "vercel",
-      label,
-      hint,
-    });
-  }
-
-  if (existingDeployment && existingDeployment !== "none") {
-    return "none";
-  }
-
-  if (options.length > 0) {
-    options.push({
-      value: "none",
-      label: "None",
-      hint: "Skip deployment setup",
-    });
-  }
-
-  if (options.length === 0) {
-    return "none";
-  }
 
   const response = await navigableSelect<WebDeploy>({
     message: "Select web deployment",
