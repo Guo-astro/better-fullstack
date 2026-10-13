@@ -17,6 +17,9 @@ import { existsSync } from "node:fs";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { homedir, tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { runInNewContext } from "node:vm";
+import { parse as parseYaml } from "yaml";
+import { z } from "zod";
 
 import { writeBtsConfig } from "@/config/bts-config";
 import { validateConfigForProgrammaticUse } from "@/config/config-validation";
@@ -547,6 +550,46 @@ describe("generated job queues", () => {
         expect(compose).toContain("  worker:\n");
         expect(compose).toContain(`command: ${JSON.stringify(command).replaceAll(",", ", ")}`);
         expect(readme).toContain("jobs:worker:start");
+        const serviceSchema = z.object({
+          env_file: z.array(z.string()).default([]),
+          environment: z.array(z.string()).default([]),
+        });
+        const services = z
+          .object({
+            services: z.object({ server: serviceSchema, worker: serviceSchema }),
+          })
+          .parse(parseYaml(compose)).services;
+        const schemaSource = readVirtualFileContent(root, "packages/env/src/server.ts")
+          .replace(/^import .*;\n/gm, "")
+          .replace("export const env = createEnv(", "const options = (");
+        const executable = new Bun.Transpiler({ loader: "ts" }).transformSync(schemaSource);
+        for (const service of [services.server, services.worker]) {
+          const declarations = [
+            ...service.env_file.flatMap((file) =>
+              readVirtualFileContent(root, file)
+                .replace("HATCHET_CLIENT_TOKEN=", "HATCHET_CLIENT_TOKEN=fixture-hatchet-token")
+                .split(/\r?\n/),
+            ),
+            ...service.environment,
+          ].filter((line) => /^[A-Z_][A-Z0-9_]*=/.test(line));
+          const runtimeEnv = Object.fromEntries(
+            declarations.map((line) => {
+              const separator = line.indexOf("=");
+              return [line.slice(0, separator), line.slice(separator + 1)];
+            }),
+          );
+          const validated: unknown = runInNewContext(
+            `${executable}\nz.object(options.server).parse(process.env);`,
+            { z, process: { env: runtimeEnv } },
+          );
+          expect(validated).toMatchObject({
+            NODE_ENV: "production",
+            DATABASE_URL: expect.stringContaining("@db:5432/"),
+          });
+          if (jobQueue === "hatchet") {
+            expect(validated).toMatchObject({ HATCHET_CLIENT_TOKEN: "fixture-hatchet-token" });
+          }
+        }
       });
     }
   }
