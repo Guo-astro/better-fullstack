@@ -2029,4 +2029,33 @@ describe("evaluateCompatibility", () => {
   it("ignores options that belong to another ecosystem", () => {
     expect(evaluateCompatibility(DEFAULT_STACK_SELECTION).issues).toEqual([]);
   });
+
+  it("reports distinct conflicts for one selected option", () => {
+    const issues = evaluateCompatibility({
+      ...DEFAULT_STACK_SELECTION,
+      backend: "hono",
+      runtime: "node",
+      examples: ["chat-sdk"],
+      webFrontend: ["svelte"],
+      aiSdk: "tanstack-ai",
+    }).issues;
+
+    const aiMessages = issues
+      .filter((issue) => issue.category === "ai" && issue.optionId === "tanstack-ai")
+      .map((issue) => issue.message);
+    expect(aiMessages.some((message) => message.includes("requires React or Solid"))).toBe(true);
+    expect(aiMessages.some((message) => message.includes("requires Vercel AI SDK"))).toBe(true);
+  });
+
+  it("does not repeat an equivalent conflict for one selected option", () => {
+    const issues = evaluateCompatibility({
+      ...DEFAULT_STACK_SELECTION,
+      webFrontend: ["svelte"],
+      aiSdk: "tanstack-ai",
+    }).issues;
+
+    expect(
+      issues.filter((issue) => issue.category === "ai" && issue.optionId === "tanstack-ai"),
+    ).toHaveLength(1);
+  });
 });
