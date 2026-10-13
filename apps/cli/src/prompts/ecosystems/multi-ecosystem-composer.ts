@@ -791,7 +791,9 @@ export async function gatherMultiEcosystemConfig(
     const goOrm =
       database === "none" || goWebFramework === "none"
         ? "none"
-        : promptValue(await getGoOrmChoice(flags.goOrm));
+        : promptValue(
+            await getGoOrmChoice(flags.goOrm, { database, goMigrations: flags.goMigrations }),
+          );
     const goApi =
       goWebFramework === "none" ? "none" : promptValue(await getGoApiChoice(flags.goApi));
     const goAuth =

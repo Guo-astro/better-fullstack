@@ -49,6 +49,7 @@ Do not fabricate freshness dates. Update them when the page was substantively re
 - Compatibility examples may be authored, but accepted/rejected facts must be backed by executable
   compatibility behavior.
 - Resource links and icons must use their validators.
+- Icon validation checks bundled files and Simple Icons slugs against the installed `react-icons` catalog. Use `bun run --cwd apps/web validate:tech-icons --live` to also check remote availability.
 - When an identifier changes, preserve documented aliases and review inbound links.
 
 ## Navigation and Search

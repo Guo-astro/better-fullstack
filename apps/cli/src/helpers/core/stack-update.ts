@@ -325,7 +325,8 @@ export function configFromBtsConfig(
 
 function withGeneratedDatabase(config: ProjectConfig): ProjectConfig {
   if (!config.stackParts?.length || isToolingOverlayOnly(config.stackParts)) return config;
-  const { database } = stackGraphToLegacyProjectConfigForEcosystem(config, "typescript");
+  const ecosystem = hasSelectedTypeScriptBackendPart(config) ? "typescript" : config.ecosystem;
+  const { database } = stackGraphToLegacyProjectConfigForEcosystem(config, ecosystem);
   return { ...config, database };
 }
 

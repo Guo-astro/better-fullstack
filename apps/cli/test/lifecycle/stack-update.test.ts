@@ -1284,6 +1284,50 @@ describe("stack update planner", () => {
     );
   });
 
+  it("keeps a Go backend-owned database when planning replacement or removal", async () => {
+    const root = await makeTempRoot("bfs-stack-update-go-database-");
+    const projectDir = join(root, "app");
+    await scaffoldGeneratedProject(
+      makeConfig(projectDir, {
+        ecosystem: "go",
+        backend: "none",
+        runtime: "none",
+        frontend: ["none"],
+        auth: "none",
+        orm: "none",
+        database: "postgres",
+        goWebFramework: "gin",
+        goOrm: "gorm",
+        stackParts: parseStackPartSpecs([
+          "backend:go:gin",
+          "backend.database:universal:postgres",
+          "backend.orm:go:gorm",
+        ]),
+      }),
+    );
+    const replacement = await planStackUpdate(projectDir, { database: "sqlite" });
+    expect(replacement.success).toBe(true);
+    if (!replacement.success) return;
+    expect(replacement.requiresArchitectureAck).toBe(true);
+    expect(replacement.architectureChanges).toContainEqual({
+      key: "database",
+      from: "postgres",
+      to: "sqlite",
+    });
+    expect(replacement.stackPartSpecs).toContain("backend.database:universal:sqlite");
+    const unacknowledged = await applyStackUpdate(projectDir, { database: "sqlite" });
+    expect(unacknowledged.success).toBe(false);
+    if (!unacknowledged.success)
+      expect(unacknowledged.error).toContain("acknowledgeArchitectureChange");
+    expect((await readJsonc(join(projectDir, "bts.jsonc"))).database).toBe("postgres");
+    const removal = await planStackUpdate(projectDir, { database: "none", goOrm: "none" });
+    expect(removal.success).toBe(true);
+    if (!removal.success) return;
+    expect(removal.requiresArchitectureAck).toBe(true);
+    expect(removal.proposedConfig.database).toBe("none");
+    expect(removal.stackPartSpecs).not.toContain("backend.database:universal:postgres");
+  });
+
   it("preserves graph-only metadata during unrelated stack updates", async () => {
     const root = await makeTempRoot("bfs-stack-update-graph-metadata-");
     const projectDir = join(root, "app");

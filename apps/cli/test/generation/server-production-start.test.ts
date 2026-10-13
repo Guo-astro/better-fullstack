@@ -868,7 +868,7 @@ describe("generated server production start", () => {
         const dockerfile = read(generated, "apps/server/fly.toml").match(
           /dockerfile = "([^"]+)"/,
         )![1]!;
-        expect(generated.files.has(dockerfile)).toBe(true);
+        expect(generated.files.has(posix.join("apps/server", dockerfile))).toBe(true);
       }
       if (serverDeploy === "railway") {
         const railway = read(generated, "apps/server/railway.toml");

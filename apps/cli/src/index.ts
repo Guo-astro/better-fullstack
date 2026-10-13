@@ -19,12 +19,6 @@ export {
   recovery,
 } from "@/run";
 
-import {
-  hasGeneratedJobQueueRequirements,
-  hasVectorDbRuntimeRequirements,
-  type ProjectConfig,
-} from "@/types";
-
 import { applyEffectBackendDefaults } from "@/config/config-processing";
 import {
   getAuthSelectionIssue,
@@ -32,6 +26,7 @@ import {
   getDataLayerSelectionIssue,
   getProviderDataLayer,
 } from "@/config/stack-compatibility";
+import { hasGeneratedJobQueueRequirements, type ProjectConfig } from "@/types";
 
 // Re-export virtual filesystem types for programmatic usage
 export {
@@ -311,7 +306,7 @@ export async function createVirtual(
       config.integrations === "nango" ||
       config.payments !== "none" ||
       jobQueueSelections.some(hasGeneratedJobQueueRequirements) ||
-      vectorDbSelections.some(hasVectorDbRuntimeRequirements) ||
+      vectorDbSelections.some((selection) => selection && selection !== "none") ||
       pythonLoggingSelections.some((selection) => selection && selection !== "none") ||
       goJobAndMigrationSelections.some((selection) =>
         ["river", "gocron", "goose", "atlas"].includes(selection ?? "none"),

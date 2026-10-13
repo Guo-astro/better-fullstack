@@ -9,6 +9,7 @@ import { resolveDatabasePrompt } from "@/prompts/data/database";
 import {
   resolveGoMessageQueuePrompt,
   resolveGoMigrationsPrompt,
+  resolveGoOrmPrompt,
   resolveGoWebFrameworkPrompt,
 } from "@/prompts/ecosystems/go-ecosystem";
 import { parseStackPartSpecs } from "@/types";
@@ -84,6 +85,18 @@ describe("Go background jobs", () => {
       }).options.map((option) => option.value),
     ).toEqual(["gin", "echo", "fiber", "chi", "stdlib"]);
   });
+  it("filters ORM choices against an explicit migration and selected database", () => {
+    for (const database of ["sqlite", "mysql"]) {
+      const options = resolveGoOrmPrompt(undefined, { database, goMigrations: "atlas" }).options;
+      expect(options.map((option) => option.value)).not.toContain("sqlc");
+    }
+    expect(
+      resolveGoOrmPrompt(undefined, { database: "postgres", goMigrations: "atlas" }).options.map(
+        (option) => option.value,
+      ),
+    ).toContain("sqlc");
+  });
+
   it("starts River workers without exposing an unauthenticated producer route", async () => {
     for (const [goWebFramework, route] of RIVER_ROUTES) {
       const [main, river, goMod] = await generatedFiles(
@@ -149,6 +162,23 @@ describe("Go background jobs", () => {
       ),
     ).toEqual(["golang-migrate", "goose", "none"]);
   });
+});
+
+describe("Go container toolchains", () => {
+  for (const selection of [{ goMessageQueue: "river" }, { goMigrations: "goose" }] as const) {
+    it(`builds ${Object.values(selection)[0]} with a toolchain satisfying go.mod`, async () => {
+      const [goMod, dockerfile] = await generatedFiles(
+        { ...selection, addons: ["docker-compose"] },
+        "go.mod",
+        "Dockerfile",
+      );
+      const required = goMod.match(/^go (\d+)\.(\d+)/m)!;
+      const provided = dockerfile.match(/^FROM golang:(\d+)\.(\d+)/m)!;
+      expect(Number(provided[1]) * 1000 + Number(provided[2])).toBeGreaterThanOrEqual(
+        Number(required[1]) * 1000 + Number(required[2]),
+      );
+    });
+  }
 });
 
 describe("Go migrations", () => {
@@ -225,6 +255,17 @@ describe("Go migrations", () => {
 
 describe("Go job and migration rejections", () => {
   const rejected = [
+    ...(["goose", "atlas"] as const).map((goMigrations) => ({
+      reason:
+        "GORM is only wired for PostgreSQL and SQLite, so MySQL migrations would target a different database",
+      flat: { database: "mysql" as const, goOrm: "gorm" as const, goMigrations },
+      part: [
+        "backend:go:gin",
+        "backend.orm:go:gorm",
+        `backend.migrations:go:${goMigrations}`,
+        "database:universal:mysql",
+      ],
+    })),
     {
       reason: "River requires PostgreSQL",
       flat: { database: "sqlite", goMessageQueue: "river" },

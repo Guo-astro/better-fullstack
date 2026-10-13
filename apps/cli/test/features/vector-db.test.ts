@@ -270,6 +270,24 @@ describe("vector databases", () => {
     }
   });
 
+  test("programmatic creation rejects every external vector store without a generated backend", async () => {
+    for (const vectorDb of ["upstash-vector", "turbopuffer"] as const) {
+      for (const backend of ["none", "convex"] as const) {
+        const result = await createVirtual({ backend, vectorDb });
+        expect({ backend, vectorDb, success: result.success }).toEqual({
+          backend,
+          vectorDb,
+          success: false,
+        });
+        expect(result.error).toContain(
+          backend === "none"
+            ? "No backend selected"
+            : "Vector database requires a standalone backend",
+        );
+      }
+    }
+  });
+
   test("graph-only input is validated against the vector database the generator uses", async () => {
     for (const { parts, error } of REJECTED) {
       if (!parts) continue;

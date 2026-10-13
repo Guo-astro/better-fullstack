@@ -1344,6 +1344,50 @@ function mockRegistryAheadOfEveryPackage() {
 }
 
 describe("planDependencyVersionChannel for generated native apps", () => {
+  it("keeps shared Bun catalog dependencies on native pins in latest and beta channels", async () => {
+    const result = await createVirtual({
+      projectName: "native-catalog-channels",
+      ecosystem: "react-native",
+      frontend: ["native-uniwind"],
+      backend: "none",
+      runtime: "none",
+      database: "none",
+      orm: "none",
+      api: "none",
+      auth: "none",
+      packageManager: "bun",
+    });
+    expect(result.success).toBe(true);
+    const rootContent = getFile(result.tree!.root, "package.json");
+    const nativeContent = getFile(result.tree!.root, "apps/native/package.json");
+    const generated = JSON.parse(rootContent) as {
+      workspaces: { catalog: Record<string, string> };
+    };
+    expect(generated.workspaces.catalog.typescript).toBeDefined();
+    const projectDir = await fs.mkdtemp(path.join(os.tmpdir(), "bfs-native-catalog-"));
+    const rootPath = path.join(projectDir, "package.json");
+    mockRegistryAheadOfEveryPackage();
+    for (const channel of ["latest", "beta"] as const) {
+      const rewrites = await planDependencyVersionChannel(
+        projectDir,
+        channel,
+        new Map([
+          [rootPath, rootContent],
+          [path.join(projectDir, "apps/native/package.json"), nativeContent],
+        ]),
+      );
+      const planned = JSON.parse(
+        rewrites.find(({ packageJsonPath }) => packageJsonPath === rootPath)?.content ??
+          rootContent,
+      ) as typeof generated;
+      expect({ channel, typescript: planned.workspaces.catalog.typescript }).toEqual({
+        channel,
+        typescript: generated.workspaces.catalog.typescript,
+      });
+      expect(planned.workspaces.catalog.zod).not.toBe(generated.workspaces.catalog.zod);
+    }
+  });
+
   const nativeStacks = [
     { frontend: "native-bare", mobileUI: "gluestack-ui", mobileNavigation: "expo-router" },
     { frontend: "native-bare", mobileUI: "tamagui", mobileNavigation: "react-navigation" },

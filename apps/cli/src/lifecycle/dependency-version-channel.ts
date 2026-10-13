@@ -611,9 +611,25 @@ export async function planDependencyVersionChannel(
     }
   };
 
+  const {
+    getGeneratedPackageJsonPins,
+    getLatestChannelPinnedVersion,
+    SYNCHRONIZED_DEPENDENCY_FAMILIES,
+  } = await import("@better-fullstack/template-generator");
+  const catalogPins = new Map<string, string>();
   for (const packageJsonPath of packageJsonPaths) {
     const packageJson = await readPackageJson(packageJsonPath);
-    for (const section of getVersionSections(packageJson)) recordCurrentVersions(section);
+    const sections = getVersionSections(packageJson);
+    const pins = getGeneratedPackageJsonPins(
+      new Set(sections.flatMap((section) => Object.keys(section))),
+    );
+    for (const section of sections) {
+      recordCurrentVersions(section);
+      for (const [packageName, version] of Object.entries(section)) {
+        const pin = pins.get(packageName);
+        if (version === "catalog:" && pin) catalogPins.set(packageName, pin);
+      }
+    }
   }
   if (pnpmCatalog?.editable) recordCurrentVersions(pnpmCatalog.catalog);
   const frozenPackages = new Set(
@@ -623,11 +639,6 @@ export async function planDependencyVersionChannel(
   const packageNames = [...currentVersions.keys()];
   if (packageNames.length === 0) return [];
 
-  const {
-    getGeneratedPackageJsonPins,
-    getLatestChannelPinnedVersion,
-    SYNCHRONIZED_DEPENDENCY_FAMILIES,
-  } = await import("@better-fullstack/template-generator");
   const resolvedVersions = new Map<string, string>();
   const packageInfos = new Map<string, NpmPackageInfo>();
   const latestChannelHolds = new Map<string, string>();
@@ -721,9 +732,15 @@ export async function planDependencyVersionChannel(
     const templatePins = getGeneratedPackageJsonPins(
       new Set(sections.flatMap((section) => Object.keys(section))),
     );
+    const workspaces = packageJson.workspaces;
+    const catalog =
+      workspaces && typeof workspaces === "object" && !Array.isArray(workspaces)
+        ? (workspaces as Record<string, unknown>).catalog
+        : undefined;
     let changed = false;
     for (const section of sections) {
-      if (rewriteSection(section, templatePins).length > 0) changed = true;
+      if (rewriteSection(section, section === catalog ? catalogPins : templatePins).length > 0)
+        changed = true;
     }
 
     if (changed) {

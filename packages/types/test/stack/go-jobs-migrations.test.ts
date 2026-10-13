@@ -65,8 +65,13 @@ describe("Go background jobs and migrations compatibility", () => {
     expect(getGoMigrationsIncompatibility("atlas", { database: "mysql", goOrm: "sqlc" })).toBe(
       ATLAS_SQLC_REASON,
     );
-    for (const goOrm of ["gorm", "ent", "bun", "sqlx", "none"]) {
+    for (const goOrm of ["ent", "bun", "sqlx", "none"]) {
       expect(getGoMigrationsIncompatibility("atlas", { database: "mysql", goOrm })).toBeNull();
+    }
+    for (const goMigrations of ["goose", "atlas"]) {
+      expect(
+        getGoMigrationsIncompatibility(goMigrations, { database: "mysql", goOrm: "gorm" }),
+      ).toContain("GORM is only wired");
     }
     expect(
       getGoMigrationsIncompatibility("goose", { database: "sqlite", goOrm: "sqlc" }),

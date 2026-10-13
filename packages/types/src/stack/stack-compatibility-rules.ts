@@ -116,9 +116,8 @@ export function getUnsupportedWebDeployFrontend(
   webDeploy: string | undefined,
   frontends: readonly string[] = [],
 ): string | undefined {
-  const supported = WEB_DEPLOY_COMPATIBLE_FRONTENDS[
-    webDeploy as keyof typeof WEB_DEPLOY_COMPATIBLE_FRONTENDS
-  ];
+  const supported =
+    WEB_DEPLOY_COMPATIBLE_FRONTENDS[webDeploy as keyof typeof WEB_DEPLOY_COMPATIBLE_FRONTENDS];
   if (!supported) return undefined;
 
   return frontends.find((frontend) => {
@@ -312,7 +311,8 @@ export const BACKEND_UTILS_COMPATIBLE_BACKENDS = [
 
 export function isBackendUtilsCompatibleBackend(backend: string | undefined): boolean {
   return (
-    backend !== undefined && (BACKEND_UTILS_COMPATIBLE_BACKENDS as readonly string[]).includes(backend)
+    backend !== undefined &&
+    (BACKEND_UTILS_COMPATIBLE_BACKENDS as readonly string[]).includes(backend)
   );
 }
 
@@ -364,7 +364,8 @@ export function getJobQueueIncompatibility(
 }
 
 const VECTOR_DB_RUNTIME_REASONS: Partial<Record<VectorDb, string>> = {
-  weaviate: "Weaviate's TypeScript client uses gRPC and needs the Node.js or Bun runtime, not Cloudflare Workers",
+  weaviate:
+    "Weaviate's TypeScript client uses gRPC and needs the Node.js or Bun runtime, not Cloudflare Workers",
   lancedb: "LanceDB is an embedded native database and needs a standalone Node.js or Bun server",
 };
 
@@ -380,12 +381,19 @@ export function getVectorDbIncompatibility(
   stack: { backend?: string; runtime?: string; webDeploy?: string },
   { partial = false } = {},
 ): string | null {
+  if (!vectorDb || vectorDb === "none") return null;
+  if (stack.backend === "convex") {
+    return "Vector database requires a standalone backend (Convex has built-in vector search)";
+  }
+  if (stack.backend === "none") return "No backend selected";
   const reason = VECTOR_DB_RUNTIME_REASONS[vectorDb as VectorDb];
-  if (!reason || stack.backend === "convex" || stack.backend === "none") return null;
+  if (!reason) return null;
   const isUnanswered = (value: string | undefined) => partial && value === undefined;
   if (stack.runtime === "workers") return reason;
   if (vectorDb === "weaviate") {
-    return isFullstackSelfBackend(stack.backend) && stack.webDeploy === "cloudflare" ? reason : null;
+    return isFullstackSelfBackend(stack.backend) && stack.webDeploy === "cloudflare"
+      ? reason
+      : null;
   }
   if (isFullstackSelfBackend(stack.backend)) return reason;
   if (!isUnanswered(stack.runtime) && stack.runtime !== "node" && stack.runtime !== "bun") {

@@ -1542,7 +1542,10 @@ export async function gatherConfig(
     },
     goOrm: ({ results }) => {
       if (results.ecosystem !== "go") return Promise.resolve("none" as GoOrm);
-      return getGoOrmChoice(flags.goOrm);
+      return getGoOrmChoice(flags.goOrm, {
+        database: results.database,
+        goMigrations: flags.goMigrations,
+      });
     },
     goApi: ({ results }) => {
       if (results.ecosystem !== "go") return Promise.resolve("none" as GoApi);

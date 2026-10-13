@@ -2931,6 +2931,9 @@ export function getGoMigrationsIncompatibility(
   if (!GO_MIGRATION_DATABASES.has(selection.database ?? "none")) {
     return "Go migrations require SQLite, PostgreSQL, or MySQL";
   }
+  if (selection.database === "mysql" && selection.goOrm === "gorm") {
+    return "GORM is only wired for PostgreSQL and SQLite, so MySQL migrations would target a different database";
+  }
   if (goMigrations === "atlas" && selection.goOrm === "sqlc" && selection.database !== "postgres") {
     return "Atlas loads the sqlc schema, which is PostgreSQL-only";
   }

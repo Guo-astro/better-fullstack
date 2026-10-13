@@ -256,12 +256,26 @@ export async function getGoWebFrameworkChoice(
   return response;
 }
 
-export function resolveGoOrmPrompt(goOrm?: GoOrm) {
-  return createStaticSinglePromptResolution(GO_ORM_PROMPT_OPTIONS, "gorm", goOrm);
+export function resolveGoOrmPrompt(
+  goOrm?: GoOrm,
+  selection?: { database?: string; goMigrations?: GoMigrations },
+) {
+  const options = GO_ORM_PROMPT_OPTIONS.filter(
+    (option) =>
+      !getGoMigrationsIncompatibility(selection?.goMigrations, {
+        database: selection?.database,
+        goOrm: option.value,
+        partial: true,
+      }),
+  );
+  return createStaticSinglePromptResolution(options, "gorm", goOrm);
 }
 
-export async function getGoOrmChoice(goOrm?: GoOrm) {
-  const resolution = resolveGoOrmPrompt(goOrm);
+export async function getGoOrmChoice(
+  goOrm?: GoOrm,
+  selection?: { database?: string; goMigrations?: GoMigrations },
+) {
+  const resolution = resolveGoOrmPrompt(goOrm, selection);
   if (!resolution.shouldPrompt) {
     return resolution.autoValue ?? "none";
   }
