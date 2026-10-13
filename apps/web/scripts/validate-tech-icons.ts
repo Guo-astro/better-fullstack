@@ -1,6 +1,7 @@
 import { PRESET_CATEGORIES } from "@better-fullstack/types";
 
 import { ECOSYSTEMS, TECH_OPTIONS } from "@/lib/stack/constant";
+import { getRemoteIconUrlError } from "@/lib/stack/tech-icon-validation";
 import { getSiUrl, ICON_REGISTRY, type IconConfig } from "@/lib/stack/tech-icons";
 
 type IconTarget = {
@@ -9,6 +10,7 @@ type IconTarget = {
 };
 
 const REQUEST_TIMEOUT_MS = 15_000;
+const LIVE_MODE = process.argv.includes("--live");
 // Icon CDNs sometimes close a connection mid-run. Only a failed connection is retried; an HTTP
 // status such as 404 still fails at once.
 const CONNECTION_ATTEMPTS = 3;
@@ -146,6 +148,14 @@ async function run() {
       continue;
     }
 
+    const urlError = getRemoteIconUrlError(target.src);
+    if (urlError) {
+      errors.push(`${target.owner} uses invalid icon ${target.src}: ${urlError}`);
+      continue;
+    }
+
+    if (!LIVE_MODE) continue;
+
     try {
       const status = await fetchStatusWithRetry(target.src);
       if (status >= 400) {
@@ -158,7 +168,9 @@ async function run() {
     }
   }
 
-  console.log(`[tech-icons] validated ${targets.length} configured icon sources`);
+  console.log(
+    `[tech-icons] validated ${targets.length} configured icon sources (${LIVE_MODE ? "live" : "static"} mode)`,
+  );
 
   if (warnings.length > 0) {
     console.log(`[tech-icons] warnings (${warnings.length})`);
