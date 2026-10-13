@@ -9,7 +9,6 @@ const pages = new Map<string, string>([
   ["/stack", "shared-builder"],
   ["/compare", "compare"],
   ["/templates", "templates"],
-  ["/benchmark", "benchmark"],
   ["/mcp", "mcp"],
   ["/run-before-you-clone", "run-before-you-clone"],
   ["/docs", "docs"],
