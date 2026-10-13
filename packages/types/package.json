@@ -63,6 +63,7 @@
   "scripts": {
     "build": "tsdown",
     "lint": "oxlint . && tsc --noEmit",
+    "test": "bun test",
     "prepublishOnly": "bun run build"
   },
   "dependencies": {
