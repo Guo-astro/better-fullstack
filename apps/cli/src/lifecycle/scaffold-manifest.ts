@@ -180,10 +180,6 @@ export async function computeScaffoldSnapshot(
   };
 }
 
-export async function computeScaffoldHashes(projectDir: string): Promise<Record<string, string>> {
-  return (await computeScaffoldSnapshot(projectDir)).hashes;
-}
-
 export async function writeScaffoldManifest(
   projectDir: string,
   manifest: ScaffoldManifest,

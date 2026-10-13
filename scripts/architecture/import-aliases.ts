@@ -221,13 +221,6 @@ async function canonicalExistingAlias(
     return `@scripts/${value.slice(2)}`;
   }
 
-  if (
-    project.root === "apps/web" &&
-    /scaffbench-(?:2(?:-[12])?|3-board)-data\.tsx?$/.test(sourceFile)
-  ) {
-    return `@web/${value.slice(2)}`;
-  }
-
   return undefined;
 }
 

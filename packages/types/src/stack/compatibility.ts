@@ -6121,11 +6121,18 @@ export function evaluateCompatibility(input: CompatibilityInput): CompatibilityE
   ].filter((issue): issue is CompatibilityIssue => issue !== undefined);
 
   for (const [category, optionId] of getEvaluatedSelections(input)) {
-    if (issues.some((issue) => issue.category === category && issue.optionId === optionId)) {
-      continue;
-    }
     const reason = getDisabledReason(input, category, optionId);
-    if (reason) {
+    // Structured api/ai issues can restate a disabled reason in fuller wording;
+    // skip only that duplicate, not a distinct conflict for the same option.
+    const alreadyReported =
+      reason !== null &&
+      issues.some(
+        (issue) =>
+          issue.category === category &&
+          issue.optionId === optionId &&
+          issue.message.includes(reason),
+      );
+    if (reason && !alreadyReported) {
       issues.push({
         code: ISSUE_CODE_BY_CATEGORY[category] ?? `INCOMPATIBLE_${category.toUpperCase()}`,
         message: reason,
