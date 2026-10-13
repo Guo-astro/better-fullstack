@@ -1226,380 +1226,272 @@ type ScopedStackPartField = {
   replaceExisting?: boolean;
 };
 
-const GRAPH_TYPESCRIPT_FRONTEND_PART_SELECTION_KEYS = [
-  ["webDeploy", "deploy"],
-  ["cssFramework", "css"],
-  ["uiLibrary", "ui"],
-  ["forms", "forms"],
-  ["stateManagement", "stateManagement"],
-  ["animation", "animation"],
-  ["fileUpload", "fileUpload"],
-  ["i18n", "i18n"],
-  ["analytics", "analytics"],
-  ["webMcp", "webMcp"],
-  ["botProtection", "botProtection"],
-] as const satisfies readonly [StackSelectionStringKey, ScopedStackPartRole][];
+type ScopedPartKey = Exclude<StackSelectionStringKey | StackSelectionArrayKey, undefined>;
 
-const GRAPH_TYPESCRIPT_BACKEND_PART_SELECTION_KEYS = [
-  ["runtime", "runtime"],
-  ["serverDeploy", "deploy"],
-  ["payments", "payments"],
-  ["email", "email"],
-  ["aiSdk", "ai"],
-  ["realtime", "realtime"],
-  ["jobQueue", "jobQueue"],
-  ["logging", "logging"],
-  ["observability", "observability"],
-  ["featureFlags", "featureFlags"],
-  ["integrations", "integrations"],
-  ["ecommerce", "ecommerce"],
-  ["caching", "caching"],
-  ["rateLimit", "rateLimit"],
-  ["cms", "cms"],
-  ["search", "search"],
-  ["vectorDb", "vectorDb"],
-  ["fileStorage", "fileStorage"],
-  ["backendLibraries", "effect"],
-  ["validation", "validation"],
-  ["testing", "testing"],
-] as const satisfies readonly [StackSelectionStringKey, ScopedStackPartRole][];
+type ScopedPartGroup = {
+  ownerRole: NonNullable<ScopedStackPartField["ownerRole"]>;
+  ecosystem: StackPartEcosystem;
+  allowMultiple?: boolean;
+  keys: readonly (readonly [ScopedPartKey, ScopedStackPartRole])[];
+};
 
-const GRAPH_ELIXIR_BACKEND_PART_SELECTION_KEYS = [
-  ["elixirRealtime", "realtime"],
-  ["elixirJobs", "jobQueue"],
-  ["elixirValidation", "validation"],
-  ["elixirHttp", "httpClient"],
-  ["elixirEmail", "email"],
-  ["elixirCaching", "caching"],
-  ["elixirObservability", "observability"],
-  ["elixirTesting", "testing"],
-  ["elixirQuality", "codeQuality"],
-  ["elixirI18n", "i18n"],
-  ["elixirHttpServer", "runtime"],
-  ["elixirApplicationFramework", "libraries"],
-  ["elixirDocumentation", "documentation"],
-  ["elixirClustering", "config"],
-  ["elixirDeploy", "deploy"],
-] as const satisfies readonly [StackSelectionStringKey, ScopedStackPartRole][];
+const GRAPH_SCOPED_PART_GROUPS: readonly ScopedPartGroup[] = [
+  {
+    ownerRole: "frontend",
+    ecosystem: "typescript",
+    keys: [
+      ["webDeploy", "deploy"],
+      ["cssFramework", "css"],
+      ["uiLibrary", "ui"],
+      ["forms", "forms"],
+      ["stateManagement", "stateManagement"],
+      ["animation", "animation"],
+      ["fileUpload", "fileUpload"],
+      ["i18n", "i18n"],
+      ["analytics", "analytics"],
+      ["webMcp", "webMcp"],
+      ["botProtection", "botProtection"],
+    ],
+  },
+  {
+    ownerRole: "backend",
+    ecosystem: "typescript",
+    keys: [
+      ["runtime", "runtime"],
+      ["serverDeploy", "deploy"],
+      ["payments", "payments"],
+      ["email", "email"],
+      ["aiSdk", "ai"],
+      ["realtime", "realtime"],
+      ["jobQueue", "jobQueue"],
+      ["logging", "logging"],
+      ["observability", "observability"],
+      ["featureFlags", "featureFlags"],
+      ["integrations", "integrations"],
+      ["ecommerce", "ecommerce"],
+      ["caching", "caching"],
+      ["rateLimit", "rateLimit"],
+      ["cms", "cms"],
+      ["search", "search"],
+      ["vectorDb", "vectorDb"],
+      ["fileStorage", "fileStorage"],
+      ["backendLibraries", "effect"],
+      ["validation", "validation"],
+      ["testing", "testing"],
+    ],
+  },
+  {
+    ownerRole: "backend",
+    ecosystem: "elixir",
+    keys: [
+      ["elixirRealtime", "realtime"],
+      ["elixirJobs", "jobQueue"],
+      ["elixirValidation", "validation"],
+      ["elixirHttp", "httpClient"],
+      ["elixirEmail", "email"],
+      ["elixirCaching", "caching"],
+      ["elixirObservability", "observability"],
+      ["elixirTesting", "testing"],
+      ["elixirQuality", "codeQuality"],
+      ["elixirI18n", "i18n"],
+      ["elixirHttpServer", "runtime"],
+      ["elixirApplicationFramework", "libraries"],
+      ["elixirDocumentation", "documentation"],
+      ["elixirClustering", "config"],
+      ["elixirDeploy", "deploy"],
+    ],
+  },
+  {
+    ownerRole: "mobile",
+    ecosystem: "react-native",
+    keys: [
+      ["auth", "auth"],
+      ["payments", "payments"],
+      ["mobileNavigation", "navigation"],
+      ["mobileUI", "ui"],
+      ["mobileStorage", "storage"],
+      ["mobileTesting", "testing"],
+      ["mobilePush", "push"],
+      ["mobileOTA", "ota"],
+      ["mobileDeepLinking", "deepLinking"],
+    ],
+  },
+  {
+    ownerRole: "mobile",
+    ecosystem: "react-native",
+    allowMultiple: true,
+    keys: [["mobileLibraries", "libraries"]],
+  },
+  {
+    ownerRole: "mobile",
+    ecosystem: "kotlin",
+    allowMultiple: true,
+    keys: [["kotlinMobileLibraries", "libraries"]],
+  },
+  {
+    ownerRole: "backend",
+    ecosystem: "rust",
+    keys: [
+      ["rustCli", "cli"],
+      ["rustLogging", "logging"],
+      ["rustErrorHandling", "errorHandling"],
+      ["rustRealtime", "realtime"],
+      ["rustMessageQueue", "jobQueue"],
+      ["rustObservability", "observability"],
+      ["rustTemplating", "templating"],
+      ["email", "email"],
+      ["observability", "observability"],
+      ["caching", "caching"],
+      ["search", "search"],
+      ["rustCaching", "caching"],
+    ],
+  },
+  {
+    ownerRole: "backend",
+    ecosystem: "rust",
+    allowMultiple: true,
+    keys: [["rustLibraries", "libraries"]],
+  },
+  {
+    ownerRole: "backend",
+    ecosystem: "python",
+    keys: [
+      ["pythonValidation", "validation"],
+      ["pythonTaskQueue", "jobQueue"],
+      ["pythonGraphql", "graphql"],
+      ["pythonQuality", "codeQuality"],
+      ["pythonCloudSdk", "cloudSdk"],
+      ["pythonHttpClient", "httpClient"],
+      ["pythonMedia", "media"],
+      ["pythonServer", "server"],
+      ["pythonPackageManager", "packageManager"],
+      ["pythonMessageQueue", "messageQueue"],
+      ["pythonCaching", "caching"],
+      ["pythonRealtime", "realtime"],
+      ["pythonObservability", "observability"],
+      ["pythonLogging", "logging"],
+      ["email", "email"],
+      ["observability", "observability"],
+      ["caching", "caching"],
+      ["search", "search"],
+    ],
+  },
+  {
+    ownerRole: "backend",
+    ecosystem: "python",
+    allowMultiple: true,
+    keys: [
+      ["pythonAi", "ai"],
+      ["pythonTesting", "testing"],
+      ["pythonCli", "cli"],
+      ["pythonData", "data"],
+    ],
+  },
+  {
+    ownerRole: "backend",
+    ecosystem: "go",
+    keys: [
+      ["goCli", "cli"],
+      ["goLogging", "logging"],
+      ["goValidation", "validation"],
+      ["goQuality", "codeQuality"],
+      ["goMigrations", "migrations"],
+      ["goTemplating", "templating"],
+      ["goProtoTooling", "buildTool"],
+      ["goDI", "libraries"],
+      ["goRealtime", "realtime"],
+      ["goMessageQueue", "jobQueue"],
+      ["goCaching", "caching"],
+      ["goConfig", "config"],
+      ["goObservability", "observability"],
+      ["email", "email"],
+      ["observability", "observability"],
+      ["caching", "caching"],
+      ["search", "search"],
+    ],
+  },
+  {
+    ownerRole: "backend",
+    ecosystem: "go",
+    allowMultiple: true,
+    keys: [["goTesting", "testing"]],
+  },
+  {
+    ownerRole: "backend",
+    ecosystem: "java",
+    keys: [
+      ["javaLanguage", "language"],
+      ["javaBuildTool", "buildTool"],
+      ["javaLogging", "logging"],
+      ["email", "email"],
+      ["observability", "observability"],
+      ["caching", "caching"],
+      ["search", "search"],
+    ],
+  },
+  {
+    ownerRole: "backend",
+    ecosystem: "java",
+    allowMultiple: true,
+    keys: [
+      ["javaLibraries", "libraries"],
+      ["javaTestingLibraries", "testing"],
+    ],
+  },
+  {
+    ownerRole: "backend",
+    ecosystem: "dotnet",
+    keys: [
+      ["dotnetOrm", "orm"],
+      ["dotnetAuth", "auth"],
+      ["dotnetApi", "api"],
+      ["dotnetJobQueue", "jobQueue"],
+      ["dotnetRealtime", "realtime"],
+      ["dotnetValidation", "validation"],
+      ["dotnetCaching", "caching"],
+      ["dotnetDeploy", "deploy"],
+    ],
+  },
+  {
+    ownerRole: "backend",
+    ecosystem: "dotnet",
+    allowMultiple: true,
+    keys: [
+      ["dotnetTesting", "testing"],
+      ["dotnetObservability", "observability"],
+      ["dotnetLibraries", "libraries"],
+    ],
+  },
+  {
+    ownerRole: "backend",
+    ecosystem: "elixir",
+    allowMultiple: true,
+    keys: [["elixirLibraries", "libraries"]],
+  },
+  {
+    ownerRole: "database",
+    ecosystem: "universal",
+    keys: [["dbSetup", "dbSetup"]],
+  },
+];
 
-const GRAPH_DATABASE_PART_SELECTION_KEYS = [["dbSetup", "dbSetup"]] as const satisfies readonly [
-  StackSelectionStringKey,
-  ScopedStackPartRole,
-][];
+const CLI_KEY_BY_SELECTION_KEY: Partial<Record<ScopedPartKey, keyof CLIInput>> = {
+  aiSdk: "ai",
+  backendLibraries: "effect",
+};
 
-const GRAPH_MOBILE_PART_SELECTION_KEYS = [
-  ["auth", "auth"],
-  ["payments", "payments"],
-  ["mobileNavigation", "navigation"],
-  ["mobileUI", "ui"],
-  ["mobileStorage", "storage"],
-  ["mobileTesting", "testing"],
-  ["mobilePush", "push"],
-  ["mobileOTA", "ota"],
-  ["mobileDeepLinking", "deepLinking"],
-] as const satisfies readonly [StackSelectionStringKey, ScopedStackPartRole][];
-
-const GRAPH_MOBILE_ARRAY_PART_SELECTION_KEYS = [
-  ["mobileLibraries", "libraries"],
-] as const satisfies readonly [StackSelectionArrayKey, ScopedStackPartRole][];
-
-const GRAPH_KOTLIN_MOBILE_ARRAY_PART_SELECTION_KEYS = [
-  ["kotlinMobileLibraries", "libraries"],
-] as const satisfies readonly [StackSelectionArrayKey, ScopedStackPartRole][];
-
-const GRAPH_RUST_BACKEND_PART_SELECTION_KEYS = [
-  ["rustCli", "cli"],
-  ["rustLogging", "logging"],
-  ["rustErrorHandling", "errorHandling"],
-  ["rustRealtime", "realtime"],
-  ["rustMessageQueue", "jobQueue"],
-  ["rustObservability", "observability"],
-  ["rustTemplating", "templating"],
-  ["email", "email"],
-  ["observability", "observability"],
-  ["caching", "caching"],
-  ["search", "search"],
-  ["rustCaching", "caching"],
-] as const satisfies readonly [StackSelectionStringKey, ScopedStackPartRole][];
-
-const GRAPH_RUST_BACKEND_ARRAY_PART_SELECTION_KEYS = [
-  ["rustLibraries", "libraries"],
-] as const satisfies readonly [StackSelectionArrayKey, ScopedStackPartRole][];
-
-const GRAPH_PYTHON_BACKEND_PART_SELECTION_KEYS = [
-  ["pythonValidation", "validation"],
-  ["pythonTaskQueue", "jobQueue"],
-  ["pythonGraphql", "graphql"],
-  ["pythonQuality", "codeQuality"],
-  ["pythonCloudSdk", "cloudSdk"],
-  ["pythonHttpClient", "httpClient"],
-  ["pythonMedia", "media"],
-  ["pythonServer", "server"],
-  ["pythonPackageManager", "packageManager"],
-  ["pythonMessageQueue", "messageQueue"],
-  ["pythonCaching", "caching"],
-  ["pythonRealtime", "realtime"],
-  ["pythonObservability", "observability"],
-  ["pythonLogging", "logging"],
-  ["email", "email"],
-  ["observability", "observability"],
-  ["caching", "caching"],
-  ["search", "search"],
-] as const satisfies readonly [StackSelectionStringKey, ScopedStackPartRole][];
-
-const GRAPH_PYTHON_BACKEND_ARRAY_PART_SELECTION_KEYS = [
-  ["pythonAi", "ai"],
-  ["pythonTesting", "testing"],
-  ["pythonCli", "cli"],
-  ["pythonData", "data"],
-] as const satisfies readonly [StackSelectionArrayKey, ScopedStackPartRole][];
-
-const GRAPH_GO_BACKEND_PART_SELECTION_KEYS = [
-  ["goCli", "cli"],
-  ["goLogging", "logging"],
-  ["goValidation", "validation"],
-  ["goQuality", "codeQuality"],
-  ["goMigrations", "migrations"],
-  ["goTemplating", "templating"],
-  ["goProtoTooling", "buildTool"],
-  ["goDI", "libraries"],
-  ["goRealtime", "realtime"],
-  ["goMessageQueue", "jobQueue"],
-  ["goCaching", "caching"],
-  ["goConfig", "config"],
-  ["goObservability", "observability"],
-  ["email", "email"],
-  ["observability", "observability"],
-  ["caching", "caching"],
-  ["search", "search"],
-] as const satisfies readonly [StackSelectionStringKey, ScopedStackPartRole][];
-
-const GRAPH_GO_BACKEND_ARRAY_PART_SELECTION_KEYS = [
-  ["goTesting", "testing"],
-] as const satisfies readonly [StackSelectionArrayKey, ScopedStackPartRole][];
-
-const GRAPH_JAVA_BACKEND_PART_SELECTION_KEYS = [
-  ["javaLanguage", "language"],
-  ["javaBuildTool", "buildTool"],
-  ["javaLogging", "logging"],
-  ["email", "email"],
-  ["observability", "observability"],
-  ["caching", "caching"],
-  ["search", "search"],
-] as const satisfies readonly [StackSelectionStringKey, ScopedStackPartRole][];
-
-const GRAPH_JAVA_BACKEND_ARRAY_PART_SELECTION_KEYS = [
-  ["javaLibraries", "libraries"],
-  ["javaTestingLibraries", "testing"],
-] as const satisfies readonly [StackSelectionArrayKey, ScopedStackPartRole][];
-
-const GRAPH_DOTNET_BACKEND_PART_SELECTION_KEYS = [
-  ["dotnetOrm", "orm"],
-  ["dotnetAuth", "auth"],
-  ["dotnetApi", "api"],
-  ["dotnetJobQueue", "jobQueue"],
-  ["dotnetRealtime", "realtime"],
-  ["dotnetValidation", "validation"],
-  ["dotnetCaching", "caching"],
-  ["dotnetDeploy", "deploy"],
-] as const satisfies readonly [StackSelectionStringKey, ScopedStackPartRole][];
-
-const GRAPH_DOTNET_BACKEND_ARRAY_PART_SELECTION_KEYS = [
-  ["dotnetTesting", "testing"],
-  ["dotnetObservability", "observability"],
-  ["dotnetLibraries", "libraries"],
-] as const satisfies readonly [StackSelectionArrayKey, ScopedStackPartRole][];
-
-const GRAPH_ELIXIR_BACKEND_ARRAY_PART_SELECTION_KEYS = [
-  ["elixirLibraries", "libraries"],
-] as const satisfies readonly [StackSelectionArrayKey, ScopedStackPartRole][];
-
-const GRAPH_TYPESCRIPT_FRONTEND_PART_CLI_KEYS = [
-  ["webDeploy", "deploy"],
-  ["cssFramework", "css"],
-  ["uiLibrary", "ui"],
-  ["forms", "forms"],
-  ["stateManagement", "stateManagement"],
-  ["animation", "animation"],
-  ["fileUpload", "fileUpload"],
-  ["i18n", "i18n"],
-  ["analytics", "analytics"],
-  ["webMcp", "webMcp"],
-  ["botProtection", "botProtection"],
-  ["validation", "validation"],
-  ["testing", "testing"],
-] as const satisfies readonly [keyof CLIInput, ScopedStackPartRole][];
-
-const GRAPH_TYPESCRIPT_BACKEND_PART_CLI_KEYS = [
-  ["runtime", "runtime"],
-  ["serverDeploy", "deploy"],
-  ["payments", "payments"],
-  ["email", "email"],
-  ["ai", "ai"],
-  ["realtime", "realtime"],
-  ["jobQueue", "jobQueue"],
-  ["logging", "logging"],
-  ["observability", "observability"],
-  ["featureFlags", "featureFlags"],
-  ["integrations", "integrations"],
-  ["ecommerce", "ecommerce"],
-  ["caching", "caching"],
-  ["rateLimit", "rateLimit"],
-  ["cms", "cms"],
-  ["search", "search"],
-  ["vectorDb", "vectorDb"],
-  ["fileStorage", "fileStorage"],
-  ["effect", "effect"],
-] as const satisfies readonly [keyof CLIInput, ScopedStackPartRole][];
-
-const GRAPH_ELIXIR_BACKEND_PART_CLI_KEYS = [
-  ["elixirRealtime", "realtime"],
-  ["elixirJobs", "jobQueue"],
-  ["elixirValidation", "validation"],
-  ["elixirHttp", "httpClient"],
-  ["elixirEmail", "email"],
-  ["elixirCaching", "caching"],
-  ["elixirObservability", "observability"],
-  ["elixirTesting", "testing"],
-  ["elixirQuality", "codeQuality"],
-  ["elixirI18n", "i18n"],
-  ["elixirHttpServer", "runtime"],
-  ["elixirApplicationFramework", "libraries"],
-  ["elixirDocumentation", "documentation"],
-  ["elixirClustering", "config"],
-  ["elixirDeploy", "deploy"],
-] as const satisfies readonly [keyof CLIInput, ScopedStackPartRole][];
-
-const GRAPH_DATABASE_PART_CLI_KEYS = [["dbSetup", "dbSetup"]] as const satisfies readonly [
-  keyof CLIInput,
-  ScopedStackPartRole,
-][];
-
-const GRAPH_MOBILE_PART_CLI_KEYS = [
-  ["auth", "auth"],
-  ["payments", "payments"],
-  ["mobileNavigation", "navigation"],
-  ["mobileUI", "ui"],
-  ["mobileStorage", "storage"],
-  ["mobileTesting", "testing"],
-  ["mobilePush", "push"],
-  ["mobileOTA", "ota"],
-  ["mobileDeepLinking", "deepLinking"],
-] as const satisfies readonly [keyof CLIInput, ScopedStackPartRole][];
-
-const GRAPH_MOBILE_ARRAY_PART_CLI_KEYS = [
-  ["mobileLibraries", "libraries"],
-] as const satisfies readonly [keyof CLIInput, ScopedStackPartRole][];
-
-const GRAPH_KOTLIN_MOBILE_ARRAY_PART_CLI_KEYS = [
-  ["kotlinMobileLibraries", "libraries"],
-] as const satisfies readonly [keyof CLIInput, ScopedStackPartRole][];
-
-const GRAPH_RUST_BACKEND_PART_CLI_KEYS = [
-  ["rustCli", "cli"],
-  ["rustLogging", "logging"],
-  ["rustErrorHandling", "errorHandling"],
-  ["rustRealtime", "realtime"],
-  ["rustMessageQueue", "jobQueue"],
-  ["rustObservability", "observability"],
-  ["rustTemplating", "templating"],
-  ["email", "email"],
-  ["observability", "observability"],
-  ["caching", "caching"],
-  ["search", "search"],
-  ["rustCaching", "caching"],
-] as const satisfies readonly [keyof CLIInput, ScopedStackPartRole][];
-
-const GRAPH_RUST_BACKEND_ARRAY_PART_CLI_KEYS = [
-  ["rustLibraries", "libraries"],
-] as const satisfies readonly [keyof CLIInput, ScopedStackPartRole][];
-
-const GRAPH_PYTHON_BACKEND_PART_CLI_KEYS = [
-  ["pythonValidation", "validation"],
-  ["pythonTaskQueue", "jobQueue"],
-  ["pythonGraphql", "graphql"],
-  ["pythonQuality", "codeQuality"],
-  ["pythonCloudSdk", "cloudSdk"],
-  ["pythonHttpClient", "httpClient"],
-  ["pythonMedia", "media"],
-  ["pythonServer", "server"],
-  ["pythonPackageManager", "packageManager"],
-  ["pythonMessageQueue", "messageQueue"],
-  ["pythonCaching", "caching"],
-  ["pythonRealtime", "realtime"],
-  ["pythonObservability", "observability"],
-  ["pythonLogging", "logging"],
-  ["email", "email"],
-  ["observability", "observability"],
-  ["caching", "caching"],
-  ["search", "search"],
-] as const satisfies readonly [keyof CLIInput, ScopedStackPartRole][];
-
-const GRAPH_PYTHON_BACKEND_ARRAY_PART_CLI_KEYS = [
-  ["pythonAi", "ai"],
-  ["pythonTesting", "testing"],
-  ["pythonCli", "cli"],
-  ["pythonData", "data"],
-] as const satisfies readonly [keyof CLIInput, ScopedStackPartRole][];
-
-const GRAPH_GO_BACKEND_PART_CLI_KEYS = [
-  ["goCli", "cli"],
-  ["goLogging", "logging"],
-  ["goValidation", "validation"],
-  ["goQuality", "codeQuality"],
-  ["goMigrations", "migrations"],
-  ["goTemplating", "templating"],
-  ["goProtoTooling", "buildTool"],
-  ["goDI", "libraries"],
-  ["goRealtime", "realtime"],
-  ["goMessageQueue", "jobQueue"],
-  ["goCaching", "caching"],
-  ["goConfig", "config"],
-  ["goObservability", "observability"],
-  ["email", "email"],
-  ["observability", "observability"],
-  ["caching", "caching"],
-  ["search", "search"],
-] as const satisfies readonly [keyof CLIInput, ScopedStackPartRole][];
-
-const GRAPH_GO_BACKEND_ARRAY_PART_CLI_KEYS = [
-  ["goTesting", "testing"],
-] as const satisfies readonly [keyof CLIInput, ScopedStackPartRole][];
-
-const GRAPH_JAVA_BACKEND_PART_CLI_KEYS = [
-  ["javaBuildTool", "buildTool"],
-  ["javaLogging", "logging"],
-  ["email", "email"],
-  ["observability", "observability"],
-  ["caching", "caching"],
-  ["search", "search"],
-] as const satisfies readonly [keyof CLIInput, ScopedStackPartRole][];
-
-const GRAPH_JAVA_BACKEND_ARRAY_PART_CLI_KEYS = [
-  ["javaLibraries", "libraries"],
-  ["javaTestingLibraries", "testing"],
-] as const satisfies readonly [keyof CLIInput, ScopedStackPartRole][];
-
-const GRAPH_DOTNET_BACKEND_PART_CLI_KEYS = [
-  ["dotnetOrm", "orm"],
-  ["dotnetAuth", "auth"],
-  ["dotnetApi", "api"],
-  ["dotnetJobQueue", "jobQueue"],
-  ["dotnetRealtime", "realtime"],
-  ["dotnetValidation", "validation"],
-  ["dotnetCaching", "caching"],
-  ["dotnetDeploy", "deploy"],
-] as const satisfies readonly [keyof CLIInput, ScopedStackPartRole][];
-
-const GRAPH_DOTNET_BACKEND_ARRAY_PART_CLI_KEYS = [
-  ["dotnetTesting", "testing"],
-  ["dotnetObservability", "observability"],
-  ["dotnetLibraries", "libraries"],
-] as const satisfies readonly [keyof CLIInput, ScopedStackPartRole][];
-
-const GRAPH_ELIXIR_BACKEND_ARRAY_PART_CLI_KEYS = [
-  ["elixirLibraries", "libraries"],
-] as const satisfies readonly [keyof CLIInput, ScopedStackPartRole][];
+function getScopedPartFields(
+  readValue: (key: ScopedPartKey, allowMultiple: boolean) => ScopedStackPartField["value"],
+): ScopedStackPartField[] {
+  return GRAPH_SCOPED_PART_GROUPS.flatMap(({ keys, ...group }) =>
+    keys.map(([key, role]) => ({
+      ...group,
+      role,
+      value: readValue(key, group.allowMultiple ?? false),
+      ...(role === "webMcp" ? { replaceExisting: true } : {}),
+    })),
+  );
+}
 
 function getAddonScopedPartFields(addons: readonly string[] | undefined): ScopedStackPartField[] {
   return toUniqueNonNoneArray(addons ?? []).flatMap((addon) => {
@@ -1742,123 +1634,7 @@ function expandScopedStackPartSpecs(
 
 function getSelectionScopedPartFields(selection: StackSelectionInput): ScopedStackPartField[] {
   return [
-    ...GRAPH_TYPESCRIPT_FRONTEND_PART_SELECTION_KEYS.map(([key, role]) => ({
-      ownerRole: "frontend" as const,
-      ecosystem: "typescript" as const,
-      role,
-      value: selection[key],
-      replaceExisting: role === "webMcp",
-    })),
-    ...GRAPH_TYPESCRIPT_BACKEND_PART_SELECTION_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "typescript" as const,
-      role,
-      value: selection[key],
-    })),
-    ...GRAPH_ELIXIR_BACKEND_PART_SELECTION_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "elixir" as const,
-      role,
-      value: selection[key],
-    })),
-    ...GRAPH_MOBILE_PART_SELECTION_KEYS.map(([key, role]) => ({
-      ownerRole: "mobile" as const,
-      ecosystem: "react-native" as const,
-      role,
-      value: selection[key],
-    })),
-    ...GRAPH_MOBILE_ARRAY_PART_SELECTION_KEYS.map(([key, role]) => ({
-      ownerRole: "mobile" as const,
-      ecosystem: "react-native" as const,
-      role,
-      value: selection[key],
-      allowMultiple: true,
-    })),
-    ...GRAPH_KOTLIN_MOBILE_ARRAY_PART_SELECTION_KEYS.map(([key, role]) => ({
-      ownerRole: "mobile" as const,
-      ecosystem: "kotlin" as const,
-      role,
-      value: selection[key],
-      allowMultiple: true,
-    })),
-    ...GRAPH_RUST_BACKEND_PART_SELECTION_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "rust" as const,
-      role,
-      value: selection[key],
-    })),
-    ...GRAPH_RUST_BACKEND_ARRAY_PART_SELECTION_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "rust" as const,
-      role,
-      value: selection[key],
-      allowMultiple: true,
-    })),
-    ...GRAPH_PYTHON_BACKEND_PART_SELECTION_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "python" as const,
-      role,
-      value: selection[key],
-    })),
-    ...GRAPH_PYTHON_BACKEND_ARRAY_PART_SELECTION_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "python" as const,
-      role,
-      value: selection[key],
-      allowMultiple: true,
-    })),
-    ...GRAPH_GO_BACKEND_PART_SELECTION_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "go" as const,
-      role,
-      value: selection[key],
-    })),
-    ...GRAPH_GO_BACKEND_ARRAY_PART_SELECTION_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "go" as const,
-      role,
-      value: selection[key],
-      allowMultiple: true,
-    })),
-    ...GRAPH_JAVA_BACKEND_PART_SELECTION_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "java" as const,
-      role,
-      value: selection[key],
-    })),
-    ...GRAPH_JAVA_BACKEND_ARRAY_PART_SELECTION_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "java" as const,
-      role,
-      value: selection[key],
-      allowMultiple: true,
-    })),
-    ...GRAPH_DOTNET_BACKEND_PART_SELECTION_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "dotnet" as const,
-      role,
-      value: selection[key],
-    })),
-    ...GRAPH_DOTNET_BACKEND_ARRAY_PART_SELECTION_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "dotnet" as const,
-      role,
-      value: selection[key],
-      allowMultiple: true,
-    })),
-    ...GRAPH_ELIXIR_BACKEND_ARRAY_PART_SELECTION_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "elixir" as const,
-      role,
-      value: selection[key],
-      allowMultiple: true,
-    })),
-    ...GRAPH_DATABASE_PART_SELECTION_KEYS.map(([key, role]) => ({
-      ownerRole: "database" as const,
-      ecosystem: "universal" as const,
-      role,
-      value: selection[key],
-    })),
+    ...getScopedPartFields((key) => selection[key] as ScopedStackPartField["value"]),
     ...getAddonScopedPartFields([
       ...selection.codeQuality,
       ...selection.documentation,
@@ -1979,135 +1755,16 @@ export function patchGraphScopedSelections(
 }
 
 function getCliScopedPartFields(input: CLIInput): ScopedStackPartField[] {
-  const getValue = (key: keyof CLIInput) => {
-    const value = input[key];
-    return typeof value === "string" ? value : undefined;
-  };
-  const getArrayValue = (key: keyof CLIInput) => {
-    const value = input[key];
-    return Array.isArray(value)
-      ? value.filter((item): item is string => typeof item === "string")
-      : undefined;
-  };
-
   return [
-    ...GRAPH_TYPESCRIPT_FRONTEND_PART_CLI_KEYS.map(([key, role]) => ({
-      ownerRole: "frontend" as const,
-      ecosystem: "typescript" as const,
-      role,
-      value: getValue(key),
-      replaceExisting: role === "webMcp",
-    })),
-    ...GRAPH_TYPESCRIPT_BACKEND_PART_CLI_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "typescript" as const,
-      role,
-      value: getValue(key),
-    })),
-    ...GRAPH_ELIXIR_BACKEND_PART_CLI_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "elixir" as const,
-      role,
-      value: getValue(key),
-    })),
-    ...GRAPH_MOBILE_PART_CLI_KEYS.map(([key, role]) => ({
-      ownerRole: "mobile" as const,
-      ecosystem: "react-native" as const,
-      role,
-      value: getValue(key),
-    })),
-    ...GRAPH_MOBILE_ARRAY_PART_CLI_KEYS.map(([key, role]) => ({
-      ownerRole: "mobile" as const,
-      ecosystem: "react-native" as const,
-      role,
-      value: getArrayValue(key),
-      allowMultiple: true,
-    })),
-    ...GRAPH_KOTLIN_MOBILE_ARRAY_PART_CLI_KEYS.map(([key, role]) => ({
-      ownerRole: "mobile" as const,
-      ecosystem: "kotlin" as const,
-      role,
-      value: getArrayValue(key),
-      allowMultiple: true,
-    })),
-    ...GRAPH_RUST_BACKEND_PART_CLI_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "rust" as const,
-      role,
-      value: getValue(key),
-    })),
-    ...GRAPH_RUST_BACKEND_ARRAY_PART_CLI_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "rust" as const,
-      role,
-      value: getArrayValue(key),
-      allowMultiple: true,
-    })),
-    ...GRAPH_PYTHON_BACKEND_PART_CLI_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "python" as const,
-      role,
-      value: getValue(key),
-    })),
-    ...GRAPH_PYTHON_BACKEND_ARRAY_PART_CLI_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "python" as const,
-      role,
-      value: getArrayValue(key),
-      allowMultiple: true,
-    })),
-    ...GRAPH_GO_BACKEND_PART_CLI_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "go" as const,
-      role,
-      value: getValue(key),
-    })),
-    ...GRAPH_GO_BACKEND_ARRAY_PART_CLI_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "go" as const,
-      role,
-      value: getArrayValue(key),
-      allowMultiple: true,
-    })),
-    ...GRAPH_JAVA_BACKEND_PART_CLI_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "java" as const,
-      role,
-      value: getValue(key),
-    })),
-    ...GRAPH_JAVA_BACKEND_ARRAY_PART_CLI_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "java" as const,
-      role,
-      value: getArrayValue(key),
-      allowMultiple: true,
-    })),
-    ...GRAPH_DOTNET_BACKEND_PART_CLI_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "dotnet" as const,
-      role,
-      value: getValue(key),
-    })),
-    ...GRAPH_DOTNET_BACKEND_ARRAY_PART_CLI_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "dotnet" as const,
-      role,
-      value: getArrayValue(key),
-      allowMultiple: true,
-    })),
-    ...GRAPH_ELIXIR_BACKEND_ARRAY_PART_CLI_KEYS.map(([key, role]) => ({
-      ownerRole: "backend" as const,
-      ecosystem: "elixir" as const,
-      role,
-      value: getArrayValue(key),
-      allowMultiple: true,
-    })),
-    ...GRAPH_DATABASE_PART_CLI_KEYS.map(([key, role]) => ({
-      ownerRole: "database" as const,
-      ecosystem: "universal" as const,
-      role,
-      value: getValue(key),
-    })),
+    ...getScopedPartFields((key, allowMultiple) => {
+      const value = input[CLI_KEY_BY_SELECTION_KEY[key] ?? (key as keyof CLIInput)];
+      if (allowMultiple) {
+        return Array.isArray(value)
+          ? value.filter((item): item is string => typeof item === "string")
+          : undefined;
+      }
+      return typeof value === "string" ? value : undefined;
+    }),
     ...getAddonScopedPartFields(input.addons),
     ...getExampleScopedPartFields(input.examples),
   ];
