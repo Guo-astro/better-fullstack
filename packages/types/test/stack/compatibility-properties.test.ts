@@ -253,9 +253,10 @@ describe("compatibility engine - property invariants", () => {
  *    `adjustedStack` is perpetually non-null even though the value is stable.
  *
  * 3. Constraint-satisfaction ("adjusted output re-evaluates clean") is FALSE.
- *    analyzeStackCompatibility does not scrub cross-ecosystem leftover fields,
- *    while evaluateCompatibility checks every ecosystem's fields unconditionally,
- *    so the adjusted output still reports issues the analyzer never touches.
+ *    analyzeStackCompatibility does not scrub TypeScript fields left on other
+ *    ecosystems (payments, api, ai, shadcn options on React Native), and
+ *    evaluateCompatibility checks those shared fields for every ecosystem, so
+ *    the adjusted output still reports issues the analyzer never touches.
  *
  * Only determinism, from the original candidate list, holds; it is covered above.
  */

@@ -63,31 +63,6 @@
   color: var(--color-fd-primary-foreground);
 }
 
-.react-tweet-theme {
-  --tweet-container-margin: 0 !important;
-  @apply bg-fd-background! border-none! h-full! border-transparent! w-full!;
-  max-width: 100% !important;
-  min-width: 0 !important;
-}
-
-.react-tweet-theme > * {
-  max-width: 100% !important;
-  width: 100% !important;
-  min-width: 0 !important;
-}
-
-.react-tweet-theme img,
-.react-tweet-theme video {
-  max-width: 100% !important;
-  height: auto !important;
-}
-
-.react-tweet-theme * {
-  word-wrap: break-word !important;
-  word-break: break-word !important;
-  overflow-wrap: break-word !important;
-}
-
 @keyframes fadeInUp {
   from {
     opacity: 0;

@@ -163,192 +163,7 @@ import {
   WEB_MCP_VALUES,
 } from "@/config/schemas";
 
-export type OptionCategory =
-  | "api"
-  | "webFrontend"
-  | "nativeFrontend"
-  | "astroIntegration"
-  | "runtime"
-  | "backend"
-  | "database"
-  | "orm"
-  | "dbSetup"
-  | "webDeploy"
-  | "serverDeploy"
-  | "auth"
-  | "payments"
-  | "email"
-  | "fileUpload"
-  | "logging"
-  | "observability"
-  | "backendLibraries"
-  | "stateManagement"
-  | "forms"
-  | "validation"
-  | "testing"
-  | "realtime"
-  | "jobQueue"
-  | "caching"
-  | "rateLimit"
-  | "botProtection"
-  | "i18n"
-  | "search"
-  | "vectorDb"
-  | "fileStorage"
-  | "animation"
-  | "cssFramework"
-  | "uiLibrary"
-  | "cms"
-  | "featureFlags"
-  | "integrations"
-  | "ecommerce"
-  | "analytics"
-  | "webMcp"
-  | "mobileNavigation"
-  | "mobileUI"
-  | "mobileStorage"
-  | "mobileTesting"
-  | "mobilePush"
-  | "mobileOTA"
-  | "mobileDeepLinking"
-  | "mobileLibraries"
-  | "codeQuality"
-  | "documentation"
-  | "appShells"
-  | "appPlatforms"
-  | "toolchainProfile"
-  | "workspaceRunner"
-  | "codeQualityProfile"
-  | "gitHooks"
-  | "staticAnalysis"
-  | "aiTooling"
-  | "testingTools"
-  | "dataClient"
-  | "frontendUtilities"
-  | "httpClientTool"
-  | "codeGeneration"
-  | "developerEnvironment"
-  | "containerOrchestration"
-  | "apiGateway"
-  | "continuousIntegration"
-  | "backendUtilitiesTool"
-  | "packageManager"
-  | "workspaceShape"
-  | "versionChannel"
-  | "examples"
-  | "ai"
-  | "aiDocs"
-  | "git"
-  | "install"
-  | "effect"
-  | "shadcnBase"
-  | "shadcnStyle"
-  | "shadcnIconLibrary"
-  | "shadcnColorTheme"
-  | "shadcnBaseColor"
-  | "shadcnFont"
-  | "shadcnRadius"
-  | "rustWebFramework"
-  | "rustFrontend"
-  | "dotnetFrontend"
-  | "kotlinMobile"
-  | "kotlinMobileLibraries"
-  | "swiftMobile"
-  | "dartMobile"
-  | "rustOrm"
-  | "rustApi"
-  | "rustCli"
-  | "rustLibraries"
-  | "rustLogging"
-  | "rustErrorHandling"
-  | "rustCaching"
-  | "rustAuth"
-  | "rustRealtime"
-  | "rustMessageQueue"
-  | "rustObservability"
-  | "rustTemplating"
-  | "pythonWebFramework"
-  | "pythonOrm"
-  | "pythonValidation"
-  | "pythonAi"
-  | "pythonAuth"
-  | "pythonApi"
-  | "pythonTaskQueue"
-  | "pythonGraphql"
-  | "pythonQuality"
-  | "pythonTesting"
-  | "pythonCaching"
-  | "pythonRealtime"
-  | "pythonObservability"
-  | "pythonLogging"
-  | "pythonCli"
-  | "pythonCloudSdk"
-  | "pythonHttpClient"
-  | "pythonData"
-  | "pythonMedia"
-  | "pythonServer"
-  | "pythonPackageManager"
-  | "pythonMessageQueue"
-  | "goWebFramework"
-  | "goOrm"
-  | "goApi"
-  | "goCli"
-  | "goLogging"
-  | "goAuth"
-  | "goTesting"
-  | "goRealtime"
-  | "goMessageQueue"
-  | "goCaching"
-  | "goConfig"
-  | "goObservability"
-  | "goValidation"
-  | "goQuality"
-  | "goMigrations"
-  | "goTemplating"
-  | "goProtoTooling"
-  | "goDI"
-  | "javaLanguage"
-  | "javaWebFramework"
-  | "javaBuildTool"
-  | "javaOrm"
-  | "javaAuth"
-  | "javaApi"
-  | "javaLogging"
-  | "javaLibraries"
-  | "javaTestingLibraries"
-  | "dotnetWebFramework"
-  | "dotnetOrm"
-  | "dotnetAuth"
-  | "dotnetApi"
-  | "dotnetTesting"
-  | "dotnetJobQueue"
-  | "dotnetRealtime"
-  | "dotnetObservability"
-  | "dotnetValidation"
-  | "dotnetCaching"
-  | "dotnetDeploy"
-  | "dotnetLibraries"
-  | "elixirWebFramework"
-  | "elixirOrm"
-  | "elixirAuth"
-  | "elixirApi"
-  | "elixirRealtime"
-  | "elixirJobs"
-  | "elixirValidation"
-  | "elixirHttp"
-  | "elixirJson"
-  | "elixirEmail"
-  | "elixirCaching"
-  | "elixirObservability"
-  | "elixirTesting"
-  | "elixirQuality"
-  | "elixirI18n"
-  | "elixirHttpServer"
-  | "elixirApplicationFramework"
-  | "elixirDocumentation"
-  | "elixirClustering"
-  | "elixirDeploy"
-  | "elixirLibraries";
+export type OptionCategory = keyof typeof CATEGORY_DEFINITIONS;
 
 export type OptionSelectionMode = "single" | "multiple";
 
@@ -664,158 +479,9 @@ export function getCategoryOrderForEcosystem(
 }
 
 export function getCategoryDisplayName(categoryKey: string): string {
-  const categoryNames: Record<string, string> = {
-    i18n: "i18n",
-    api: "API",
-    orm: "ORM",
-    dbSetup: "DB Setup",
-    cssFramework: "CSS Framework",
-    uiLibrary: "UI Library",
-    shadcnBase: "shadcn/ui Base",
-    shadcnStyle: "shadcn/ui Style",
-    shadcnIconLibrary: "shadcn/ui Icons",
-    shadcnColorTheme: "shadcn/ui Theme",
-    shadcnBaseColor: "shadcn/ui Base Color",
-    shadcnFont: "shadcn/ui Font",
-    shadcnRadius: "shadcn/ui Radius",
-    ai: "AI SDK",
-    aiDocs: "AI Docs",
-    vectorDb: "Vector DB",
-    cms: "CMS",
-    ecommerce: "E-commerce",
-    webMcp: "WebMCP",
-    appShells: "App Platforms",
-    appPlatforms: "Legacy Capabilities",
-    toolchainProfile: "JavaScript Toolchain",
-    workspaceRunner: "Workspace Runner",
-    codeQualityProfile: "Code Quality",
-    gitHooks: "Git Hooks",
-    staticAnalysis: "Static Analysis",
-    aiTooling: "AI Tooling",
-    testingTools: "Testing Support",
-    dataClient: "Data Client",
-    frontendUtilities: "Frontend Utilities",
-    httpClientTool: "HTTP Client",
-    codeGeneration: "API Code Generation",
-    developerEnvironment: "Developer Environment",
-    containerOrchestration: "Local Containers",
-    apiGateway: "API Gateway",
-    continuousIntegration: "Continuous Integration",
-    backendUtilitiesTool: "Backend Utilities",
-    mobileNavigation: "Mobile Navigation",
-    mobileUI: "Mobile UI",
-    mobileStorage: "Mobile Storage",
-    mobileTesting: "Mobile Testing",
-    mobilePush: "Mobile Push",
-    mobileOTA: "Mobile OTA",
-    mobileDeepLinking: "Mobile Deep Linking",
-    mobileLibraries: "Mobile Libraries",
-    backendLibraries: "Effect Services",
-    rustWebFramework: "Rust Web Framework",
-    rustFrontend: "Rust Frontend (WASM)",
-    dotnetFrontend: ".NET Frontend",
-    kotlinMobile: "Kotlin Mobile",
-    kotlinMobileLibraries: "Kotlin Mobile Libraries",
-    swiftMobile: "Swift Mobile",
-    dartMobile: "Flutter / Dart Mobile",
-    rustOrm: "Rust ORM / Database",
-    rustApi: "Rust API Layer",
-    rustCli: "Rust CLI Tools",
-    rustLibraries: "Rust Core Libraries",
-    rustLogging: "Rust Logging",
-    rustErrorHandling: "Rust Error Handling",
-    rustCaching: "Rust Caching",
-    rustAuth: "Rust Auth",
-    rustRealtime: "Rust Realtime",
-    rustMessageQueue: "Rust Message Queue",
-    rustObservability: "Rust Observability",
-    rustTemplating: "Rust Templating",
-    pythonWebFramework: "Python Web Framework",
-    pythonOrm: "Python ORM / Database",
-    pythonValidation: "Python Validation",
-    pythonAi: "Python AI / ML",
-    pythonAuth: "Python Auth",
-    pythonApi: "Python API Framework",
-    pythonTaskQueue: "Python Task Queue",
-    pythonGraphql: "Python GraphQL",
-    pythonQuality: "Python Code Quality",
-    pythonTesting: "Python Testing",
-    pythonCaching: "Python Caching",
-    pythonRealtime: "Python Realtime",
-    pythonObservability: "Python Observability",
-    pythonLogging: "Python Logging",
-    pythonCli: "Python CLI Tooling",
-    pythonCloudSdk: "Python Cloud SDK",
-    pythonHttpClient: "Python HTTP Client",
-    pythonData: "Python Data & Scientific Computing",
-    pythonMedia: "Python Media",
-    pythonServer: "Python Production Server",
-    pythonPackageManager: "Python Package Manager",
-    pythonMessageQueue: "Python Message Queue",
-    goWebFramework: "Go Web Framework",
-    goOrm: "Go ORM / Database",
-    goApi: "Go API Layer",
-    goCli: "Go CLI Tools",
-    goLogging: "Go Logging",
-    goAuth: "Go Auth",
-    goTesting: "Go Testing",
-    goRealtime: "Go Realtime",
-    goMessageQueue: "Go Message Queue",
-    goCaching: "Go Caching",
-    goConfig: "Go Config",
-    goObservability: "Go Observability",
-    goValidation: "Go Validation",
-    goQuality: "Go Code Quality",
-    goMigrations: "Go Database Migrations",
-    goTemplating: "Go Templating",
-    goProtoTooling: "Go Protobuf Tooling",
-    goDI: "Go Dependency Injection",
-    javaLanguage: "Java Language",
-    javaWebFramework: "Java Web Framework",
-    javaBuildTool: "Java Build Tool",
-    javaOrm: "Java ORM / Database",
-    javaAuth: "Java Auth",
-    javaApi: "Java API Layer",
-    javaLogging: "Java Logging",
-    javaLibraries: "Java Libraries",
-    javaTestingLibraries: "Java Testing Libraries",
-    dotnetWebFramework: ".NET Web Framework",
-    dotnetOrm: ".NET Data Access",
-    dotnetAuth: ".NET Auth",
-    dotnetApi: ".NET API Style",
-    dotnetTesting: ".NET Testing",
-    dotnetJobQueue: ".NET Background Jobs",
-    dotnetRealtime: ".NET Realtime",
-    dotnetObservability: ".NET Observability",
-    dotnetValidation: ".NET Validation",
-    dotnetCaching: ".NET Caching",
-    dotnetDeploy: ".NET Deploy",
-    dotnetLibraries: ".NET Libraries",
-    elixirWebFramework: "Elixir Web Framework",
-    elixirOrm: "Elixir ORM / Database",
-    elixirAuth: "Elixir Auth",
-    elixirApi: "Elixir API Layer",
-    elixirRealtime: "Elixir Realtime",
-    elixirJobs: "Elixir Jobs",
-    elixirValidation: "Elixir Validation",
-    elixirHttp: "Elixir HTTP Client",
-    elixirJson: "Elixir JSON",
-    elixirEmail: "Elixir Email",
-    elixirCaching: "Elixir Caching",
-    elixirObservability: "Elixir Observability",
-    elixirTesting: "Elixir Testing",
-    elixirQuality: "Elixir Code Quality",
-    elixirI18n: "Elixir Localization",
-    elixirHttpServer: "Elixir HTTP Server",
-    elixirApplicationFramework: "Elixir Application Framework",
-    elixirDocumentation: "Elixir Documentation",
-    elixirClustering: "Elixir Clustering",
-    elixirDeploy: "Elixir Deploy",
-    elixirLibraries: "Elixir Libraries",
-  };
-
-  const customName = categoryNames[categoryKey];
-  if (customName) return customName;
+  const definition: CategoryDefinition | undefined =
+    CATEGORY_DEFINITIONS[categoryKey as OptionCategory];
+  if (definition?.displayName) return definition.displayName;
 
   const result = categoryKey.replace(/([A-Z])/g, " $1");
   return result.charAt(0).toUpperCase() + result.slice(1);
@@ -934,225 +600,301 @@ const toolingSelectionIds = (category: Parameters<typeof getToolingSelectionOpti
 
 const BOOLEAN_OPTION_VALUES = ["true", "false"] as const satisfies readonly string[];
 
-const MULTI_SELECT_CATEGORIES = new Set<OptionCategory>([
-  "codeQualityProfile",
-  "webFrontend",
-  "nativeFrontend",
-  "codeQuality",
-  "appShells",
-  "appPlatforms",
-  "staticAnalysis",
-  "aiTooling",
-  "testingTools",
-  "frontendUtilities",
-  "codeGeneration",
-  "developerEnvironment",
-  "backendUtilitiesTool",
-  "examples",
-  "aiDocs",
-  "rustLibraries",
-  "pythonAi",
-  "javaLibraries",
-  "javaTestingLibraries",
-  "mobileLibraries",
-  "kotlinMobileLibraries",
-  "dotnetLibraries",
-  "dotnetTesting",
-  "dotnetObservability",
-  "goTesting",
-  "pythonTesting",
-  "pythonCli",
-  "pythonData",
-  "elixirLibraries",
-]);
-
-const CATEGORY_VALUE_IDS: Record<OptionCategory, readonly string[]> = {
-  api: API_VALUES,
-  webFrontend: WEB_FRONTEND_VALUES,
-  nativeFrontend: NATIVE_FRONTEND_VALUES,
-  astroIntegration: ASTRO_INTEGRATION_VALUES,
-  runtime: RUNTIME_VALUES,
-  backend: BACKEND_BUILDER_VALUES,
-  database: DATABASE_VALUES,
-  orm: ORM_VALUES,
-  dbSetup: DATABASE_SETUP_VALUES,
-  webDeploy: WEB_DEPLOY_VALUES,
-  serverDeploy: SERVER_DEPLOY_VALUES,
-  auth: AUTH_VALUES,
-  payments: PAYMENTS_VALUES,
-  email: EMAIL_VALUES,
-  fileUpload: FILE_UPLOAD_VALUES,
-  logging: LOGGING_VALUES,
-  observability: OBSERVABILITY_VALUES,
-  backendLibraries: EFFECT_VALUES,
-  stateManagement: STATE_MANAGEMENT_VALUES,
-  forms: FORMS_VALUES,
-  validation: VALIDATION_VALUES,
-  testing: TESTING_VALUES,
-  realtime: REALTIME_VALUES,
-  jobQueue: JOB_QUEUE_VALUES,
-  caching: CACHING_VALUES,
-  rateLimit: RATE_LIMIT_VALUES,
-  botProtection: BOT_PROTECTION_VALUES,
-  i18n: I18N_VALUES,
-  search: SEARCH_VALUES,
-  vectorDb: VECTOR_DB_VALUES,
-  fileStorage: FILE_STORAGE_VALUES,
-  animation: ANIMATION_VALUES,
-  cssFramework: CSS_FRAMEWORK_VALUES,
-  uiLibrary: UI_LIBRARY_VALUES,
-  cms: CMS_VALUES,
-  featureFlags: FEATURE_FLAGS_VALUES,
-  integrations: INTEGRATIONS_VALUES,
-  ecommerce: ECOMMERCE_VALUES,
-  analytics: ANALYTICS_VALUES,
-  webMcp: WEB_MCP_VALUES,
-  mobileNavigation: MOBILE_NAVIGATION_VALUES,
-  mobileUI: MOBILE_UI_VALUES,
-  mobileStorage: MOBILE_STORAGE_VALUES,
-  mobileTesting: MOBILE_TESTING_VALUES,
-  mobilePush: MOBILE_PUSH_VALUES,
-  mobileOTA: MOBILE_OTA_VALUES,
-  mobileDeepLinking: MOBILE_DEEP_LINKING_VALUES,
-  mobileLibraries: MOBILE_LIBRARIES_VALUES,
-  codeQuality: CODE_QUALITY_VALUES,
-  documentation: DOCUMENTATION_VALUES,
-  appShells: APP_SHELL_VALUES,
-  appPlatforms: APP_PLATFORM_VALUES,
-  toolchainProfile: toolingSelectionIds("toolchain"),
-  workspaceRunner: toolingSelectionIds("workspaceRunner"),
-  codeQualityProfile: toolingSelectionIds("codeQuality"),
-  gitHooks: toolingSelectionIds("gitHooks"),
-  staticAnalysis: toolingSelectionIds("staticAnalysis"),
-  aiTooling: toolingSelectionIds("aiTooling"),
-  testingTools: toolingSelectionIds("testingTools"),
-  dataClient: toolingSelectionIds("dataClient"),
-  frontendUtilities: toolingSelectionIds("frontendUtilities"),
-  httpClientTool: toolingSelectionIds("httpClient"),
-  codeGeneration: toolingSelectionIds("codeGeneration"),
-  developerEnvironment: toolingSelectionIds("developerEnvironment"),
-  containerOrchestration: toolingSelectionIds("containerOrchestration"),
-  apiGateway: toolingSelectionIds("apiGateway"),
-  continuousIntegration: toolingSelectionIds("continuousIntegration"),
-  backendUtilitiesTool: toolingSelectionIds("backendUtilities"),
-  packageManager: PACKAGE_MANAGER_VALUES,
-  workspaceShape: WORKSPACE_SHAPE_VALUES,
-  versionChannel: VERSION_CHANNEL_VALUES,
-  examples: EXAMPLES_VALUES,
-  ai: AI_VALUES,
-  aiDocs: AI_DOCS_VALUES,
-  git: BOOLEAN_OPTION_VALUES,
-  install: BOOLEAN_OPTION_VALUES,
-  effect: EFFECT_VALUES,
-  shadcnBase: SHADCN_BASE_VALUES,
-  shadcnStyle: SHADCN_STYLE_VALUES,
-  shadcnIconLibrary: SHADCN_ICON_LIBRARY_VALUES,
-  shadcnColorTheme: SHADCN_COLOR_THEME_VALUES,
-  shadcnBaseColor: SHADCN_BASE_COLOR_VALUES,
-  shadcnFont: SHADCN_FONT_VALUES,
-  shadcnRadius: SHADCN_RADIUS_VALUES,
-  rustWebFramework: RUST_WEB_FRAMEWORK_VALUES,
-  rustFrontend: RUST_FRONTEND_VALUES,
-  dotnetFrontend: DOTNET_FRONTEND_VALUES,
-  kotlinMobile: KOTLIN_MOBILE_VALUES,
-  kotlinMobileLibraries: KOTLIN_MOBILE_LIBRARIES_VALUES,
-  swiftMobile: SWIFT_MOBILE_VALUES,
-  dartMobile: DART_MOBILE_VALUES,
-  rustOrm: RUST_ORM_VALUES,
-  rustApi: RUST_API_VALUES,
-  rustCli: RUST_CLI_VALUES,
-  rustLibraries: RUST_LIBRARIES_VALUES,
-  rustLogging: RUST_LOGGING_VALUES,
-  rustErrorHandling: RUST_ERROR_HANDLING_VALUES,
-  rustCaching: RUST_CACHING_VALUES,
-  rustAuth: RUST_AUTH_VALUES,
-  rustRealtime: RUST_REALTIME_VALUES,
-  rustMessageQueue: RUST_MESSAGE_QUEUE_VALUES,
-  rustObservability: RUST_OBSERVABILITY_VALUES,
-  rustTemplating: RUST_TEMPLATING_VALUES,
-  pythonWebFramework: PYTHON_WEB_FRAMEWORK_VALUES,
-  pythonOrm: PYTHON_ORM_VALUES,
-  pythonValidation: PYTHON_VALIDATION_VALUES,
-  pythonAi: PYTHON_AI_VALUES,
-  pythonAuth: PYTHON_AUTH_VALUES,
-  pythonApi: PYTHON_API_VALUES,
-  pythonTaskQueue: PYTHON_TASK_QUEUE_VALUES,
-  pythonGraphql: PYTHON_GRAPHQL_VALUES,
-  pythonQuality: PYTHON_QUALITY_VALUES,
-  pythonTesting: PYTHON_TESTING_VALUES,
-  pythonCaching: PYTHON_CACHING_VALUES,
-  pythonRealtime: PYTHON_REALTIME_VALUES,
-  pythonObservability: PYTHON_OBSERVABILITY_VALUES,
-  pythonLogging: PYTHON_LOGGING_VALUES,
-  pythonCli: PYTHON_CLI_VALUES,
-  pythonCloudSdk: PYTHON_CLOUD_SDK_VALUES,
-  pythonHttpClient: PYTHON_HTTP_CLIENT_VALUES,
-  pythonData: PYTHON_DATA_VALUES,
-  pythonMedia: PYTHON_MEDIA_VALUES,
-  pythonServer: PYTHON_SERVER_VALUES,
-  pythonPackageManager: PYTHON_PACKAGE_MANAGER_VALUES,
-  pythonMessageQueue: PYTHON_MESSAGE_QUEUE_VALUES,
-  goWebFramework: GO_WEB_FRAMEWORK_VALUES,
-  goOrm: GO_ORM_VALUES,
-  goApi: GO_API_VALUES,
-  goCli: GO_CLI_VALUES,
-  goLogging: GO_LOGGING_VALUES,
-  goAuth: GO_AUTH_VALUES,
-  goTesting: GO_TESTING_VALUES,
-  goRealtime: GO_REALTIME_VALUES,
-  goMessageQueue: GO_MESSAGE_QUEUE_VALUES,
-  goCaching: GO_CACHING_VALUES,
-  goConfig: GO_CONFIG_VALUES,
-  goObservability: GO_OBSERVABILITY_VALUES,
-  goValidation: GO_VALIDATION_VALUES,
-  goQuality: GO_QUALITY_VALUES,
-  goMigrations: GO_MIGRATIONS_VALUES,
-  goTemplating: GO_TEMPLATING_VALUES,
-  goProtoTooling: GO_PROTO_TOOLING_VALUES,
-  goDI: GO_DI_VALUES,
-  javaLanguage: JAVA_LANGUAGE_VALUES,
-  javaWebFramework: JAVA_WEB_FRAMEWORK_VALUES,
-  javaBuildTool: JAVA_BUILD_TOOL_VALUES,
-  javaOrm: JAVA_ORM_VALUES,
-  javaAuth: JAVA_AUTH_VALUES,
-  javaApi: JAVA_API_VALUES,
-  javaLogging: JAVA_LOGGING_VALUES,
-  javaLibraries: JAVA_LIBRARIES_VALUES,
-  javaTestingLibraries: JAVA_TESTING_LIBRARIES_VALUES,
-  dotnetWebFramework: DOTNET_WEB_FRAMEWORK_VALUES,
-  dotnetOrm: DOTNET_ORM_VALUES,
-  dotnetAuth: DOTNET_AUTH_VALUES,
-  dotnetApi: DOTNET_API_VALUES,
-  dotnetTesting: DOTNET_TESTING_VALUES,
-  dotnetJobQueue: DOTNET_JOB_QUEUE_VALUES,
-  dotnetRealtime: DOTNET_REALTIME_VALUES,
-  dotnetObservability: DOTNET_OBSERVABILITY_VALUES,
-  dotnetValidation: DOTNET_VALIDATION_VALUES,
-  dotnetCaching: DOTNET_CACHING_VALUES,
-  dotnetDeploy: DOTNET_DEPLOY_VALUES,
-  dotnetLibraries: DOTNET_LIBRARIES_VALUES,
-  elixirWebFramework: ELIXIR_WEB_FRAMEWORK_VALUES,
-  elixirOrm: ELIXIR_ORM_VALUES,
-  elixirAuth: ELIXIR_AUTH_VALUES,
-  elixirApi: ELIXIR_API_VALUES,
-  elixirRealtime: ELIXIR_REALTIME_VALUES,
-  elixirJobs: ELIXIR_JOBS_VALUES,
-  elixirValidation: ELIXIR_VALIDATION_VALUES,
-  elixirHttp: ELIXIR_HTTP_VALUES,
-  elixirJson: ELIXIR_JSON_VALUES,
-  elixirEmail: ELIXIR_EMAIL_VALUES,
-  elixirCaching: ELIXIR_CACHING_VALUES,
-  elixirObservability: ELIXIR_OBSERVABILITY_VALUES,
-  elixirTesting: ELIXIR_TESTING_VALUES,
-  elixirQuality: ELIXIR_QUALITY_VALUES,
-  elixirI18n: ELIXIR_I18N_VALUES,
-  elixirHttpServer: ELIXIR_HTTP_SERVER_VALUES,
-  elixirApplicationFramework: ELIXIR_APPLICATION_FRAMEWORK_VALUES,
-  elixirDocumentation: ELIXIR_DOCUMENTATION_VALUES,
-  elixirClustering: ELIXIR_CLUSTERING_VALUES,
-  elixirDeploy: ELIXIR_DEPLOY_VALUES,
-  elixirLibraries: ELIXIR_LIBRARIES_VALUES,
+type CategoryDefinition = {
+  values: readonly string[];
+  selectionMode?: OptionSelectionMode;
+  displayName?: string;
 };
+
+const CATEGORY_DEFINITIONS = {
+  api: { values: API_VALUES, displayName: "API" },
+  webFrontend: { values: WEB_FRONTEND_VALUES, selectionMode: "multiple" },
+  nativeFrontend: { values: NATIVE_FRONTEND_VALUES, selectionMode: "multiple" },
+  astroIntegration: { values: ASTRO_INTEGRATION_VALUES },
+  runtime: { values: RUNTIME_VALUES },
+  backend: { values: BACKEND_BUILDER_VALUES },
+  database: { values: DATABASE_VALUES },
+  orm: { values: ORM_VALUES, displayName: "ORM" },
+  dbSetup: { values: DATABASE_SETUP_VALUES, displayName: "DB Setup" },
+  webDeploy: { values: WEB_DEPLOY_VALUES },
+  serverDeploy: { values: SERVER_DEPLOY_VALUES },
+  auth: { values: AUTH_VALUES },
+  payments: { values: PAYMENTS_VALUES },
+  email: { values: EMAIL_VALUES },
+  fileUpload: { values: FILE_UPLOAD_VALUES },
+  logging: { values: LOGGING_VALUES },
+  observability: { values: OBSERVABILITY_VALUES },
+  backendLibraries: { values: EFFECT_VALUES, displayName: "Effect Services" },
+  stateManagement: { values: STATE_MANAGEMENT_VALUES },
+  forms: { values: FORMS_VALUES },
+  validation: { values: VALIDATION_VALUES },
+  testing: { values: TESTING_VALUES },
+  realtime: { values: REALTIME_VALUES },
+  jobQueue: { values: JOB_QUEUE_VALUES },
+  caching: { values: CACHING_VALUES },
+  rateLimit: { values: RATE_LIMIT_VALUES },
+  botProtection: { values: BOT_PROTECTION_VALUES },
+  i18n: { values: I18N_VALUES, displayName: "i18n" },
+  search: { values: SEARCH_VALUES },
+  vectorDb: { values: VECTOR_DB_VALUES, displayName: "Vector DB" },
+  fileStorage: { values: FILE_STORAGE_VALUES },
+  animation: { values: ANIMATION_VALUES },
+  cssFramework: { values: CSS_FRAMEWORK_VALUES, displayName: "CSS Framework" },
+  uiLibrary: { values: UI_LIBRARY_VALUES, displayName: "UI Library" },
+  cms: { values: CMS_VALUES, displayName: "CMS" },
+  featureFlags: { values: FEATURE_FLAGS_VALUES },
+  integrations: { values: INTEGRATIONS_VALUES },
+  ecommerce: { values: ECOMMERCE_VALUES, displayName: "E-commerce" },
+  analytics: { values: ANALYTICS_VALUES },
+  webMcp: { values: WEB_MCP_VALUES, displayName: "WebMCP" },
+  mobileNavigation: { values: MOBILE_NAVIGATION_VALUES, displayName: "Mobile Navigation" },
+  mobileUI: { values: MOBILE_UI_VALUES, displayName: "Mobile UI" },
+  mobileStorage: { values: MOBILE_STORAGE_VALUES, displayName: "Mobile Storage" },
+  mobileTesting: { values: MOBILE_TESTING_VALUES, displayName: "Mobile Testing" },
+  mobilePush: { values: MOBILE_PUSH_VALUES, displayName: "Mobile Push" },
+  mobileOTA: { values: MOBILE_OTA_VALUES, displayName: "Mobile OTA" },
+  mobileDeepLinking: { values: MOBILE_DEEP_LINKING_VALUES, displayName: "Mobile Deep Linking" },
+  mobileLibraries: {
+    values: MOBILE_LIBRARIES_VALUES,
+    selectionMode: "multiple",
+    displayName: "Mobile Libraries",
+  },
+  codeQuality: { values: CODE_QUALITY_VALUES, selectionMode: "multiple" },
+  documentation: { values: DOCUMENTATION_VALUES },
+  appShells: { values: APP_SHELL_VALUES, selectionMode: "multiple", displayName: "App Platforms" },
+  appPlatforms: {
+    values: APP_PLATFORM_VALUES,
+    selectionMode: "multiple",
+    displayName: "Legacy Capabilities",
+  },
+  toolchainProfile: {
+    values: toolingSelectionIds("toolchain"),
+    displayName: "JavaScript Toolchain",
+  },
+  workspaceRunner: {
+    values: toolingSelectionIds("workspaceRunner"),
+    displayName: "Workspace Runner",
+  },
+  codeQualityProfile: {
+    values: toolingSelectionIds("codeQuality"),
+    selectionMode: "multiple",
+    displayName: "Code Quality",
+  },
+  gitHooks: { values: toolingSelectionIds("gitHooks"), displayName: "Git Hooks" },
+  staticAnalysis: {
+    values: toolingSelectionIds("staticAnalysis"),
+    selectionMode: "multiple",
+    displayName: "Static Analysis",
+  },
+  aiTooling: {
+    values: toolingSelectionIds("aiTooling"),
+    selectionMode: "multiple",
+    displayName: "AI Tooling",
+  },
+  testingTools: {
+    values: toolingSelectionIds("testingTools"),
+    selectionMode: "multiple",
+    displayName: "Testing Support",
+  },
+  dataClient: { values: toolingSelectionIds("dataClient"), displayName: "Data Client" },
+  frontendUtilities: {
+    values: toolingSelectionIds("frontendUtilities"),
+    selectionMode: "multiple",
+    displayName: "Frontend Utilities",
+  },
+  httpClientTool: { values: toolingSelectionIds("httpClient"), displayName: "HTTP Client" },
+  codeGeneration: {
+    values: toolingSelectionIds("codeGeneration"),
+    selectionMode: "multiple",
+    displayName: "API Code Generation",
+  },
+  developerEnvironment: {
+    values: toolingSelectionIds("developerEnvironment"),
+    selectionMode: "multiple",
+    displayName: "Developer Environment",
+  },
+  containerOrchestration: {
+    values: toolingSelectionIds("containerOrchestration"),
+    displayName: "Local Containers",
+  },
+  apiGateway: { values: toolingSelectionIds("apiGateway"), displayName: "API Gateway" },
+  continuousIntegration: {
+    values: toolingSelectionIds("continuousIntegration"),
+    displayName: "Continuous Integration",
+  },
+  backendUtilitiesTool: {
+    values: toolingSelectionIds("backendUtilities"),
+    selectionMode: "multiple",
+    displayName: "Backend Utilities",
+  },
+  packageManager: { values: PACKAGE_MANAGER_VALUES },
+  workspaceShape: { values: WORKSPACE_SHAPE_VALUES },
+  versionChannel: { values: VERSION_CHANNEL_VALUES },
+  examples: { values: EXAMPLES_VALUES, selectionMode: "multiple" },
+  ai: { values: AI_VALUES, displayName: "AI SDK" },
+  aiDocs: { values: AI_DOCS_VALUES, selectionMode: "multiple", displayName: "AI Docs" },
+  git: { values: BOOLEAN_OPTION_VALUES },
+  install: { values: BOOLEAN_OPTION_VALUES },
+  effect: { values: EFFECT_VALUES },
+  shadcnBase: { values: SHADCN_BASE_VALUES, displayName: "shadcn/ui Base" },
+  shadcnStyle: { values: SHADCN_STYLE_VALUES, displayName: "shadcn/ui Style" },
+  shadcnIconLibrary: { values: SHADCN_ICON_LIBRARY_VALUES, displayName: "shadcn/ui Icons" },
+  shadcnColorTheme: { values: SHADCN_COLOR_THEME_VALUES, displayName: "shadcn/ui Theme" },
+  shadcnBaseColor: { values: SHADCN_BASE_COLOR_VALUES, displayName: "shadcn/ui Base Color" },
+  shadcnFont: { values: SHADCN_FONT_VALUES, displayName: "shadcn/ui Font" },
+  shadcnRadius: { values: SHADCN_RADIUS_VALUES, displayName: "shadcn/ui Radius" },
+  rustWebFramework: { values: RUST_WEB_FRAMEWORK_VALUES, displayName: "Rust Web Framework" },
+  rustFrontend: { values: RUST_FRONTEND_VALUES, displayName: "Rust Frontend (WASM)" },
+  dotnetFrontend: { values: DOTNET_FRONTEND_VALUES, displayName: ".NET Frontend" },
+  kotlinMobile: { values: KOTLIN_MOBILE_VALUES, displayName: "Kotlin Mobile" },
+  kotlinMobileLibraries: {
+    values: KOTLIN_MOBILE_LIBRARIES_VALUES,
+    selectionMode: "multiple",
+    displayName: "Kotlin Mobile Libraries",
+  },
+  swiftMobile: { values: SWIFT_MOBILE_VALUES, displayName: "Swift Mobile" },
+  dartMobile: { values: DART_MOBILE_VALUES, displayName: "Flutter / Dart Mobile" },
+  rustOrm: { values: RUST_ORM_VALUES, displayName: "Rust ORM / Database" },
+  rustApi: { values: RUST_API_VALUES, displayName: "Rust API Layer" },
+  rustCli: { values: RUST_CLI_VALUES, displayName: "Rust CLI Tools" },
+  rustLibraries: {
+    values: RUST_LIBRARIES_VALUES,
+    selectionMode: "multiple",
+    displayName: "Rust Core Libraries",
+  },
+  rustLogging: { values: RUST_LOGGING_VALUES, displayName: "Rust Logging" },
+  rustErrorHandling: { values: RUST_ERROR_HANDLING_VALUES, displayName: "Rust Error Handling" },
+  rustCaching: { values: RUST_CACHING_VALUES, displayName: "Rust Caching" },
+  rustAuth: { values: RUST_AUTH_VALUES, displayName: "Rust Auth" },
+  rustRealtime: { values: RUST_REALTIME_VALUES, displayName: "Rust Realtime" },
+  rustMessageQueue: { values: RUST_MESSAGE_QUEUE_VALUES, displayName: "Rust Message Queue" },
+  rustObservability: { values: RUST_OBSERVABILITY_VALUES, displayName: "Rust Observability" },
+  rustTemplating: { values: RUST_TEMPLATING_VALUES, displayName: "Rust Templating" },
+  pythonWebFramework: { values: PYTHON_WEB_FRAMEWORK_VALUES, displayName: "Python Web Framework" },
+  pythonOrm: { values: PYTHON_ORM_VALUES, displayName: "Python ORM / Database" },
+  pythonValidation: { values: PYTHON_VALIDATION_VALUES, displayName: "Python Validation" },
+  pythonAi: { values: PYTHON_AI_VALUES, selectionMode: "multiple", displayName: "Python AI / ML" },
+  pythonAuth: { values: PYTHON_AUTH_VALUES, displayName: "Python Auth" },
+  pythonApi: { values: PYTHON_API_VALUES, displayName: "Python API Framework" },
+  pythonTaskQueue: { values: PYTHON_TASK_QUEUE_VALUES, displayName: "Python Task Queue" },
+  pythonGraphql: { values: PYTHON_GRAPHQL_VALUES, displayName: "Python GraphQL" },
+  pythonQuality: { values: PYTHON_QUALITY_VALUES, displayName: "Python Code Quality" },
+  pythonTesting: {
+    values: PYTHON_TESTING_VALUES,
+    selectionMode: "multiple",
+    displayName: "Python Testing",
+  },
+  pythonCaching: { values: PYTHON_CACHING_VALUES, displayName: "Python Caching" },
+  pythonRealtime: { values: PYTHON_REALTIME_VALUES, displayName: "Python Realtime" },
+  pythonObservability: { values: PYTHON_OBSERVABILITY_VALUES, displayName: "Python Observability" },
+  pythonLogging: { values: PYTHON_LOGGING_VALUES, displayName: "Python Logging" },
+  pythonCli: {
+    values: PYTHON_CLI_VALUES,
+    selectionMode: "multiple",
+    displayName: "Python CLI Tooling",
+  },
+  pythonCloudSdk: { values: PYTHON_CLOUD_SDK_VALUES, displayName: "Python Cloud SDK" },
+  pythonHttpClient: { values: PYTHON_HTTP_CLIENT_VALUES, displayName: "Python HTTP Client" },
+  pythonData: {
+    values: PYTHON_DATA_VALUES,
+    selectionMode: "multiple",
+    displayName: "Python Data & Scientific Computing",
+  },
+  pythonMedia: { values: PYTHON_MEDIA_VALUES, displayName: "Python Media" },
+  pythonServer: { values: PYTHON_SERVER_VALUES, displayName: "Python Production Server" },
+  pythonPackageManager: {
+    values: PYTHON_PACKAGE_MANAGER_VALUES,
+    displayName: "Python Package Manager",
+  },
+  pythonMessageQueue: { values: PYTHON_MESSAGE_QUEUE_VALUES, displayName: "Python Message Queue" },
+  goWebFramework: { values: GO_WEB_FRAMEWORK_VALUES, displayName: "Go Web Framework" },
+  goOrm: { values: GO_ORM_VALUES, displayName: "Go ORM / Database" },
+  goApi: { values: GO_API_VALUES, displayName: "Go API Layer" },
+  goCli: { values: GO_CLI_VALUES, displayName: "Go CLI Tools" },
+  goLogging: { values: GO_LOGGING_VALUES, displayName: "Go Logging" },
+  goAuth: { values: GO_AUTH_VALUES, displayName: "Go Auth" },
+  goTesting: { values: GO_TESTING_VALUES, selectionMode: "multiple", displayName: "Go Testing" },
+  goRealtime: { values: GO_REALTIME_VALUES, displayName: "Go Realtime" },
+  goMessageQueue: { values: GO_MESSAGE_QUEUE_VALUES, displayName: "Go Message Queue" },
+  goCaching: { values: GO_CACHING_VALUES, displayName: "Go Caching" },
+  goConfig: { values: GO_CONFIG_VALUES, displayName: "Go Config" },
+  goObservability: { values: GO_OBSERVABILITY_VALUES, displayName: "Go Observability" },
+  goValidation: { values: GO_VALIDATION_VALUES, displayName: "Go Validation" },
+  goQuality: { values: GO_QUALITY_VALUES, displayName: "Go Code Quality" },
+  goMigrations: { values: GO_MIGRATIONS_VALUES, displayName: "Go Database Migrations" },
+  goTemplating: { values: GO_TEMPLATING_VALUES, displayName: "Go Templating" },
+  goProtoTooling: { values: GO_PROTO_TOOLING_VALUES, displayName: "Go Protobuf Tooling" },
+  goDI: { values: GO_DI_VALUES, displayName: "Go Dependency Injection" },
+  javaLanguage: { values: JAVA_LANGUAGE_VALUES, displayName: "Java Language" },
+  javaWebFramework: { values: JAVA_WEB_FRAMEWORK_VALUES, displayName: "Java Web Framework" },
+  javaBuildTool: { values: JAVA_BUILD_TOOL_VALUES, displayName: "Java Build Tool" },
+  javaOrm: { values: JAVA_ORM_VALUES, displayName: "Java ORM / Database" },
+  javaAuth: { values: JAVA_AUTH_VALUES, displayName: "Java Auth" },
+  javaApi: { values: JAVA_API_VALUES, displayName: "Java API Layer" },
+  javaLogging: { values: JAVA_LOGGING_VALUES, displayName: "Java Logging" },
+  javaLibraries: {
+    values: JAVA_LIBRARIES_VALUES,
+    selectionMode: "multiple",
+    displayName: "Java Libraries",
+  },
+  javaTestingLibraries: {
+    values: JAVA_TESTING_LIBRARIES_VALUES,
+    selectionMode: "multiple",
+    displayName: "Java Testing Libraries",
+  },
+  dotnetWebFramework: { values: DOTNET_WEB_FRAMEWORK_VALUES, displayName: ".NET Web Framework" },
+  dotnetOrm: { values: DOTNET_ORM_VALUES, displayName: ".NET Data Access" },
+  dotnetAuth: { values: DOTNET_AUTH_VALUES, displayName: ".NET Auth" },
+  dotnetApi: { values: DOTNET_API_VALUES, displayName: ".NET API Style" },
+  dotnetTesting: {
+    values: DOTNET_TESTING_VALUES,
+    selectionMode: "multiple",
+    displayName: ".NET Testing",
+  },
+  dotnetJobQueue: { values: DOTNET_JOB_QUEUE_VALUES, displayName: ".NET Background Jobs" },
+  dotnetRealtime: { values: DOTNET_REALTIME_VALUES, displayName: ".NET Realtime" },
+  dotnetObservability: {
+    values: DOTNET_OBSERVABILITY_VALUES,
+    selectionMode: "multiple",
+    displayName: ".NET Observability",
+  },
+  dotnetValidation: { values: DOTNET_VALIDATION_VALUES, displayName: ".NET Validation" },
+  dotnetCaching: { values: DOTNET_CACHING_VALUES, displayName: ".NET Caching" },
+  dotnetDeploy: { values: DOTNET_DEPLOY_VALUES, displayName: ".NET Deploy" },
+  dotnetLibraries: {
+    values: DOTNET_LIBRARIES_VALUES,
+    selectionMode: "multiple",
+    displayName: ".NET Libraries",
+  },
+  elixirWebFramework: { values: ELIXIR_WEB_FRAMEWORK_VALUES, displayName: "Elixir Web Framework" },
+  elixirOrm: { values: ELIXIR_ORM_VALUES, displayName: "Elixir ORM / Database" },
+  elixirAuth: { values: ELIXIR_AUTH_VALUES, displayName: "Elixir Auth" },
+  elixirApi: { values: ELIXIR_API_VALUES, displayName: "Elixir API Layer" },
+  elixirRealtime: { values: ELIXIR_REALTIME_VALUES, displayName: "Elixir Realtime" },
+  elixirJobs: { values: ELIXIR_JOBS_VALUES, displayName: "Elixir Jobs" },
+  elixirValidation: { values: ELIXIR_VALIDATION_VALUES, displayName: "Elixir Validation" },
+  elixirHttp: { values: ELIXIR_HTTP_VALUES, displayName: "Elixir HTTP Client" },
+  elixirJson: { values: ELIXIR_JSON_VALUES, displayName: "Elixir JSON" },
+  elixirEmail: { values: ELIXIR_EMAIL_VALUES, displayName: "Elixir Email" },
+  elixirCaching: { values: ELIXIR_CACHING_VALUES, displayName: "Elixir Caching" },
+  elixirObservability: { values: ELIXIR_OBSERVABILITY_VALUES, displayName: "Elixir Observability" },
+  elixirTesting: { values: ELIXIR_TESTING_VALUES, displayName: "Elixir Testing" },
+  elixirQuality: { values: ELIXIR_QUALITY_VALUES, displayName: "Elixir Code Quality" },
+  elixirI18n: { values: ELIXIR_I18N_VALUES, displayName: "Elixir Localization" },
+  elixirHttpServer: { values: ELIXIR_HTTP_SERVER_VALUES, displayName: "Elixir HTTP Server" },
+  elixirApplicationFramework: {
+    values: ELIXIR_APPLICATION_FRAMEWORK_VALUES,
+    displayName: "Elixir Application Framework",
+  },
+  elixirDocumentation: { values: ELIXIR_DOCUMENTATION_VALUES, displayName: "Elixir Documentation" },
+  elixirClustering: { values: ELIXIR_CLUSTERING_VALUES, displayName: "Elixir Clustering" },
+  elixirDeploy: { values: ELIXIR_DEPLOY_VALUES, displayName: "Elixir Deploy" },
+  elixirLibraries: {
+    values: ELIXIR_LIBRARIES_VALUES,
+    selectionMode: "multiple",
+    displayName: "Elixir Libraries",
+  },
+} satisfies Record<string, CategoryDefinition>;
 
 const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<string, string>>>> = {
   api: {
@@ -2205,9 +1947,10 @@ function getCliValue(category: OptionCategory, id: string): string {
 }
 
 function buildCategoryMetadata(category: OptionCategory): OptionCategoryMetadata {
+  const definition: CategoryDefinition = CATEGORY_DEFINITIONS[category];
   return {
-    selectionMode: MULTI_SELECT_CATEGORIES.has(category) ? "multiple" : "single",
-    options: CATEGORY_VALUE_IDS[category].map((id) => ({
+    selectionMode: definition.selectionMode ?? "single",
+    options: definition.values.map((id) => ({
       id,
       label: getOptionLabel(category, id),
       aliases: getOptionAliases(category, id),
@@ -2216,193 +1959,12 @@ function buildCategoryMetadata(category: OptionCategory): OptionCategoryMetadata
   };
 }
 
-export const OPTION_CATEGORY_METADATA: Record<OptionCategory, OptionCategoryMetadata> = {
-  api: buildCategoryMetadata("api"),
-  webFrontend: buildCategoryMetadata("webFrontend"),
-  nativeFrontend: buildCategoryMetadata("nativeFrontend"),
-  astroIntegration: buildCategoryMetadata("astroIntegration"),
-  runtime: buildCategoryMetadata("runtime"),
-  backend: buildCategoryMetadata("backend"),
-  database: buildCategoryMetadata("database"),
-  orm: buildCategoryMetadata("orm"),
-  dbSetup: buildCategoryMetadata("dbSetup"),
-  webDeploy: buildCategoryMetadata("webDeploy"),
-  serverDeploy: buildCategoryMetadata("serverDeploy"),
-  auth: buildCategoryMetadata("auth"),
-  payments: buildCategoryMetadata("payments"),
-  email: buildCategoryMetadata("email"),
-  fileUpload: buildCategoryMetadata("fileUpload"),
-  logging: buildCategoryMetadata("logging"),
-  observability: buildCategoryMetadata("observability"),
-  backendLibraries: buildCategoryMetadata("backendLibraries"),
-  stateManagement: buildCategoryMetadata("stateManagement"),
-  forms: buildCategoryMetadata("forms"),
-  validation: buildCategoryMetadata("validation"),
-  testing: buildCategoryMetadata("testing"),
-  realtime: buildCategoryMetadata("realtime"),
-  jobQueue: buildCategoryMetadata("jobQueue"),
-  caching: buildCategoryMetadata("caching"),
-  rateLimit: buildCategoryMetadata("rateLimit"),
-  botProtection: buildCategoryMetadata("botProtection"),
-  i18n: buildCategoryMetadata("i18n"),
-  search: buildCategoryMetadata("search"),
-  vectorDb: buildCategoryMetadata("vectorDb"),
-  fileStorage: buildCategoryMetadata("fileStorage"),
-  animation: buildCategoryMetadata("animation"),
-  cssFramework: buildCategoryMetadata("cssFramework"),
-  uiLibrary: buildCategoryMetadata("uiLibrary"),
-  cms: buildCategoryMetadata("cms"),
-  featureFlags: buildCategoryMetadata("featureFlags"),
-  integrations: buildCategoryMetadata("integrations"),
-  ecommerce: buildCategoryMetadata("ecommerce"),
-  analytics: buildCategoryMetadata("analytics"),
-  webMcp: buildCategoryMetadata("webMcp"),
-  mobileNavigation: buildCategoryMetadata("mobileNavigation"),
-  mobileUI: buildCategoryMetadata("mobileUI"),
-  mobileStorage: buildCategoryMetadata("mobileStorage"),
-  mobileTesting: buildCategoryMetadata("mobileTesting"),
-  mobilePush: buildCategoryMetadata("mobilePush"),
-  mobileOTA: buildCategoryMetadata("mobileOTA"),
-  mobileDeepLinking: buildCategoryMetadata("mobileDeepLinking"),
-  mobileLibraries: buildCategoryMetadata("mobileLibraries"),
-  codeQuality: buildCategoryMetadata("codeQuality"),
-  documentation: buildCategoryMetadata("documentation"),
-  appShells: buildCategoryMetadata("appShells"),
-  appPlatforms: buildCategoryMetadata("appPlatforms"),
-  toolchainProfile: buildCategoryMetadata("toolchainProfile"),
-  workspaceRunner: buildCategoryMetadata("workspaceRunner"),
-  codeQualityProfile: buildCategoryMetadata("codeQualityProfile"),
-  gitHooks: buildCategoryMetadata("gitHooks"),
-  staticAnalysis: buildCategoryMetadata("staticAnalysis"),
-  aiTooling: buildCategoryMetadata("aiTooling"),
-  testingTools: buildCategoryMetadata("testingTools"),
-  dataClient: buildCategoryMetadata("dataClient"),
-  frontendUtilities: buildCategoryMetadata("frontendUtilities"),
-  httpClientTool: buildCategoryMetadata("httpClientTool"),
-  codeGeneration: buildCategoryMetadata("codeGeneration"),
-  developerEnvironment: buildCategoryMetadata("developerEnvironment"),
-  containerOrchestration: buildCategoryMetadata("containerOrchestration"),
-  apiGateway: buildCategoryMetadata("apiGateway"),
-  continuousIntegration: buildCategoryMetadata("continuousIntegration"),
-  backendUtilitiesTool: buildCategoryMetadata("backendUtilitiesTool"),
-  packageManager: buildCategoryMetadata("packageManager"),
-  workspaceShape: buildCategoryMetadata("workspaceShape"),
-  versionChannel: buildCategoryMetadata("versionChannel"),
-  examples: buildCategoryMetadata("examples"),
-  ai: buildCategoryMetadata("ai"),
-  aiDocs: buildCategoryMetadata("aiDocs"),
-  git: buildCategoryMetadata("git"),
-  install: buildCategoryMetadata("install"),
-  effect: buildCategoryMetadata("effect"),
-  shadcnBase: buildCategoryMetadata("shadcnBase"),
-  shadcnStyle: buildCategoryMetadata("shadcnStyle"),
-  shadcnIconLibrary: buildCategoryMetadata("shadcnIconLibrary"),
-  shadcnColorTheme: buildCategoryMetadata("shadcnColorTheme"),
-  shadcnBaseColor: buildCategoryMetadata("shadcnBaseColor"),
-  shadcnFont: buildCategoryMetadata("shadcnFont"),
-  shadcnRadius: buildCategoryMetadata("shadcnRadius"),
-  rustWebFramework: buildCategoryMetadata("rustWebFramework"),
-  rustFrontend: buildCategoryMetadata("rustFrontend"),
-  dotnetFrontend: buildCategoryMetadata("dotnetFrontend"),
-  kotlinMobile: buildCategoryMetadata("kotlinMobile"),
-  kotlinMobileLibraries: buildCategoryMetadata("kotlinMobileLibraries"),
-  swiftMobile: buildCategoryMetadata("swiftMobile"),
-  dartMobile: buildCategoryMetadata("dartMobile"),
-  rustOrm: buildCategoryMetadata("rustOrm"),
-  rustApi: buildCategoryMetadata("rustApi"),
-  rustCli: buildCategoryMetadata("rustCli"),
-  rustLibraries: buildCategoryMetadata("rustLibraries"),
-  rustLogging: buildCategoryMetadata("rustLogging"),
-  rustErrorHandling: buildCategoryMetadata("rustErrorHandling"),
-  rustCaching: buildCategoryMetadata("rustCaching"),
-  rustAuth: buildCategoryMetadata("rustAuth"),
-  rustRealtime: buildCategoryMetadata("rustRealtime"),
-  rustMessageQueue: buildCategoryMetadata("rustMessageQueue"),
-  rustObservability: buildCategoryMetadata("rustObservability"),
-  rustTemplating: buildCategoryMetadata("rustTemplating"),
-  pythonWebFramework: buildCategoryMetadata("pythonWebFramework"),
-  pythonOrm: buildCategoryMetadata("pythonOrm"),
-  pythonValidation: buildCategoryMetadata("pythonValidation"),
-  pythonAi: buildCategoryMetadata("pythonAi"),
-  pythonAuth: buildCategoryMetadata("pythonAuth"),
-  pythonApi: buildCategoryMetadata("pythonApi"),
-  pythonTaskQueue: buildCategoryMetadata("pythonTaskQueue"),
-  pythonGraphql: buildCategoryMetadata("pythonGraphql"),
-  pythonQuality: buildCategoryMetadata("pythonQuality"),
-  pythonTesting: buildCategoryMetadata("pythonTesting"),
-  pythonCaching: buildCategoryMetadata("pythonCaching"),
-  pythonRealtime: buildCategoryMetadata("pythonRealtime"),
-  pythonObservability: buildCategoryMetadata("pythonObservability"),
-  pythonLogging: buildCategoryMetadata("pythonLogging"),
-  pythonCli: buildCategoryMetadata("pythonCli"),
-  pythonCloudSdk: buildCategoryMetadata("pythonCloudSdk"),
-  pythonHttpClient: buildCategoryMetadata("pythonHttpClient"),
-  pythonData: buildCategoryMetadata("pythonData"),
-  pythonMedia: buildCategoryMetadata("pythonMedia"),
-  pythonServer: buildCategoryMetadata("pythonServer"),
-  pythonPackageManager: buildCategoryMetadata("pythonPackageManager"),
-  pythonMessageQueue: buildCategoryMetadata("pythonMessageQueue"),
-  goWebFramework: buildCategoryMetadata("goWebFramework"),
-  goOrm: buildCategoryMetadata("goOrm"),
-  goApi: buildCategoryMetadata("goApi"),
-  goCli: buildCategoryMetadata("goCli"),
-  goLogging: buildCategoryMetadata("goLogging"),
-  goAuth: buildCategoryMetadata("goAuth"),
-  goTesting: buildCategoryMetadata("goTesting"),
-  goRealtime: buildCategoryMetadata("goRealtime"),
-  goMessageQueue: buildCategoryMetadata("goMessageQueue"),
-  goCaching: buildCategoryMetadata("goCaching"),
-  goConfig: buildCategoryMetadata("goConfig"),
-  goObservability: buildCategoryMetadata("goObservability"),
-  goValidation: buildCategoryMetadata("goValidation"),
-  goQuality: buildCategoryMetadata("goQuality"),
-  goMigrations: buildCategoryMetadata("goMigrations"),
-  goTemplating: buildCategoryMetadata("goTemplating"),
-  goProtoTooling: buildCategoryMetadata("goProtoTooling"),
-  goDI: buildCategoryMetadata("goDI"),
-  javaLanguage: buildCategoryMetadata("javaLanguage"),
-  javaWebFramework: buildCategoryMetadata("javaWebFramework"),
-  javaBuildTool: buildCategoryMetadata("javaBuildTool"),
-  javaOrm: buildCategoryMetadata("javaOrm"),
-  javaAuth: buildCategoryMetadata("javaAuth"),
-  javaApi: buildCategoryMetadata("javaApi"),
-  javaLogging: buildCategoryMetadata("javaLogging"),
-  javaLibraries: buildCategoryMetadata("javaLibraries"),
-  javaTestingLibraries: buildCategoryMetadata("javaTestingLibraries"),
-  dotnetWebFramework: buildCategoryMetadata("dotnetWebFramework"),
-  dotnetOrm: buildCategoryMetadata("dotnetOrm"),
-  dotnetAuth: buildCategoryMetadata("dotnetAuth"),
-  dotnetApi: buildCategoryMetadata("dotnetApi"),
-  dotnetTesting: buildCategoryMetadata("dotnetTesting"),
-  dotnetJobQueue: buildCategoryMetadata("dotnetJobQueue"),
-  dotnetRealtime: buildCategoryMetadata("dotnetRealtime"),
-  dotnetObservability: buildCategoryMetadata("dotnetObservability"),
-  dotnetValidation: buildCategoryMetadata("dotnetValidation"),
-  dotnetCaching: buildCategoryMetadata("dotnetCaching"),
-  dotnetDeploy: buildCategoryMetadata("dotnetDeploy"),
-  dotnetLibraries: buildCategoryMetadata("dotnetLibraries"),
-  elixirWebFramework: buildCategoryMetadata("elixirWebFramework"),
-  elixirOrm: buildCategoryMetadata("elixirOrm"),
-  elixirAuth: buildCategoryMetadata("elixirAuth"),
-  elixirApi: buildCategoryMetadata("elixirApi"),
-  elixirRealtime: buildCategoryMetadata("elixirRealtime"),
-  elixirJobs: buildCategoryMetadata("elixirJobs"),
-  elixirValidation: buildCategoryMetadata("elixirValidation"),
-  elixirHttp: buildCategoryMetadata("elixirHttp"),
-  elixirJson: buildCategoryMetadata("elixirJson"),
-  elixirEmail: buildCategoryMetadata("elixirEmail"),
-  elixirCaching: buildCategoryMetadata("elixirCaching"),
-  elixirObservability: buildCategoryMetadata("elixirObservability"),
-  elixirTesting: buildCategoryMetadata("elixirTesting"),
-  elixirQuality: buildCategoryMetadata("elixirQuality"),
-  elixirI18n: buildCategoryMetadata("elixirI18n"),
-  elixirHttpServer: buildCategoryMetadata("elixirHttpServer"),
-  elixirApplicationFramework: buildCategoryMetadata("elixirApplicationFramework"),
-  elixirDocumentation: buildCategoryMetadata("elixirDocumentation"),
-  elixirClustering: buildCategoryMetadata("elixirClustering"),
-  elixirDeploy: buildCategoryMetadata("elixirDeploy"),
-  elixirLibraries: buildCategoryMetadata("elixirLibraries"),
-};
+export const OPTION_CATEGORY_METADATA = Object.fromEntries(
+  (Object.keys(CATEGORY_DEFINITIONS) as OptionCategory[]).map((category) => [
+    category,
+    buildCategoryMetadata(category),
+  ]),
+) as Record<OptionCategory, OptionCategoryMetadata>;
 
 const OPTION_LOOKUP = Object.fromEntries(
   (Object.entries(OPTION_CATEGORY_METADATA) as Array<[OptionCategory, OptionCategoryMetadata]>).map(
