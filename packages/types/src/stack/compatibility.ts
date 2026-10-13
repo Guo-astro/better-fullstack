@@ -1525,6 +1525,22 @@ export const analyzeStackCompatibility = (
         message: `API set to 'oRPC' (${apiName} requires React integration with Astro)`,
       });
     }
+
+    const apiFrontends = [...nextStack.webFrontend, ...nextStack.nativeFrontend] as Frontend[];
+    const apiIssue = getApiFrontendCompatibilityIssue(
+      nextStack.api as API,
+      apiFrontends,
+      nextStack.astroIntegration as AstroIntegration,
+    );
+    if (apiIssue) {
+      const fallback =
+        allowedApisForFrontends(apiFrontends, nextStack.astroIntegration as AstroIntegration).find(
+          (api) => api !== "none",
+        ) ?? "none";
+      nextStack.api = fallback;
+      changed = true;
+      changes.push({ category: "api", message: `API set to '${fallback}' (${apiIssue.message})` });
+    }
   }
 
   // ============================================
@@ -2027,6 +2043,25 @@ export const analyzeStackCompatibility = (
         message: "UI library changed to 'daisyUI' (Park UI requires React, Vue, or Solid)",
       });
     }
+  }
+
+  const uiFrontends = [...nextStack.webFrontend, ...nextStack.nativeFrontend] as Frontend[];
+  const compatibleUILibraries = getCompatibleUILibraries(
+    uiFrontends,
+    nextStack.astroIntegration as AstroIntegration,
+  );
+  if (
+    nextStack.uiLibrary !== "none" &&
+    nextStack.webFrontend.some((f) => f !== "none") &&
+    !compatibleUILibraries.includes(nextStack.uiLibrary as UILibrary)
+  ) {
+    const fallback = compatibleUILibraries.includes("daisyui") ? "daisyui" : "none";
+    nextStack.uiLibrary = fallback;
+    changed = true;
+    changes.push({
+      category: "uiLibrary",
+      message: `UI library changed to '${fallback === "daisyui" ? "daisyUI" : "None"}' (not supported by this frontend)`,
+    });
   }
 
   // ============================================
@@ -3654,6 +3689,15 @@ export const getDisabledReason = (
     }
   }
 
+  if (category === "api") {
+    const apiIssue = getApiFrontendCompatibilityIssue(
+      optionId as API,
+      [...currentStack.webFrontend, ...currentStack.nativeFrontend] as Frontend[],
+      currentStack.astroIntegration as AstroIntegration,
+    );
+    if (apiIssue) return apiIssue.message;
+  }
+
   if (category === "appPlatforms" && ["turborepo", "nx", "vite-plus"].includes(optionId)) {
     const otherRunner = currentStack.appPlatforms.find(
       (selected) => selected !== optionId && ["turborepo", "nx", "vite-plus"].includes(selected),
@@ -4156,6 +4200,23 @@ export const getDisabledReason = (
                 : "NextUI";
         return `${libraryName} requires Tailwind CSS`;
       }
+    }
+  }
+
+  if (category === "uiLibrary" && optionId !== "none") {
+    const uiFrontends = [...currentStack.webFrontend, ...currentStack.nativeFrontend] as Frontend[];
+    const astroIntegration = currentStack.astroIntegration as AstroIntegration;
+    if (
+      currentStack.webFrontend.some((f) => f !== "none") &&
+      !getCompatibleUILibraries(uiFrontends, astroIntegration).includes(optionId as UILibrary)
+    ) {
+      const needsAstroReact =
+        currentStack.webFrontend.includes("astro") &&
+        astroIntegration !== "react" &&
+        getCompatibleUILibraries(["astro"], "react").includes(optionId as UILibrary);
+      return needsAstroReact
+        ? `UI library '${optionId}' requires React integration with Astro`
+        : `UI library '${optionId}' is not compatible with the selected frontend`;
     }
   }
 
@@ -5660,10 +5721,7 @@ export function splitFrontends(values: Frontend[] = []): {
   return { web, native };
 }
 
-export function allowedApisForFrontends(
-  frontends: Frontend[] = [],
-  astroIntegration?: AstroIntegration,
-) {
+function listApisForFrontends(frontends: Frontend[] = [], astroIntegration?: AstroIntegration) {
   const includesNuxt = frontends.includes("nuxt");
   const includesSvelte = frontends.includes("svelte");
   const includesSolid = frontends.includes("solid");
@@ -5713,6 +5771,15 @@ export function allowedApisForFrontends(
   }
 
   return base;
+}
+
+export function allowedApisForFrontends(
+  frontends: Frontend[] = [],
+  astroIntegration?: AstroIntegration,
+): API[] {
+  return listApisForFrontends(frontends, astroIntegration).filter(
+    (api) => !getApiFrontendCompatibilityIssue(api, frontends, astroIntegration),
+  );
 }
 
 function getReactOnlyApiDisplayName(api: API) {
