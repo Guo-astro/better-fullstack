@@ -204,7 +204,7 @@ export async function setupE2EProject(
   const result = await runTRPCTest({
     projectName,
     install: true,
-    git: false,
+    git: true,
     smokeDir,
     ...config,
   });
