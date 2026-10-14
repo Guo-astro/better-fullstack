@@ -84,7 +84,7 @@ Current examples live in `apps/cli/test/features/`, `apps/cli/test/ecosystems/`,
 nearby tests instead of copying a second API reference from documentation.
 
 Rebuild changed workspace producers before testing consumers of their built output. Run relevant
-package checks, CLI/builder parity, and `bun run test:release` for stack/generator changes.
+package checks, CLI/builder parity, `bun run test`, and `bun run test:release` for stack/generator changes.
 Use `bun run --cwd apps/web validate:tech-links` when adding icons or links.
 
 Snapshots prove output changes, not runtime correctness. Exercise generated routes, commands,

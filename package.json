@@ -18,7 +18,7 @@
     "test": "turbo test",
     "test:cli": "turbo test --filter=create-better-fullstack",
     "test:web": "turbo test --filter=web",
-    "test:scripts": "bun test scripts testing",
+    "test:scripts": "bun test ./scripts ./testing",
     "test:release": "bun run build:core && bun run test:scripts && bun run test:agent-docs && bun run test:plugin-bundle && bun run scripts/validation/validate-preview-workflows.ts && bun run scripts/release/validate-release-workflow.ts && bun run scripts/evidence/validate-public-evidence-claims.ts && bun run scripts/evidence/capability-evidence-audit.ts --markdown && bun run scripts/evidence/recommendation-evaluation.ts && bun run scripts/release/validate-update-qualification.ts && bun run scripts/release/validate-update-action.ts && bun run scripts/validation/mutation-contract-audit.ts && BFS_MCP_TEST_BUILT=1 bun test apps/cli/test/mcp/mcp-protocol.test.ts && bun run --cwd apps/web validate:tech-links",
     "test:plugin-bundle": "bun run scripts/validation/validate-plugin-bundle.ts",
     "test:agent-docs": "bun run scripts/validation/validate-agent-docs.ts",

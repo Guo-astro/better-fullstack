@@ -46,7 +46,7 @@ post-processing. Rebuild affected producers before testing built consumers. Foll
   handles CRLF and trailing whitespace; review intentional diffs rather than accepting bulk churn.
 - `apps/cli/test/recommendations/cli-builder-sync.test.ts` must fail on parsing gaps and missing
   schema/prompt/builder values. Do not hide options such as explicit `none` behind unexplained skips.
-- Run `bun run test:release` for release-sensitive generator changes. That lane must build its own
+- Run `bun run test` and `bun run test:release` for release-sensitive generator changes. That lane must build its own
   prerequisites from a clean checkout.
 - Root scratch ignore rules must not hide nested tracked tests: `/test/` and `test/` differ.
 

@@ -16,6 +16,7 @@ Run the narrowest checks that cover the changed area:
 For changes that affect stack options, generated output, compatibility, or preview correctness, also run:
 
 ```bash
+bun run test
 bun run test:release
 ```
 
@@ -49,8 +50,8 @@ Additional focused release-facing checks:
 
 ## Release workflow expectations
 
-- Pull requests run lint. The final `Build Check` preserves the required check name and follows
-  the lint result without requiring tests or builds.
+- Pull requests run lint and tests. The final `Build Check` preserves the required check name and
+  fails when either fails; Release Guard and the web build run only after pushes to main.
 - After pushes to main, `.github/workflows/test.yaml` runs `Release Guard`, lint, tests, and the web
   build in parallel. `Build Check` fails when any prerequisite fails.
   Release Guard owns the core package and CLI builds; Web Build owns the Vercel-parity web build.
@@ -110,7 +111,7 @@ The report classifies likely backport candidates into `reliability`, `dependency
 1. Pick commits from the report by area and impact. Prefer reliability, DX, and compatibility fixes first; skip upstream architectural shifts that conflict with this fork.
 2. Implement manually - avoid large cherry-picks unless the change is isolated and low-risk.
 3. Keep Better-Fullstack-specific naming and architecture choices intact.
-4. Run affected package checks and `bun run test:release` for stack/generator changes. Add the web
+4. Run affected package checks, `bun run test`, and `bun run test:release` for stack/generator changes. Add the web
    build when routes or bundles change. Root `bun run check` formats the whole repository; avoid it
    for a scoped backport in a dirty worktree.
 5. Keep each backport focused by theme. Commit, push, and PR creation need the user's authorization.
