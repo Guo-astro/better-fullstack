@@ -4108,7 +4108,10 @@ function getSelectedPrimaryPart(parts: readonly StackPart[], role: StackPartRole
 }
 
 function getFrontendDeploy(parts: readonly StackPart[]) {
-  return getSelectedScopedPart(parts, getPrimaryPart(parts, "frontend"), "deploy")?.toolId;
+  const frontend = parts.find(
+    (part) => part.role === "frontend" && part.ecosystem === "typescript" && !part.ownerPartId,
+  );
+  return getSelectedScopedPart(parts, frontend, "deploy")?.toolId;
 }
 
 function getSelectedScopedPart(
