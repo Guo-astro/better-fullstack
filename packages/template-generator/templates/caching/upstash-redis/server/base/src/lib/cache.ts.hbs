@@ -1,4 +1,4 @@
-import { Redis } from "@upstash/redis";
+import { Redis, type SetCommandOptions } from "@upstash/redis";
 
 /**
  * Upstash Redis client for serverless caching
@@ -26,21 +26,9 @@ export async function cacheGet<T>(key: string): Promise<T | null> {
 export async function cacheSet<T>(
   key: string,
   value: T,
-  options?: { ex?: number; px?: number; nx?: boolean; xx?: boolean }
+  options?: SetCommandOptions
 ): Promise<"OK" | T | null> {
-  if (options?.ex) {
-    return redis.set(key, value, { ex: options.ex });
-  }
-  if (options?.px) {
-    return redis.set(key, value, { px: options.px });
-  }
-  if (options?.nx) {
-    return redis.set(key, value, { nx: true });
-  }
-  if (options?.xx) {
-    return redis.set(key, value, { xx: true });
-  }
-  return redis.set(key, value);
+  return redis.set(key, value, options);
 }
 
 /**

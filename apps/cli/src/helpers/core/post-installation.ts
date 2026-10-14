@@ -1132,8 +1132,8 @@ function displayDotnetInstructions(config: ProjectConfig & { depsInstalled: bool
   const steps = [
     `cd ${config.relativePath}`,
     ...(config.depsInstalled ? [] : ["dotnet restore"]),
-    "dotnet run",
     ...(hasTests ? [`dotnet test ${toDotnetIdentifierSegment(config.projectName)}.Tests`] : []),
+    "dotnet run",
   ];
   const stack = (["dotnetWebFramework", "dotnetOrm", "dotnetAuth", "dotnetApi"] as const).flatMap(
     (category) => {
