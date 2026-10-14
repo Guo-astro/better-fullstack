@@ -2025,6 +2025,19 @@ describe("UI library fallback", () => {
     expect(result.adjustedStack?.uiLibrary).toBe("daisyui");
     expect(result.adjustedStack?.cssFramework).toBe("tailwind");
   });
+
+  it("offers React UI libraries on Vinext", () => {
+    const stack = {
+      ...DEFAULT_STACK_SELECTION,
+      webFrontend: ["vinext"],
+      backend: "self-vinext",
+      runtime: "none",
+      cssFramework: "tailwind",
+    };
+
+    expect(getDisabledReason(stack, "uiLibrary", "shadcn-ui")).toBeNull();
+    expect(getDisabledReason(stack, "uiLibrary", "headless-ui")).toBeNull();
+  });
 });
 
 describe("API fallback", () => {

@@ -4142,76 +4142,8 @@ export const getDisabledReason = (
       }
     }
 
-    // React-only UI libraries
-    const reactOnlyLibraries = ["shadcn-ui", "radix-ui", "chakra-ui", "nextui", "mui", "antd"];
-    const reactFrontends = [
-      "tanstack-router",
-      "react-router",
-      "react-vite",
-      "tanstack-start",
-      "next",
-    ];
-
-    if (reactOnlyLibraries.includes(optionId)) {
-      const hasReactFrontend = currentStack.webFrontend.some((f) => reactFrontends.includes(f));
-      // Astro with React integration also works
-      const hasAstroReact =
-        currentStack.webFrontend.includes("astro") && currentStack.astroIntegration === "react";
-      if (!hasReactFrontend && !hasAstroReact) {
-        const libraryName =
-          optionId === "shadcn-ui"
-            ? "shadcn/ui"
-            : optionId === "radix-ui"
-              ? "Radix UI"
-              : optionId === "chakra-ui"
-                ? "Chakra UI"
-                : optionId === "mui"
-                  ? "MUI"
-                  : optionId === "antd"
-                    ? "Ant Design"
-                    : "NextUI";
-        return `${libraryName} requires a React-based frontend`;
-      }
-    }
-
-    if (optionId === "shadcn-svelte") {
-      const hasSvelteFrontend = currentStack.webFrontend.includes("svelte");
-      const hasAstroSvelte =
-        currentStack.webFrontend.includes("astro") && currentStack.astroIntegration === "svelte";
-      if (!hasSvelteFrontend && !hasAstroSvelte) {
-        return "shadcn-svelte requires SvelteKit or Astro with Svelte integration";
-      }
-    }
-
-    // Headless UI works with React and Vue
-    if (optionId === "headless-ui") {
-      const hasReactFrontend = currentStack.webFrontend.some((f) => reactFrontends.includes(f));
-      const hasVueFrontend = currentStack.webFrontend.includes("nuxt");
-      const hasAstroReactOrVue =
-        currentStack.webFrontend.includes("astro") &&
-        ["react", "vue"].includes(currentStack.astroIntegration);
-      if (!hasReactFrontend && !hasVueFrontend && !hasAstroReactOrVue) {
-        return "Headless UI requires React or Vue frontend";
-      }
-    }
-
-    // Park UI works with React, Vue, and Solid
-    if (optionId === "park-ui") {
-      const hasReactFrontend = currentStack.webFrontend.some((f) => reactFrontends.includes(f));
-      const hasVueFrontend = currentStack.webFrontend.includes("nuxt");
-      const hasSolidFrontend =
-        currentStack.webFrontend.includes("solid") ||
-        currentStack.webFrontend.includes("solid-start");
-      const hasAstroCompatible =
-        currentStack.webFrontend.includes("astro") &&
-        ["react", "vue", "solid"].includes(currentStack.astroIntegration);
-      if (!hasReactFrontend && !hasVueFrontend && !hasSolidFrontend && !hasAstroCompatible) {
-        return "Park UI requires React, Vue, or Solid frontend";
-      }
-      // Park UI requires a CSS framework (not "none")
-      if (currentStack.cssFramework === "none") {
-        return "Park UI requires a CSS framework";
-      }
+    if (optionId === "park-ui" && currentStack.cssFramework === "none") {
+      return "Park UI requires a CSS framework";
     }
 
     // UI libraries requiring Tailwind
