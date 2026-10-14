@@ -1849,7 +1849,7 @@ describe("stack graph structural round-trip (phase 0)", () => {
     for (const example of EXAMPLES_VALUES) {
       const config = {
         ...TS_BASE,
-        frontend: ["next"],
+        frontend: [example === "tanstack-showcase" ? "tanstack-router" : "next"],
         runtime: example === "chat-sdk" ? "node" : "bun",
         examples: [example],
       };

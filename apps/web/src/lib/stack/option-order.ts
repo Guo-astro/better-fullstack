@@ -1,4 +1,4 @@
-// Generated from registry popularity (npm, crates.io, PyPI, NuGet and Hex downloads; GitHub stars
+// Ordered by registry popularity (npm, crates.io, PyPI, NuGet and Hex downloads; GitHub stars
 // for Go, Java and hosted tools), September 2026. Opt-outs stay last. Categories with no fair
 // metric keep their source order and are left out.
 export const OPTION_DISPLAY_ORDER: Readonly<Record<string, readonly string[]>> = {

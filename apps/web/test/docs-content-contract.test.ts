@@ -12,6 +12,7 @@ import { CALLOUT_KINDS } from "../src/components/docs/mdx/callout";
 import { GUIDE_COMPATIBILITY_KINDS } from "../src/components/docs/mdx/guide-compatibility-note";
 import { buildSearchSections } from "../src/lib/docs/search";
 import { LOCALIZED_CONTENT_LOCALES } from "../src/lib/i18n/locales";
+import { MCP_RESOURCE_COUNT, MCP_TOOL_COUNT } from "../src/lib/project/project-stats";
 
 const WEB_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const CONTENT_ROOT = join(WEB_ROOT, "content");
@@ -270,6 +271,29 @@ describe("docs content contract", () => {
     expect(missingLocalizedContent).toEqual([]);
   });
 
+  it("keeps technology names untranslated in localized categories", () => {
+    const translatableCategories = new Set(["Guides", "Packs", "AI Tools"]);
+    const localizedBundles = new Map(
+      LOCALIZED_CONTENT_LOCALES.map((locale) => [locale, readLocalizedContent(locale)]),
+    );
+    const renamedTechnologies = contentFiles
+      .filter((file) => !isLocalizedMdxFile(file.path))
+      .flatMap((file) => {
+        const category = parseFrontmatter(file.source).get("category")?.replace(/^"|"$/g, "");
+        const section = getContentSection(file.path);
+        if (!category || translatableCategories.has(category) || !section) return [];
+        return LOCALIZED_CONTENT_LOCALES.flatMap((locale) => {
+          const localized =
+            localizedBundles.get(locale)?.[section.section]?.[section.path]?.frontmatter?.category;
+          return localized && localized !== category
+            ? [`${file.relativePath} (${locale}): ${category} -> ${localized}`]
+            : [];
+        });
+      });
+
+    expect(renamedTechnologies).toEqual([]);
+  });
+
   it("keeps localized guide indexes in sync with base navigation links", () => {
     const baseIndex = readFileSync(join(GUIDES_ROOT, "index.mdx"), "utf8");
     const expectedLinks = new Set(
@@ -509,6 +533,23 @@ describe("docs content contract", () => {
         body: "",
       }),
     ]);
+  });
+
+  it("shows the live MCP tool and resource counts on the MCP page", () => {
+    const mcpSource = readFileSync(join(WEB_ROOT, "../cli/src/mcp.ts"), "utf8");
+    const operationsDir = join(WEB_ROOT, "../cli/src/operations");
+    const operationsSource = readdirSync(operationsDir)
+      .map((file) => readFileSync(join(operationsDir, file), "utf8"))
+      .join("\n");
+    const toolNames = new Set([
+      ...[...mcpSource.matchAll(/registerTool\(\s*"(bfs_[a-z_]+)"/g)].map((match) => match[1]),
+      ...[...operationsSource.matchAll(/^\s*name: "([a-z_]+)",$/gm)].map(
+        (match) => `bfs_${match[1]}`,
+      ),
+    ]);
+
+    expect(MCP_TOOL_COUNT).toBe(toolNames.size);
+    expect(MCP_RESOURCE_COUNT).toBe([...mcpSource.matchAll(/registerResource\(/g)].length);
   });
 
   it("documents the exact live MCP tool surface", () => {

@@ -28,6 +28,7 @@ export { processDeployTemplates } from "@/template-handlers/features/deploy";
 export { processLoggingTemplates } from "@/template-handlers/features/logging";
 export { processObservabilityTemplates } from "@/template-handlers/features/observability";
 export { processRateLimitTemplates } from "@/template-handlers/features/rate-limit";
+export { processCachingTemplates } from "@/template-handlers/features/caching";
 export { processBotProtectionTemplates } from "@/template-handlers/features/bot-protection";
 export { processFeatureFlagsTemplates } from "@/template-handlers/features/feature-flags";
 export { processIntegrationsTemplates } from "@/template-handlers/features/integrations";

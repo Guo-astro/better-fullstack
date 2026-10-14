@@ -28,6 +28,7 @@ import {
   mergeProjectConfigSettingsIntoStackParts,
   parseStackPartSpecs,
   stackPartsToLegacyProjectConfigPartial,
+  stackQualifiesForSingleApp,
   validateStackParts,
 } from "@better-fullstack/types";
 
@@ -515,6 +516,12 @@ export function buildProjectConfig(
   Object.assign(config, getProviderDataLayer(config, input));
   applyEffectBackendDefaults(config, new Set(Object.keys(input)));
   validateMcpProjectConfigCompatibility(config);
+  if (
+    config.workspaceShape === "single-app" &&
+    !stackQualifiesForSingleApp(buildMcpCompatibilityInput(config))
+  ) {
+    config.workspaceShape = "monorepo";
+  }
 
   return config;
 }

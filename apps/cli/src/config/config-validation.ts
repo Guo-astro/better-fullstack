@@ -399,7 +399,9 @@ function validateBackendNoneConstraints(
   );
   const hasEcosystemBackend = getEcosystemBackend(config) !== undefined;
 
-  if (backend !== "none" || hasGraphBackend || hasEcosystemBackend) {
+  const usesTypeScriptBackendField =
+    !config.ecosystem || config.ecosystem === "typescript" || config.ecosystem === "react-native";
+  if (backend !== "none" || hasGraphBackend || hasEcosystemBackend || !usesTypeScriptBackendField) {
     return;
   }
 

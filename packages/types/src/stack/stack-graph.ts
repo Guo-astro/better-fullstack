@@ -190,6 +190,7 @@ import {
   hasTauriCompatibleFrontend,
   isBackendUtilsCompatibleBackend,
   isExampleAIAllowed,
+  isExampleTanstackShowcaseAllowed,
   isExampleChatSdkAllowed,
   requiresChatSdkVercelAIForExamples,
   UI_LIBRARY_COMPATIBILITY,
@@ -1695,6 +1696,7 @@ function createTypeScriptBackendCompatibilityIssue(
         backend: context.ownerToolId,
         runtime: context.siblingToolIdsByRole?.runtime,
         serverDeploy: part.role === "deploy" ? part.toolId : context.siblingToolIdsByRole?.deploy,
+        webDeploy: getFrontendDeploy(context.parts ?? []),
         database: getDataLayerDatabase({
           standalone: context.primaryToolIdsByRole?.database,
           backend: context.siblingToolIdsByRole?.database,
@@ -2714,6 +2716,20 @@ function createAddonCompatibilityIssue(
         role: part.role,
         toolId: part.toolId,
         message: "AI example is not compatible with the selected graph stack.",
+      });
+    }
+
+    if (
+      part.toolId === "tanstack-showcase" &&
+      !isExampleTanstackShowcaseAllowed(frontendTools as ProjectConfig["frontend"])
+    ) {
+      return createStackGraphIssue({
+        code: "INCOMPATIBLE_GRAPH_SELECTION",
+        partId: part.id,
+        role: part.role,
+        toolId: part.toolId,
+        message:
+          "The TanStack showcase example requires TanStack Router, TanStack Start, SolidStart, or TanStack Start (Solid).",
       });
     }
 
@@ -4089,6 +4105,13 @@ function getSelectedPrimaryPart(parts: readonly StackPart[], role: StackPartRole
   return parts.find(
     (part) => part.role === role && !part.ownerPartId && part.source !== "provided",
   );
+}
+
+function getFrontendDeploy(parts: readonly StackPart[]) {
+  const frontend = parts.find(
+    (part) => part.role === "frontend" && part.ecosystem === "typescript" && !part.ownerPartId,
+  );
+  return getSelectedScopedPart(parts, frontend, "deploy")?.toolId;
 }
 
 function getSelectedScopedPart(

@@ -1193,6 +1193,7 @@ export async function gatherConfig(
         results.runtime,
         results.database,
         results.serverDeploy,
+        results.webDeploy,
       );
     },
     fileUpload: ({ results }) => {
