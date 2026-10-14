@@ -27,4 +27,20 @@ describe(".NET README", () => {
     expect(readme).toContain("dotnet run");
     expect(readme).not.toContain("TypeScript");
   });
+
+  it("points dotnet test at the generated test project", async () => {
+    const result = await generateVirtualProject({
+      config: makeConfig({
+        ecosystem: "dotnet",
+        projectName: "my-api",
+        dotnetWebFramework: "aspnet-minimal",
+        dotnetTesting: ["xunit"],
+      }),
+      templates: EMBEDDED_TEMPLATES,
+    });
+
+    const readme = result.tree ? findFile(result.tree.root, "README.md") : undefined;
+    expect(readme).toContain("dotnet test my_api.Tests");
+    expect(result.tree && findFile(result.tree.root, "my_api.Tests/my_api.Tests.csproj")).toBeDefined();
+  });
 });

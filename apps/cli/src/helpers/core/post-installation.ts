@@ -5,6 +5,7 @@ import {
   hasJavaScriptWorkspaceRoot,
   isToolingOverlayOnly,
   type OptionCategory,
+  toDotnetIdentifierSegment,
 } from "@better-fullstack/types";
 import { consola } from "consola";
 import pc from "picocolors";
@@ -1126,7 +1127,7 @@ function displayDotnetInstructions(config: ProjectConfig & { depsInstalled: bool
     `cd ${config.relativePath}`,
     ...(config.depsInstalled ? [] : ["dotnet restore"]),
     "dotnet run",
-    ...(hasTests ? ["dotnet test"] : []),
+    ...(hasTests ? [`dotnet test ${toDotnetIdentifierSegment(config.projectName)}.Tests`] : []),
   ];
   const stack = (["dotnetWebFramework", "dotnetOrm", "dotnetAuth", "dotnetApi"] as const).flatMap(
     (category) => {

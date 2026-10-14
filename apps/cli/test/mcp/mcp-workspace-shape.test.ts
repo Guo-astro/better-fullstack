@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test";
 
 import { planProjectOperation } from "@/operations/project-create";
+import { buildProjectConfig } from "@/operations/stack-helpers";
 import { MCP_STACK_UPDATE_SCHEMA } from "@/operations/stack-input";
 
 const fullstackNext = {
@@ -30,6 +31,17 @@ describe("MCP workspace shape", () => {
   it("keeps the monorepo layout by default", async () => {
     const paths = await plannedPaths(fullstackNext);
     expect(paths.some((path) => path.includes("apps/web/"))).toBe(true);
+  });
+
+  it("keeps the monorepo layout for stacks that cannot be flattened", () => {
+    const config = buildProjectConfig({
+      ...fullstackNext,
+      frontend: ["tanstack-router"],
+      backend: "hono",
+      runtime: "bun",
+      workspaceShape: "single-app",
+    });
+    expect(config.workspaceShape).toBe("monorepo");
   });
 
   it("does not offer layout conversion through stack updates", () => {

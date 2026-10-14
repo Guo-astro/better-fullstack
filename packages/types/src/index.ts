@@ -6,6 +6,7 @@ export * from "@/stack/compatibility";
 export * from "@/catalog/option-metadata";
 export * from "@/catalog/cli-flags";
 export * from "@/platform/local-dev";
+export * from "@/platform/dotnet-project";
 export * from "@/config/defaults";
 export * from "@/stack/stack-translation";
 export * from "@/stack/stack-graph";

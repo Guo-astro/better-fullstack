@@ -1893,7 +1893,7 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
     "openapi-typescript": "openapi-typescript",
   },
   developerEnvironment: {
-    devcontainer: "Dev Container",
+    devcontainer: "DevContainer",
   },
 };
 
