@@ -36,7 +36,7 @@ See `docs/guidelines/` for deeper reference on these topics:
 
 - Never start the dev server (`turbo dev`, `bun run dev`, `vite dev`, etc.) unless explicitly asked to.
 - After code changes, run the smallest verification set that proves the modified area still works. Prefer package-local `bun run lint`, `bun run test`, `bun run build`, or specific `bun test <file>` commands over broad workspace sweeps.
-- For release-sensitive stack or generator changes, run `bun run test:release` from the repo root. That lane covers template snapshots, CLI/builder parity, and preview-config regressions.
+- For release-sensitive stack or generator changes, run `bun run test` and `bun run test:release` from the repo root. `bun run test` covers template snapshots and CLI/builder parity; `test:release` covers the release validators.
 
 ## Bun
 

@@ -24,7 +24,6 @@ package identities for commit `67d73993c38effd0bfb65c7d8601c1b646fbb680`. It cer
 and its declared recipe scope, not every catalog option or the current checkout. New releases
 and material producer changes require fresh evidence.
 
-The [local evidence ledger](verified-combinations.md) does not replace published receipts.
 The [capability inventory](reference/capability-evidence-inventory.md) defines proof and freshness.
 Completed implementation plans live in Git history rather than a second documentation archive.
 
