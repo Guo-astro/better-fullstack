@@ -24,7 +24,6 @@ behavior. Reference documents must never override them.
 - `docs/reference/README.md` - current contracts, inventories, and operating references
 - `docs/next-updates-roadmap.md` - canonical product direction and priority order
 - `docs/update-support-policy.md` - rolling update-window contract and current qualification state
-- `docs/verified-combinations.md` - generated compatibility evidence
 - `testing/README.md` - production-package and smoke-test workspace
 - `apps/web/content/docs/` - user-facing product documentation
 
