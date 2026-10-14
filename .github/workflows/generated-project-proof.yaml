@@ -72,6 +72,16 @@ jobs:
           otp-version: 28.0.2
           elixir-version: 1.19.0
 
+      - name: Cache Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            ~/.bun/install/cache
+          key: deps-${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            deps-${{ runner.os }}-bun-
+
       - name: Install repository dependencies
         run: bun install --frozen-lockfile
 
