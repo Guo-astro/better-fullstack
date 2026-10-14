@@ -396,7 +396,7 @@ export async function getRustFrontendChoice(rustFrontend?: RustFrontend) {
 }
 
 export function resolveRustOrmPrompt(rustOrm?: RustOrm) {
-  return createStaticSinglePromptResolution(RUST_ORM_PROMPT_OPTIONS, "none", rustOrm);
+  return createStaticSinglePromptResolution(RUST_ORM_PROMPT_OPTIONS, "sea-orm", rustOrm);
 }
 
 export async function getRustOrmChoice(rustOrm?: RustOrm) {

@@ -446,7 +446,12 @@ if (args.majorDeps) {
     console.log();
   }
 } else if (args.preset) {
-  combos = getPresetCombos(args.preset);
+  combos = getPresetCombos(
+    args.preset,
+    args.partitionIndex !== undefined && args.partitionTotal
+      ? { index: args.partitionIndex, total: args.partitionTotal }
+      : undefined,
+  );
   const flags = [
     args.devCheck && "dev-check",
     args.strict && "strict",

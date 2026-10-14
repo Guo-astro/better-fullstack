@@ -13,6 +13,7 @@ import {
   isBackendUtilsCompatibleBackend,
   isExampleAIAllowed as isExampleAIAllowedShared,
   isExampleChatSdkAllowed as isExampleChatSdkAllowedShared,
+  isExampleTanstackShowcaseAllowed,
   isFrontendAllowedWithBackend as isFrontendAllowedWithBackendShared,
   isWebFrontend as isWebFrontendShared,
   requiresChatSdkVercelAIForSelection,
@@ -883,14 +884,7 @@ export function validateExamplesCompatibility(
   if (examplesArr.length === 0 || examplesArr.includes("none")) return;
 
   if (examplesArr.includes("tanstack-showcase")) {
-    const showcaseFrontends: Frontend[] = [
-      "tanstack-router",
-      "tanstack-start",
-      "solid-start",
-      "tanstack-start-solid",
-    ];
-    const hasShowcaseFrontend = (frontend ?? []).some((f) => showcaseFrontends.includes(f));
-    if (!hasShowcaseFrontend) {
+    if (!isExampleTanstackShowcaseAllowed(frontend)) {
       exitWithError(
         "The 'tanstack-showcase' example requires TanStack Router, TanStack Start, SolidStart, or TanStack Start (Solid).",
       );

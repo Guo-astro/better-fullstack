@@ -898,6 +898,7 @@ const CATEGORY_DEFINITIONS = {
 
 const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<string, string>>>> = {
   api: {
+    "ts-rest": "ts-rest",
     trpc: "tRPC",
     orpc: "oRPC",
     "graphql-yoga": "GraphQL Yoga",
@@ -905,6 +906,7 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
     openapi: "OpenAPI",
   },
   webFrontend: {
+    "solid-start": "SolidStart",
     next: "Next.js",
     vinext: "Vinext",
     "react-vite": "React + Vite",
@@ -1876,6 +1878,23 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
     gigalixir: "Gigalixir",
     "mix-release": "Mix Release",
   },
+  packageManager: {
+    npm: "npm",
+    pnpm: "pnpm",
+  },
+  toolchainProfile: {
+    "vite-plus": "Vite+",
+  },
+  codeQualityProfile: {
+    "eslint-prettier": "ESLint + Prettier",
+    "shadcn-lint": "shadcn/lint",
+  },
+  codeGeneration: {
+    "openapi-typescript": "openapi-typescript",
+  },
+  developerEnvironment: {
+    devcontainer: "DevContainer",
+  },
 };
 
 const OPTION_ALIASES: Partial<Record<OptionCategory, Partial<Record<string, readonly string[]>>>> =
@@ -1916,6 +1935,21 @@ const TOKEN_LABELS: Record<string, string> = {
   ses: "SES",
   sql: "SQL",
   ui: "UI",
+  adonisjs: "AdonisJS",
+  eslint: "ESLint",
+  github: "GitHub",
+  gsap: "GSAP",
+  mcp: "MCP",
+  mobx: "MobX",
+  msw: "MSW",
+  mysql: "MySQL",
+  openapi: "OpenAPI",
+  partykit: "PartyKit",
+  posthog: "PostHog",
+  revenuecat: "RevenueCat",
+  swr: "SWR",
+  tanstack: "TanStack",
+  typescript: "TypeScript",
 };
 
 function toStartCaseToken(token: string): string {

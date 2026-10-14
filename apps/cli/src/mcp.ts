@@ -4,6 +4,7 @@ import { EcosystemSchema, OPTION_CATEGORY_METADATA } from "@better-fullstack/typ
 import { type CallToolResult, McpServer } from "@modelcontextprotocol/server";
 import { serveStdio } from "@modelcontextprotocol/server/stdio";
 
+import { renderCompatibilityGuide } from "@/mcp/mcp-compatibility-guide";
 import { allOperations, errorMessage, operationToolName } from "@/operations";
 import { getSchemaOptions } from "@/operations/stack-helpers";
 import { getLatestCLIVersion } from "@/platform/get-latest-cli-version";
@@ -85,53 +86,6 @@ CRITICAL RULES:
 - Always specify "ecosystem" first - it determines which other fields are relevant.
 - TypeScript web-specific fields (web frontend, backend, orm, etc.) are IGNORED for react-native/rust/python/go/java/dotnet/elixir ecosystems.
 - The compatibility engine auto-adjusts invalid combinations - always call bfs_check_compatibility first to see adjustments.`;
-
-const COMPATIBILITY_RULES_MD = `# Better-Fullstack Compatibility Rules
-
-## Backend Constraints
-- **Convex**: Forces runtime=none, database=none, orm=none, api=none, dbSetup=none, serverDeploy=none. Removes incompatible frontends (Solid, SolidStart, Astro).
-- **Effect backend**: Requires effect=effect-full and validation=effect-schema. Other compatible frontend/backend-adjacent tools can still be selected.
-- **No backend (none)**: Clears auth, payments, database, orm, api, serverDeploy, search, fileStorage.
-- **Fullstack (backend='self')**: Sets runtime=none, serverDeploy=none. Only works with: next, vinext, tanstack-start, astro, nuxt, svelte, solid-start, tanstack-start-solid.
-
-## Runtime Constraints
-- NestJS and AdonisJS require runtime=node.
-- Elysia requires runtime=bun.
-- Cloudflare Workers runtime only works with Hono backend.
-- backend=self or backend=convex requires runtime=none.
-
-## API Constraints
-- tRPC only works with React-based frontends: next, vinext, react-router, tanstack-router, tanstack-start.
-- Use oRPC for svelte, solid, nuxt.
-- Angular: use api=none (has built-in HttpClient).
-- Qwik: use backend=none, api=none (built-in server, no external APIs).
-
-## Database / ORM Constraints
-- TypeORM + better-auth: unsupported (no adapter). Use auth=none or switch ORM.
-- Sequelize + better-auth: unsupported (no adapter). Use auth=none or switch ORM.
-- MongoDB requires mongoose ORM.
-- EdgeDB has its own ORM (edgedb).
-
-## UI Constraints
-- shadcn-ui is incompatible with svelte and solid frontends.
-- Redwood requires api=none and only supports daisyui or none for uiLibrary.
-
-## Payments
-- Polar requires better-auth and a web frontend.
-
-## Email
-- Rust, Python, Go, and Java currently support only Resend for email (\`email=resend\`) or no email (\`email=none\`).
-- Java Resend requires Maven or Gradle so the generated project can manage the SDK dependency.
-
-## Observability
-- Rust, Python, Go, and Java currently support only Sentry for observability (\`observability=sentry\`) or no observability (\`observability=none\`).
-- Python and Go additionally support SigNoz through their native fields (\`pythonObservability=signoz\` and \`goObservability=signoz\`).
-- Java Sentry requires Maven or Gradle so the generated project can manage the SDK dependency.
-
-## Ecosystem Isolation
-- Rust, Python, Go, Java, and Elixir ecosystems are independent - TypeScript fields are ignored.
-- Each ecosystem generates a standalone project with its own build system.
-`;
 
 const GETTING_STARTED_MD = `# Getting Started with Better-Fullstack MCP
 
@@ -341,7 +295,7 @@ export function createMcpServer(): McpServer {
       cacheHint: { ttlMs: 300_000, cacheScope: "public" },
     },
     async () => ({
-      contents: [{ uri: "docs://compatibility-rules", text: COMPATIBILITY_RULES_MD }],
+      contents: [{ uri: "docs://compatibility-rules", text: renderCompatibilityGuide() }],
     }),
   );
 

@@ -30,6 +30,8 @@ See `docs/guidelines/` for deeper reference on these topics:
 
 ## Workflow
 
+- Prefer concise, simple solutions. If a problem can be solved in a simpler way, propose it.
+- If asked to do too much work at once, stop and say so clearly.
 - Use `testing/README.md` for prompt-free scaffolds, published-package validation, and runtime-proof lanes.
 
 - Never start the dev server (`turbo dev`, `bun run dev`, `vite dev`, etc.) unless explicitly asked to.

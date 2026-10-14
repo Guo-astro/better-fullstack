@@ -70,6 +70,7 @@ export {
   isBackendUtilsCompatibleBackend,
   isExampleAIAllowed,
   isExampleChatSdkAllowed,
+  isExampleTanstackShowcaseAllowed,
   requiresChatSdkVercelAIForExamples,
   UI_LIBRARY_COMPATIBILITY,
 } from "@/stack/stack-compatibility-rules";

@@ -157,6 +157,17 @@ describe("generateReproducibleCommand", () => {
     expect(command).toContain("--astro-integration react");
   });
 
+  it.each(["rust", "go", "python", "java", "dotnet", "elixir"] as const)(
+    "keeps JavaScript workspace tooling out of %s commands",
+    (ecosystem) => {
+      const command = generateReproducibleCommand(
+        makeConfig({ ...createCliDefaultProjectConfigBase(), ecosystem, addons: ["turborepo"] }),
+      );
+
+      expect(command).not.toContain("workspaceRunner:universal:turborepo");
+    },
+  );
+
   it("generates a Python command with explicit none selections", () => {
     const config = makeConfig({
       ecosystem: "python",
