@@ -81,6 +81,11 @@ const ENVIRONMENT_PATTERNS = [
   /qwik.*MODULE_NOT_FOUND/is,
   /registry/i,
   /certificate/i,
+  // HTTP/2 stream resets from module proxies/CDNs (e.g. proxy.golang.org
+  // answering a module download with "stream ID N; INTERNAL_ERROR") are
+  // transport faults, not template defects. Version-not-found responses
+  // from the same proxies do not match this and still gate.
+  /stream error: stream ID \d+; INTERNAL_ERROR/i,
 ];
 
 const TEMPLATE_PATTERNS = [

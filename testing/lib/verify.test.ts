@@ -7,6 +7,7 @@ import {
   getVerifier,
   runWithRegistryPropagationRetry,
   verifyElixir,
+  verifyGo,
   verifyReactNative,
   verifyTypeScript,
 } from "@testing/lib/verify";
@@ -117,6 +118,33 @@ fi
       rmSync(dir, { recursive: true, force: true });
     }
   }, 90_000);
+
+  it("treats a Go proxy HTTP/2 stream reset during mod-tidy as environmental", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "bfs-go-proxy-reset-"));
+    const bin = join(dir, "bin");
+    mkdirSync(bin);
+    writeFileSync(
+      join(bin, "go"),
+      `#!/bin/sh
+echo 'github.com/blevesearch/gtreap: github.com/blevesearch/gtreap@v0.1.1: read "https://proxy.golang.org/github.com/blevesearch/gtreap/@v/v0.1.1.zip": stream error: stream ID 169; INTERNAL_ERROR; received from peer' >&2
+exit 1
+`,
+    );
+    chmodSync(join(bin, "go"), 0o755);
+    const path = process.env.PATH;
+    process.env.PATH = `${bin}:${path}`;
+
+    try {
+      const result = await verifyGo("go-proxy-reset", dir);
+
+      expect(result.overallSuccess).toBe(false);
+      expect(result.steps[0]?.step).toBe("mod-tidy");
+      expect(result.steps[0]?.classification).toBe("environment");
+    } finally {
+      process.env.PATH = path;
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
 
   it("gates a Docker build that times out, since a hang is not proof of a network fault", () => {
     const result = dockerFailure({
