@@ -963,6 +963,12 @@ function displayRustInstructions(config: ProjectConfig & { depsInstalled: boolea
   let output = `${pc.bold("Next steps")}\n${pc.cyan("1.")} ${cdCmd}\n`;
   let stepCounter = 2;
 
+  // These layers read DATABASE_URL at startup; mongodb and rusqlite fall back to local defaults.
+  const needsDatabaseUrl = ["sea-orm", "sqlx", "diesel", "tokio-postgres"].includes(rustOrm ?? "");
+  if (needsDatabaseUrl) {
+    output += `${pc.cyan(`${stepCounter++}.`)} cp .env.example .env  ${pc.dim("# then set DATABASE_URL in .env")}\n`;
+  }
+
   // Rust projects use cargo, not npm/pnpm/bun
   output += `${pc.cyan(`${stepCounter++}.`)} cargo build\n`;
   output += `${pc.cyan(`${stepCounter++}.`)} cargo run\n`;
