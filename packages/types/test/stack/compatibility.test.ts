@@ -2027,6 +2027,30 @@ describe("UI library fallback", () => {
   });
 });
 
+describe("API fallback", () => {
+  it("drops API-specific add-ons when a frontend change replaces the API", () => {
+    const graphql = analyzeStackCompatibility({
+      ...DEFAULT_STACK_SELECTION,
+      webFrontend: ["nuxt"],
+      backend: "hono",
+      api: "garph",
+      appPlatforms: ["turborepo", "apollo-client"],
+    });
+    expect(graphql.adjustedStack?.api).not.toBe("garph");
+    expect(graphql.adjustedStack?.appPlatforms).not.toContain("apollo-client");
+
+    const openapi = analyzeStackCompatibility({
+      ...DEFAULT_STACK_SELECTION,
+      webFrontend: ["angular"],
+      backend: "hono",
+      api: "openapi",
+      appPlatforms: ["turborepo", "openapi-typescript"],
+    });
+    expect(openapi.adjustedStack?.api).not.toBe("openapi");
+    expect(openapi.adjustedStack?.appPlatforms).not.toContain("openapi-typescript");
+  });
+});
+
 describe("evaluateCompatibility", () => {
   it("reports conflicts in ecosystem-specific categories", () => {
     const issues = evaluateCompatibility({

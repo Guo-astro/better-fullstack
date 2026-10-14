@@ -2140,6 +2140,25 @@ export const analyzeStackCompatibility = (
     });
   }
 
+  const apiDependentAddons = [
+    {
+      id: "apollo-client",
+      message: "Apollo Client removed (requires a GraphQL API selection)",
+      supported: ["garph", "graphql-yoga", "apollo-server"].includes(nextStack.api),
+    },
+    {
+      id: "openapi-typescript",
+      message: "openapi-typescript removed (requires the OpenAPI API selection)",
+      supported: nextStack.api === "openapi",
+    },
+  ];
+  for (const addon of apiDependentAddons) {
+    if (addon.supported || !nextStack.appPlatforms.includes(addon.id)) continue;
+    nextStack.appPlatforms = nextStack.appPlatforms.filter((platform) => platform !== addon.id);
+    changed = true;
+    changes.push({ category: "appPlatforms", message: addon.message });
+  }
+
   // ============================================
   // EXAMPLES CONSTRAINTS
   // ============================================
