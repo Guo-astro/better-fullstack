@@ -181,6 +181,15 @@ describe("generated job queue compatibility", () => {
     ).toBeNull();
  
     expect(
+      getDisabledReason(
+        compatibilityInput({ ...stack, webDeploy: "cloudflare", jobQueue: "upstash-qstash" }),
+        "jobQueue",
+        "upstash-qstash",
+      ),
+    ).toBe(
+      "Upstash QStash is not generated for full-stack Cloudflare deployments. Choose another web deployment",
+    );
+    expect(
       graphIssues({
         frontend: ["next"],
         backend: "self",

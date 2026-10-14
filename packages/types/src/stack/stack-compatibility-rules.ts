@@ -366,6 +366,9 @@ export function getJobQueueIncompatibility(
   ) {
     return `${requirements.label} requires a separate worker process; generated ${stack.webDeploy} deployments do not start one. Choose no web deployment`;
   }
+  if (!requirements.workerProcess && isSelfBackend && stack.webDeploy === "cloudflare") {
+    return `${requirements.label} is not generated for full-stack Cloudflare deployments. Choose another web deployment`;
+  }
   if (requirements.workerProcess && stack.runtime === "workers") {
     return `${requirements.label} needs a long-running Node.js or Bun worker process, not Cloudflare Workers`;
   }
