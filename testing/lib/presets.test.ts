@@ -71,6 +71,18 @@ describe("preset groups", () => {
     ]);
   });
 
+  it("partitions a preset group into disjoint shards covering the whole group", () => {
+    const shardNames = [0, 1, 2].map((index) =>
+      getPresetCombos("pr-broad", { index, total: 3 }).map((combo) => combo.name),
+    );
+
+    expect(shardNames.flat().sort()).toEqual([...PR_BROAD_PRESET_NAMES].sort());
+    expect(new Set(shardNames.flat()).size).toBe(PR_BROAD_PRESET_NAMES.length);
+    for (const names of shardNames) {
+      expect(Math.abs(names.length - PR_BROAD_PRESET_NAMES.length / 3)).toBeLessThan(1);
+    }
+  });
+
   it("renders complete CLI commands for all presets", () => {
     for (const combo of getPresetCombos("all")) {
       expect(combo.command).not.toContain(" undefined");
