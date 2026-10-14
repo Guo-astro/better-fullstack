@@ -227,14 +227,14 @@ jobs:
           retention-days: 7
 
   smoke-strict-broad:
-    name: Strict Smoke Tests (Broad ${{ matrix.shard }}/6)
+    name: Strict Smoke Tests (Broad ${{ matrix.shard }}/8)
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.run_smoke_strict }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        shard: [0, 1, 2, 3, 4, 5]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
     services:
       postgres:
         image: postgres:16
@@ -264,7 +264,7 @@ jobs:
     steps:
       # The broad matrix once exhausted the runner disk when all presets ran
       # in one job (run 29582988254 died with "No space left on device"). Each
-      # shard now runs ~1/6 of the presets and cleans up per project, but the
+      # shard now runs ~1/8 of the presets and cleans up per project, but the
       # big preinstalled toolchains this job never uses (~25GB: Android SDK,
       # GHC, CodeQL, Swift, boost) are still dropped as a safety margin.
       - name: Free runner disk space
@@ -320,7 +320,7 @@ jobs:
         run: |
           bun run testing/smoke-test.ts \
             --preset pr-broad \
-            --partition ${{ matrix.shard }}/6 \
+            --partition ${{ matrix.shard }}/8 \
             --dev-check \
             --strict \
             --output testing/.smoke-output/broad-${{ matrix.shard }}
