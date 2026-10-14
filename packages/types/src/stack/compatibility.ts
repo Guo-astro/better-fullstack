@@ -1950,19 +1950,6 @@ export const analyzeStackCompatibility = (
     });
   }
 
-  const requiresTailwind = ["shadcn-ui", "shadcn-svelte", "daisyui", "nextui"].includes(
-    nextStack.uiLibrary,
-  );
-  if (requiresTailwind && nextStack.cssFramework !== "tailwind") {
-    // Auto-set Tailwind when selecting a Tailwind-dependent UI library
-    nextStack.cssFramework = "tailwind";
-    changed = true;
-    changes.push({
-      category: "cssFramework",
-      message: `CSS framework set to 'Tailwind' (required by ${nextStack.uiLibrary})`,
-    });
-  }
-
   // React-only UI libraries - check frontend compatibility
   const reactOnlyLibraries = ["shadcn-ui", "radix-ui", "chakra-ui", "nextui", "mui", "antd"];
   const reactFrontends = [
@@ -2025,7 +2012,8 @@ export const analyzeStackCompatibility = (
   if (nextStack.uiLibrary === "park-ui") {
     const hasReactFrontend = nextStack.webFrontend.some((f) => reactFrontends.includes(f));
     const hasVueFrontend = nextStack.webFrontend.includes("nuxt");
-    const hasSolidFrontend = nextStack.webFrontend.includes("solid");
+    const hasSolidFrontend =
+      nextStack.webFrontend.includes("solid") || nextStack.webFrontend.includes("solid-start");
     const hasAstroCompatible =
       nextStack.webFrontend.includes("astro") &&
       ["react", "vue", "solid"].includes(nextStack.astroIntegration);
@@ -2061,6 +2049,19 @@ export const analyzeStackCompatibility = (
     changes.push({
       category: "uiLibrary",
       message: `UI library changed to '${fallback === "daisyui" ? "daisyUI" : "None"}' (not supported by this frontend)`,
+    });
+  }
+
+  const requiresTailwind = ["shadcn-ui", "shadcn-svelte", "daisyui", "nextui"].includes(
+    nextStack.uiLibrary,
+  );
+  if (requiresTailwind && nextStack.cssFramework !== "tailwind") {
+    // Auto-set Tailwind when selecting a Tailwind-dependent UI library
+    nextStack.cssFramework = "tailwind";
+    changed = true;
+    changes.push({
+      category: "cssFramework",
+      message: `CSS framework set to 'Tailwind' (required by ${nextStack.uiLibrary})`,
     });
   }
 
@@ -2878,6 +2879,8 @@ export const analyzeStackCompatibility = (
  * - Allow users to select options that will trigger auto-adjustments
  * - Follow CLI behavior: filter options based on UPSTREAM selections only
  */
+const SHARED_FRONTEND_RULE_CATEGORIES = new Set<CompatibilityCategory>(["api", "uiLibrary"]);
+
 export const getDisabledReason = (
   currentStack: CompatibilityInput,
   category: CompatibilityCategory,
@@ -3367,7 +3370,11 @@ export const getDisabledReason = (
   if (graphDisabledReason.reason) {
     return graphDisabledReason.reason;
   }
-  if (graphDisabledReason.handled && graphDisabledReason.authoritative) {
+  if (
+    graphDisabledReason.handled &&
+    graphDisabledReason.authoritative &&
+    !SHARED_FRONTEND_RULE_CATEGORIES.has(category)
+  ) {
     return null;
   }
 

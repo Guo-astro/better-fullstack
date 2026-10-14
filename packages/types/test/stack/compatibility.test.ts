@@ -2011,6 +2011,22 @@ describe("compatibility issue helpers", () => {
   });
 });
 
+describe("UI library fallback", () => {
+  it("switches to Tailwind when an unsupported UI library falls back to daisyUI", () => {
+    const result = analyzeStackCompatibility({
+      ...DEFAULT_STACK_SELECTION,
+      webFrontend: ["astro"],
+      astroIntegration: "vue",
+      api: "none",
+      uiLibrary: "mantine",
+      cssFramework: "scss",
+    });
+
+    expect(result.adjustedStack?.uiLibrary).toBe("daisyui");
+    expect(result.adjustedStack?.cssFramework).toBe("tailwind");
+  });
+});
+
 describe("evaluateCompatibility", () => {
   it("reports conflicts in ecosystem-specific categories", () => {
     const issues = evaluateCompatibility({

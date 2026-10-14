@@ -122,6 +122,7 @@ function baseStacks(): { name: string; selection: StackSelectionInput }[] {
   }));
 }
 
+const SHARED_RULE_CATEGORIES = new Set<OptionCategory>(["api", "uiLibrary"]);
 const STACKS = baseStacks();
 const KEY_BY_CATEGORY = Object.fromEntries(
   Object.entries(STACK_SELECTION_OPTION_CATEGORY_BY_KEY).map(([key, category]) => [category, key]),
@@ -150,13 +151,18 @@ describe("builder and CLI agreement", () => {
             [key]: isList ? [option.id] : option.id,
           } as StackSelectionInput;
           if (getDisabledReason(selection, category, option.id)) continue;
+          const label = `${option.id} on ${stack.name}`;
           const adjusted = normalize(selection);
           const value = adjusted[key];
           const kept = Array.isArray(value) ? value.includes(option.id) : value === option.id;
-          if (!kept) continue;
+          if (!kept) {
+            if (SHARED_RULE_CATEGORIES.has(category)) {
+              failures.push(`${label}: offered, but the analyzer replaces it`);
+            }
+            continue;
+          }
           offered = true;
 
-          const label = `${option.id} on ${stack.name}`;
           const config = stackSelectionToProjectConfig(adjusted, {
             projectDir: "/virtual/agreement",
             relativePath: "agreement",
