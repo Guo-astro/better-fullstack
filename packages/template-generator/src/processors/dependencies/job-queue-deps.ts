@@ -6,6 +6,7 @@ import { addPackageDependency, type AvailableDependencies } from "@/dependencies
 
 type PackageJson = {
   scripts?: Record<string, string>;
+  engines?: Record<string, string>;
   [key: string]: unknown;
 };
 
@@ -32,11 +33,15 @@ export function processJobQueueDeps(vfs: VirtualFileSystem, config: ProjectConfi
 const PG_BOSS_MIN_NODE = ">=22.12.0";
 
 function addJobQueueEngines(vfs: VirtualFileSystem, serverPath: string, config: ProjectConfig) {
-  if (config.jobQueue !== "pg-boss" || config.runtime !== "node") return;
+  if (config.jobQueue !== "pg-boss") return;
+  if (config.runtime !== "node" && config.backend !== "self") return;
 
   const pkgJson = vfs.readJson<PackageJson>(serverPath);
   if (!pkgJson) return;
-  vfs.writeJson(serverPath, { ...pkgJson, engines: { node: PG_BOSS_MIN_NODE } });
+  vfs.writeJson(serverPath, {
+    ...pkgJson,
+    engines: { ...pkgJson.engines, node: PG_BOSS_MIN_NODE },
+  });
 }
 
 function getJobQueueDeps(jobQueue: ProjectConfig["jobQueue"]): AvailableDependencies[] {

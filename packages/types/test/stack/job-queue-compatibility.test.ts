@@ -179,6 +179,18 @@ describe("generated job queue compatibility", () => {
         "upstash-qstash",
       ),
     ).toBeNull();
+ 
+    expect(
+      graphIssues({
+        frontend: ["next"],
+        backend: "self",
+        runtime: "none",
+        webDeploy: "vercel",
+        jobQueue: "pg-boss",
+      } as unknown as Record<string, string>),
+    ).toContain(
+      "pg-boss requires a separate worker process; generated vercel deployments do not start one. Choose no web deployment.",
+    );
   });
 
   it("judges pg-boss by the standalone database generation uses over a backend-owned one", () => {

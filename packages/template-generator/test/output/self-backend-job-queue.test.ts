@@ -41,6 +41,7 @@ describe("job queues on full-stack frameworks", () => {
       expect(webPackage.dependencies["pg-boss"]).toBeDefined();
       expect(webPackage.dependencies.tsx).toBeDefined();
       expect(webPackage.scripts["jobs:worker"]).toBe("tsx src/jobs/worker.ts");
+      expect(webPackage.engines.node).toBe(">=22.12.0");
       expect(output["README.md"]).toContain("cd apps/web && pnpm run jobs:worker");
       expect(output["README.md"]).not.toContain("apps/server");
     },

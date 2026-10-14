@@ -1696,6 +1696,7 @@ function createTypeScriptBackendCompatibilityIssue(
         backend: context.ownerToolId,
         runtime: context.siblingToolIdsByRole?.runtime,
         serverDeploy: part.role === "deploy" ? part.toolId : context.siblingToolIdsByRole?.deploy,
+        webDeploy: getFrontendDeploy(context.parts ?? []),
         database: getDataLayerDatabase({
           standalone: context.primaryToolIdsByRole?.database,
           backend: context.siblingToolIdsByRole?.database,
@@ -4104,6 +4105,10 @@ function getSelectedPrimaryPart(parts: readonly StackPart[], role: StackPartRole
   return parts.find(
     (part) => part.role === role && !part.ownerPartId && part.source !== "provided",
   );
+}
+
+function getFrontendDeploy(parts: readonly StackPart[]) {
+  return getSelectedScopedPart(parts, getPrimaryPart(parts, "frontend"), "deploy")?.toolId;
 }
 
 function getSelectedScopedPart(
