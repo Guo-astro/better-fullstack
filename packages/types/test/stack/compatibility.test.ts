@@ -2011,6 +2011,59 @@ describe("compatibility issue helpers", () => {
   });
 });
 
+describe("UI library fallback", () => {
+  it("switches to Tailwind when an unsupported UI library falls back to daisyUI", () => {
+    const result = analyzeStackCompatibility({
+      ...DEFAULT_STACK_SELECTION,
+      webFrontend: ["astro"],
+      astroIntegration: "vue",
+      api: "none",
+      uiLibrary: "mantine",
+      cssFramework: "scss",
+    });
+
+    expect(result.adjustedStack?.uiLibrary).toBe("daisyui");
+    expect(result.adjustedStack?.cssFramework).toBe("tailwind");
+  });
+
+  it("offers React UI libraries on Vinext", () => {
+    const stack = {
+      ...DEFAULT_STACK_SELECTION,
+      webFrontend: ["vinext"],
+      backend: "self-vinext",
+      runtime: "none",
+      cssFramework: "tailwind",
+    };
+
+    expect(getDisabledReason(stack, "uiLibrary", "shadcn-ui")).toBeNull();
+    expect(getDisabledReason(stack, "uiLibrary", "headless-ui")).toBeNull();
+  });
+});
+
+describe("API fallback", () => {
+  it("drops API-specific add-ons when a frontend change replaces the API", () => {
+    const graphql = analyzeStackCompatibility({
+      ...DEFAULT_STACK_SELECTION,
+      webFrontend: ["nuxt"],
+      backend: "hono",
+      api: "garph",
+      appPlatforms: ["turborepo", "apollo-client"],
+    });
+    expect(graphql.adjustedStack?.api).not.toBe("garph");
+    expect(graphql.adjustedStack?.appPlatforms).not.toContain("apollo-client");
+
+    const openapi = analyzeStackCompatibility({
+      ...DEFAULT_STACK_SELECTION,
+      webFrontend: ["angular"],
+      backend: "hono",
+      api: "openapi",
+      appPlatforms: ["turborepo", "openapi-typescript"],
+    });
+    expect(openapi.adjustedStack?.api).not.toBe("openapi");
+    expect(openapi.adjustedStack?.appPlatforms).not.toContain("openapi-typescript");
+  });
+});
+
 describe("evaluateCompatibility", () => {
   it("reports conflicts in ecosystem-specific categories", () => {
     const issues = evaluateCompatibility({

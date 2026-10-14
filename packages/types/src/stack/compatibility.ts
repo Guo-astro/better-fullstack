@@ -1526,6 +1526,22 @@ export const analyzeStackCompatibility = (
         message: `API set to 'oRPC' (${apiName} requires React integration with Astro)`,
       });
     }
+
+    const apiFrontends = [...nextStack.webFrontend, ...nextStack.nativeFrontend] as Frontend[];
+    const apiIssue = getApiFrontendCompatibilityIssue(
+      nextStack.api as API,
+      apiFrontends,
+      nextStack.astroIntegration as AstroIntegration,
+    );
+    if (apiIssue) {
+      const fallback =
+        allowedApisForFrontends(apiFrontends, nextStack.astroIntegration as AstroIntegration).find(
+          (api) => api !== "none",
+        ) ?? "none";
+      nextStack.api = fallback;
+      changed = true;
+      changes.push({ category: "api", message: `API set to '${fallback}' (${apiIssue.message})` });
+    }
   }
 
   // ============================================
@@ -1935,19 +1951,6 @@ export const analyzeStackCompatibility = (
     });
   }
 
-  const requiresTailwind = ["shadcn-ui", "shadcn-svelte", "daisyui", "nextui"].includes(
-    nextStack.uiLibrary,
-  );
-  if (requiresTailwind && nextStack.cssFramework !== "tailwind") {
-    // Auto-set Tailwind when selecting a Tailwind-dependent UI library
-    nextStack.cssFramework = "tailwind";
-    changed = true;
-    changes.push({
-      category: "cssFramework",
-      message: `CSS framework set to 'Tailwind' (required by ${nextStack.uiLibrary})`,
-    });
-  }
-
   // React-only UI libraries - check frontend compatibility
   const reactOnlyLibraries = ["shadcn-ui", "radix-ui", "chakra-ui", "nextui", "mui", "antd"];
   const reactFrontends = [
@@ -2010,7 +2013,8 @@ export const analyzeStackCompatibility = (
   if (nextStack.uiLibrary === "park-ui") {
     const hasReactFrontend = nextStack.webFrontend.some((f) => reactFrontends.includes(f));
     const hasVueFrontend = nextStack.webFrontend.includes("nuxt");
-    const hasSolidFrontend = nextStack.webFrontend.includes("solid");
+    const hasSolidFrontend =
+      nextStack.webFrontend.includes("solid") || nextStack.webFrontend.includes("solid-start");
     const hasAstroCompatible =
       nextStack.webFrontend.includes("astro") &&
       ["react", "vue", "solid"].includes(nextStack.astroIntegration);
@@ -2028,6 +2032,38 @@ export const analyzeStackCompatibility = (
         message: "UI library changed to 'daisyUI' (Park UI requires React, Vue, or Solid)",
       });
     }
+  }
+
+  const uiFrontends = [...nextStack.webFrontend, ...nextStack.nativeFrontend] as Frontend[];
+  const compatibleUILibraries = getCompatibleUILibraries(
+    uiFrontends,
+    nextStack.astroIntegration as AstroIntegration,
+  );
+  if (
+    nextStack.uiLibrary !== "none" &&
+    nextStack.webFrontend.some((f) => f !== "none") &&
+    !compatibleUILibraries.includes(nextStack.uiLibrary as UILibrary)
+  ) {
+    const fallback = compatibleUILibraries.includes("daisyui") ? "daisyui" : "none";
+    nextStack.uiLibrary = fallback;
+    changed = true;
+    changes.push({
+      category: "uiLibrary",
+      message: `UI library changed to '${fallback === "daisyui" ? "daisyUI" : "None"}' (not supported by this frontend)`,
+    });
+  }
+
+  const requiresTailwind = ["shadcn-ui", "shadcn-svelte", "daisyui", "nextui"].includes(
+    nextStack.uiLibrary,
+  );
+  if (requiresTailwind && nextStack.cssFramework !== "tailwind") {
+    // Auto-set Tailwind when selecting a Tailwind-dependent UI library
+    nextStack.cssFramework = "tailwind";
+    changed = true;
+    changes.push({
+      category: "cssFramework",
+      message: `CSS framework set to 'Tailwind' (required by ${nextStack.uiLibrary})`,
+    });
   }
 
   // ============================================
@@ -2103,6 +2139,25 @@ export const analyzeStackCompatibility = (
       category: "appPlatforms",
       message: "GraphQL Code Generator removed (requires a GraphQL API selection)",
     });
+  }
+
+  const apiDependentAddons = [
+    {
+      id: "apollo-client",
+      message: "Apollo Client removed (requires a GraphQL API selection)",
+      supported: ["garph", "graphql-yoga", "apollo-server"].includes(nextStack.api),
+    },
+    {
+      id: "openapi-typescript",
+      message: "openapi-typescript removed (requires the OpenAPI API selection)",
+      supported: nextStack.api === "openapi",
+    },
+  ];
+  for (const addon of apiDependentAddons) {
+    if (addon.supported || !nextStack.appPlatforms.includes(addon.id)) continue;
+    nextStack.appPlatforms = nextStack.appPlatforms.filter((platform) => platform !== addon.id);
+    changed = true;
+    changes.push({ category: "appPlatforms", message: addon.message });
   }
 
   // ============================================
@@ -2844,6 +2899,8 @@ export const analyzeStackCompatibility = (
  * - Allow users to select options that will trigger auto-adjustments
  * - Follow CLI behavior: filter options based on UPSTREAM selections only
  */
+const SHARED_FRONTEND_RULE_CATEGORIES = new Set<CompatibilityCategory>(["api", "uiLibrary"]);
+
 export const getDisabledReason = (
   currentStack: CompatibilityInput,
   category: CompatibilityCategory,
@@ -3333,7 +3390,11 @@ export const getDisabledReason = (
   if (graphDisabledReason.reason) {
     return graphDisabledReason.reason;
   }
-  if (graphDisabledReason.handled && graphDisabledReason.authoritative) {
+  if (
+    graphDisabledReason.handled &&
+    graphDisabledReason.authoritative &&
+    !SHARED_FRONTEND_RULE_CATEGORIES.has(category)
+  ) {
     return null;
   }
 
@@ -3653,6 +3714,15 @@ export const getDisabledReason = (
     if (!["hono", "effect", "express", "fastify", "elysia"].includes(currentStack.backend)) {
       return "Apollo Server currently supports Hono, Effect, Express, Fastify, and Elysia backends";
     }
+  }
+
+  if (category === "api") {
+    const apiIssue = getApiFrontendCompatibilityIssue(
+      optionId as API,
+      [...currentStack.webFrontend, ...currentStack.nativeFrontend] as Frontend[],
+      currentStack.astroIntegration as AstroIntegration,
+    );
+    if (apiIssue) return apiIssue.message;
   }
 
   if (category === "appPlatforms" && ["turborepo", "nx", "vite-plus"].includes(optionId)) {
@@ -4072,76 +4142,8 @@ export const getDisabledReason = (
       }
     }
 
-    // React-only UI libraries
-    const reactOnlyLibraries = ["shadcn-ui", "radix-ui", "chakra-ui", "nextui", "mui", "antd"];
-    const reactFrontends = [
-      "tanstack-router",
-      "react-router",
-      "react-vite",
-      "tanstack-start",
-      "next",
-    ];
-
-    if (reactOnlyLibraries.includes(optionId)) {
-      const hasReactFrontend = currentStack.webFrontend.some((f) => reactFrontends.includes(f));
-      // Astro with React integration also works
-      const hasAstroReact =
-        currentStack.webFrontend.includes("astro") && currentStack.astroIntegration === "react";
-      if (!hasReactFrontend && !hasAstroReact) {
-        const libraryName =
-          optionId === "shadcn-ui"
-            ? "shadcn/ui"
-            : optionId === "radix-ui"
-              ? "Radix UI"
-              : optionId === "chakra-ui"
-                ? "Chakra UI"
-                : optionId === "mui"
-                  ? "MUI"
-                  : optionId === "antd"
-                    ? "Ant Design"
-                    : "NextUI";
-        return `${libraryName} requires a React-based frontend`;
-      }
-    }
-
-    if (optionId === "shadcn-svelte") {
-      const hasSvelteFrontend = currentStack.webFrontend.includes("svelte");
-      const hasAstroSvelte =
-        currentStack.webFrontend.includes("astro") && currentStack.astroIntegration === "svelte";
-      if (!hasSvelteFrontend && !hasAstroSvelte) {
-        return "shadcn-svelte requires SvelteKit or Astro with Svelte integration";
-      }
-    }
-
-    // Headless UI works with React and Vue
-    if (optionId === "headless-ui") {
-      const hasReactFrontend = currentStack.webFrontend.some((f) => reactFrontends.includes(f));
-      const hasVueFrontend = currentStack.webFrontend.includes("nuxt");
-      const hasAstroReactOrVue =
-        currentStack.webFrontend.includes("astro") &&
-        ["react", "vue"].includes(currentStack.astroIntegration);
-      if (!hasReactFrontend && !hasVueFrontend && !hasAstroReactOrVue) {
-        return "Headless UI requires React or Vue frontend";
-      }
-    }
-
-    // Park UI works with React, Vue, and Solid
-    if (optionId === "park-ui") {
-      const hasReactFrontend = currentStack.webFrontend.some((f) => reactFrontends.includes(f));
-      const hasVueFrontend = currentStack.webFrontend.includes("nuxt");
-      const hasSolidFrontend =
-        currentStack.webFrontend.includes("solid") ||
-        currentStack.webFrontend.includes("solid-start");
-      const hasAstroCompatible =
-        currentStack.webFrontend.includes("astro") &&
-        ["react", "vue", "solid"].includes(currentStack.astroIntegration);
-      if (!hasReactFrontend && !hasVueFrontend && !hasSolidFrontend && !hasAstroCompatible) {
-        return "Park UI requires React, Vue, or Solid frontend";
-      }
-      // Park UI requires a CSS framework (not "none")
-      if (currentStack.cssFramework === "none") {
-        return "Park UI requires a CSS framework";
-      }
+    if (optionId === "park-ui" && currentStack.cssFramework === "none") {
+      return "Park UI requires a CSS framework";
     }
 
     // UI libraries requiring Tailwind
@@ -4157,6 +4159,23 @@ export const getDisabledReason = (
                 : "NextUI";
         return `${libraryName} requires Tailwind CSS`;
       }
+    }
+  }
+
+  if (category === "uiLibrary" && optionId !== "none") {
+    const uiFrontends = [...currentStack.webFrontend, ...currentStack.nativeFrontend] as Frontend[];
+    const astroIntegration = currentStack.astroIntegration as AstroIntegration;
+    if (
+      currentStack.webFrontend.some((f) => f !== "none") &&
+      !getCompatibleUILibraries(uiFrontends, astroIntegration).includes(optionId as UILibrary)
+    ) {
+      const needsAstroReact =
+        currentStack.webFrontend.includes("astro") &&
+        astroIntegration !== "react" &&
+        getCompatibleUILibraries(["astro"], "react").includes(optionId as UILibrary);
+      return needsAstroReact
+        ? `UI library '${optionId}' requires React integration with Astro`
+        : `UI library '${optionId}' is not compatible with the selected frontend`;
     }
   }
 
@@ -5661,10 +5680,7 @@ export function splitFrontends(values: Frontend[] = []): {
   return { web, native };
 }
 
-export function allowedApisForFrontends(
-  frontends: Frontend[] = [],
-  astroIntegration?: AstroIntegration,
-) {
+function listApisForFrontends(frontends: Frontend[] = [], astroIntegration?: AstroIntegration) {
   const includesNuxt = frontends.includes("nuxt");
   const includesSvelte = frontends.includes("svelte");
   const includesSolid = frontends.includes("solid");
@@ -5714,6 +5730,15 @@ export function allowedApisForFrontends(
   }
 
   return base;
+}
+
+export function allowedApisForFrontends(
+  frontends: Frontend[] = [],
+  astroIntegration?: AstroIntegration,
+): API[] {
+  return listApisForFrontends(frontends, astroIntegration).filter(
+    (api) => !getApiFrontendCompatibilityIssue(api, frontends, astroIntegration),
+  );
 }
 
 function getReactOnlyApiDisplayName(api: API) {
