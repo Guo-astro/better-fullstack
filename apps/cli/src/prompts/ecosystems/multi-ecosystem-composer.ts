@@ -677,7 +677,7 @@ export async function gatherMultiEcosystemConfig(
               runtime,
               database,
               flags.serverDeploy,
-              flags.webDeploy,
+              webDeploy,
             ),
           );
     const caching =
