@@ -671,7 +671,14 @@ export async function gatherMultiEcosystemConfig(
       backend === "none"
         ? "none"
         : await scopedPromptValue("typescript", "jobQueue", configScope, backendSections, () =>
-            getJobQueueChoice(flags.jobQueue, backend, runtime, database, flags.serverDeploy),
+            getJobQueueChoice(
+              flags.jobQueue,
+              backend,
+              runtime,
+              database,
+              flags.serverDeploy,
+              flags.webDeploy,
+            ),
           );
     const caching =
       backend === "none"

@@ -416,6 +416,16 @@ describe("generated job queues", () => {
     expect(
       promptValues({ backend: "nestjs", runtime: "node", database: "postgres" }),
     ).not.toContain("upstash-qstash");
+
+    const selfOnVercel = promptValues({
+      backend: "self",
+      runtime: "none",
+      database: "postgres",
+      webDeploy: "vercel",
+    });
+    expect(selfOnVercel).toContain("upstash-qstash");
+    expect(selfOnVercel).not.toContain("pg-boss");
+    expect(selfOnVercel).not.toContain("hatchet");
   });
 
   test("graph-only input is validated against the job queue the generator uses", async () => {
