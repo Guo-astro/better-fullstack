@@ -1193,6 +1193,7 @@ export async function gatherConfig(
         results.runtime,
         results.database,
         results.serverDeploy,
+        results.webDeploy,
       );
     },
     fileUpload: ({ results }) => {
@@ -1392,6 +1393,10 @@ export async function gatherConfig(
     },
     rustOrm: ({ results }) => {
       if (results.ecosystem !== "rust") return Promise.resolve("none" as RustOrm);
+      // No Rust server means no ORM default; an explicit --rust-orm still wins.
+      if (!flags.rustOrm && results.rustWebFramework === "none") {
+        return Promise.resolve("none" as RustOrm);
+      }
       return getRustOrmChoice(flags.rustOrm);
     },
     rustApi: ({ results }) => {

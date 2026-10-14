@@ -1126,10 +1126,21 @@ function resolvePresetIds(presetId: string): string[] | null {
   return null;
 }
 
-export function getPresetCombos(presetId: string): ComboCandidate[] {
+export interface PresetPartition {
+  index: number;
+  total: number;
+}
+
+export function getPresetCombos(presetId: string, partition?: PresetPartition): ComboCandidate[] {
   const resolvedPresetIds = resolvePresetIds(presetId);
   if (resolvedPresetIds) {
-    return resolvedPresetIds.map((id) => buildSinglePresetCombo(id));
+    // Stride by index so each shard mixes ecosystems and heavy/light presets
+    // instead of inheriting the grouped list's ordering.
+    const ids =
+      partition && partition.total > 1
+        ? resolvedPresetIds.filter((_, i) => i % partition.total === partition.index)
+        : resolvedPresetIds;
+    return ids.map((id) => buildSinglePresetCombo(id));
   }
 
   const def = SMOKE_TEST_PRESETS[presetId];

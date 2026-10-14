@@ -7,6 +7,7 @@ import {
   isToolingOverlayOnly,
   legacyProjectConfigToStackParts,
   projectStackPartSettingsToProjectConfig,
+  toolingRequiresJavaScriptWorkspace,
 } from "@/types";
 
 function getBaseCommand(packageManager: ProjectConfig["packageManager"]) {
@@ -65,8 +66,13 @@ function appendAddonsNoneFlag(flags: string[], config: ProjectConfig) {
 
 function appendCapabilityPartFlags(flags: string[], config: ProjectConfig) {
   const parts = legacyProjectConfigToStackParts(config, "selected");
+  const hasJavaScriptWorkspace =
+    config.ecosystem === "typescript" ||
+    config.ecosystem === "react-native" ||
+    hasJavaScriptWorkspaceRoot(config.stackParts ?? []);
   for (const part of parts) {
     if (part.source === "provided" || part.toolId === "none") continue;
+    if (!hasJavaScriptWorkspace && toolingRequiresJavaScriptWorkspace(part.toolId)) continue;
     const binding = getAddonStackPartBinding(part.toolId);
     if (!binding || binding.role !== part.role || binding.ecosystem !== part.ecosystem) continue;
     flags.push(`--part ${formatStackPartSpec(part, parts)}`);
