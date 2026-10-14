@@ -338,14 +338,33 @@ export function hasGeneratedJobQueueRequirements(jobQueue: string | undefined): 
  */
 export function getJobQueueIncompatibility(
   jobQueue: string | undefined,
-  stack: { backend?: string; runtime?: string; database?: string; serverDeploy?: string },
+  stack: {
+    backend?: string;
+    runtime?: string;
+    database?: string;
+    serverDeploy?: string;
+    webDeploy?: string;
+  },
   { partial = false } = {},
 ): string | null {
   const requirements = GENERATED_JOB_QUEUE_REQUIREMENTS[jobQueue as JobQueue];
   if (!requirements) return null;
   const isUnanswered = (value: string | undefined) => partial && value === undefined;
-  if (!isUnanswered(stack.backend) && !GENERATED_JOB_QUEUE_BACKENDS.has(stack.backend ?? "")) {
-    return `${requirements.label} is generated for Hono, Express, Fastify, and Elysia backends`;
+  const isSelfBackend = isFullstackSelfBackend(stack.backend);
+  if (
+    !isUnanswered(stack.backend) &&
+    !isSelfBackend &&
+    !GENERATED_JOB_QUEUE_BACKENDS.has(stack.backend ?? "")
+  ) {
+    return `${requirements.label} is generated for Hono, Express, Fastify, Elysia, and full-stack framework backends`;
+  }
+  if (
+    requirements.workerProcess &&
+    isSelfBackend &&
+    stack.webDeploy &&
+    stack.webDeploy !== "none"
+  ) {
+    return `${requirements.label} requires a separate worker process; generated ${stack.webDeploy} deployments do not start one. Choose no web deployment`;
   }
   if (requirements.workerProcess && stack.runtime === "workers") {
     return `${requirements.label} needs a long-running Node.js or Bun worker process, not Cloudflare Workers`;

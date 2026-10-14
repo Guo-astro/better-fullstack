@@ -59,12 +59,12 @@ const REJECTED = [
   {
     jobQueue: "hatchet",
     stack: { backend: "nestjs", runtime: "node", database: "sqlite" },
-    reason: "Hatchet is generated for Hono, Express, Fastify, and Elysia backends",
+    reason: "Hatchet is generated for Hono, Express, Fastify, Elysia, and full-stack framework backends",
   },
   {
     jobQueue: "upstash-qstash",
     stack: { backend: "nestjs", runtime: "node", database: "sqlite" },
-    reason: "Upstash QStash is generated for Hono, Express, Fastify, and Elysia backends",
+    reason: "Upstash QStash is generated for Hono, Express, Fastify, Elysia, and full-stack framework backends",
   },
 ] as const;
 
@@ -131,6 +131,56 @@ describe("generated job queue compatibility", () => {
     }
   });
 
+  it("accepts generated job queues on full-stack framework backends", () => {
+    for (const jobQueue of ["pg-boss", "hatchet", "upstash-qstash"] as const) {
+      const input = compatibilityInput({
+        webFrontend: ["next"],
+        backend: "self-next",
+        runtime: "none",
+        database: "postgres",
+        orm: "drizzle",
+        webDeploy: "none",
+        jobQueue,
+      });
+      expect(getDisabledReason(input, "jobQueue", jobQueue)).toBeNull();
+      expect(analyzeStackCompatibility(input).adjustedStack?.jobQueue ?? jobQueue).toBe(jobQueue);
+      expect(
+        getJobQueueIncompatibility(jobQueue, {
+          backend: "self",
+          runtime: "none",
+          database: "postgres",
+          webDeploy: "none",
+        }),
+      ).toBeNull();
+    }
+  });
+
+  it("rejects worker queues on full-stack backends whose web deployment does not start the worker", () => {
+    const stack = {
+      webFrontend: ["next"],
+      backend: "self-next",
+      runtime: "none",
+      database: "postgres",
+      orm: "drizzle",
+      webDeploy: "vercel",
+    };
+    for (const [jobQueue, label] of [
+      ["pg-boss", "pg-boss"],
+      ["hatchet", "Hatchet"],
+    ] as const) {
+      expect(getDisabledReason(compatibilityInput({ ...stack, jobQueue }), "jobQueue", jobQueue)).toBe(
+        `${label} requires a separate worker process; generated vercel deployments do not start one. Choose no web deployment`,
+      );
+    }
+    expect(
+      getDisabledReason(
+        compatibilityInput({ ...stack, jobQueue: "upstash-qstash" }),
+        "jobQueue",
+        "upstash-qstash",
+      ),
+    ).toBeNull();
+  });
+
   it("judges pg-boss by the standalone database generation uses over a backend-owned one", () => {
     const graphMessages = (standalone: string, owned: string) =>
       validateStackParts(
@@ -162,7 +212,7 @@ describe("generated job queue compatibility", () => {
       "Hatchet needs a long-running Node.js or Bun worker process, not Cloudflare Workers",
     );
     expect(getJobQueueIncompatibility("upstash-qstash", { backend: "nestjs" }, partial)).toBe(
-      "Upstash QStash is generated for Hono, Express, Fastify, and Elysia backends",
+      "Upstash QStash is generated for Hono, Express, Fastify, Elysia, and full-stack framework backends",
     );
     // A complete stack still treats a missing backend or database as unsupported.
     expect(getJobQueueIncompatibility("pg-boss", { backend: "hono" })).toBe(

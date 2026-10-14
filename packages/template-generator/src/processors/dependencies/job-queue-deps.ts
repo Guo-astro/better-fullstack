@@ -100,7 +100,7 @@ function addJobQueueScripts(vfs: VirtualFileSystem, packagePath: string, config:
   }
 
   if (config.backend === "self" && runner === "tsx") {
-    addPackageDependency({ vfs, packagePath, devDependencies: ["tsx"] });
+    addPackageDependency({ vfs, packagePath, dependencies: ["tsx"] });
   }
   const pkgJson = vfs.readJson<PackageJson>(packagePath);
   if (!pkgJson) return;
