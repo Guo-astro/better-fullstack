@@ -9,29 +9,37 @@ const en_docssearchretry2 = /** @type {(inputs: Docssearchretry2Inputs) => Local
 	return /** @type {LocalizedString} */ (`Try again`)
 };
 
-/** @type {(inputs: Docssearchretry2Inputs) => LocalizedString} */
-const es_docssearchretry2 = en_docssearchretry2;
+const es_docssearchretry2 = /** @type {(inputs: Docssearchretry2Inputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Intentar de nuevo`)
+};
 
-/** @type {(inputs: Docssearchretry2Inputs) => LocalizedString} */
-const zh_docssearchretry2 = en_docssearchretry2;
+const zh_docssearchretry2 = /** @type {(inputs: Docssearchretry2Inputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`重试`)
+};
 
-/** @type {(inputs: Docssearchretry2Inputs) => LocalizedString} */
-const ja_docssearchretry2 = en_docssearchretry2;
+const ja_docssearchretry2 = /** @type {(inputs: Docssearchretry2Inputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`再試行`)
+};
 
-/** @type {(inputs: Docssearchretry2Inputs) => LocalizedString} */
-const ko_docssearchretry2 = en_docssearchretry2;
+const ko_docssearchretry2 = /** @type {(inputs: Docssearchretry2Inputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`다시 시도`)
+};
 
-/** @type {(inputs: Docssearchretry2Inputs) => LocalizedString} */
-const zh_hant1_docssearchretry2 = zh_docssearchretry2;
+const zh_hant1_docssearchretry2 = /** @type {(inputs: Docssearchretry2Inputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`重試`)
+};
 
-/** @type {(inputs: Docssearchretry2Inputs) => LocalizedString} */
-const de_docssearchretry2 = en_docssearchretry2;
+const de_docssearchretry2 = /** @type {(inputs: Docssearchretry2Inputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Erneut versuchen`)
+};
 
-/** @type {(inputs: Docssearchretry2Inputs) => LocalizedString} */
-const fr_docssearchretry2 = en_docssearchretry2;
+const fr_docssearchretry2 = /** @type {(inputs: Docssearchretry2Inputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Réessayer`)
+};
 
-/** @type {(inputs: Docssearchretry2Inputs) => LocalizedString} */
-const uk_docssearchretry2 = en_docssearchretry2;
+const uk_docssearchretry2 = /** @type {(inputs: Docssearchretry2Inputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Спробувати ще раз`)
+};
 
 /**
 * | output |

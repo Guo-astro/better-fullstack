@@ -8,10 +8,10 @@ import { useTheme } from "@/lib/content/theme";
  * point kept in view when narrow screens crop the sides.
  */
 const SCENES = [
-  { id: "owlshead", focus: "43%" },
-  { id: "wilderness", focus: "50%" },
-  { id: "bostonharbor", focus: "30%" },
-  { id: "harbor", focus: "62%" },
+  { id: "owlshead", focus: "43%", width: 2560 },
+  { id: "wilderness", focus: "50%", width: 2560 },
+  { id: "bostonharbor", focus: "30%", width: 2560 },
+  { id: "harbor", focus: "62%", width: 2000 },
 ] as const;
 
 /** Hashed URLs, so the paintings cache forever and a re-grade ships under a new name. */
@@ -47,7 +47,6 @@ type SceneTime = "day" | "night";
 const SCENE_WIDTHS = [
   [1280, "-1280"],
   [1920, "-1920"],
-  [2560, ""],
 ] as const;
 
 export const SCENE_SIZES = "(max-width: 832px) 560px, 100vw";
@@ -61,9 +60,10 @@ export function sceneImage(scene: Scene, time: SceneTime) {
 }
 
 export function sceneSrcSet(scene: Scene, time: SceneTime) {
-  return SCENE_WIDTHS.map(([width, suffix]) => `${sceneFile(scene, time, suffix)} ${width}w`).join(
-    ", ",
-  );
+  return [
+    ...SCENE_WIDTHS.map(([width, suffix]) => `${sceneFile(scene, time, suffix)} ${width}w`),
+    `${sceneImage(scene, time)} ${scene.width}w`,
+  ].join(", ");
 }
 
 const SCENE_SRCSETS = Object.fromEntries(

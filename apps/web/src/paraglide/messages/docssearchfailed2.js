@@ -9,29 +9,37 @@ const en_docssearchfailed2 = /** @type {(inputs: Docssearchfailed2Inputs) => Loc
 	return /** @type {LocalizedString} */ (`Search couldn't load.`)
 };
 
-/** @type {(inputs: Docssearchfailed2Inputs) => LocalizedString} */
-const es_docssearchfailed2 = en_docssearchfailed2;
+const es_docssearchfailed2 = /** @type {(inputs: Docssearchfailed2Inputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`No se pudo cargar la búsqueda.`)
+};
 
-/** @type {(inputs: Docssearchfailed2Inputs) => LocalizedString} */
-const zh_docssearchfailed2 = en_docssearchfailed2;
+const zh_docssearchfailed2 = /** @type {(inputs: Docssearchfailed2Inputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`搜索加载失败。`)
+};
 
-/** @type {(inputs: Docssearchfailed2Inputs) => LocalizedString} */
-const ja_docssearchfailed2 = en_docssearchfailed2;
+const ja_docssearchfailed2 = /** @type {(inputs: Docssearchfailed2Inputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`検索を読み込めませんでした。`)
+};
 
-/** @type {(inputs: Docssearchfailed2Inputs) => LocalizedString} */
-const ko_docssearchfailed2 = en_docssearchfailed2;
+const ko_docssearchfailed2 = /** @type {(inputs: Docssearchfailed2Inputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`검색을 불러오지 못했습니다.`)
+};
 
-/** @type {(inputs: Docssearchfailed2Inputs) => LocalizedString} */
-const zh_hant1_docssearchfailed2 = zh_docssearchfailed2;
+const zh_hant1_docssearchfailed2 = /** @type {(inputs: Docssearchfailed2Inputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`搜尋載入失敗。`)
+};
 
-/** @type {(inputs: Docssearchfailed2Inputs) => LocalizedString} */
-const de_docssearchfailed2 = en_docssearchfailed2;
+const de_docssearchfailed2 = /** @type {(inputs: Docssearchfailed2Inputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Suche konnte nicht geladen werden.`)
+};
 
-/** @type {(inputs: Docssearchfailed2Inputs) => LocalizedString} */
-const fr_docssearchfailed2 = en_docssearchfailed2;
+const fr_docssearchfailed2 = /** @type {(inputs: Docssearchfailed2Inputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`La recherche n'a pas pu être chargée.`)
+};
 
-/** @type {(inputs: Docssearchfailed2Inputs) => LocalizedString} */
-const uk_docssearchfailed2 = en_docssearchfailed2;
+const uk_docssearchfailed2 = /** @type {(inputs: Docssearchfailed2Inputs) => LocalizedString} */ () => {
+	return /** @type {LocalizedString} */ (`Не вдалося завантажити пошук.`)
+};
 
 /**
 * | output |

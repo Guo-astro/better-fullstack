@@ -617,6 +617,8 @@
   "docsCloseSearch": "Закрити пошук",
   "docsSearchPlaceholder": "Шукати в документації...",
   "docsSearchLoading": "Завантажуємо пошук...",
+  "docsSearchFailed": "Не вдалося завантажити пошук.",
+  "docsSearchRetry": "Спробувати ще раз",
   "docsTypeToSearch": "Почніть вводити запит",
   "docsNoResultsPrefix": "Немає результатів для",
   "docsSearchNavigate": "Навігація",

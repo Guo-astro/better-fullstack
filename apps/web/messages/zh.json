@@ -616,6 +616,8 @@
   "docsCloseSearch": "关闭搜索",
   "docsSearchPlaceholder": "搜索文档...",
   "docsSearchLoading": "正在加载搜索...",
+  "docsSearchFailed": "搜索加载失败。",
+  "docsSearchRetry": "重试",
   "docsTypeToSearch": "输入内容开始搜索",
   "docsNoResultsPrefix": "没有结果：",
   "docsSearchNavigate": "导航",
