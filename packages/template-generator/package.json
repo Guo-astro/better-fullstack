@@ -59,6 +59,7 @@
     "build": "tsdown",
     "prepublishOnly": "bun run build",
     "dev": "tsdown --watch",
+    "pretest": "test -f src/templates.generated.ts || bun run generate-templates",
     "test": "bun run typecheck:test && bun test",
     "test:watch": "bun test --watch",
     "prelint": "test -f src/templates.generated.ts || bun run generate-templates",

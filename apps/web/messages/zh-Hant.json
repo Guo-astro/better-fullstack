@@ -616,6 +616,8 @@
   "docsCloseSearch": "關閉搜尋",
   "docsSearchPlaceholder": "搜尋文件...",
   "docsSearchLoading": "正在加載搜尋...",
+  "docsSearchFailed": "搜尋載入失敗。",
+  "docsSearchRetry": "重試",
   "docsTypeToSearch": "輸入內容開始搜尋",
   "docsNoResultsPrefix": "沒有結果：",
   "docsSearchNavigate": "導航",

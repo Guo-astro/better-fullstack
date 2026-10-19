@@ -616,6 +616,8 @@
   "docsCloseSearch": "Fermer la recherche",
   "docsSearchPlaceholder": "Rechercher des documents...",
   "docsSearchLoading": "Chargement de la recherche...",
+  "docsSearchFailed": "La recherche n'a pas pu être chargée.",
+  "docsSearchRetry": "Réessayer",
   "docsTypeToSearch": "Tapez pour rechercher",
   "docsNoResultsPrefix": "Aucun résultat pour",
   "docsSearchNavigate": "Naviguer",

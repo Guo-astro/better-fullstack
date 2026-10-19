@@ -616,6 +616,8 @@
   "docsCloseSearch": "검색 닫기",
   "docsSearchPlaceholder": "문서 검색...",
   "docsSearchLoading": "검색 로드 중...",
+  "docsSearchFailed": "검색을 불러오지 못했습니다.",
+  "docsSearchRetry": "다시 시도",
   "docsTypeToSearch": "검색하려면 입력하세요.",
   "docsNoResultsPrefix": "다음에 대한 검색결과가 없습니다.",
   "docsSearchNavigate": "탐색",
