@@ -1,4 +1,4 @@
-import { lazy, type ComponentType } from "react";
+import { lazy, Suspense, type ComponentType, type ReactNode } from "react";
 
 import { BrowserTelemetryControls } from "@/components/docs/mdx/browser-telemetry-controls";
 import { Callout } from "@/components/docs/mdx/callout";
@@ -25,18 +25,28 @@ import { PMTabs } from "@/components/docs/mdx/pm-tabs";
 import { DocsTable } from "@/components/docs/mdx/table";
 import { VerificationStatus } from "@/components/docs/mdx/verification-status";
 
-function lazyMdx<P extends object>(load: () => Promise<ComponentType<P>>) {
-  return lazy(async () => ({ default: await load() }));
+function lazyMdx<P extends object>(load: () => Promise<ComponentType<P>>, fallback: ReactNode) {
+  const Lazy = lazy(async () => ({ default: await load() }));
+  return function LazyMdxComponent(props: P) {
+    return (
+      <Suspense fallback={fallback}>
+        <Lazy {...props} />
+      </Suspense>
+    );
+  };
 }
 
-const CliFlagTable = lazyMdx(() =>
-  import("@/components/docs/mdx/cli-flags-table").then((mod) => mod.CliFlagTable),
+const CliFlagTable = lazyMdx(
+  () => import("@/components/docs/mdx/cli-flags-table").then((mod) => mod.CliFlagTable),
+  <div className="not-prose my-6 min-h-80 rounded-lg border border-[var(--docs-border-subtle)]" />,
 );
-const StarterPackCta = lazyMdx(() =>
-  import("@/components/docs/mdx/starter-pack-cta").then((mod) => mod.StarterPackCta),
+const StarterPackCta = lazyMdx(
+  () => import("@/components/docs/mdx/starter-pack-cta").then((mod) => mod.StarterPackCta),
+  <div className="not-prose my-8 min-h-72 rounded-md border border-border" />,
 );
-const StarterPackHub = lazyMdx(() =>
-  import("@/components/docs/mdx/starter-pack-cta").then((mod) => mod.StarterPackHub),
+const StarterPackHub = lazyMdx(
+  () => import("@/components/docs/mdx/starter-pack-cta").then((mod) => mod.StarterPackHub),
+  <div className="not-prose my-8 min-h-[54rem] sm:min-h-[27rem]" />,
 );
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
