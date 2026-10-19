@@ -219,6 +219,7 @@ export function trackProductEvent(
   const properties = { ...pageContext, ...input };
 
   const send = (safe: ProductAnalyticsProperties) => {
+    if (!isBrowserTelemetryEnabled()) return;
     const payload = JSON.stringify({
       ...safe,
       eventId: crypto.randomUUID(),

@@ -2,8 +2,10 @@ import { TELEMETRY_STACK_DIMENSION_KEYS } from "@better-fullstack/types/telemetr
 import { describe, expect, it } from "bun:test";
 
 import {
+  BROWSER_TELEMETRY_DISABLED_KEY,
   PAGE_PROPERTY_KEYS,
   resolveBrowserTelemetryStatus,
+  trackProductEvent,
 } from "@/lib/analytics/product-analytics";
 import { sanitizeProductProperties } from "@/lib/analytics/product-properties";
 
@@ -55,6 +57,48 @@ describe("browser product analytics", () => {
   it("sends page events without the stack sanitizer only for non-stack keys", () => {
     for (const key of PAGE_PROPERTY_KEYS) {
       expect(TELEMETRY_STACK_DIMENSION_KEYS as readonly string[]).not.toContain(key);
+    }
+  });
+
+  it("drops a stack event when telemetry is disabled while the sanitizer loads", async () => {
+    const store = new Map<string, string>();
+    const requests: unknown[] = [];
+    const previous = {
+      window: globalThis.window,
+      fetch: globalThis.fetch,
+      enabled: process.env.VITE_BFS_TELEMETRY_ENABLED,
+    };
+    const fakeWindow = {
+      localStorage: {
+        getItem: (key: string) => store.get(key) ?? null,
+        setItem: (key: string, value: string) => store.set(key, value),
+        removeItem: (key: string) => store.delete(key),
+      },
+      navigator: {},
+      dispatchEvent: () => true,
+    };
+    Object.assign(globalThis, {
+      window: fakeWindow,
+      fetch: (...args: unknown[]) => {
+        requests.push(args);
+        return Promise.resolve(new Response());
+      },
+    });
+    process.env.VITE_BFS_TELEMETRY_ENABLED = "1";
+    const settled = () => new Promise((resolve) => setTimeout(resolve, 50));
+    try {
+      trackProductEvent("builder_generate", "started", { ecosystem: "typescript" });
+      store.set(BROWSER_TELEMETRY_DISABLED_KEY, "1");
+      await settled();
+      expect(requests).toHaveLength(0);
+
+      store.delete(BROWSER_TELEMETRY_DISABLED_KEY);
+      trackProductEvent("builder_generate", "started", { ecosystem: "typescript" });
+      await settled();
+      expect(requests).toHaveLength(1);
+    } finally {
+      Object.assign(globalThis, { window: previous.window, fetch: previous.fetch });
+      process.env.VITE_BFS_TELEMETRY_ENABLED = previous.enabled;
     }
   });
 

@@ -632,6 +632,8 @@
   "docsCloseSearch": "Close search",
   "docsSearchPlaceholder": "Search docs...",
   "docsSearchLoading": "Loading search...",
+  "docsSearchFailed": "Search couldn't load.",
+  "docsSearchRetry": "Try again",
   "docsTypeToSearch": "Type to search",
   "docsNoResultsPrefix": "No results for",
   "docsSearchNavigate": "Navigate",

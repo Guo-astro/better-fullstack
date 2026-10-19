@@ -1,4 +1,4 @@
-import { lazy, Suspense, type ComponentType } from "react";
+import { lazy, type ComponentType } from "react";
 
 import { BrowserTelemetryControls } from "@/components/docs/mdx/browser-telemetry-controls";
 import { Callout } from "@/components/docs/mdx/callout";
@@ -26,14 +26,7 @@ import { DocsTable } from "@/components/docs/mdx/table";
 import { VerificationStatus } from "@/components/docs/mdx/verification-status";
 
 function lazyMdx<P extends object>(load: () => Promise<ComponentType<P>>) {
-  const Lazy = lazy(async () => ({ default: await load() }));
-  return function LazyMdxComponent(props: P) {
-    return (
-      <Suspense fallback={null}>
-        <Lazy {...props} />
-      </Suspense>
-    );
-  };
+  return lazy(async () => ({ default: await load() }));
 }
 
 const CliFlagTable = lazyMdx(() =>

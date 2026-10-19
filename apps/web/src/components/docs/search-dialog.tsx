@@ -80,6 +80,7 @@ export function DocsSearchDialog({
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [search, setSearch] = useState<DocSearch | null>(null);
+  const [searchFailed, setSearchFailed] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
   const locale = getLocale();
@@ -94,22 +95,26 @@ export function DocsSearchDialog({
   // Lazy-init Orama on first open. The promise is cached so repeat opens
   // don't rebuild the index.
   useEffect(() => {
-    if (!open || search) return;
+    if (!open || search || searchFailed) return;
     let cancelled = false;
     const init = async () => {
-      const [{ loadSearchSections }, { createDocSearch }] = await Promise.all([
-        import("@/lib/docs/search-data"),
-        import("@/lib/docs/search"),
-      ]);
-      const sections = await loadSearchSections();
-      const instance = await createDocSearch(sections, locale);
-      if (!cancelled) setSearch(instance);
+      try {
+        const [{ loadSearchSections }, { createDocSearch }] = await Promise.all([
+          import("@/lib/docs/search-data"),
+          import("@/lib/docs/search"),
+        ]);
+        const sections = await loadSearchSections();
+        const instance = await createDocSearch(sections, locale);
+        if (!cancelled) setSearch(instance);
+      } catch {
+        if (!cancelled) setSearchFailed(true);
+      }
     };
     void init();
     return () => {
       cancelled = true;
     };
-  }, [locale, open, search]);
+  }, [locale, open, search, searchFailed]);
 
   // Run the query whenever input changes.
   useEffect(() => {
@@ -136,6 +141,7 @@ export function DocsSearchDialog({
     setQuery("");
     setHits([]);
     setActiveIndex(0);
+    setSearchFailed(false);
   }, [open]);
 
   useEffect(() => {
@@ -288,7 +294,20 @@ export function DocsSearchDialog({
             </div>
 
             <div ref={listRef} className="max-h-[min(60vh,24rem)] overflow-y-auto p-1.5">
-              {searching && !search ? (
+              {searching && searchFailed ? (
+                <Empty>
+                  <span className="flex flex-col items-center gap-3">
+                    {m.docsSearchFailed()}
+                    <button
+                      type="button"
+                      onClick={() => setSearchFailed(false)}
+                      className="rounded-md border border-[var(--docs-panel-border)] px-2.5 py-1 text-foreground transition-colors hover:bg-[var(--docs-panel)]"
+                    >
+                      {m.docsSearchRetry()}
+                    </button>
+                  </span>
+                </Empty>
+              ) : searching && !search ? (
                 <Empty>{m.docsSearchLoading()}</Empty>
               ) : searching && hits.length === 0 ? (
                 <Empty>
