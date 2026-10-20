@@ -55,6 +55,14 @@ describe("multi-ecosystem project output", () => {
     }
   });
 
+  it("renders a single non-TypeScript backend graph with the flat root layout", async () => {
+    const output = await generate(["backend:rust:axum"]);
+    expect(output.has("Cargo.toml")).toBe(true);
+    expect(output.has("crates/server/src/main.rs")).toBe(true);
+    expect([...output.keys()].some((path) => path.startsWith("apps/"))).toBe(false);
+    expect(output.has("scripts/dev.sh")).toBe(false);
+  });
+
   it("rejects ownerless MSW in a native-only graph before emitting partial output", async () => {
     const config = configFor(["backend:go:gin", "testing:typescript:msw"]);
     const result = await generateVirtualProject({ config, templates: EMBEDDED_TEMPLATES });

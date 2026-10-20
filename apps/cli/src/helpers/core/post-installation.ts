@@ -2,10 +2,11 @@ import {
   getCategoryDisplayName,
   getLocalWebDevPort,
   getOptionMetadata,
+  getStandaloneBackendEcosystem,
   hasJavaScriptWorkspaceRoot,
   isToolingOverlayOnly,
-  type OptionCategory,
   toDotnetIdentifierSegment,
+  type OptionCategory,
 } from "@better-fullstack/types";
 import { consola } from "consola";
 import pc from "picocolors";
@@ -49,14 +50,20 @@ export async function displayPostInstallInstructions(
     dbSetup,
     webDeploy,
     serverDeploy,
-    ecosystem,
   } = config;
+
+  const standaloneEcosystem = getStandaloneBackendEcosystem(config.stackParts);
+  const ecosystem = standaloneEcosystem ?? config.ecosystem;
 
   if (ecosystem !== "typescript" && addons?.includes("gitleaks")) {
     consola.box(getGitleaksInstructions("gitleaks", false, config.git));
   }
 
-  if (config.stackParts?.length && !isToolingOverlayOnly(config.stackParts)) {
+  if (
+    config.stackParts?.length &&
+    !isToolingOverlayOnly(config.stackParts) &&
+    !standaloneEcosystem
+  ) {
     const { getGraphProjectTasks } = await import("@better-fullstack/template-generator");
     const tasks = getGraphProjectTasks(config);
     const hasJavaScript = hasJavaScriptWorkspaceRoot(config.stackParts);

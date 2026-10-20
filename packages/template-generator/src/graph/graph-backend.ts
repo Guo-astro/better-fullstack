@@ -1,6 +1,7 @@
 import {
   getLocalWebDevPort,
   getRoleTargetPath,
+  getStandaloneBackendEcosystem,
   type ProjectConfig,
   type StackPart,
 } from "@better-fullstack/types";
@@ -73,7 +74,9 @@ function getRawGraphBackendConnection(config: ProjectConfig): GraphBackendConnec
 
   if (!backend) return null;
 
-  const targetPath = backend.targetPath ?? getRoleTargetPath("backend") ?? "apps/server";
+  const targetPath = getStandaloneBackendEcosystem(config.stackParts)
+    ? "."
+    : (backend.targetPath ?? getRoleTargetPath("backend") ?? "apps/server");
   const label = BACKEND_LABELS[backend.toolId] ?? `${backend.ecosystem} ${backend.toolId}`;
   const graphFrontends = getGraphWebFrontends(config);
   const graphFrontend = graphFrontends[0];

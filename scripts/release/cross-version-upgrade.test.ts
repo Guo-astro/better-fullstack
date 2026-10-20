@@ -141,7 +141,7 @@ if (action === "update" && !args.includes("--apply")) {
     files: [{ path: "y-managed.ts" }, { path: "z-managed.ts" }],
     manual: [],
     reviewToken: token,
-    summary: { drift: 1, userEdited: hasUserEdit ? 1 : 0 },
+    summary: { drift: 1, unchanged: 3, userEdited: hasUserEdit ? 1 : 0 },
     userEdited: hasUserEdit ? ["y-managed.ts"] : [],
     lifecycle: {
       provenance: {

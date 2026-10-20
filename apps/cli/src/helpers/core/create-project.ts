@@ -29,7 +29,7 @@ import {
 import { formatProject } from "@/platform/file-formatter";
 import { isSilent } from "@/presentation/context";
 import { ProjectCreationError, type CreationStage } from "@/telemetry/creation-failure";
-import { isToolingOverlayOnly, type ProjectConfig } from "@/types";
+import { getStandaloneBackendEcosystem, isToolingOverlayOnly, type ProjectConfig } from "@/types";
 
 export interface CreateProjectOptions {
   manualDb?: boolean;
@@ -126,8 +126,12 @@ export async function createProject(options: ProjectConfig, cliInput: CreateProj
     const repositoryInitialized = await initializeGit(projectDir, options.git);
 
     failureStage = "dependency_install";
+    const standaloneEcosystem = getStandaloneBackendEcosystem(options.stackParts);
     const usesGraph =
-      Boolean(options.stackParts?.length) && !isToolingOverlayOnly(options.stackParts);
+      Boolean(options.stackParts?.length) &&
+      !isToolingOverlayOnly(options.stackParts) &&
+      !standaloneEcosystem;
+    const installEcosystem = standaloneEcosystem ?? options.ecosystem;
     if (options.install && usesGraph) {
       for (const task of getGraphProjectTasks(options)) {
         if (!task.setup) continue;
@@ -156,7 +160,7 @@ export async function createProject(options: ProjectConfig, cliInput: CreateProj
     if (
       options.install &&
       !usesGraph &&
-      (options.ecosystem === "typescript" || options.ecosystem === "react-native")
+      (installEcosystem === "typescript" || installEcosystem === "react-native")
     ) {
       const result = await installDependencies({
         projectDir,
@@ -166,13 +170,13 @@ export async function createProject(options: ProjectConfig, cliInput: CreateProj
     }
 
     // Run cargo build for Rust projects
-    if (options.install && !usesGraph && options.ecosystem === "rust") {
+    if (options.install && !usesGraph && installEcosystem === "rust") {
       const result = await runCargoBuild({ projectDir });
       if (!result.success) setupFailures.push(result);
     }
 
     // Install Python dependencies with the selected Python package manager.
-    if (options.install && !usesGraph && options.ecosystem === "python") {
+    if (options.install && !usesGraph && installEcosystem === "python") {
       const result = await runPythonInstall({
         projectDir,
         packageManager: options.pythonPackageManager,
@@ -181,7 +185,7 @@ export async function createProject(options: ProjectConfig, cliInput: CreateProj
     }
 
     // Run go mod tidy for Go projects
-    if (options.install && !usesGraph && options.ecosystem === "go") {
+    if (options.install && !usesGraph && installEcosystem === "go") {
       const result = await runGoModTidy({ projectDir });
       if (!result.success) setupFailures.push(result);
     }
@@ -190,7 +194,7 @@ export async function createProject(options: ProjectConfig, cliInput: CreateProj
     if (
       options.install &&
       !usesGraph &&
-      options.ecosystem === "java" &&
+      installEcosystem === "java" &&
       options.javaBuildTool !== "none"
     ) {
       const result =
@@ -200,7 +204,7 @@ export async function createProject(options: ProjectConfig, cliInput: CreateProj
       if (!result.success) setupFailures.push(result);
     }
 
-    if (options.install && !usesGraph && options.ecosystem === "elixir") {
+    if (options.install && !usesGraph && installEcosystem === "elixir") {
       const result = await runMixCompile({ projectDir });
       if (!result.success) setupFailures.push(result);
     }

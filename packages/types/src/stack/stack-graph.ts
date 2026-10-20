@@ -18,6 +18,7 @@ import {
   getToolingCategory,
   getToolingSelectionOptions,
   TOOLING_CAPABILITIES,
+  toolingRequiresJavaScriptWorkspace,
 } from "@/capabilities/tooling-capabilities";
 import {
   API_VALUES,
@@ -1305,6 +1306,20 @@ function isLegacyBackendEcosystem(
   ecosystem: StackPartEcosystem | undefined,
 ): ecosystem is LegacyBackendEcosystem {
   return ecosystem !== undefined && ecosystem in LEGACY_BACKEND_CATEGORY_BY_ECOSYSTEM;
+}
+
+export function getStandaloneBackendEcosystem(
+  parts: readonly StackPart[] | undefined,
+): LegacyBackendEcosystem | undefined {
+  const primaries = (parts ?? []).filter(
+    (part) =>
+      !part.ownerPartId &&
+      part.source !== "provided" &&
+      (part.role === "frontend" || part.role === "backend" || part.role === "mobile"),
+  );
+  const [backend] = primaries;
+  if (primaries.length !== 1 || !backend || backend.role !== "backend") return undefined;
+  return isLegacyBackendEcosystem(backend.ecosystem) ? backend.ecosystem : undefined;
 }
 
 function allowsCrossEcosystemOwner(
@@ -3725,8 +3740,12 @@ export function legacyProjectConfigToStackParts(
     throw new Error("Multiple primary mobile frontends are not supported in the stack graph.");
   }
 
-  const webFrontend = webFrontends[0];
-  const nativeFrontend = nativeFrontends[0];
+  const ownsTypeScriptParts =
+    config.ecosystem === undefined ||
+    config.ecosystem === "typescript" ||
+    config.ecosystem === "react-native";
+  const webFrontend = ownsTypeScriptParts ? webFrontends[0] : undefined;
+  const nativeFrontend = ownsTypeScriptParts ? nativeFrontends[0] : undefined;
   const frontendPart = addLegacyPart(parts, "frontend", "typescript", webFrontend, source);
   const mobilePart = addLegacyPart(parts, "mobile", "react-native", nativeFrontend, source);
   addLegacyPart(parts, "frontend", "dotnet", config.dotnetFrontend, source);
@@ -3770,6 +3789,7 @@ export function legacyProjectConfigToStackParts(
   }
 
   for (const addon of config.addons ?? []) {
+    if (!ownsTypeScriptParts && toolingRequiresJavaScriptWorkspace(addon)) continue;
     addLegacyAddonPart(parts, addon, source, frontendPart, backendPart);
   }
   for (const example of config.examples ?? []) {
@@ -3780,11 +3800,7 @@ export function legacyProjectConfigToStackParts(
   // stacks. For other ecosystems these are inert TS defaults and the ecosystem-specific
   // blocks below own the real bindings - mapping the generic fields there would emit
   // invalid or duplicate capability parts (e.g. `auth:go:better-auth` alongside `goAuth`).
-  if (
-    config.ecosystem === undefined ||
-    config.ecosystem === "typescript" ||
-    config.ecosystem === "react-native"
-  ) {
+  if (ownsTypeScriptParts) {
     addLegacyPart(parts, "orm", "typescript", config.orm, source, capabilityOwner);
     addLegacyPart(parts, "api", "typescript", config.api, source, capabilityOwner);
     addLegacyPart(

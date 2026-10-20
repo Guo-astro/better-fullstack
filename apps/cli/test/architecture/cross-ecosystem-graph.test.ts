@@ -186,7 +186,7 @@ describe("Cross-ecosystem graph generation", () => {
     );
   });
 
-  it("keeps server-only graph containers in the backend target path", async () => {
+  it("keeps server-only graph containers at the project root", async () => {
     const result = await createVirtual({
       projectName: "python-kong-server-only",
       frontend: [],
@@ -200,10 +200,10 @@ describe("Cross-ecosystem graph generation", () => {
     expect(result.success).toBe(true);
     const root = result.tree!.root;
     const compose = fileContent(root, "docker-compose.yml");
-    expect(compose).toContain("context: apps/server");
-    expect(compose).toContain("- apps/server/.env");
-    expect(fileContent(root, "apps/server/Dockerfile")).toContain("FROM python:3.12-slim");
-    expect(fileContent(root, "apps/server/.dockerignore")).toContain(".env*");
+    expect(compose).toContain("context: .");
+    expect(compose).toContain("- .env");
+    expect(fileContent(root, "Dockerfile")).toContain("FROM python:3.12-slim");
+    expect(fileContent(root, ".dockerignore")).toContain(".env*");
   });
 
   it("connects a TypeScript Next frontend to an Elixir Phoenix backend", async () => {
@@ -368,7 +368,7 @@ describe("Cross-ecosystem graph generation", () => {
     expect(readme).not.toContain("bun run dev");
   });
 
-  it("keeps graph-only non-TypeScript GitHub Actions rooted in the backend app", async () => {
+  it("keeps graph-only non-TypeScript GitHub Actions at the project root", async () => {
     const result = await createVirtual({
       projectName: "graph-python-ci",
       ecosystem: "python",
@@ -383,7 +383,7 @@ describe("Cross-ecosystem graph generation", () => {
     expect(result.success).toBe(true);
 
     const workflow = fileContent(result.tree!.root, ".github/workflows/ci.yml");
-    expect(workflow).toContain('working-directory: "apps/server"');
+    expect(workflow).not.toContain("working-directory");
     expect(workflow).toContain("if [ -f pyproject.toml ]; then pip install -e");
     expect(workflow).toContain("run: pytest");
   });

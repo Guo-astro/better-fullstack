@@ -664,7 +664,7 @@ describe("Virtual Generator Regressions", () => {
       const workflow = readTextFromTree(result.tree!, ".github/workflows/ci.yml");
       const rootPackageJson = readJsonFromTree(result.tree!, "package.json");
 
-      expect(workflow).toContain('working-directory: "apps/server"');
+      expect(workflow).not.toContain("working-directory");
       for (const expected of testCase.workflowIncludes) {
         expect(workflow).toContain(expected);
       }

@@ -142,13 +142,13 @@ test("failed native installation retains the setup command in next steps", async
       flags,
       env: { PATH: `${join(directory, "bin")}:${process.env.PATH}` },
       timeoutMs: 30_000,
-      expectedFiles: ["bts.jsonc", "scripts/setup.sh"],
+      expectedFiles: ["bts.jsonc", "go.mod"],
     });
     expect(result.timedOut, formatCliScaffoldFailure(result)).toBe(false);
     expect(result.missingExpectedFiles, formatCliScaffoldFailure(result)).toBeUndefined();
     expect(result.stdout).toContain("Next steps");
     expect(result.stdout.split("Next steps")[1]).toContain("go mod tidy");
-    expect(result.stdout.split("Next steps")[1]).toContain("bash scripts/dev.sh");
+    expect(result.stdout.split("Next steps")[1]).toContain("go run cmd/server/main.go");
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
@@ -208,12 +208,10 @@ test("installs a native service named workspace with its own toolchain", async (
       flags: ["--part", "backend:go:gin:workspace", "--ai-docs", "none", "--no-git", "--yes"],
       env: { PATH: `${join(directory, "bin")}:${process.env.PATH}`, GRAPH_INSTALL_LOG: logPath },
       timeoutMs: 30_000,
-      expectedFiles: ["bts.jsonc", "apps/server/go.mod"],
+      expectedFiles: ["bts.jsonc", "go.mod"],
     });
     expect(result.ok, formatCliScaffoldFailure(result)).toBe(true);
-    expect((await readFile(logPath, "utf8")).trim()).toBe(
-      `${result.projectDir}/apps/server|mod tidy`,
-    );
+    expect((await readFile(logPath, "utf8")).trim()).toBe(`${result.projectDir}|mod tidy`);
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

@@ -1945,6 +1945,22 @@ describe("stack graph structural round-trip (phase 0)", () => {
     }
   });
 
+  it("ignores inert TypeScript frontend defaults for legacy-ecosystem projects", () => {
+    const parts = legacyProjectConfigToStackParts({
+      ecosystem: "rust",
+      frontend: ["tanstack-router"],
+      rustWebFramework: "axum",
+      rustOrm: "sea-orm",
+      database: "sqlite",
+      addons: ["turborepo"],
+    });
+
+    expect(parts.some((part) => part.role === "frontend")).toBe(false);
+    expect(parts.some((part) => part.toolId === "turborepo")).toBe(false);
+    expect(parts.find((part) => part.role === "backend")?.ecosystem).toBe("rust");
+    expect(stackPartsToLegacyProjectConfigPartial(parts).ecosystem).toBe("rust");
+  });
+
   it("round-trips every legacy-ecosystem backend and capability value", () => {
     const cases = [
       {
