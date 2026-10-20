@@ -1,8 +1,7 @@
 This file provides the small set of project-wide instructions agents should read before working in Better-Fullstack. Keep detailed, area-specific guidance in `docs/guidelines/` instead of growing this file with task notes.
 
 For documentation work or when the right source of project knowledge is unclear, read
-`docs/README.md`. It defines document authority, lifecycle, and routing. Use
-`docs/next-updates-roadmap.md` for product priority.
+`docs/README.md`. It defines document authority and routing.
 
 ## Guidelines
 

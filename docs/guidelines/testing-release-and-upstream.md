@@ -115,5 +115,3 @@ The report classifies likely backport candidates into `reliability`, `dependency
    build when routes or bundles change. Root `bun run check` formats the whole repository; avoid it
    for a scoped backport in a dirty worktree.
 5. Keep each backport focused by theme. Commit, push, and PR creation need the user's authorization.
-
-Use `docs/projects/README.md` as the stable entry point for current project documents.

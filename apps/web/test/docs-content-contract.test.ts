@@ -1,8 +1,4 @@
-import {
-  OPTION_CATEGORY_METADATA,
-  STACK_SELECTION_URL_KEYS,
-  STARTER_TRACK_FILTER_URL_KEYS,
-} from "@better-fullstack/types";
+import { STACK_SELECTION_URL_KEYS, STARTER_TRACK_FILTER_URL_KEYS } from "@better-fullstack/types";
 import { describe, expect, it } from "bun:test";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
@@ -20,7 +16,6 @@ const DOCS_ROOT = join(CONTENT_ROOT, "docs");
 const GUIDES_ROOT = join(CONTENT_ROOT, "guides");
 const BLOG_ROOT = join(CONTENT_ROOT, "blog");
 const LOCALIZED_CONTENT_ROOT = join(CONTENT_ROOT, "i18n");
-const PROJECT_BACKLOG_ROOT = join(WEB_ROOT, "../../docs/projects/backlog");
 const PLUGIN_SKILLS_ROOT = join(WEB_ROOT, "../../plugin/skills");
 const REPOSITORY_README = join(WEB_ROOT, "../../README.md");
 const NPM_README = join(WEB_ROOT, "../cli/README.md");
@@ -637,27 +632,6 @@ describe("docs content contract", () => {
     expect(manualInventories).toEqual([]);
     expect(misCasedAgentFiles).toEqual([]);
     expect(readFileSync(join(DOCS_ROOT, "ecosystems/index.mdx"), "utf8")).toContain(".NET SDK 10");
-  });
-
-  it("does not leave already-registered options as unchecked add work", () => {
-    const registeredOptions = new Set(
-      Object.values(OPTION_CATEGORY_METADATA).flatMap((metadata) =>
-        metadata.options.flatMap((option) => [option.id, option.cliValue]),
-      ),
-    );
-    const staleRows = walkFiles(PROJECT_BACKLOG_ROOT, (path) => path.endsWith(".md")).flatMap(
-      (path) => {
-        const source = readFileSync(path, "utf8");
-        return [...source.matchAll(/^- \[ \] Add `([^`]+)`/gm)]
-          .filter((match) => registeredOptions.has(match[1]))
-          .map(
-            (match) =>
-              `${relative(WEB_ROOT, path)}:${lineNumberForIndex(source, match.index)} ${match[1]}`,
-          );
-      },
-    );
-
-    expect(staleRows).toEqual([]);
   });
 
   it("makes pending translations fall back to current English content", () => {
