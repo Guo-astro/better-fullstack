@@ -148,6 +148,32 @@ export async function runCargoBuild({
   }
 }
 
+export async function runDotnetRestore({
+  projectDir,
+}: {
+  projectDir: string;
+}): Promise<SetupStepResult> {
+  const s = spinner();
+  const step = "dotnet restore";
+
+  try {
+    s.start("Running dotnet restore...");
+
+    await $({
+      cwd: projectDir,
+      stderr: ["inherit", "pipe"],
+    })`dotnet restore`;
+
+    s.stop(".NET dependencies restored successfully");
+    return { step, success: true };
+  } catch (error) {
+    s.stop(pc.red("dotnet restore failed"));
+    const errorMessage = toErrorMessage(error);
+    consola.error(pc.red(`dotnet restore error: ${errorMessage}`));
+    return toStepFailure(step, error, errorMessage);
+  }
+}
+
 export async function runUvSync({ projectDir }: { projectDir: string }): Promise<SetupStepResult> {
   const s = spinner();
   const step = "uv sync --extra dev (Python dependencies)";

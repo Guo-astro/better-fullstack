@@ -1319,6 +1319,9 @@ export function getStandaloneBackendEcosystem(
   );
   const [backend] = primaries;
   if (primaries.length !== 1 || !backend || backend.role !== "backend") return undefined;
+  if (backend.targetPath !== undefined && backend.targetPath !== getRoleTargetPath("backend")) {
+    return undefined;
+  }
   return isLegacyBackendEcosystem(backend.ecosystem) ? backend.ecosystem : undefined;
 }
 

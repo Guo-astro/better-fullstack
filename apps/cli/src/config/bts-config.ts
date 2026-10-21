@@ -763,10 +763,7 @@ export function recordsUnscaffoldedJavaScriptWorkspace(
   const baselinePaths = Object.keys(baselineHashes);
   const baselineHasJavaScriptEvidence = baselinePaths.some(
     (filePath) =>
-      filePath === "package.json" ||
-      filePath.endsWith("/package.json") ||
-      filePath === "deno.json" ||
-      filePath.startsWith("apps/"),
+      filePath === "package.json" || filePath.endsWith("/package.json") || filePath === "deno.json",
   );
   return (
     hasJavaScriptWorkspaceRoot(parts) &&

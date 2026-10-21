@@ -12,6 +12,7 @@ import { commitInitialScaffold, initializeGit } from "@/helpers/core/git";
 import {
   installDependencies,
   runCargoBuild,
+  runDotnetRestore,
   runGradleTests,
   runMavenTests,
   runPythonInstall,
@@ -206,6 +207,11 @@ export async function createProject(options: ProjectConfig, cliInput: CreateProj
 
     if (options.install && !usesGraph && installEcosystem === "elixir") {
       const result = await runMixCompile({ projectDir });
+      if (!result.success) setupFailures.push(result);
+    }
+
+    if (options.install && !usesGraph && installEcosystem === "dotnet") {
+      const result = await runDotnetRestore({ projectDir });
       if (!result.success) setupFailures.push(result);
     }
 

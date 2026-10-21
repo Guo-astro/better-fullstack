@@ -136,6 +136,7 @@ import {
   getAddonStackPartBinding,
   getStackPartCompatibilityIssueForPart,
   getStackPartOptions,
+  getStandaloneBackendEcosystem,
   formatStackPartSpec,
   legacyProjectConfigToStackParts,
   mergeProjectConfigSettingsIntoStackParts,
@@ -1959,6 +1960,19 @@ describe("stack graph structural round-trip (phase 0)", () => {
     expect(parts.some((part) => part.toolId === "turborepo")).toBe(false);
     expect(parts.find((part) => part.role === "backend")?.ecosystem).toBe("rust");
     expect(stackPartsToLegacyProjectConfigPartial(parts).ecosystem).toBe("rust");
+  });
+
+  it("keeps a single backend standalone only on the default backend path", () => {
+    const parts = parseStackPartSpecs(["backend:go:gin"]);
+    expect(getStandaloneBackendEcosystem(parts)).toBe("go");
+    expect(
+      getStandaloneBackendEcosystem(parts.map((part) => ({ ...part, targetPath: "services/api" }))),
+    ).toBeUndefined();
+    expect(
+      getStandaloneBackendEcosystem(
+        parseStackPartSpecs(["backend:go:gin", "frontend:typescript:next"]),
+      ),
+    ).toBeUndefined();
   });
 
   it("round-trips every legacy-ecosystem backend and capability value", () => {
