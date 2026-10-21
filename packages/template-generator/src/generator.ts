@@ -1,16 +1,17 @@
 import type { ProjectConfig, StackPart } from "@better-fullstack/types";
 
 import {
-  hasJavaScriptWorkspaceRoot,
+  parseStackPartSpecs,
+  formatStackGraphIssue,
   getCodeQualitySelectionIssue,
+  getRoleTargetPath,
   getShadcnLintFrontendIssue,
   getShadcnLintGraphFrontendIssue,
-  toolingRequiresJavaScriptWorkspace,
-  formatStackGraphIssue,
-  getRoleTargetPath,
+  getStandaloneBackendEcosystem,
+  hasJavaScriptWorkspaceRoot,
   hasVitePlusWorkspaceRoot,
   isToolingOverlayOnly,
-  parseStackPartSpecs,
+  toolingRequiresJavaScriptWorkspace,
   stackGraphToLegacyProjectConfigForEcosystem,
   validateStackParts,
 } from "@better-fullstack/types";
@@ -446,6 +447,20 @@ async function processTypeScriptWorkspaceTemplates(
   processCatalogs(vfs, config);
 }
 
+function resolveGenerationConfig(config: ProjectConfig): ProjectConfig {
+  const ecosystem = getStandaloneBackendEcosystem(config.stackParts);
+  if (!ecosystem || isToolingOverlayOnly(config.stackParts)) return config;
+  const projected = withGraphAddonSelections(
+    config,
+    stackGraphToLegacyProjectConfigForEcosystem(config, ecosystem),
+  );
+  return {
+    ...projected,
+    examples: config.examples,
+    stackParts: undefined,
+  };
+}
+
 export async function generateVirtualProject(options: GeneratorOptions): Promise<GeneratorResult> {
   try {
     const { config, templates } = options;
@@ -522,48 +537,48 @@ export async function generateVirtualProject(options: GeneratorOptions): Promise
     }
 
     const vfs = new VirtualFileSystem();
+    const generationConfig = resolveGenerationConfig(config);
+    const rendersGraph = usesGraphParts && generationConfig === config;
 
-    if (usesGraphParts) {
-      await processGraphTemplates(vfs, templates, config);
-    } else if (config.ecosystem in ECOSYSTEM_BASE_TEMPLATE_PROCESSORS) {
-      await ECOSYSTEM_BASE_TEMPLATE_PROCESSORS[config.ecosystem as NonTypeScriptTemplateEcosystem](
-        vfs,
-        templates,
-        config,
-      );
+    if (rendersGraph) {
+      await processGraphTemplates(vfs, templates, generationConfig);
+    } else if (generationConfig.ecosystem in ECOSYSTEM_BASE_TEMPLATE_PROCESSORS) {
+      await ECOSYSTEM_BASE_TEMPLATE_PROCESSORS[
+        generationConfig.ecosystem as NonTypeScriptTemplateEcosystem
+      ](vfs, templates, generationConfig);
     } else {
       // TypeScript and React Native ecosystems use package.json and TS project structure.
-      await processBaseTemplate(vfs, templates, config);
-      await processTypeScriptWorkspaceTemplates(vfs, templates, config, {
-        addonConfig: config,
+      await processBaseTemplate(vfs, templates, generationConfig);
+      await processTypeScriptWorkspaceTemplates(vfs, templates, generationConfig, {
+        addonConfig: generationConfig,
         includeDatabaseTemplates: true,
       });
 
       // Collapse the monorepo layout into a flat single-app repo when the stack
       // qualifies (thin self app). Runs last so it operates on the complete,
       // valid monorepo tree; a no-op for the default monorepo shape.
-      if (qualifiesForSingleApp(config)) {
-        flattenSingleApp(vfs, config);
+      if (qualifiesForSingleApp(generationConfig)) {
+        flattenSingleApp(vfs, generationConfig);
       }
     }
 
     if (
-      !usesGraphParts &&
-      config.ecosystem !== "typescript" &&
-      config.ecosystem !== "react-native"
+      !rendersGraph &&
+      generationConfig.ecosystem !== "typescript" &&
+      generationConfig.ecosystem !== "react-native"
     ) {
-      await processAddonTemplates(vfs, templates, config);
-      processEnvVariables(vfs, config);
+      await processAddonTemplates(vfs, templates, generationConfig);
+      processEnvVariables(vfs, generationConfig);
     }
 
-    processReadme(vfs, config);
-    processAiDocs(vfs, config);
+    processReadme(vfs, generationConfig);
+    processAiDocs(vfs, generationConfig);
 
     const tree: VirtualFileTree = {
-      root: vfs.toTree(config.projectName),
+      root: vfs.toTree(generationConfig.projectName),
       fileCount: vfs.getFileCount(),
       directoryCount: vfs.getDirectoryCount(),
-      config,
+      config: generationConfig,
     };
 
     return { success: true, tree };

@@ -4,16 +4,18 @@ import path from "node:path";
 
 import type { BetterTStackConfig, ProjectConfig } from "@/types";
 
+import { getEffectiveStack, getGraphSummary } from "@/config/graph-summary";
+import { getLatestCLIVersion } from "@/platform/get-latest-cli-version";
 import {
   createStackPart,
   getAddonStackPartBinding,
+  hasJavaScriptWorkspaceRoot,
   legacyProjectConfigToStackParts,
   mergeProjectConfigSettingsIntoStackParts,
   projectStackPartSettingsToProjectConfig,
   stackPartsToLegacyProjectConfigPartial,
+  toolingRequiresJavaScriptWorkspace,
 } from "@/types";
-import { getLatestCLIVersion } from "@/platform/get-latest-cli-version";
-import { getEffectiveStack, getGraphSummary } from "@/config/graph-summary";
 
 const BTS_CONFIG_FILE = "bts.jsonc";
 
@@ -80,6 +82,11 @@ function normalizeGraphConfigForPersistence(
       ? (legacyConfig.ecosystem ?? projectConfig.ecosystem)
       : projectConfig.ecosystem,
   };
+  if (!hasJavaScriptWorkspaceRoot(stackParts)) {
+    normalized.addons = (normalized.addons ?? []).filter(
+      (addon) => !toolingRequiresJavaScriptWorkspace(addon),
+    );
+  }
 
   if (!selectedEcosystems.has("rust")) {
     normalized.rustWebFramework = "none";
@@ -734,6 +741,59 @@ ${graphNote}
 
 ${configContent}`;
   return finalContent;
+}
+
+export const UNSCAFFOLDED_JAVASCRIPT_WORKSPACE_ERROR =
+  "bts.jsonc records a TypeScript workspace that was never scaffolded. Run `doctor --fix` to repair the config, then plan again.";
+
+export function recordsUnscaffoldedJavaScriptWorkspace(
+  stackParts: readonly StackPart[] | undefined,
+  baselineHashes: Record<string, string>,
+) {
+  const parts = stackParts ?? [];
+  const hasNonJavaScriptBackend = parts.some(
+    (part) =>
+      part.role === "backend" &&
+      !part.ownerPartId &&
+      part.source !== "provided" &&
+      part.ecosystem !== "typescript" &&
+      part.ecosystem !== "react-native" &&
+      part.ecosystem !== "universal",
+  );
+  const baselinePaths = Object.keys(baselineHashes);
+  const baselineHasJavaScriptEvidence = baselinePaths.some(
+    (filePath) =>
+      filePath === "package.json" || filePath.endsWith("/package.json") || filePath === "deno.json",
+  );
+  return (
+    hasJavaScriptWorkspaceRoot(parts) &&
+    hasNonJavaScriptBackend &&
+    baselinePaths.length > 0 &&
+    !baselineHasJavaScriptEvidence
+  );
+}
+
+export function dropUnscaffoldedJavaScriptWorkspace(config: BetterTStackConfig) {
+  const parts = config.stackParts ?? [];
+  const javaScriptPartIds = new Set(
+    parts
+      .filter(
+        (part) =>
+          part.source !== "provided" &&
+          (part.ecosystem === "typescript" || part.ecosystem === "react-native"),
+      )
+      .map((part) => part.id),
+  );
+  const kept = parts.filter(
+    (part) =>
+      !javaScriptPartIds.has(part.id) &&
+      !(part.ownerPartId && javaScriptPartIds.has(part.ownerPartId)) &&
+      !toolingRequiresJavaScriptWorkspace(part.toolId),
+  );
+  return buildBtsConfigForPersistence({ ...config, stackParts: kept } as unknown as ProjectConfig, {
+    version: config.version,
+    createdAt: config.createdAt,
+  });
 }
 
 export async function writeBtsConfig(
