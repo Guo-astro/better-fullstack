@@ -72,6 +72,14 @@ jobs:
           otp-version: 28.0.2
           elixir-version: 1.19.0
 
+      - name: Setup PHP and Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.5.12"
+          extensions: dom, filter, json, libxml, mbstring, xmlwriter
+          coverage: none
+          tools: composer:2.10.3
+
       - name: Cache Dependencies
         uses: actions/cache@v4
         with:
@@ -100,7 +108,10 @@ jobs:
       - name: Run persistent recipe runtime proof
         run: bun run test:recipe-runtime
 
-      - name: Run eight-ecosystem generated project runtime proof
+      - name: Run native PHP HTTP proof
+        run: bun run testing/php-runtime-proof.ts
+
+      - name: Run generated project runtime proof
         run: bun run testing/generated-project-proof.ts
 
       - name: Publish job summary
@@ -115,6 +126,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: generated-project-proof-${{ github.sha }}
-          path: testing/.smoke-output/generated-project-proof/
+          path: |
+            testing/.smoke-output/generated-project-proof/
+            testing/.smoke-output/php-runtime-proof/
           include-hidden-files: true
           if-no-files-found: error

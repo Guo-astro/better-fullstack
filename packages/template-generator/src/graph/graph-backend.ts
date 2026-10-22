@@ -57,6 +57,7 @@ const BACKEND_LABELS: Record<string, string> = {
   "aspnet-minimal": ".NET ASP.NET Core Minimal APIs",
   "aspnet-mvc": ".NET ASP.NET Core MVC",
   "aspnet-blazor": ".NET ASP.NET Core Blazor",
+  slim: "PHP Slim",
   phoenix: "Elixir Phoenix",
   "phoenix-live-view": "Elixir Phoenix LiveView",
 };
@@ -89,6 +90,22 @@ function getRawGraphBackendConnection(config: ProjectConfig): GraphBackendConnec
   const webOrigin = graphFrontends.length <= 1 && webPort ? `http://localhost:${webPort}` : null;
 
   switch (backend.ecosystem) {
+    case "php":
+      return {
+        partId: backend.id,
+        ecosystem: backend.ecosystem,
+        toolId: backend.toolId,
+        label,
+        targetPath,
+        webOrigin,
+        serverUrl: "http://localhost:8080",
+        healthPath: "/health",
+        healthUrl: "http://localhost:8080/health",
+        setupCommand: `cd ${targetPath} && composer install --no-interaction`,
+        devCommand: `cd ${targetPath} && composer run dev`,
+        checkCommand: `cd ${targetPath} && composer run build`,
+        testCommand: `cd ${targetPath} && composer test`,
+      };
     case "elixir": {
       const hasPhoenix = backend.toolId === "phoenix" || backend.toolId === "phoenix-live-view";
       const hasEcto = (config.stackParts ?? []).some(

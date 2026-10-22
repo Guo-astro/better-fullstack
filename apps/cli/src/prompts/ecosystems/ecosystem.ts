@@ -41,6 +41,11 @@ export const ECOSYSTEM_PROMPT_OPTIONS = [
     hint: "ASP.NET Core ecosystem with Minimal APIs, EF Core, SignalR, and more",
   },
   {
+    value: "php" as const,
+    label: "PHP",
+    hint: "Experimental Slim HTTP application with Composer and PHPUnit",
+  },
+  {
     value: "elixir" as const,
     label: "Elixir",
     hint: "Elixir ecosystem with Phoenix, LiveView, Ecto, and more",

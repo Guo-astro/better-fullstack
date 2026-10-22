@@ -24,6 +24,7 @@ const BACKEND_KEY_BY_ECOSYSTEM = {
   python: "pythonWebFramework",
   go: "goWebFramework",
   java: "javaWebFramework",
+  php: "phpWebFramework",
   elixir: "elixirWebFramework",
   dotnet: "dotnetWebFramework",
 } as const satisfies Record<Ecosystem, keyof StackState | null>;

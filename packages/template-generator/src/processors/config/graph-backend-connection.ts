@@ -27,7 +27,10 @@ export function processGraphBackendEnv(vfs: VirtualFileSystem, config: ProjectCo
         next = current.replace(/^CORS_ORIGIN=.*$/m, line);
       } else {
         const separator = current.length > 0 && !current.endsWith("\n") ? "\n" : "";
-        const comment = "# Web frontend dev origin (unset or empty = allow any origin)\n";
+        const comment =
+          connection.ecosystem === "php"
+            ? ""
+            : "# Web frontend dev origin (unset or empty = allow any origin)\n";
         next = `${current}${separator}${current.length > 0 ? "\n" : ""}${comment}${line}\n`;
       }
       vfs.writeFile(path, next);

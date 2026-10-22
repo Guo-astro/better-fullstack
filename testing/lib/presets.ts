@@ -121,6 +121,7 @@ export function makeBaseConfig(name: string, ecosystem: Ecosystem): ProjectConfi
     javaLogging: "none",
     javaLibraries: [],
     javaTestingLibraries: [],
+    phpWebFramework: ecosystem === "php" ? "slim" : "none",
     elixirWebFramework: "none",
     elixirOrm: "none",
     elixirAuth: "none",

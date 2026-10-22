@@ -32,6 +32,7 @@ import {
   type OptionCategory,
 } from "@/catalog/option-metadata";
 import { ANALYTICS_VALUES } from "@/config/schemas";
+import { PHP_RECIPE_REASONS, PHP_UNSUPPORTED_BACKEND_FIELDS } from "@/stack/php-compatibility";
 import {
   getDatabaseOrmIncompatibility,
   getDatabaseOrmRequirementIssue,
@@ -403,6 +404,7 @@ export type CompatibilityInput = {
     | "python"
     | "go"
     | "java"
+    | "php"
     | "elixir"
     | "dotnet";
   projectName: string | null;
@@ -553,6 +555,7 @@ export type CompatibilityInput = {
   dotnetCaching: string;
   dotnetDeploy: string;
   dotnetLibraries: string[];
+  phpWebFramework: string;
   elixirWebFramework: string;
   elixirOrm: string;
   elixirAuth: string;
@@ -2906,6 +2909,15 @@ export const getDisabledReason = (
   category: CompatibilityCategory,
   optionId: string,
 ): string | null => {
+  if (currentStack.ecosystem === "php") {
+    if (category === "phpWebFramework" && optionId === "none") return PHP_RECIPE_REASONS.framework;
+    if (category === "database" && optionId !== "none") return PHP_RECIPE_REASONS.database;
+    if (
+      PHP_UNSUPPORTED_BACKEND_FIELDS.some((field) => field === category) &&
+      optionId !== "none"
+    )
+      return PHP_RECIPE_REASONS.capability;
+  }
   if (
     optionId !== "none" &&
     category === "kotlinMobileLibraries" &&
@@ -6104,7 +6116,7 @@ const ISSUE_CODE_BY_CATEGORY: Partial<Record<OptionCategory, string>> = {
   dotnetLibraries: "INCOMPATIBLE_DOTNET_LIBRARY",
 };
 
-const SERVER_ECOSYSTEMS = ["rust", "python", "go", "java", "dotnet", "elixir"] as const;
+const SERVER_ECOSYSTEMS = ["rust", "python", "go", "java", "dotnet", "elixir", "php"] as const;
 
 const typeScriptCategories: ReadonlySet<OptionCategory> = new Set(
   getCategoryOrderForEcosystem("typescript"),

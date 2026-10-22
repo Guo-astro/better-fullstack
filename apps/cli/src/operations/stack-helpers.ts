@@ -16,6 +16,7 @@ import {
   analyzeStackCompatibility,
   formatStackPartSpec,
   getCategoryOrderForEcosystem,
+  getPhpRecipeIssue,
   getCodeQualitySelectionIssue,
   getJobQueueIncompatibility,
   getReplacedCodeQualityTools,
@@ -181,6 +182,8 @@ export function getInstallCommand(
       return `cd ${projectName} && uv sync --extra dev`;
     case "go":
       return `cd ${projectName} && go mod tidy`;
+    case "php":
+      return `cd ${projectName} && composer install --no-interaction && composer run build && composer test`;
     case "elixir":
       return `cd ${projectName} && mix deps.get && mix compile && mix test`;
     case "java":
@@ -347,6 +350,8 @@ export function validateMcpProjectConfigCompatibility(
       >
     >,
 ): void {
+  const phpIssue = getPhpRecipeIssue(config);
+  if (phpIssue) throw new Error(phpIssue);
   const qualityIssue = getCodeQualitySelectionIssue(config.addons ?? []);
   if (qualityIssue) throw new Error(qualityIssue);
   const pythonLoggingIssue = getPythonLoggingSelectionIssue(config);

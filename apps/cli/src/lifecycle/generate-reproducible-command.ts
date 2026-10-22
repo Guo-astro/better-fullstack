@@ -1268,6 +1268,14 @@ export function generateReproducibleCommand(config: ProjectConfig) {
     case "dotnet":
       flags = getDotnetFlags(config);
       break;
+    case "php":
+      flags = [
+        "--ecosystem php",
+        `--php-web-framework ${config.phpWebFramework}`,
+        "--database none",
+      ];
+      appendCommonFlags(flags, config);
+      break;
     case "elixir":
       flags = getElixirFlags(config);
       break;

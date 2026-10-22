@@ -200,6 +200,7 @@ export const STACK_SELECTION_OPTION_CATEGORY_BY_KEY: Record<
   dotnetCaching: "dotnetCaching",
   dotnetDeploy: "dotnetDeploy",
   dotnetLibraries: "dotnetLibraries",
+  phpWebFramework: "phpWebFramework",
   elixirWebFramework: "elixirWebFramework",
   elixirOrm: "elixirOrm",
   elixirAuth: "elixirAuth",
@@ -396,6 +397,7 @@ export const STACK_SELECTION_URL_KEYS = {
   dotnetCaching: "dncache",
   dotnetDeploy: "dndeploy",
   dotnetLibraries: "dnlib",
+  phpWebFramework: "phwf",
   elixirWebFramework: "ewf",
   elixirOrm: "eorm",
   elixirAuth: "eauth",
@@ -782,6 +784,7 @@ const CLI_SCALAR_CONFIG_FIELDS = [
   ["dotnetValidation", "dotnetValidation"],
   ["dotnetCaching", "dotnetCaching"],
   ["dotnetDeploy", "dotnetDeploy"],
+  ["phpWebFramework", "phpWebFramework"],
   ["elixirWebFramework", "elixirWebFramework"],
   ["elixirOrm", "elixirOrm"],
   ["elixirAuth", "elixirAuth"],
@@ -1390,7 +1393,9 @@ function expandScopedStackPartSpecs(
   fields: readonly ScopedStackPartField[],
 ) {
   const stackParts = parseStackPartSpecs(specs, "selected");
-  const stackPartSpecs = stackParts.map((part) => formatStackPartSpec(part, stackParts));
+  const stackPartSpecs = stackParts
+    .filter((part) => part.source !== "provided")
+    .map((part) => formatStackPartSpec(part, stackParts));
   const stackPartSpecSet = new Set(stackPartSpecs);
 
   const getPrimary = (
@@ -1782,7 +1787,9 @@ export function cliInputToProjectConfigPartial(
 function getCliGraphStackParts(input: CLIInput): StackPart[] {
   const inputSpecs = [...(input.part ?? [])];
   const stackParts = parseStackPartSpecs(inputSpecs, "selected");
-  const stackPartSpecs = stackParts.map((part) => formatStackPartSpec(part, stackParts));
+  const stackPartSpecs = stackParts
+    .filter((part) => part.source !== "provided")
+    .map((part) => formatStackPartSpec(part, stackParts));
   const stackPartSpecSet = new Set(stackPartSpecs);
 
   const hasPrimary = (role: StackPartRole, ecosystem: StackPartEcosystem) =>
@@ -2031,6 +2038,7 @@ function buildProjectConfigBase(
     dotnetLibraries: toUniqueNonNoneArray(
       stack.dotnetLibraries,
     ) as ProjectConfig["dotnetLibraries"],
+    phpWebFramework: stack.phpWebFramework as ProjectConfig["phpWebFramework"],
     elixirWebFramework: stack.elixirWebFramework as ProjectConfig["elixirWebFramework"],
     elixirOrm: stack.elixirOrm as ProjectConfig["elixirOrm"],
     elixirAuth: stack.elixirAuth as ProjectConfig["elixirAuth"],
@@ -2126,6 +2134,7 @@ export function isCliDefaultStackSelection(
           ...GO_CONFIG_KEYS,
           ...JAVA_CONFIG_KEYS,
           ...DOTNET_CONFIG_KEYS,
+          "phpWebFramework",
           ...ELIXIR_CONFIG_KEYS,
           ...(selection.ecosystem === "typescript" ? REACT_NATIVE_CONFIG_KEYS : []),
         ])
@@ -2560,6 +2569,17 @@ export function generateStackSelectionCommand(selection: StackSelectionInput): s
       return generateJavaCommand(selection, projectName);
     case "dotnet":
       return generateDotnetCommand(selection, projectName);
+    case "php": {
+      const flags = [
+        `--ecosystem php`,
+        `--php-web-framework ${selection.phpWebFramework}`,
+        `--database ${selection.database}`,
+      ];
+      flags.push(formatArrayFlag("ai-docs", selection.aiDocs));
+      if (selection.git === "false") flags.push("--no-git");
+      if (selection.install === "false") flags.push("--no-install");
+      return `${getBaseCommand(selection)} ${projectName} ${flags.join(" ")}`;
+    }
     case "elixir":
       return generateElixirCommand(selection, projectName);
     case "typescript":

@@ -843,6 +843,7 @@ function createValidationBase(projectName: string, draft: CandidateDraft): Proje
     javaTestingLibraries: [],
     mobileLibraries: [],
     dotnetLibraries: [],
+    phpWebFramework: "none",
     elixirWebFramework: "none",
     elixirOrm: "none",
     elixirAuth: "none",
@@ -971,6 +972,11 @@ function createDraft(ecosystem: Ecosystem, args: GeneratorArgs): CandidateDraft 
       return makeGoDraft(args);
     case "java":
       return makeJavaDraft(args);
+    case "php":
+      return {
+        ecosystem: "php",
+        options: { ...createCommonOptions("php", args), phpWebFramework: "slim", database: "none" },
+      };
     case "elixir":
       return makeElixirDraft(args);
     case "dotnet":

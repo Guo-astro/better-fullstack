@@ -76,6 +76,7 @@ const LANGUAGE_LOADERS = {
   go: () => import("shiki/dist/langs/go.mjs"),
   templ: () => import("shiki/dist/langs/templ.mjs"),
   python: () => import("shiki/dist/langs/python.mjs"),
+  php: () => import("shiki/dist/langs/php.mjs"),
   jinja: () => import("shiki/dist/langs/jinja.mjs"),
   java: () => import("shiki/dist/langs/java.mjs"),
   kotlin: () => import("shiki/dist/langs/kotlin.mjs"),

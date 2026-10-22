@@ -95,6 +95,20 @@ export async function getinstallChoice(
     return response;
   }
 
+  if (ecosystem === "php") {
+    if (!(await commandExists("php")) || !(await commandExists("composer"))) {
+      log.warn(
+        "PHP 8.5.12+ and Composer 2 are required. See https://www.php.net/downloads and https://getcomposer.org/download/",
+      );
+      return false;
+    }
+    const response = await navigableConfirm({
+      message: "Run composer install?",
+      initialValue: DEFAULT_CONFIG.install,
+    });
+    return isCancel(response) ? exitCancelled("Operation cancelled") : response;
+  }
+
   if (ecosystem === "elixir") {
     const mixInstalled = await commandExists("mix");
     if (!mixInstalled) {

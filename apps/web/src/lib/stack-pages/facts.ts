@@ -69,6 +69,7 @@ const CORE_KEYS_BY_ECOSYSTEM: Record<string, StackSelectionKey[]> = {
     "dotnetObservability",
     "dotnetTesting",
   ],
+  php: ["phpWebFramework"],
   elixir: [
     "elixirWebFramework",
     "database",
@@ -126,6 +127,7 @@ const ROLE_LABELS: Partial<Record<OptionCategory, string>> = {
   dotnetJobQueue: "Background jobs",
   dotnetObservability: "Observability",
   dotnetTesting: "Testing",
+  phpWebFramework: "Backend",
   elixirWebFramework: "Backend",
   elixirOrm: "ORM",
   elixirAuth: "Authentication",

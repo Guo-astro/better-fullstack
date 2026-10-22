@@ -72,8 +72,11 @@ export async function createVirtual(
   try {
     const ecosystem = options.ecosystem || "typescript";
     const isReactNative = ecosystem === "react-native";
-    const frontend = options.frontend || (isReactNative ? ["native-bare"] : ["tanstack-router"]);
-    const backend = options.backend || (isReactNative ? "none" : "hono");
+    const isPhp = ecosystem === "php";
+    const frontend =
+      options.frontend ||
+      (isPhp ? ["none"] : isReactNative ? ["native-bare"] : ["tanstack-router"]);
+    const backend = options.backend || (isReactNative || isPhp ? "none" : "hono");
     const hasNativeFrontend = frontend.some(
       (item) => item === "native-bare" || item === "native-uniwind" || item === "native-unistyles",
     );
@@ -85,7 +88,7 @@ export async function createVirtual(
       database: options.database || "none",
       orm: options.orm || "none",
       backend,
-      runtime: options.runtime || (isReactNative ? "none" : "bun"),
+      runtime: options.runtime || (isReactNative || isPhp ? "none" : "bun"),
       frontend,
       addons: options.addons || [],
       examples: options.examples || [],
@@ -100,7 +103,7 @@ export async function createVirtual(
       versionChannel: options.versionChannel || "stable",
       install: false,
       dbSetup: options.dbSetup || "none",
-      api: options.api || (isReactNative ? "none" : "trpc"),
+      api: options.api || (isReactNative || isPhp ? "none" : "trpc"),
       webDeploy: options.webDeploy || "none",
       serverDeploy: options.serverDeploy || "none",
       astroIntegration: options.astroIntegration || "none",
@@ -229,6 +232,7 @@ export async function createVirtual(
       dotnetCaching: options.dotnetCaching || "none",
       dotnetDeploy: options.dotnetDeploy || (options.ecosystem === "dotnet" ? "docker" : "none"),
       dotnetLibraries: options.dotnetLibraries || [],
+      phpWebFramework: options.phpWebFramework ?? (options.ecosystem === "php" ? "slim" : "none"),
       elixirWebFramework:
         options.elixirWebFramework || (options.ecosystem === "elixir" ? "phoenix" : "none"),
       elixirOrm: options.elixirOrm || (options.ecosystem === "elixir" ? "ecto-sql" : "none"),

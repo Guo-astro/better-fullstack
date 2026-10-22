@@ -1,0 +1,42 @@
+# {{projectName}}
+
+Experimental PHP/Slim HTTP application. Composer owns PHP dependencies and scripts. The recipe uses PHP 8.5.12, Slim 4.15.3, Slim PSR-7 1.8.0 and PHPUnit 13.4.3 as its minimum patch versions. PHP 8.6 is outside this recipe's declared version range.
+
+## Setup and checks
+
+Install PHP 8.5.12 or a later 8.5 patch and Composer 2. PHPUnit requires DOM, filter, JSON, libxml, mbstring and XMLWriter extensions. Run these commands in this service directory:
+
+```sh
+composer install --no-interaction
+composer run build
+composer test
+composer run proof:http
+composer run dev
+```
+
+Commit the generated `composer.lock`. `build` validates the manifest, checks PHP syntax and validates optimized PSR-4 autoloading. `test` exercises the real Slim request pipeline in process. `proof:http` starts a PHP HTTP process on an available loopback port, checks parsed responses and rejection behavior, then verifies shutdown. A successful file generation is not build or runtime verification.
+
+`composer run dev` uses PHP's development server at http://127.0.0.1:8080. Stop it with Ctrl-C. This server is for local development only.
+
+## HTTP contract
+
+- `GET /health` returns `{"status":"ok","framework":"slim"}`.
+- `POST /api/greetings` accepts `application/json` with `name` and optional integer `repetitions` from 1 to 5. A trimmed name must contain 1 to 80 bytes. Unknown fields are rejected.
+- `{"name":"Ada","repetitions":2}` returns `{"message":"Hello, Ada! Hello, Ada!","repetitions":2}`.
+- Malformed JSON returns 400, invalid values return 422, wrong media types return 415, and bodies over 4096 bytes return 413. Missing routes return JSON with status 404.
+
+## Configuration and extension
+
+Copy `.env.example` to `.env` if local configuration is needed. `Environment::load` reads only HOST, PORT and CORS_ORIGIN as INI strings. Exported environment variables take precedence. HOST defaults to 127.0.0.1 and PORT to 8080. CORS is disabled unless CORS_ORIGIN is set to one exact origin. A composed web graph writes that origin through the shared generator connection owner.
+
+`src/Application.php` owns routes and middleware. `src/Greeting.php` owns typed input validation. Add behavior here with request-level PHPUnit tests; keep `bin/proof-http.php` aligned with the public HTTP contract. Composer remains the dependency authority. TypeScript package processors must not modify this service.
+
+No database, migrations, authentication, deployment adapter or production hosting recipe is generated. Add these through explicit Stack Part roles and compatibility rules before advertising support. For a production rollout, configure a PHP-capable web server with `public/` as its document root and route application requests to `public/index.php`; obtain separate deployment verification.
+
+## Upstream references
+
+- [PHP 8.5](https://www.php.net/releases/8_5_0.php)
+- [Slim 4.15.3 source](https://github.com/slimphp/Slim/tree/4.15.3)
+- [Slim PSR-7 1.8.0 source](https://github.com/slimphp/Slim-Psr7/tree/1.8.0)
+- [PHPUnit 13.4](https://docs.phpunit.de/en/13.4/)
+- [Composer scripts](https://getcomposer.org/doc/articles/scripts.md)

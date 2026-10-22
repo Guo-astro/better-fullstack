@@ -583,6 +583,7 @@
   "docsCliSummaryDotnetDotnetCaching": "Caché en .NET.",
   "docsCliSummaryDotnetDotnetDeploy": "Destino de despliegue .NET.",
   "docsCliSummaryDotnetDotnetLibraries": "Bibliotecas opcionales de .NET.",
+  "docsCliSummaryPhpPhpWebFramework": "Framework HTTP de PHP.",
   "docsCliSummaryElixirElixirWebFramework": "Framework web Elixir.",
   "docsCliSummaryElixirElixirOrm": "ORM / base de datos Elixir.",
   "docsCliSummaryElixirElixirAuth": "Autenticación en Elixir.",

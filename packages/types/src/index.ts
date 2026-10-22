@@ -21,3 +21,5 @@ export * from "@/stack/starter-tracks";
 export * from "@/catalog/preset-ids";
 export * from "@/stack/presets";
 export * from "@/telemetry/telemetry";
+
+export { getPhpRecipeIssue, PHP_RECIPE_REASONS } from "./stack/php-compatibility";

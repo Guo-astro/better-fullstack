@@ -114,6 +114,7 @@ import {
   getJavaTestingLibrariesChoice,
   getJavaWebFrameworkChoice,
 } from "@/prompts/ecosystems/java-ecosystem";
+import { getPhpWebFrameworkChoice } from "@/prompts/ecosystems/php-ecosystem";
 import {
   getPythonAiChoice,
   getPythonAuthChoice,
@@ -184,7 +185,7 @@ import {
 type CompositionMode = "single" | "multi";
 export type BackendEcosystem = Extract<
   Ecosystem,
-  "typescript" | "go" | "rust" | "python" | "java" | "dotnet" | "elixir"
+  "typescript" | "go" | "rust" | "python" | "java" | "dotnet" | "elixir" | "php"
 >;
 export type FrontendEcosystem = "typescript" | "rust" | "dotnet";
 export type MobileEcosystem = "none" | "react-native" | "kotlin" | "swift" | "dart";
@@ -235,6 +236,7 @@ export async function selectBackendEcosystem(
       { value: "python", label: "Python", hint: "FastAPI, Django, Flask" },
       { value: "java", label: "Java / Kotlin", hint: "Spring Boot, Ktor, Quarkus" },
       { value: "dotnet", label: ".NET", hint: "ASP.NET Core, EF Core, SignalR" },
+      { value: "php", label: "PHP", hint: "Slim HTTP with Composer" },
       { value: "elixir", label: "Elixir", hint: "Phoenix, LiveView" },
     ],
     initialValue,
@@ -1420,6 +1422,12 @@ export async function gatherMultiEcosystemConfig(
     for (const library of dotnetLibraries) {
       if (library !== "none") stackPartSpecs.push(`backend.libraries:dotnet:${library}`);
     }
+  }
+
+  if (backendEcosystem === "php") {
+    const phpWebFramework = promptValue(await getPhpWebFrameworkChoice(flags.phpWebFramework));
+    Object.assign(backendChoices, { phpWebFramework });
+    if (phpWebFramework !== "none") stackPartSpecs.push(`backend:php:${phpWebFramework}`);
   }
 
   if (backendEcosystem === "elixir") {

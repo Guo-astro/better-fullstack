@@ -6,15 +6,16 @@ This file owns scaffold execution, published-package validation, and runtime-pro
 
 ## Lanes
 
-| Command | Proof |
-| --- | --- |
-| `bun run test:smoke:pr-core` | Curated core generated-project checks. |
-| `bun run test:smoke:pr-broad` | Additional curated frontend/ecosystem checks. |
-| `bun run test:e2e:package-managers` | Default `--yes` path across package managers. |
-| `bun test apps/cli/test/e2e/web-command-roundtrip.test.ts --timeout 600000` | Web-produced commands against the built CLI. |
-| `bun run testing/generated-project-proof.ts` | Eight named ecosystem recipes crossing live behavior boundaries. |
-| `bun run test:recipe-runtime` | Generated persistent resource CRUD and ownership checks. |
-| `bun run test:published-package -- --specifier <tag-or-version>` | Already-published npm package through the installed-package smoke harness. |
+| Command                                                                     | Proof                                                                      |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `bun run test:smoke:pr-core`                                                | Curated core generated-project checks.                                     |
+| `bun run test:smoke:pr-broad`                                               | Additional curated frontend/ecosystem checks.                              |
+| `bun run test:e2e:package-managers`                                         | Default `--yes` path across package managers.                              |
+| `bun test apps/cli/test/e2e/web-command-roundtrip.test.ts --timeout 600000` | Web-produced commands against the built CLI.                               |
+| `bun run testing/generated-project-proof.ts`                                | Named ecosystem recipes crossing live behavior boundaries.                 |
+| `bun run testing/php-runtime-proof.ts` | Fresh PHP/Slim install, native build/tests, parsed HTTP responses, rejected input, and shutdown. |
+| `bun run test:recipe-runtime`                                               | Generated persistent resource CRUD and ownership checks.                   |
+| `bun run test:published-package -- --specifier <tag-or-version>`            | Already-published npm package through the installed-package smoke harness. |
 
 Smoke presets use Bun installs except as noted below. Package-manager correctness belongs in its
 dedicated matrix, including Yarn inference and CI immutable/hardened installs. Preset groups in
@@ -80,10 +81,15 @@ bun run test:recipe-runtime
 bun run testing/generated-project-proof.ts
 ```
 
-All eight required rows and steps must execute successfully. Missing tools, skipped required steps,
+Every required row and step must execute successfully. Missing tools, skipped required steps,
 dirty inputs, or a mismatched SHA fail proof. Native backend HTTP checks do not prove device UI;
 current-runtime checks do not prove historical upgrades. See the
 [capability inventory](../docs/reference/capability-evidence-inventory.md) for recipe boundaries.
+
+The native PHP proof runs separately in CI and releases. It records its CLI hash, source revision,
+dirty state, toolchain versions, Composer lockfile, and native results. This observation does not
+change the versioned eight-case upgrade fixture or promote public capability evidence. Successful
+runs remove their temporary project; failed runs retain it for diagnosis.
 
 Results under `testing/.smoke-output/generated-project-proof/` include
 `generated-project-proof.json`, its Markdown summary, and `capability-runtime-receipt.json`.
