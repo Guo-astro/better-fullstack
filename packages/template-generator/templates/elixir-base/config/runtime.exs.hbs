@@ -57,7 +57,11 @@ config :{{elixirAppName}}, {{elixirModuleName}}.GRPCEndpoint,
 if config_env() == :prod do
 {{#if (eq elixirApi "grpc")}}
   config :{{elixirAppName}}, {{elixirModuleName}}.GRPCEndpoint,
+{{#if (eq elixirDeploy "fly")}}
+    adapter_opts: [ip: {0, 0, 0, 0, 0, 0, 0, 0}, ipv6_v6only: false]
+{{else}}
     adapter_opts: [ip: {0, 0, 0, 0}]
+{{/if}}
 
 {{/if}}
 {{#if (eq elixirOrm "ecto-sql")}}
