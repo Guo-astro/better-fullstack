@@ -5,8 +5,13 @@ primary_region = "iad"
   dockerfile = "Dockerfile"
 
 [env]
+{{#if (ne elixirWebFramework "none")}}
   PHX_HOST = "{{elixirDeployAppName}}.fly.dev"
   PORT = "4000"
+{{/if}}
+{{#if (eq elixirClustering "libcluster")}}
+  DNS_CLUSTER_QUERY = "{{elixirDeployAppName}}.internal"
+{{/if}}
 {{#if (eq elixirOrm "ecto_sqlite3")}}
   DATABASE_PATH = "/data/{{elixirAppName}}.db"
 
@@ -15,6 +20,7 @@ primary_region = "iad"
   destination = "/data"
 {{/if}}
 
+{{#if (ne elixirWebFramework "none")}}
 [http_service]
   internal_port = 4000
   force_https = true
@@ -27,6 +33,7 @@ primary_region = "iad"
   min_machines_running = 0
 {{/if}}
   processes = ["app"]
+{{/if}}
 
 [[vm]]
   memory = "1gb"

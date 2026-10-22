@@ -72,6 +72,47 @@ git push gigalixir main
 ```
 {{/if}}
 
+{{#if (or (ne elixirDeploy "none") (eq elixirClustering "libcluster"))}}
+## Releases
+
+Use Elixir 1.17 or newer. The Docker builder pins Elixir 1.20.4 and OTP 29.0.6.
+
+```sh
+MIX_ENV=prod mix deps.get --only prod
+MIX_ENV=prod mix release
+_build/prod/rel/{{elixirAppName}}/bin/{{elixirAppName}} start
+```
+
+Release settings are read at startup through `config/runtime.exs` and `rel/env.sh.eex`.
+Keep `mix.lock` with the project and review dependency updates before rebuilding a release.
+The generated Dockerfile can be built with `docker build -t {{elixirAppName}} .`.
+{{#if (ne elixirWebFramework "none")}}
+Set `SECRET_KEY_BASE` and `PHX_HOST` in the deployment environment before starting the release.
+{{/if}}
+{{#if (eq elixirClustering "libcluster")}}
+
+### Clustering
+
+Set `RELEASE_COOKIE` to the same private value on every node. Set a unique, reachable
+`RELEASE_NODE` such as `{{elixirAppName}}_a@10.0.0.10` on each node. The release enables long node
+names; it refuses to start without a cookie. Keep Erlang distribution on a private network.
+
+For Docker, Gigalixir, and standalone Mix releases, set `CLUSTER_HOSTS` to comma-separated full
+node names. The EPMD strategy reconnects every second. Alternatively, set `DNS_CLUSTER_QUERY`
+to a DNS name whose addresses correspond to `{{elixirAppName}}@<address>` nodes. Explicit hosts
+take precedence over DNS. Empty discovery settings leave the node unclustered.
+{{#if (eq elixirDeploy "fly")}}
+
+Fly uses the application's internal DNS and `FLY_PRIVATE_IP` automatically. Set the same
+`RELEASE_COOKIE` secret on its machines. Its release uses IPv6 Erlang distribution.
+{{/if}}
+
+Gigalixir must supply a unique `RELEASE_NODE` and the shared cookie in its release environment.
+Choose discovery values that resolve inside that application's private network. These settings
+do not provision machines or certify a hosted deployment.
+{{/if}}
+
+{{/if}}
 {{#if (eq elixirObservability "prom_ex")}}
 ## Metrics
 
@@ -94,4 +135,33 @@ Guardian token endpoints are available at `/api/auth/token` and `/api/auth/me`. 
 ## Ueberauth
 
 Add provider strategy packages and entries under `config :ueberauth, Ueberauth, providers: [...]` before using `/auth/:provider`.
+{{/if}}
+
+{{#if (eq elixirApi "grpc")}}
+## gRPC
+
+The application starts the generated Greeter service on `127.0.0.1:50051`. Set `GRPC_PORT` to
+choose another port. Production releases bind the service to all interfaces. The protobuf contract
+is `priv/protos/greeter.proto`; its message definitions and client stub are included under
+`lib/{{elixirAppName}}/grpc/`.
+
+From the running application's IEx session:
+
+```elixir
+{:ok, channel} = GRPC.Stub.connect("127.0.0.1:50051", connect_timeout: 2_000)
+request = %{{elixirModuleName}}.Rpc.HelloRequest{name: "Better Fullstack"}
+{:ok, reply} = {{elixirModuleName}}.Rpc.Greeter.Stub.say_hello(channel, request, timeout: 2_000)
+reply.message
+GRPC.Stub.disconnect(channel)
+```
+
+`say_hello` returns `invalid_argument` for an empty name or a name longer than 80 characters.
+`mix test` exercises the real server and client on a temporary local port, including that error.
+
+After changing the protobuf contract, regenerate its definitions with `protoc` and the Elixir
+protobuf plugin, then update the server implementation:
+
+```sh
+protoc --elixir_out=plugins=grpc:lib/{{elixirAppName}}/grpc -I priv/protos priv/protos/greeter.proto
+```
 {{/if}}
