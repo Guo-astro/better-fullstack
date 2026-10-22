@@ -72,7 +72,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
 
       - uses: actions/setup-java@v4
         with:
@@ -162,7 +162,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
 
       # The pnpm preset (hono-node-prisma-docker) installs with pnpm on the host.
       - name: Setup pinned pnpm
@@ -281,7 +281,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
 
       - uses: actions/setup-java@v4
         with:
@@ -371,7 +371,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
 
       - uses: actions/cache@v4
         with:
@@ -428,7 +428,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
 
       - uses: actions/cache@v4
         with:
@@ -479,7 +479,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
 
       - uses: actions/cache@v4
         with:
@@ -525,7 +525,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
 
       - uses: actions/cache@v4
         with:
@@ -570,7 +570,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
 
       - uses: actions/cache@v4
         with:

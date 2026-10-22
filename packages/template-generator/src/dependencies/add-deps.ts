@@ -111,7 +111,7 @@ export const dependencyVersionMap = {
   "@tauri-apps/cli": "^2.12.1",
   "@tauri-apps/api": "^2.12.1",
 
-  "@biomejs/biome": "^2.5.15",
+  "@biomejs/biome": "^2.6.2",
   ultracite: "^7.12.2",
   knip: "^6.39.0",
 
