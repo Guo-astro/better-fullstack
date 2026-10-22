@@ -381,6 +381,8 @@ export const dependencyVersionMap = {
   "@types/react": "~19.2.18",
   "@wxt-dev/module-react": "^1.2.2",
   wxt: "^0.20.27",
+  plasmo: "0.90.5",
+  "@types/chrome": "0.3.6",
   "@opentui/core": "^0.4.5",
   nodemailer: "^9.0.5",
   "@types/react-dom": "~19.2.7",

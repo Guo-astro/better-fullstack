@@ -2,6 +2,7 @@
 export * from "@/config/schemas";
 export * from "@/config/types";
 export * from "@/capabilities/capabilities";
+export * from "@/capabilities/browser-extensions";
 export * from "@/stack/compatibility";
 export * from "@/catalog/option-metadata";
 export * from "@/catalog/cli-flags";

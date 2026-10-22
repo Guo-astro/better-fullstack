@@ -239,6 +239,7 @@ export const AddonsSchema = z
     "shadcn-lint",
     "opentui",
     "wxt",
+    "plasmo",
     "msw",
     "storybook",
     "swr",
@@ -272,6 +273,7 @@ export const APP_PLATFORM_ADDON_VALUES = [
   "electron",
   "capacitor",
   "wxt",
+  "plasmo",
   "opentui",
 ] as const;
 

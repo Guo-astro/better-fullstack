@@ -31,6 +31,20 @@ function graphConfig(parts: string[]): ProjectConfig {
 }
 
 describe("browser template family loader", () => {
+  it("preserves the complete Plasmo extension in flat, overlay, and mixed selected-template loads", async () => {
+    for (const config of [
+      makeConfig({ addons: ["plasmo"], database: "none", orm: "none", testing: "none" }),
+      makeConfig({ stackParts: cliInputToProjectConfigPartial({ part: ["appPlatform:typescript:plasmo"] }).stackParts, addons: [] }),
+      graphConfig(["frontend:typescript:react-vite:site", "backend:go:gin:api", "appPlatform:typescript:plasmo"]),
+    ]) {
+      expect(getRequiredTemplateFamilies(config)).toContain("addons");
+      const eager = await generatedFiles(config, EMBEDDED_TEMPLATES);
+      expect(await generatedFiles(config, await loadTemplatesForConfig(config))).toEqual(eager);
+      expect(eager.find(([path]) => path === "apps/extension/src/content.ts")?.[1]).toContain('matches: ["https://example.com/*"]');
+      expect(eager.find(([path]) => path === "apps/extension/assets/icon.png")?.[1]).toBe("[Binary file]");
+    }
+  });
+
   it("loads a strict subset for a default TypeScript project with eager-equivalent output", async () => {
     const config = makeConfig({ auth: "none" });
     const selectedTemplates = await loadTemplatesForConfig(config);

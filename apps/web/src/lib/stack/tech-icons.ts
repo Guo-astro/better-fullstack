@@ -682,6 +682,7 @@ export const ICON_REGISTRY: Record<string, IconConfig> = {
   formik: { type: "si", slug: "formik", hex: "2563EB" },
   lefthook: { type: "si", slug: "lefthook", hex: "FF1E1E" },
   wxt: { type: "si", slug: "wxt", hex: "67D55E" },
+  plasmo: { type: "local", src: "/icon/plasmo.png" },
   opentui: { type: "si", slug: "opentui", hex: "000000" },
   "claude-md": { type: "si", slug: "claude", hex: "D97757" },
   cursorrules: { type: "si", slug: "cursor", hex: "000000" },
