@@ -39,7 +39,7 @@ describe("Effect HttpApi recipe", () => {
     expect(app).toContain("HttpApiBuilder.api(Api)");
     expect(app).toContain("Layer.provide(healthLayer)");
     expect(app).toContain("HttpApiBuilder.toWebHandler(");
-    expect(app).toContain('app.all("/health", (c) => handler(c.req.raw))');
+    expect(app).toContain('app.all("*", (c) => handler(c.req.raw))');
     expect(app).toContain('new Request(new URL("/health", c.req.url).toString(), c.req.raw)');
     const server = vfs.readFile("apps/server/src/server.ts");
     expect(server).toContain("Effect.acquireRelease(");

@@ -70,6 +70,31 @@ for (const unavailable of [false, true]) {
         ? { _tag: "HealthUnavailable", message: "The health dependency is unavailable" }
         : { status: "ok" });
     }
+    const extension = await fetch(`${baseUrl}/proof/echo`, {
+      method: "POST",
+      headers: { origin: corsOrigin, "content-type": "application/json" },
+      body: JSON.stringify({ message: "hello Effect" }),
+      signal: AbortSignal.timeout(5000),
+    });
+    assert.equal(extension.status, 200);
+    assert.equal(extension.headers.get("access-control-allow-origin"), corsOrigin);
+    assert.deepEqual(await extension.json(), { echoed: "HELLO EFFECT" });
+    const invalidPayload = await fetch(`${baseUrl}/proof/echo`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ message: 42 }),
+      signal: AbortSignal.timeout(5000),
+    });
+    assert.equal(invalidPayload.status, 400);
+    await invalidPayload.arrayBuffer();
+    const extensionPreflight = await fetch(`${baseUrl}/proof/echo`, {
+      method: "OPTIONS",
+      headers: { origin: corsOrigin, "access-control-request-method": "POST" },
+      signal: AbortSignal.timeout(5000),
+    });
+    assert.equal(extensionPreflight.status, 204);
+    assert.equal(extensionPreflight.headers.get("access-control-allow-origin"), corsOrigin);
+    await extensionPreflight.arrayBuffer();
     const missing = await fetch(`${baseUrl}/missing`, { signal: AbortSignal.timeout(5000) });
     assert.equal(missing.status, 404);
     await missing.arrayBuffer();
@@ -91,4 +116,4 @@ for (const unavailable of [false, true]) {
   await assert.rejects(fetch(`${baseUrl}/health`, { signal: AbortSignal.timeout(1000) }));
 }
 
-console.log("Effect HttpApi {{runtime}} proof passed: health, typed 503, root alias, CORS, 404, scoped service disposal, and server shutdown");
+console.log("Effect HttpApi {{runtime}} proof passed: health, typed 503, root alias, schema-only POST extension, payload validation, CORS, 404, scoped service disposal, and server shutdown");

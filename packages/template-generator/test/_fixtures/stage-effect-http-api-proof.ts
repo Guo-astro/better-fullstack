@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rename, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -32,6 +32,9 @@ const generated = await generateVirtualProject({ config, templates: await loadTe
 if (!generated.success || !generated.tree) throw new Error(generated.error ?? "Effect HttpApi generation failed");
 await writeTreeToFilesystem(generated.tree, projectDir);
 const serverDir = join(projectDir, "apps/server");
+await rename(join(serverDir, "src/http-api.ts"), join(serverDir, "src/http-api-base.ts"));
+const extension = await readFile(new URL("./effect-http-api-extension.ts.hbs", import.meta.url), "utf8");
+await writeFile(join(serverDir, "src/http-api.ts"), processTemplateString(extension, config));
 const proof = await readFile(new URL("./effect-http-api-proof.ts.hbs", import.meta.url), "utf8");
 await writeFile(join(serverDir, "effect-http-api-proof.ts"), processTemplateString(proof, config));
 const packagePath = join(serverDir, "package.json");

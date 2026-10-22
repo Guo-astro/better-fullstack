@@ -27,8 +27,8 @@ export function createApp(healthLayer: Layer.Layer<HealthService> = HealthServic
 			allowMethods: ["GET", "POST", "OPTIONS"],
 		})
 	);
-	app.all("/health", (c) => handler(c.req.raw));
 	app.get("/", (c) => handler(new Request(new URL("/health", c.req.url).toString(), c.req.raw)));
+	app.all("*", (c) => handler(c.req.raw));
 
 	return { app, dispose };
 }
