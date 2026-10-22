@@ -5,14 +5,21 @@ import {
   ProjectConfigSchema,
   type ProjectConfig,
 } from "@better-fullstack/types";
+import { ensureBuiltCliBinary } from "@testing/lib/cli-binary";
 import { scaffoldWithCli, formatCliScaffoldFailure } from "@testing/lib/cli-scaffold";
-import { expect, test } from "bun:test";
+import { beforeAll, expect, test } from "bun:test";
 import { parse } from "jsonc-parser";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
 import { generateReproducibleCommand } from "@/lifecycle/generate-reproducible-command";
+
+let cliPath = "";
+
+beforeAll(async () => {
+  cliPath = await ensureBuiltCliBinary(resolve(import.meta.dir, "../../../.."));
+}, 120_000);
 
 const selectedGoFields = {
   goWebFramework: "echo",
@@ -67,7 +74,7 @@ async function scaffoldCommand(command: string, cwd: string) {
     .split(/\s+/);
   if (!projectName) throw new Error("Missing generated project name");
   const result = await scaffoldWithCli({
-    cliPath: resolve(import.meta.dir, "../../dist/cli.mjs"),
+    cliPath,
     cwd,
     projectName,
     flags,
