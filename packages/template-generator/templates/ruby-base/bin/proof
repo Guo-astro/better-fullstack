@@ -46,7 +46,9 @@ begin
   raise "Valid request failed" unless response.code == "200" && JSON.parse(response.body) == { "greeting" => "Hello, Ruby!" }
   response = http.post("/api/greetings", JSON.generate(name: " "), "Content-Type" => "application/json")
   raise "Invalid request was accepted" unless response.code == "422" && JSON.parse(response.body).fetch("error") == "name_length_must_be_1_to_80"
-  puts JSON.generate(health: "passed", parsed_response: "passed", invalid_request: "passed", frontend_origins: "passed")
+  response = http.post("/api/greetings", "", "Content-Type" => "application/json")
+  raise "Empty JSON request was not rejected" unless response.code == "400" && JSON.parse(response.body).fetch("error") == "invalid_json"
+  puts JSON.generate(health: "passed", parsed_response: "passed", invalid_request: "passed", frontend_origins: "passed", empty_json: "passed")
 rescue StandardError => error
   log.rewind
   warn log.read

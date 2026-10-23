@@ -45,6 +45,12 @@ class AppTest < Minitest::Test
     assert_equal "invalid_json", JSON.parse(last_response.body).fetch("error")
   end
 
+  def test_empty_json_body
+    post "/api/greetings", "", "CONTENT_TYPE" => "application/json"
+    assert_equal 400, last_response.status
+    assert_equal "invalid_json", JSON.parse(last_response.body).fetch("error")
+  end
+
   def test_non_json_content_type
     post "/api/greetings", "name=Ruby"
     assert_equal 415, last_response.status

@@ -45,7 +45,7 @@ module BetterFullstack
       unless request.media_type == "application/json"
         halt 415, JSON.generate(error: "content_type_must_be_json")
       end
-      raw = request.body.read(RequestBodyLimit::MAX_BYTES + 1)
+      raw = request.body.read(RequestBodyLimit::MAX_BYTES + 1) || ""
       halt 413, JSON.generate(error: "body_too_large") if raw.bytesize > RequestBodyLimit::MAX_BYTES
       begin
         payload = JSON.parse(raw)
