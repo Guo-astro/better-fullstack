@@ -14,7 +14,7 @@ pid = nil
 
 begin
   pid = Process.spawn(
-    { "HOST" => "127.0.0.1", "PORT" => port.to_s, "RACK_ENV" => "production" },
+    { "HOST" => "127.0.0.1", "PORT" => port.to_s, "RACK_ENV" => "production", "ALLOWED_ORIGIN" => "http://localhost:5173,http://localhost:8080" },
     RbConfig.ruby, File.expand_path("server", __dir__),
     chdir: File.expand_path("..", __dir__), out: log, err: log, pgroup: true
   )
@@ -34,11 +34,19 @@ begin
     sleep 0.1
   end
   raise "Unexpected health response" unless JSON.parse(health.body) == { "status" => "ok", "service" => "sinatra" }
+  ["http://localhost:5173", "http://localhost:8080"].each do |origin|
+    response = http.get("/health", "Origin" => origin)
+    raise "Frontend origin rejected" unless response.code == "200" && response["access-control-allow-origin"] == origin
+    response = http.post("/api/greetings", JSON.generate(name: "Ruby"), "Content-Type" => "application/json", "Origin" => origin)
+    raise "Frontend POST rejected" unless response.code == "200" && JSON.parse(response.body) == { "greeting" => "Hello, Ruby!" }
+  end
+  response = http.get("/health", "Origin" => "http://localhost:9999")
+  raise "Untrusted frontend accepted" unless response.code == "403"
   response = http.post("/api/greetings", JSON.generate(name: "Ruby"), "Content-Type" => "application/json")
   raise "Valid request failed" unless response.code == "200" && JSON.parse(response.body) == { "greeting" => "Hello, Ruby!" }
   response = http.post("/api/greetings", JSON.generate(name: " "), "Content-Type" => "application/json")
   raise "Invalid request was accepted" unless response.code == "422" && JSON.parse(response.body).fetch("error") == "name_length_must_be_1_to_80"
-  puts JSON.generate(health: "passed", parsed_response: "passed", invalid_request: "passed")
+  puts JSON.generate(health: "passed", parsed_response: "passed", invalid_request: "passed", frontend_origins: "passed")
 rescue StandardError => error
   log.rewind
   warn log.read

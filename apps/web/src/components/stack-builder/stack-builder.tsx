@@ -1094,6 +1094,14 @@ function getDefaultGraphTool(
   return toolOptions.find((option) => option.id !== "none")?.id ?? fallback;
 }
 
+export function getComposerParts(specs: readonly string[]) {
+  try {
+    return parseStackPartSpecs([...specs]);
+  } catch {
+    return [];
+  }
+}
+
 function getSoloBackendSelection(stack: StackState): GraphSelection {
   const currentEcosystem = isGraphBackendEcosystem(stack.ecosystem)
     ? stack.ecosystem
@@ -2372,7 +2380,7 @@ function CreationModeComposer({
         (option) => !isKotlinIncompatibleOption("javaWebFramework", option.id),
       )
     : allBackendOptions;
-  const databaseParts = parseStackPartSpecs(
+  const databaseParts = getComposerParts(
     stack.stackPartSpecs.length > 0 ? stack.stackPartSpecs : graphSelectionToSpecs(graphSelection),
   );
   const databaseOptions = getGraphToolOptions("database", "database", "universal", {

@@ -270,7 +270,9 @@ function getEcosystemBackend(cfg: Partial<ProjectConfig>) {
         ? cfg.dotnetWebFramework
         : undefined;
     case "ruby":
-      return cfg.rubyWebFramework && cfg.rubyWebFramework !== "none" ? cfg.rubyWebFramework : undefined;
+      return cfg.rubyWebFramework && cfg.rubyWebFramework !== "none"
+        ? cfg.rubyWebFramework
+        : undefined;
     case "elixir":
       return cfg.elixirWebFramework && cfg.elixirWebFramework !== "none"
         ? cfg.elixirWebFramework
@@ -1543,7 +1545,7 @@ export function validateFullConfig(
   partial = false,
 ) {
   const rubyIssue = getRubyRecipeIssue(config);
-  if (rubyIssue) throw new Error(rubyIssue);
+  if (rubyIssue) exitWithError(rubyIssue);
   validateCodeQualityConstraints(config, partial);
   if (config.stackParts && !isToolingOverlayOnly(config.stackParts) && !options.yolo) {
     const graphValidation = validateStackParts(config.stackParts);

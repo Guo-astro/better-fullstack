@@ -1,4 +1,3 @@
-import { createRubyProjectConfigDefaults, getRubyRecipeIssue } from "@/stack/ruby-compatibility";
 import type {
   CLIInput,
   ProjectConfig,
@@ -19,6 +18,7 @@ import {
   type CliDefaultProjectConfigBase,
 } from "@/config/defaults";
 import { analyzeStackCompatibility, type CompatibilityInput } from "@/stack/compatibility";
+import { createRubyProjectConfigDefaults, getRubyRecipeIssue } from "@/stack/ruby-compatibility";
 import {
   formatStackPartSpec,
   hasJavaScriptWorkspaceRoot,
@@ -566,19 +566,29 @@ function parseScalarSelectionValue(value: StackSelectionUrlValue, defaultValue: 
   return defaultValue;
 }
 
-export function getEcosystemDefaultStackSelection(ecosystem: StackSelectionState["ecosystem"]): StackSelectionState {
+export function getEcosystemDefaultStackSelection(
+  ecosystem: StackSelectionState["ecosystem"],
+): StackSelectionState {
   const selection = cloneDefaultStackSelection();
   if (ecosystem !== "ruby") return { ...selection, ecosystem };
   const defaults = createRubyProjectConfigDefaults();
-  const renamed: Record<string, string> = { frontend: "webFrontend", addons: "appPlatforms", ai: "aiSdk", effect: "backendLibraries" };
-  for (const [key, value] of Object.entries(defaults)) (selection as unknown as Record<string, unknown>)[renamed[key] ?? key] = value;
+  const renamed: Record<string, string> = {
+    frontend: "webFrontend",
+    addons: "appPlatforms",
+    ai: "aiSdk",
+    effect: "backendLibraries",
+  };
+  for (const [key, value] of Object.entries(defaults))
+    (selection as unknown as Record<string, unknown>)[renamed[key] ?? key] = value;
   return { ...selection, ecosystem, nativeFrontend: ["none"], codeQuality: [], documentation: [] };
 }
 
 export function parseStackSelectionFromUrlRecord(
   params: StackSelectionUrlRecord,
 ): StackSelectionState {
-  const defaults = getEcosystemDefaultStackSelection(parseScalarSelectionValue(params.eco, "typescript") === "ruby" ? "ruby" : "typescript");
+  const defaults = getEcosystemDefaultStackSelection(
+    parseScalarSelectionValue(params.eco, "typescript") === "ruby" ? "ruby" : "typescript",
+  );
   const parsed = structuredClone(defaults) as Record<string, unknown>;
 
   for (const stackKey of STACK_SELECTION_KEYS) {
@@ -1752,7 +1762,8 @@ export function cliInputToProjectConfigPartial(
   input: CLIInput,
   projectName?: string,
 ): Partial<ProjectConfig> {
-  const config: Partial<ProjectConfig> = input.ecosystem === "ruby" && !input.part?.length ? createRubyProjectConfigDefaults() : {};
+  const config: Partial<ProjectConfig> =
+    input.ecosystem === "ruby" && !input.part?.length ? createRubyProjectConfigDefaults() : {};
   const assignableConfig = config as Partial<Record<keyof ProjectConfig, unknown>>;
 
   for (const [inputKey, configKey] of CLI_SCALAR_CONFIG_FIELDS) {
@@ -2528,7 +2539,16 @@ function generateDotnetCommand(selection: StackSelectionInput, projectName: stri
 
 function generateRubyCommand(selection: StackSelectionInput, projectName: string) {
   stackSelectionToCliComparableConfig(selection, projectName);
-  const flags = ["--ecosystem ruby", `--ruby-web-framework ${selection.rubyWebFramework}`, "--database none", "--addons none", "--examples none", formatArrayFlag("ai-docs", selection.aiDocs)];
+  const flags = [
+    "--ecosystem ruby",
+    `--ruby-web-framework ${selection.rubyWebFramework}`,
+    "--database none",
+    "--addons none",
+    "--examples none",
+    formatArrayFlag("ai-docs", selection.aiDocs),
+  ];
+  if (selection.versionChannel !== "stable")
+    flags.push(`--version-channel ${selection.versionChannel}`);
   if (selection.git === "false") flags.push("--no-git");
   if (selection.install === "false") flags.push("--no-install");
   return `${getBaseCommand(selection)} ${projectName} ${flags.join(" ")}`;

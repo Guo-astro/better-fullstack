@@ -1,16 +1,53 @@
 import { describe, expect, it } from "bun:test";
-import { EcosystemSchema, CreateInputSchema, ProjectConfigSchema } from "@/config/schemas";
-import { createCliDefaultProjectConfigBase } from "@/config/defaults";
-import { getCliFlagReference } from "@/catalog/cli-flags";
+
 import { getCapabilityInventory } from "@/capabilities/capability-inventory";
+import { getCliFlagReference } from "@/catalog/cli-flags";
+import { createCliDefaultProjectConfigBase } from "@/config/defaults";
+import { EcosystemSchema, CreateInputSchema, ProjectConfigSchema } from "@/config/schemas";
 import { getDisabledReason } from "@/stack/compatibility";
-import { createRubyProjectConfigDefaults, getRubyRecipeIssue, RUBY_RECIPE_EXTENSION_REASON } from "@/stack/ruby-compatibility";
-import { getStackPartOptions, legacyProjectConfigToStackParts, stackPartsToLegacyProjectConfigPartial, parseStackPartSpecs, validateStackParts, formatStackPartSpec } from "@/stack/stack-graph";
-import { cliInputToProjectConfigPartial, getEcosystemDefaultStackSelection, createStackSelectionSearchParams, parseStackSelectionFromUrlRecord, stackSelectionToProjectConfig, generateStackSelectionCommand } from "@/stack/stack-translation";
+import {
+  createRubyProjectConfigDefaults,
+  getRubyRecipeIssue,
+  RUBY_RECIPE_EXTENSION_REASON,
+} from "@/stack/ruby-compatibility";
+import {
+  getStackPartOptions,
+  legacyProjectConfigToStackParts,
+  stackPartsToLegacyProjectConfigPartial,
+  parseStackPartSpecs,
+  validateStackParts,
+  formatStackPartSpec,
+} from "@/stack/stack-graph";
+import {
+  cliInputToProjectConfigPartial,
+  getEcosystemDefaultStackSelection,
+  createStackSelectionSearchParams,
+  parseStackSelectionFromUrlRecord,
+  stackSelectionToProjectConfig,
+  generateStackSelectionCommand,
+} from "@/stack/stack-translation";
 
 const rubySelection = () => getEcosystemDefaultStackSelection("ruby");
 
 describe("Ruby recipe contracts", () => {
+  it.each(["latest", "beta"] as const)(
+    "preserves the %s channel in Ruby command replay",
+    (versionChannel) => {
+      expect(generateStackSelectionCommand({ ...rubySelection(), versionChannel })).toContain(
+        `--version-channel ${versionChannel}`,
+      );
+    },
+  );
+
+  it("rejects tooling beside a disabled JavaScript frontend", () => {
+    const parts = parseStackPartSpecs([
+      "backend:ruby:sinatra",
+      "frontend:typescript:none",
+      "codeQuality:universal:biome",
+    ]);
+    expect(getRubyRecipeIssue({ stackParts: parts })).toBe(RUBY_RECIPE_EXTENSION_REASON);
+  });
+
   it("continues reading pre-Ruby project configs", () => {
     const { rubyWebFramework: _rubyWebFramework, ...legacy } = createCliDefaultProjectConfigBase();
     const parsed = ProjectConfigSchema.parse({ ...legacy, projectDir: "/virtual" });
@@ -24,10 +61,15 @@ describe("Ruby recipe contracts", () => {
     const config = cliInputToProjectConfigPartial(input);
     expect(getRubyRecipeIssue(config)).toBeNull();
     const parts = legacyProjectConfigToStackParts(config);
-    expect(parts.filter((part) => part.role === "backend").map((part) => part.toolId)).toEqual(["sinatra"]);
+    expect(parts.filter((part) => part.role === "backend").map((part) => part.toolId)).toEqual([
+      "sinatra",
+    ]);
     expect(stackPartsToLegacyProjectConfigPartial(parts).rubyWebFramework).toBe("sinatra");
     const flags = getCliFlagReference().flatMap((group) => group.flags);
-    expect(flags.find((flag) => flag.flag === "--ruby-web-framework")?.values).toEqual(["sinatra", "none"]);
+    expect(flags.find((flag) => flag.flag === "--ruby-web-framework")?.values).toEqual([
+      "sinatra",
+      "none",
+    ]);
   });
 
   it("keeps a minimal Ruby share URL native and replays its explicit command", () => {
@@ -35,7 +77,11 @@ describe("Ruby recipe contracts", () => {
     expect(selection.rubyWebFramework).toBe("sinatra");
     expect(selection.backend).toBe("none");
     expect(selection.webFrontend).toEqual([]);
-    const config = stackSelectionToProjectConfig(selection, { projectDir: "/virtual", relativePath: "ruby-service", install: false });
+    const config = stackSelectionToProjectConfig(selection, {
+      projectDir: "/virtual",
+      relativePath: "ruby-service",
+      install: false,
+    });
     expect(getRubyRecipeIssue(config)).toBeNull();
     const params = createStackSelectionSearchParams(selection);
     expect(parseStackSelectionFromUrlRecord(Object.fromEntries(params))).toEqual(selection);
@@ -46,11 +92,25 @@ describe("Ruby recipe contracts", () => {
   });
 
   it("preserves named Ruby services and TypeScript capabilities through graph replay", () => {
-    const parts = parseStackPartSpecs(["frontend:typescript:react-vite", "frontend.css:typescript:tailwind", "backend:ruby:sinatra:public-api", "backend:ruby:sinatra:internal-api", "backend:go:gin:go-api", "go-api.orm:go:gorm", "database:universal:sqlite"]);
+    const parts = parseStackPartSpecs([
+      "frontend:typescript:react-vite",
+      "frontend.css:typescript:tailwind",
+      "backend:ruby:sinatra:public-api",
+      "backend:ruby:sinatra:internal-api",
+      "backend:go:gin:go-api",
+      "go-api.orm:go:gorm",
+      "database:universal:sqlite",
+    ]);
     expect(validateStackParts(parts).issues).toEqual([]);
     expect(getRubyRecipeIssue({ stackParts: parts })).toBeNull();
-    const replay = parseStackPartSpecs(parts.filter((part) => part.source !== "provided").map((part) => formatStackPartSpec(part, parts)));
-    expect(replay.map((part) => [part.id, part.ownerPartId, part.toolId])).toEqual(parts.map((part) => [part.id, part.ownerPartId, part.toolId]));
+    const replay = parseStackPartSpecs(
+      parts
+        .filter((part) => part.source !== "provided")
+        .map((part) => formatStackPartSpec(part, parts)),
+    );
+    expect(replay.map((part) => [part.id, part.ownerPartId, part.toolId])).toEqual(
+      parts.map((part) => [part.id, part.ownerPartId, part.toolId]),
+    );
     const lowered = stackPartsToLegacyProjectConfigPartial(parts);
     expect(lowered.rubyWebFramework).toBe("sinatra");
     expect(lowered.goOrm).toBe("gorm");
@@ -58,23 +118,55 @@ describe("Ruby recipe contracts", () => {
   });
 
   it("rejects unsupported Ruby extensions through flat and graph boundaries with a shared reason", () => {
-    expect(getRubyRecipeIssue({ ...createRubyProjectConfigDefaults(), ecosystem: "ruby", database: "sqlite" })).toBe(RUBY_RECIPE_EXTENSION_REASON);
-    expect(getDisabledReason(rubySelection(), "database", "sqlite")).toBe(RUBY_RECIPE_EXTENSION_REASON);
+    expect(
+      getRubyRecipeIssue({
+        ...createRubyProjectConfigDefaults(),
+        ecosystem: "ruby",
+        database: "sqlite",
+      }),
+    ).toBe(RUBY_RECIPE_EXTENSION_REASON);
+    expect(getDisabledReason(rubySelection(), "database", "sqlite")).toBe(
+      RUBY_RECIPE_EXTENSION_REASON,
+    );
     const invalidSelection = { ...rubySelection(), database: "sqlite" };
-    expect(() => stackSelectionToProjectConfig(invalidSelection, { projectDir: "/virtual", relativePath: "ruby-service" })).toThrow(RUBY_RECIPE_EXTENSION_REASON);
-    expect(() => generateStackSelectionCommand(invalidSelection)).toThrow(RUBY_RECIPE_EXTENSION_REASON);
-    expect(getDisabledReason(rubySelection(), "auth", "better-auth")).toBe(RUBY_RECIPE_EXTENSION_REASON);
-    expect(getRubyRecipeIssue({ stackParts: parseStackPartSpecs(["backend:ruby:sinatra", "continuousIntegration:universal:github-actions"]) })).toBe(RUBY_RECIPE_EXTENSION_REASON);
+    expect(() =>
+      stackSelectionToProjectConfig(invalidSelection, {
+        projectDir: "/virtual",
+        relativePath: "ruby-service",
+      }),
+    ).toThrow(RUBY_RECIPE_EXTENSION_REASON);
+    expect(() => generateStackSelectionCommand(invalidSelection)).toThrow(
+      RUBY_RECIPE_EXTENSION_REASON,
+    );
+    expect(getDisabledReason(rubySelection(), "auth", "better-auth")).toBe(
+      RUBY_RECIPE_EXTENSION_REASON,
+    );
+    expect(
+      getRubyRecipeIssue({
+        stackParts: parseStackPartSpecs([
+          "backend:ruby:sinatra",
+          "continuousIntegration:universal:github-actions",
+        ]),
+      }),
+    ).toBe(RUBY_RECIPE_EXTENSION_REASON);
     const parts = parseStackPartSpecs(["backend:ruby:sinatra", "backend.orm:typescript:drizzle"]);
     expect(getRubyRecipeIssue({ stackParts: parts })).toBe(RUBY_RECIPE_EXTENSION_REASON);
-    expect(validateStackParts(parts).issues.some((issue) => issue.message === RUBY_RECIPE_EXTENSION_REASON)).toBe(true);
+    expect(
+      validateStackParts(parts).issues.some(
+        (issue) => issue.message === RUBY_RECIPE_EXTENSION_REASON,
+      ),
+    ).toBe(true);
   });
 
   it("rejects selected databases when Ruby is the only backend, in either picker order", () => {
     const ruby = parseStackPartSpecs(["backend:ruby:sinatra:api"]);
     const database = parseStackPartSpecs(["database:universal:sqlite"]);
-    expect(getStackPartOptions({ role: "database", ecosystem: "universal", parts: ruby })).not.toContain("sqlite");
-    expect(getStackPartOptions({ role: "backend", ecosystem: "ruby", parts: database })).not.toContain("sinatra");
+    expect(
+      getStackPartOptions({ role: "database", ecosystem: "universal", parts: ruby }),
+    ).not.toContain("sqlite");
+    expect(
+      getStackPartOptions({ role: "backend", ecosystem: "ruby", parts: database }),
+    ).not.toContain("sinatra");
     for (const specs of [
       ["backend:ruby:sinatra", "database:universal:sqlite"],
       ["database:universal:sqlite", "backend:ruby:sinatra"],
@@ -83,7 +175,11 @@ describe("Ruby recipe contracts", () => {
     ]) {
       const parts = parseStackPartSpecs(specs);
       expect(getRubyRecipeIssue({ stackParts: parts })).toBe(RUBY_RECIPE_EXTENSION_REASON);
-      expect(validateStackParts(parts).issues.some((issue) => issue.message === RUBY_RECIPE_EXTENSION_REASON)).toBe(true);
+      expect(
+        validateStackParts(parts).issues.some(
+          (issue) => issue.message === RUBY_RECIPE_EXTENSION_REASON,
+        ),
+      ).toBe(true);
     }
   });
 
@@ -93,26 +189,47 @@ describe("Ruby recipe contracts", () => {
       stackMode: "multi" as const,
       stackPartSpecs: ["backend:ruby:sinatra", "codeQuality:universal:biome"],
     };
-    expect(() => stackSelectionToProjectConfig(selection, { projectDir: "/virtual", relativePath: "ruby-service" })).toThrow(RUBY_RECIPE_EXTENSION_REASON);
+    expect(() =>
+      stackSelectionToProjectConfig(selection, {
+        projectDir: "/virtual",
+        relativePath: "ruby-service",
+      }),
+    ).toThrow(RUBY_RECIPE_EXTENSION_REASON);
     expect(() => generateStackSelectionCommand(selection)).toThrow(RUBY_RECIPE_EXTENSION_REASON);
   });
 
   it("retains database choices for unrelated Go and TypeScript backends", () => {
-    for (const [backend, orm] of [["go:gin", "go:gorm"], ["typescript:hono", "typescript:drizzle"]]) {
-      const parts = parseStackPartSpecs(["backend:ruby:sinatra:ruby-api", `backend:${backend}:data-api`, `data-api.orm:${orm}`, "database:universal:sqlite"]);
+    for (const [backend, orm] of [
+      ["go:gin", "go:gorm"],
+      ["typescript:hono", "typescript:drizzle"],
+    ]) {
+      const parts = parseStackPartSpecs([
+        "backend:ruby:sinatra:ruby-api",
+        `backend:${backend}:data-api`,
+        `data-api.orm:${orm}`,
+        "database:universal:sqlite",
+      ]);
       expect(getRubyRecipeIssue({ stackParts: parts })).toBeNull();
       expect(validateStackParts(parts).issues).toEqual([]);
-      expect(getStackPartOptions({ role: "database", ecosystem: "universal", parts })).toContain("sqlite");
+      expect(getStackPartOptions({ role: "database", ecosystem: "universal", parts })).toContain(
+        "sqlite",
+      );
       expect(stackPartsToLegacyProjectConfigPartial(parts).database).toBe("sqlite");
       expect(parts.find((part) => part.role === "orm")?.ownerPartId).toBe("data-api");
     }
-    const standaloneGo = parseStackPartSpecs(["backend:go:gin", "backend.orm:go:gorm", "database:universal:sqlite"]);
+    const standaloneGo = parseStackPartSpecs([
+      "backend:go:gin",
+      "backend.orm:go:gorm",
+      "database:universal:sqlite",
+    ]);
     expect(getRubyRecipeIssue({ stackParts: standaloneGo })).toBeNull();
     expect(validateStackParts(standaloneGo).issues).toEqual([]);
   });
 
   it("does not raise evidence from source availability", () => {
-    const records = getCapabilityInventory().filter((record) => record.ecosystem === "ruby" && record.optionId === "sinatra");
+    const records = getCapabilityInventory().filter(
+      (record) => record.ecosystem === "ruby" && record.optionId === "sinatra",
+    );
     expect(records).toHaveLength(1);
     expect(records[0]?.evidenceLevel).toBe("listed");
     expect(records[0]?.maturity).toBe("experimental");

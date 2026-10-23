@@ -22,7 +22,7 @@ bundle exec ruby bin/server
 - POST `/api/greetings` accepts exactly `{"name":"Ruby"}` and returns `{"greeting":"Hello, Ruby!"}`.
 - Blank, non-string, unknown-field, and over-80-character names return 422. Malformed JSON returns 400, non-JSON content returns 415, and bodies over 16 KiB return 413.
 
-The server binds to `127.0.0.1:{{rubyPort}}`. `HOST`, `PORT`, `RACK_ENV`, and `ALLOWED_ORIGIN` are process environment variables. `.env.example` documents values and is not loaded automatically. CORS permits the exact origin `{{rubyWebOrigin}}` by default. Set ALLOWED_ORIGIN for a different frontend. Host authorization accepts localhost and loopback addresses. Configure explicit trusted hosts before public hosting.
+The server binds to `127.0.0.1:{{rubyPort}}`. `HOST`, `PORT`, `RACK_ENV`, and `ALLOWED_ORIGIN` are process environment variables. `.env.example` documents values and is not loaded automatically. CORS permits the generated frontend origins `{{rubyWebOrigin}}` by default. Set ALLOWED_ORIGIN to a comma-separated list of trusted frontend origins to override them. Host authorization accepts localhost and loopback addresses. Configure explicit trusted hosts before public hosting.
 
 Use Ctrl-C to stop the foreground server. Add future routes in `app.rb` and behavior tests in `test/app_test.rb`. Keep Gemfile ownership inside this service when composed with other languages.
 

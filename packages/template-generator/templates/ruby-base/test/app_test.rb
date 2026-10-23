@@ -61,11 +61,55 @@ class AppTest < Minitest::Test
     assert_equal "not_found", JSON.parse(last_response.body).fetch("error")
   end
 
+  def test_oversized_form_is_rejected_before_reading_declared_input
+    input = StringIO.new("name=" + "a" * 1_048_576)
+    env = Rack::MockRequest.env_for("/api/greetings", method: "POST")
+    env["HTTP_HOST"] = "localhost"
+    env["CONTENT_TYPE"] = "application/x-www-form-urlencoded"
+    env["CONTENT_LENGTH"] = input.size.to_s
+    env["rack.input"] = input
+    status, _, body = app.call(env)
+    assert_equal 413, status
+    assert_equal "body_too_large", JSON.parse(body.to_a.join).fetch("error")
+    assert_equal 0, input.pos
+    body.close if body.respond_to?(:close)
+  end
+
+  def test_oversized_form_without_a_declared_length_is_bounded
+    input = StringIO.new("name=" + "a" * 1_048_576)
+    env = Rack::MockRequest.env_for("/api/greetings", method: "POST")
+    env["HTTP_HOST"] = "localhost"
+    env["CONTENT_TYPE"] = "application/x-www-form-urlencoded"
+    env.delete("CONTENT_LENGTH")
+    env["rack.input"] = input
+    status, _, body = app.call(env)
+    assert_equal 413, status
+    assert_equal "body_too_large", JSON.parse(body.to_a.join).fetch("error")
+    assert_operator input.pos, :<=, 16_385
+    body.close if body.respond_to?(:close)
+  end
+
+  def test_multiple_trusted_frontend_origins
+    previous = app.allowed_origins
+    app.set :allowed_origins, ["http://localhost:5173", "http://localhost:8080"]
+    app.allowed_origins.each do |origin|
+      header "Origin", origin
+      get "/health"
+      assert_equal 200, last_response.status
+      assert_equal origin, last_response.headers["access-control-allow-origin"]
+    end
+    header "Origin", "http://localhost:9999"
+    get "/health"
+    assert_equal 403, last_response.status
+  ensure
+    app.set :allowed_origins, previous
+  end
+
   def test_cors_origin_is_pinned
-    header "Origin", app.allowed_origin
+    header "Origin", app.allowed_origins.first
     options "/api/greetings"
     assert_equal 204, last_response.status
-    assert_equal app.allowed_origin, last_response.headers["access-control-allow-origin"]
+    assert_equal app.allowed_origins.first, last_response.headers["access-control-allow-origin"]
     header "Origin", "https://untrusted.example"
     post_json("name" => "Ruby")
     assert_equal 403, last_response.status

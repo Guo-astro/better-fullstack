@@ -587,13 +587,15 @@ export function getCapabilityInventory(
           passingEvidenceLevel,
           quarantineEntry ? "listed" : "runtime-verified",
         );
-        const maturity: CapabilityMaturity = ecosystem === "ruby" ? "experimental" : quarantineEntry
+        const maturity: CapabilityMaturity = quarantineEntry
           ? quarantineEntry.visibility === "hidden"
             ? "quarantined"
             : "experimental"
-          : recipeIds.length > 0 || CONTROL_CATEGORIES.has(category)
-            ? "stable"
-            : "experimental";
+          : ecosystem === "ruby"
+            ? "experimental"
+            : recipeIds.length > 0 || CONTROL_CATEGORIES.has(category)
+              ? "stable"
+              : "experimental";
         const freshness: CapabilityFreshness = quarantineEntry
           ? "quarantined"
           : failedRecipe

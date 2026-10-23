@@ -756,7 +756,12 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
     resolve: ({ value }: { value?: string[] } = {}) => resolveDotnetLibrariesPrompt(value as any),
     coverageContexts: [{}, { value: ["none"] }],
   },
-  rubyWebFramework: { schemaValues: RUBY_WEB_FRAMEWORK_VALUES, resolve: ({ value }: { value?: string } = {}) => resolveRubyWebFrameworkPrompt(value === undefined ? undefined : RubyWebFrameworkSchema.parse(value)), coverageContexts: [{}, { value: "none" }] },
+  rubyWebFramework: {
+    schemaValues: RUBY_WEB_FRAMEWORK_VALUES,
+    resolve: ({ value, allowNone }: { value?: string; allowNone?: boolean } = {}) =>
+      resolveRubyWebFrameworkPrompt(value === undefined ? undefined : RubyWebFrameworkSchema.parse(value), allowNone),
+    coverageContexts: [{}, { allowNone: true }],
+  },
   elixirWebFramework: {
     schemaValues: ELIXIR_WEB_FRAMEWORK_VALUES,
     resolve: ({ value }: { value?: string } = {}) => resolveElixirWebFrameworkPrompt(value as any),

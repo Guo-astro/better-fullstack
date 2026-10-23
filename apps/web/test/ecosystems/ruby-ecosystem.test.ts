@@ -1,11 +1,25 @@
+import {
+  getEcosystemDefaultStackSelection,
+  createStackSelectionSearchParams,
+  parseStackSelectionFromUrlRecord,
+} from "@better-fullstack/types/stack-translation";
 import { describe, expect, it } from "bun:test";
-import { getEcosystemDefaultStackSelection, createStackSelectionSearchParams, parseStackSelectionFromUrlRecord } from "@better-fullstack/types/stack-translation";
-import { ECOSYSTEMS, ECOSYSTEM_CATEGORIES, TECH_OPTIONS } from "@/lib/stack/constant";
+
+import { getComposerParts } from "@/components/stack-builder/stack-builder";
 import { stackStateToProjectConfig } from "@/lib/builder/preview-config";
-import { parseStackShareSlug, getStackSharePath } from "@/lib/stack/stack-share-paths";
 import { getStackRunSupport } from "@/lib/project/run-support";
+import { ECOSYSTEMS, ECOSYSTEM_CATEGORIES, TECH_OPTIONS } from "@/lib/stack/constant";
+import { parseStackShareSlug, getStackSharePath } from "@/lib/stack/stack-share-paths";
 
 describe("Ruby builder projections", () => {
+  it("keeps malformed saved bindings from throwing during composer rendering", () => {
+    expect(getComposerParts(["backend:ruby"])).toEqual([]);
+    expect(
+      getComposerParts(["backend:ruby:sinatra:reports"]).find((part) => part.role === "backend")
+        ?.id,
+    ).toBe("reports");
+  });
+
   it("opens the canonical Ruby share slug with native defaults and no frontend", () => {
     const stack = parseStackShareSlug("ruby");
     if (!stack) throw new Error("Ruby share slug was not recognized");
@@ -22,7 +36,9 @@ describe("Ruby builder projections", () => {
     expect(ECOSYSTEM_CATEGORIES.ruby).toContain("rubyWebFramework");
     expect(TECH_OPTIONS.rubyWebFramework.map((entry) => entry.id)).toEqual(["sinatra", "none"]);
     const selection = getEcosystemDefaultStackSelection("ruby");
-    const restored = parseStackSelectionFromUrlRecord(Object.fromEntries(createStackSelectionSearchParams(selection)));
+    const restored = parseStackSelectionFromUrlRecord(
+      Object.fromEntries(createStackSelectionSearchParams(selection)),
+    );
     const config = stackStateToProjectConfig(restored);
     expect(config.ecosystem).toBe("ruby");
     expect(config.rubyWebFramework).toBe("sinatra");

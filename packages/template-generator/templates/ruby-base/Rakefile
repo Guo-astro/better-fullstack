@@ -6,7 +6,7 @@ Rake::TestTask.new(:test) do |task|
 end
 
 task :build do
-  files = ["app.rb", "config.ru", "Rakefile", *Dir["test/**/*.rb"], *Dir["bin/*"]]
+  files = [*Dir["*.rb"], "config.ru", "Rakefile", *Dir["test/**/*.rb"], *Dir["bin/*"]]
   files.each do |file|
     abort "Syntax check failed: #{file}" unless system(RbConfig.ruby, "-c", file)
   end
