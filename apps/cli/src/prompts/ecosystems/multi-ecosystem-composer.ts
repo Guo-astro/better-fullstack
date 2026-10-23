@@ -1,3 +1,5 @@
+import { getRubyWebFrameworkChoice } from "@/prompts/ecosystems/ruby-ecosystem";
+
 import type {
   Database,
   Ecosystem,
@@ -184,7 +186,7 @@ import {
 type CompositionMode = "single" | "multi";
 export type BackendEcosystem = Extract<
   Ecosystem,
-  "typescript" | "go" | "rust" | "python" | "java" | "dotnet" | "elixir"
+  "typescript" | "go" | "rust" | "python" | "java" | "dotnet" | "elixir" | "ruby"
 >;
 export type FrontendEcosystem = "typescript" | "rust" | "dotnet";
 export type MobileEcosystem = "none" | "react-native" | "kotlin" | "swift" | "dart";
@@ -235,6 +237,7 @@ export async function selectBackendEcosystem(
       { value: "python", label: "Python", hint: "FastAPI, Django, Flask" },
       { value: "java", label: "Java / Kotlin", hint: "Spring Boot, Ktor, Quarkus" },
       { value: "dotnet", label: ".NET", hint: "ASP.NET Core, EF Core, SignalR" },
+      { value: "ruby", label: "Ruby", hint: "Experimental Sinatra JSON service" },
       { value: "elixir", label: "Elixir", hint: "Phoenix, LiveView" },
     ],
     initialValue,
@@ -1420,6 +1423,12 @@ export async function gatherMultiEcosystemConfig(
     for (const library of dotnetLibraries) {
       if (library !== "none") stackPartSpecs.push(`backend.libraries:dotnet:${library}`);
     }
+  }
+
+  if (backendEcosystem === "ruby") {
+    const rubyWebFramework = promptValue(await getRubyWebFrameworkChoice(flags.rubyWebFramework));
+    Object.assign(backendChoices, { rubyWebFramework });
+    if (rubyWebFramework !== "none") stackPartSpecs.push(`backend:ruby:${rubyWebFramework}`);
   }
 
   if (backendEcosystem === "elixir") {

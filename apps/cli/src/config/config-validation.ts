@@ -1,3 +1,4 @@
+import { getRubyRecipeIssue } from "@better-fullstack/types";
 import consola from "consola";
 import pc from "picocolors";
 
@@ -268,6 +269,8 @@ function getEcosystemBackend(cfg: Partial<ProjectConfig>) {
       return cfg.dotnetWebFramework && cfg.dotnetWebFramework !== "none"
         ? cfg.dotnetWebFramework
         : undefined;
+    case "ruby":
+      return cfg.rubyWebFramework && cfg.rubyWebFramework !== "none" ? cfg.rubyWebFramework : undefined;
     case "elixir":
       return cfg.elixirWebFramework && cfg.elixirWebFramework !== "none"
         ? cfg.elixirWebFramework
@@ -1539,6 +1542,8 @@ export function validateFullConfig(
   options: CLIInput,
   partial = false,
 ) {
+  const rubyIssue = getRubyRecipeIssue(config);
+  if (rubyIssue) throw new Error(rubyIssue);
   validateCodeQualityConstraints(config, partial);
   if (config.stackParts && !isToolingOverlayOnly(config.stackParts) && !options.yolo) {
     const graphValidation = validateStackParts(config.stackParts);
@@ -1730,6 +1735,8 @@ export function validateFullConfig(
 
 export function validateConfigForProgrammaticUse(config: Partial<ProjectConfig>) {
   try {
+    const rubyIssue = getRubyRecipeIssue(config);
+    if (rubyIssue) throw new Error(rubyIssue);
     validateCodeQualityConstraints(config);
     if (config.stackParts) {
       const graphValidation = validateStackParts(config.stackParts);

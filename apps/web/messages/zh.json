@@ -583,6 +583,7 @@
   "docsCliSummaryDotnetDotnetCaching": ".NET 缓存。",
   "docsCliSummaryDotnetDotnetDeploy": ".NET 部署目标。",
   "docsCliSummaryDotnetDotnetLibraries": "可选的 .NET 库。",
+  "docsCliSummaryRubyRubyWebFramework": "Ruby HTTP 框架。",
   "docsCliSummaryElixirElixirWebFramework": "Elixir Web 框架。",
   "docsCliSummaryElixirElixirOrm": "Elixir ORM / 数据库。",
   "docsCliSummaryElixirElixirAuth": "Elixir 认证。",

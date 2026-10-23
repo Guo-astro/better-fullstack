@@ -82,6 +82,8 @@ export function processReadme(vfs: VirtualFileSystem, config: ProjectConfig): vo
   let content: string;
   if (config.stackParts?.length && !isToolingOverlayOnly(config.stackParts)) {
     content = generateGraphReadmeContent(config);
+  } else if (config.ecosystem === "ruby" && vfs.exists("README.md")) {
+    return;
   } else if (config.ecosystem === "rust") {
     content = generateRustReadmeContent(config);
   } else if (config.ecosystem === "python") {

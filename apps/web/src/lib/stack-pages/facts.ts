@@ -69,6 +69,7 @@ const CORE_KEYS_BY_ECOSYSTEM: Record<string, StackSelectionKey[]> = {
     "dotnetObservability",
     "dotnetTesting",
   ],
+  ruby: ["rubyWebFramework"],
   elixir: [
     "elixirWebFramework",
     "database",
@@ -126,6 +127,7 @@ const ROLE_LABELS: Partial<Record<OptionCategory, string>> = {
   dotnetJobQueue: "Background jobs",
   dotnetObservability: "Observability",
   dotnetTesting: "Testing",
+  rubyWebFramework: "Backend",
   elixirWebFramework: "Backend",
   elixirOrm: "ORM",
   elixirAuth: "Authentication",

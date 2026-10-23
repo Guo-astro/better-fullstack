@@ -584,6 +584,7 @@
   "docsCliSummaryDotnetDotnetCaching": "Кешування в .NET.",
   "docsCliSummaryDotnetDotnetDeploy": "Цільове середовище розгортання .NET.",
   "docsCliSummaryDotnetDotnetLibraries": "Необов’язкові бібліотеки .NET.",
+  "docsCliSummaryRubyRubyWebFramework": "HTTP-фреймворк Ruby.",
   "docsCliSummaryElixirElixirWebFramework": "Вебфреймворк Elixir.",
   "docsCliSummaryElixirElixirOrm": "ORM / база даних Elixir.",
   "docsCliSummaryElixirElixirAuth": "Автентифікація в Elixir.",

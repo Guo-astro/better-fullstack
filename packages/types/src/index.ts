@@ -21,3 +21,5 @@ export * from "@/stack/starter-tracks";
 export * from "@/catalog/preset-ids";
 export * from "@/stack/presets";
 export * from "@/telemetry/telemetry";
+
+export * from "@/stack/ruby-compatibility";

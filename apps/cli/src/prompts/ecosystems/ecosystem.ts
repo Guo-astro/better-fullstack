@@ -40,6 +40,7 @@ export const ECOSYSTEM_PROMPT_OPTIONS = [
     label: ".NET",
     hint: "ASP.NET Core ecosystem with Minimal APIs, EF Core, SignalR, and more",
   },
+  { value: "ruby" as const, label: "Ruby", hint: "Experimental Sinatra HTTP service with Bundler and Minitest" },
   {
     value: "elixir" as const,
     label: "Elixir",

@@ -227,6 +227,8 @@ async function checkNativeTargetDependencies(
         ),
       ];
     }
+    case "ruby":
+      return [await expectedFileCheck(target, "Gemfile", "fail", "Generated Bundler manifest is missing"), await expectedFileCheck(target, "Gemfile.lock", "warn", "Run bundle install to resolve dependencies")];
     case "elixir":
       return [
         await expectedFileCheck(

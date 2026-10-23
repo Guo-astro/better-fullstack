@@ -1,4 +1,6 @@
 import {
+  createRubyProjectConfigDefaults,
+  getRubyRecipeIssue,
   DEFAULT_STACK_SELECTION,
   BackendSchema,
   type BetterTStackConfig,
@@ -181,6 +183,8 @@ export function getInstallCommand(
       return `cd ${projectName} && uv sync --extra dev`;
     case "go":
       return `cd ${projectName} && go mod tidy`;
+    case "ruby":
+      return `cd ${projectName} && bundle install`;
     case "elixir":
       return `cd ${projectName} && mix deps.get && mix compile && mix test`;
     case "java":
@@ -303,10 +307,11 @@ function applyMcpInputDefaults<TDefaults extends Record<string, string | string[
   defaults: TDefaults,
   input: Record<string, unknown>,
 ) {
+  const rubyDefaults = createRubyProjectConfigDefaults();
   return Object.fromEntries(
     Object.entries(defaults).map(([key, fallback]) => [
       key,
-      input[key] ?? cloneMcpInputDefault(fallback),
+      input[key] ?? (input.ecosystem === "ruby" && (!Array.isArray(input.part) || input.part.length === 0) ? rubyDefaults[key as keyof ProjectConfig] : undefined) ?? cloneMcpInputDefault(fallback),
     ]),
   );
 }
@@ -347,6 +352,8 @@ export function validateMcpProjectConfigCompatibility(
       >
     >,
 ): void {
+  const rubyIssue = getRubyRecipeIssue(config);
+  if (rubyIssue) throw new Error(rubyIssue);
   const qualityIssue = getCodeQualitySelectionIssue(config.addons ?? []);
   if (qualityIssue) throw new Error(qualityIssue);
   const pythonLoggingIssue = getPythonLoggingSelectionIssue(config);

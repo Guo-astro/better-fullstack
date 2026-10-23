@@ -18,6 +18,12 @@ export function processGraphBackendEnv(vfs: VirtualFileSystem, config: ProjectCo
   for (const connection of getGraphBackendConnections(config)) {
     if (!connection.webOrigin || !vfs.directoryExists(connection.targetPath)) continue;
 
+    if (connection.ecosystem === "ruby") {
+      const path = `${connection.targetPath}/.env.example`;
+      const current = vfs.readFile(path) ?? "";
+      vfs.writeFile(path, current.replace(/^ALLOWED_ORIGIN=.*$/m, `ALLOWED_ORIGIN=${connection.webOrigin}`));
+      continue;
+    }
     const line = `CORS_ORIGIN=${connection.webOrigin}`;
     for (const file of [".env", ".env.example"]) {
       const path = `${connection.targetPath}/${file}`;

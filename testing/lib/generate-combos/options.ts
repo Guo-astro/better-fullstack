@@ -608,6 +608,10 @@ function makeJavaDraft(args: GeneratorArgs): CandidateDraft {
   };
 }
 
+function makeRubyDraft(args: GeneratorArgs): CandidateDraft {
+  return { ecosystem: "ruby", options: { ...createCommonOptions("ruby", args), rubyWebFramework: "sinatra", database: "none", addons: ["none"], examples: ["none"] } };
+}
+
 function makeElixirDraft(args: GeneratorArgs): CandidateDraft {
   const elixirWebFramework = sampleScalar(ELIXIR_WEB_FRAMEWORK_VALUES, 0.08, "elixirWebFramework");
   const usesPhoenix = elixirWebFramework !== "none";
@@ -843,6 +847,7 @@ function createValidationBase(projectName: string, draft: CandidateDraft): Proje
     javaTestingLibraries: [],
     mobileLibraries: [],
     dotnetLibraries: [],
+    rubyWebFramework: "none",
     elixirWebFramework: "none",
     elixirOrm: "none",
     elixirAuth: "none",
@@ -971,6 +976,8 @@ function createDraft(ecosystem: Ecosystem, args: GeneratorArgs): CandidateDraft 
       return makeGoDraft(args);
     case "java":
       return makeJavaDraft(args);
+    case "ruby":
+      return makeRubyDraft(args);
     case "elixir":
       return makeElixirDraft(args);
     case "dotnet":

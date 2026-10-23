@@ -700,6 +700,7 @@ export async function createProjectHandler(
               dotnetCaching: "none",
               dotnetDeploy: "none",
               dotnetLibraries: [],
+              rubyWebFramework: "none",
               elixirWebFramework: "none",
               elixirOrm: "none",
               elixirAuth: "none",

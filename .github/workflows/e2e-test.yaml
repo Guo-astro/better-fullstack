@@ -290,6 +290,11 @@ jobs:
 
       - uses: astral-sh/setup-uv@v5
 
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4.11"
+          bundler: "4.0.21"
+
       - uses: erlef/setup-beam@v1
         with:
           otp-version: "27"

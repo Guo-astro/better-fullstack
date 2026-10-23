@@ -37,7 +37,8 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
           "go",
           "java",
           "elixir",
-          "dotnet"
+          "dotnet",
+          "ruby"
         ],
         "valueHint": null,
         "defaultValue": "typescript",
@@ -1283,7 +1284,7 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
           "none"
         ],
         "valueHint": null,
-        "defaultValue": "none",
+        "defaultValue": "axum",
         "multiple": false
       },
       {
@@ -1312,7 +1313,7 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
           "none"
         ],
         "valueHint": null,
-        "defaultValue": "none",
+        "defaultValue": "sea-orm",
         "multiple": false
       },
       {
@@ -2367,6 +2368,24 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
     ]
   },
   {
+    "id": "ruby",
+    "title": "Ruby flags",
+    "description": "Flags for `--ecosystem ruby`.",
+    "flags": [
+      {
+        "flag": "--ruby-web-framework",
+        "summary": "Ruby HTTP framework.",
+        "values": [
+          "sinatra",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "sinatra",
+        "multiple": false
+      }
+    ]
+  },
+  {
     "id": "elixir",
     "title": "Elixir flags",
     "description": "Flags for `--ecosystem elixir`.",
@@ -2806,6 +2825,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "dotnet:--dotnet-caching": m.docsCliSummaryDotnetDotnetCaching,
   "dotnet:--dotnet-deploy": m.docsCliSummaryDotnetDotnetDeploy,
   "dotnet:--dotnet-libraries": m.docsCliSummaryDotnetDotnetLibraries,
+  "ruby:--ruby-web-framework": m.docsCliSummaryRubyRubyWebFramework,
   "elixir:--elixir-web-framework": m.docsCliSummaryElixirElixirWebFramework,
   "elixir:--elixir-orm": m.docsCliSummaryElixirElixirOrm,
   "elixir:--elixir-auth": m.docsCliSummaryElixirElixirAuth,

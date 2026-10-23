@@ -314,6 +314,7 @@ export const SECTIONS_BY_ECOSYSTEM: Record<Ecosystem, readonly BuilderSectionDef
   go: GO_SECTIONS,
   java: JAVA_SECTIONS,
   dotnet: DOTNET_SECTIONS,
+  ruby: [section("frameworkBuild", "Framework & Build", ["rubyWebFramework"]), section("deployScaffold", "Deploy & Scaffold", ["aiDocs", "git", "install"])],
   elixir: ELIXIR_SECTIONS,
 };
 

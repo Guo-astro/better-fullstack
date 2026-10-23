@@ -31,6 +31,9 @@ const VERSION_FILES = [
   "pom.xml",
   "build.gradle",
   "build.gradle.kts",
+  "Gemfile",
+  "Gemfile.lock",
+  ".ruby-version",
   "mix.exs",
   "mix.lock",
 ] as const;

@@ -342,3 +342,13 @@ export async function runMixCompile({
     return toStepFailure(step, error, errorMessage);
   }
 }
+
+export async function runBundleInstall({ projectDir }: { projectDir: string }): Promise<SetupStepResult> {
+  const step = "bundle install";
+  try {
+    await $({ cwd: projectDir, stderr: ["inherit", "pipe"] })`bundle install`;
+    return { step, success: true };
+  } catch (error) {
+    return toStepFailure(step, error, toErrorMessage(error));
+  }
+}

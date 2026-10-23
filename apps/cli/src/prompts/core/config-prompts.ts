@@ -1,3 +1,4 @@
+import { getRubyWebFrameworkChoice } from "@/prompts/ecosystems/ruby-ecosystem";
 import { log } from "@clack/prompts";
 
 import type {
@@ -45,6 +46,7 @@ import type {
   ElixirRealtime,
   ElixirTesting,
   ElixirValidation,
+  RubyWebFramework,
   ElixirWebFramework,
   I18n,
   Database,
@@ -481,6 +483,7 @@ type PromptGroupResults = {
   dotnetDeploy: DotnetDeploy;
   dotnetLibraries: DotnetLibraries[];
   // Elixir ecosystem
+  rubyWebFramework: RubyWebFramework;
   elixirWebFramework: ElixirWebFramework;
   elixirOrm: ElixirOrm;
   elixirAuth: ElixirAuth;
@@ -662,6 +665,7 @@ const CONFIG_PROMPT_ENTRY_KEY_MAP = {
   dotnetCaching: true,
   dotnetDeploy: true,
   dotnetLibraries: true,
+  rubyWebFramework: true,
   elixirWebFramework: true,
   elixirOrm: true,
   elixirAuth: true,
@@ -883,6 +887,12 @@ function scopedPrompt<K extends PromptGroupKey>(
   }) => Promise<PromptGroupResults[K] | symbol | undefined> | undefined,
 ) {
   return (opts: { results: Partial<PromptGroupResults> }) => {
+    if (key === "rubyWebFramework" && opts.results.ecosystem !== "ruby") return Promise.resolve("none" as PromptGroupResults[K]);
+    if (opts.results.ecosystem === "ruby" && !CONFIG_SCOPE_META_KEYS.has(key) && !["rubyWebFramework", "aiDocs", "git", "install", "packageManager", "workspaceShape"].includes(key)) {
+      const supplied = flags[key as keyof ProjectConfig];
+      const value = supplied ?? (key === "javaLanguage" ? "java" : key === "shadcnOptions" || key === "astroIntegration" ? undefined : Array.isArray(getDefaultPromptValue(key as ConfigPromptKey)) ? [] : "none");
+      return Promise.resolve(value as PromptGroupResults[K]);
+    }
     if (
       !CONFIG_SCOPE_META_KEYS.has(key) &&
       !shouldAskConfigPromptKey(
@@ -1780,6 +1790,7 @@ export async function gatherConfig(
       return getDotnetLibrariesChoice(flags.dotnetLibraries);
     },
     // Elixir ecosystem prompts (skip if not Elixir)
+    rubyWebFramework: ({ results }) => results.ecosystem === "ruby" ? getRubyWebFrameworkChoice(flags.rubyWebFramework) : Promise.resolve("none" as const),
     elixirWebFramework: ({ results }) => {
       if (results.ecosystem !== "elixir") return Promise.resolve("none" as ElixirWebFramework);
       return getElixirWebFrameworkChoice(flags.elixirWebFramework);
@@ -1879,6 +1890,7 @@ export async function gatherConfig(
         results.ecosystem === "go" ||
         results.ecosystem === "java" ||
         results.ecosystem === "dotnet" ||
+        results.ecosystem === "ruby" ||
         results.ecosystem === "elixir"
       )
         return Promise.resolve(flags.packageManager ?? getUserPkgManager());
@@ -2042,6 +2054,7 @@ export async function gatherConfig(
     dotnetDeploy: result.dotnetDeploy,
     dotnetLibraries: result.dotnetLibraries,
     // Elixir ecosystem options
+    rubyWebFramework: result.rubyWebFramework,
     elixirWebFramework: result.elixirWebFramework,
     elixirOrm: result.elixirOrm,
     elixirAuth: result.elixirAuth,

@@ -13,6 +13,7 @@ const PROJECT_ECOSYSTEMS = new Set<ProjectEcosystem>([
   "python",
   "go",
   "java",
+  "ruby",
   "elixir",
   "dotnet",
 ]);
@@ -22,6 +23,7 @@ const ECOSYSTEM_TEMPLATE_FAMILY: Partial<Record<StackPartEcosystem, TemplateFami
   python: "python-base",
   go: "go-base",
   java: "java-base",
+  ruby: "ruby-base",
   elixir: "elixir-base",
   dotnet: "dotnet-base",
 };

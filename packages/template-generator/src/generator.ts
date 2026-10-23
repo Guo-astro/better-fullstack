@@ -1,6 +1,7 @@
 import type { ProjectConfig, StackPart } from "@better-fullstack/types";
 
 import {
+  getRubyRecipeIssue,
   parseStackPartSpecs,
   formatStackGraphIssue,
   getCodeQualitySelectionIssue,
@@ -50,6 +51,7 @@ import {
   processGoBaseTemplate,
   processJavaBaseTemplate,
   processDotnetBaseTemplate,
+  processRubyBaseTemplate,
   processElixirBaseTemplate,
   processFrontendTemplates,
   processGraphNativeAppTemplates,
@@ -112,6 +114,7 @@ const ECOSYSTEM_BASE_TEMPLATE_PROCESSORS = {
   go: processGoBaseTemplate,
   java: processJavaBaseTemplate,
   dotnet: processDotnetBaseTemplate,
+  ruby: processRubyBaseTemplate,
   elixir: processElixirBaseTemplate,
 } satisfies Record<NonTypeScriptTemplateEcosystem, EcosystemBaseTemplateProcessor>;
 
@@ -335,7 +338,8 @@ async function processGraphTemplates(
             pythonPackageManager: config.pythonPackageManager ?? "uv",
           }
         : projectedConfig;
-    await ECOSYSTEM_BASE_TEMPLATE_PROCESSORS[ecosystem](vfs, templates, backendConfig, targetPath);
+    const templateConfig = ecosystem === "ruby" ? { ...backendConfig, stackParts: config.stackParts } : backendConfig;
+    await ECOSYSTEM_BASE_TEMPLATE_PROCESSORS[ecosystem](vfs, templates, templateConfig, targetPath);
   }
 
   // Pin the backend's CORS to the web frontend's dev origin (must run after the
@@ -463,6 +467,9 @@ function resolveGenerationConfig(config: ProjectConfig): ProjectConfig {
 
 export async function generateVirtualProject(options: GeneratorOptions): Promise<GeneratorResult> {
   try {
+    const rubyIssue = getRubyRecipeIssue(options.config);
+    if (rubyIssue) return { success: false, error: rubyIssue };
+
     const { config, templates } = options;
 
     if (!templates || templates.size === 0) {

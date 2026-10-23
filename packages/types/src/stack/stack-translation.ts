@@ -1,3 +1,4 @@
+import { createRubyProjectConfigDefaults, getRubyRecipeIssue } from "@/stack/ruby-compatibility";
 import type {
   CLIInput,
   ProjectConfig,
@@ -200,6 +201,7 @@ export const STACK_SELECTION_OPTION_CATEGORY_BY_KEY: Record<
   dotnetCaching: "dotnetCaching",
   dotnetDeploy: "dotnetDeploy",
   dotnetLibraries: "dotnetLibraries",
+  rubyWebFramework: "rubyWebFramework",
   elixirWebFramework: "elixirWebFramework",
   elixirOrm: "elixirOrm",
   elixirAuth: "elixirAuth",
@@ -396,6 +398,7 @@ export const STACK_SELECTION_URL_KEYS = {
   dotnetCaching: "dncache",
   dotnetDeploy: "dndeploy",
   dotnetLibraries: "dnlib",
+  rubyWebFramework: "rbwf",
   elixirWebFramework: "ewf",
   elixirOrm: "eorm",
   elixirAuth: "eauth",
@@ -563,15 +566,25 @@ function parseScalarSelectionValue(value: StackSelectionUrlValue, defaultValue: 
   return defaultValue;
 }
 
+export function getEcosystemDefaultStackSelection(ecosystem: StackSelectionState["ecosystem"]): StackSelectionState {
+  const selection = cloneDefaultStackSelection();
+  if (ecosystem !== "ruby") return { ...selection, ecosystem };
+  const defaults = createRubyProjectConfigDefaults();
+  const renamed: Record<string, string> = { frontend: "webFrontend", addons: "appPlatforms", ai: "aiSdk", effect: "backendLibraries" };
+  for (const [key, value] of Object.entries(defaults)) (selection as unknown as Record<string, unknown>)[renamed[key] ?? key] = value;
+  return { ...selection, ecosystem, nativeFrontend: ["none"], codeQuality: [], documentation: [] };
+}
+
 export function parseStackSelectionFromUrlRecord(
   params: StackSelectionUrlRecord,
 ): StackSelectionState {
-  const parsed = cloneDefaultStackSelection() as Record<string, unknown>;
+  const defaults = getEcosystemDefaultStackSelection(parseScalarSelectionValue(params.eco, "typescript") === "ruby" ? "ruby" : "typescript");
+  const parsed = structuredClone(defaults) as Record<string, unknown>;
 
   for (const stackKey of STACK_SELECTION_KEYS) {
     const urlKey = STACK_SELECTION_URL_KEYS[stackKey];
     const rawValue = params[urlKey];
-    const defaultValue = DEFAULT_STACK_SELECTION[stackKey];
+    const defaultValue = defaults[stackKey];
 
     if (isArrayStackSelectionKey(stackKey)) {
       parsed[stackKey] = parseArraySelectionValue(rawValue, defaultValue as string[]);
@@ -782,6 +795,7 @@ const CLI_SCALAR_CONFIG_FIELDS = [
   ["dotnetValidation", "dotnetValidation"],
   ["dotnetCaching", "dotnetCaching"],
   ["dotnetDeploy", "dotnetDeploy"],
+  ["rubyWebFramework", "rubyWebFramework"],
   ["elixirWebFramework", "elixirWebFramework"],
   ["elixirOrm", "elixirOrm"],
   ["elixirAuth", "elixirAuth"],
@@ -1650,9 +1664,10 @@ export function isGraphStackSelection(
 }
 
 function getGraphStackParts(selection: StackSelectionInput) {
-  const hasJavaScript = hasJavaScriptWorkspaceRoot(
-    parseStackPartSpecs(selection.stackPartSpecs, "selected"),
-  );
+  const selectedParts = parseStackPartSpecs(selection.stackPartSpecs, "selected");
+  const rubyIssue = getRubyRecipeIssue({ stackParts: selectedParts });
+  if (rubyIssue) throw new Error(rubyIssue);
+  const hasJavaScript = hasJavaScriptWorkspaceRoot(selectedParts);
   const fields = getSelectionScopedPartFields(selection).map((field) => ({
     ...field,
     value: (Array.isArray(field.value) ? field.value : [field.value]).filter(
@@ -1686,6 +1701,7 @@ function getGraphStackParts(selection: StackSelectionInput) {
 }
 
 function getAdjustedSelection(selection: StackSelectionInput): StackSelectionInput {
+  if (selection.ecosystem === "ruby" && !isGraphStackSelection(selection)) return selection;
   const compatibility = analyzeStackCompatibility(selection);
   if (!compatibility.adjustedStack) return selection;
   return { ...selection, ...compatibility.adjustedStack };
@@ -1736,7 +1752,7 @@ export function cliInputToProjectConfigPartial(
   input: CLIInput,
   projectName?: string,
 ): Partial<ProjectConfig> {
-  const config: Partial<ProjectConfig> = {};
+  const config: Partial<ProjectConfig> = input.ecosystem === "ruby" && !input.part?.length ? createRubyProjectConfigDefaults() : {};
   const assignableConfig = config as Partial<Record<keyof ProjectConfig, unknown>>;
 
   for (const [inputKey, configKey] of CLI_SCALAR_CONFIG_FIELDS) {
@@ -1877,7 +1893,7 @@ function buildProjectConfigBase(
     orm: stack.orm as ProjectConfig["orm"],
     backend: mapBackendToCli(stack.backend) as ProjectConfig["backend"],
     runtime: stack.runtime as ProjectConfig["runtime"],
-    frontend: frontend.length > 0 ? frontend : ["tanstack-router"],
+    frontend: frontend.length > 0 || stack.ecosystem === "ruby" ? frontend : ["tanstack-router"],
     addons: [
       ...toUniqueNonNoneArray(stack.codeQuality),
       ...toUniqueNonNoneArray(stack.documentation),
@@ -2031,6 +2047,7 @@ function buildProjectConfigBase(
     dotnetLibraries: toUniqueNonNoneArray(
       stack.dotnetLibraries,
     ) as ProjectConfig["dotnetLibraries"],
+    rubyWebFramework: stack.rubyWebFramework as ProjectConfig["rubyWebFramework"],
     elixirWebFramework: stack.elixirWebFramework as ProjectConfig["elixirWebFramework"],
     elixirOrm: stack.elixirOrm as ProjectConfig["elixirOrm"],
     elixirAuth: stack.elixirAuth as ProjectConfig["elixirAuth"],
@@ -2059,6 +2076,8 @@ function buildProjectConfigBase(
   };
 
   if (!isGraphStackSelection(graphStack)) {
+    const rubyIssue = getRubyRecipeIssue(baseConfig);
+    if (rubyIssue) throw new Error(rubyIssue);
     return baseConfig;
   }
 
@@ -2126,6 +2145,7 @@ export function isCliDefaultStackSelection(
           ...GO_CONFIG_KEYS,
           ...JAVA_CONFIG_KEYS,
           ...DOTNET_CONFIG_KEYS,
+          "rubyWebFramework",
           ...ELIXIR_CONFIG_KEYS,
           ...(selection.ecosystem === "typescript" ? REACT_NATIVE_CONFIG_KEYS : []),
         ])
@@ -2506,6 +2526,14 @@ function generateDotnetCommand(selection: StackSelectionInput, projectName: stri
   return `${getBaseCommand(selection)} ${projectName} ${flags.join(" ")}`;
 }
 
+function generateRubyCommand(selection: StackSelectionInput, projectName: string) {
+  stackSelectionToCliComparableConfig(selection, projectName);
+  const flags = ["--ecosystem ruby", `--ruby-web-framework ${selection.rubyWebFramework}`, "--database none", "--addons none", "--examples none", formatArrayFlag("ai-docs", selection.aiDocs)];
+  if (selection.git === "false") flags.push("--no-git");
+  if (selection.install === "false") flags.push("--no-install");
+  return `${getBaseCommand(selection)} ${projectName} ${flags.join(" ")}`;
+}
+
 function generateElixirCommand(selection: StackSelectionInput, projectName: string) {
   const flags: string[] = [
     "--ecosystem elixir",
@@ -2560,6 +2588,8 @@ export function generateStackSelectionCommand(selection: StackSelectionInput): s
       return generateJavaCommand(selection, projectName);
     case "dotnet":
       return generateDotnetCommand(selection, projectName);
+    case "ruby":
+      return generateRubyCommand(selection, projectName);
     case "elixir":
       return generateElixirCommand(selection, projectName);
     case "typescript":

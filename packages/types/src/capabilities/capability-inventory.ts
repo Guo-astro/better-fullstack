@@ -538,6 +538,7 @@ export function getCapabilityInventory(
     "go",
     "java",
     "dotnet",
+    "ruby",
     "elixir",
   ] as const) {
     for (const category of getCategoryOrderForEcosystem(ecosystem)) {
@@ -586,7 +587,7 @@ export function getCapabilityInventory(
           passingEvidenceLevel,
           quarantineEntry ? "listed" : "runtime-verified",
         );
-        const maturity: CapabilityMaturity = quarantineEntry
+        const maturity: CapabilityMaturity = ecosystem === "ruby" ? "experimental" : quarantineEntry
           ? quarantineEntry.visibility === "hidden"
             ? "quarantined"
             : "experimental"

@@ -19,6 +19,7 @@ const ECOSYSTEM_DISPLAY_NAMES: Record<(typeof ECOSYSTEM_VALUES)[number], string>
   python: "Python",
   go: "Go",
   java: "Java",
+  ruby: "Ruby",
   elixir: "Elixir",
   dotnet: ".NET",
 };

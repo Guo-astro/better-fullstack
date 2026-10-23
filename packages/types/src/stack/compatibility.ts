@@ -1,3 +1,4 @@
+import { RUBY_RECIPE_EXTENSION_REASON, RUBY_RECIPE_FRAMEWORK_REASON, RUBY_UNSUPPORTED_CONFIG_KEYS } from "@/stack/ruby-compatibility";
 import type {
   AI,
   Addons,
@@ -404,7 +405,8 @@ export type CompatibilityInput = {
     | "go"
     | "java"
     | "elixir"
-    | "dotnet";
+    | "dotnet"
+    | "ruby";
   projectName: string | null;
   webFrontend: string[];
   nativeFrontend: string[];
@@ -553,6 +555,7 @@ export type CompatibilityInput = {
   dotnetCaching: string;
   dotnetDeploy: string;
   dotnetLibraries: string[];
+  rubyWebFramework: string;
   elixirWebFramework: string;
   elixirOrm: string;
   elixirAuth: string;
@@ -2906,6 +2909,12 @@ export const getDisabledReason = (
   category: CompatibilityCategory,
   optionId: string,
 ): string | null => {
+  if (currentStack.ecosystem === "ruby") {
+    if (category === "rubyWebFramework" && optionId === "none") return RUBY_RECIPE_FRAMEWORK_REASON;
+    const key = category === "webFrontend" || category === "nativeFrontend" ? "frontend" : category === "backendLibraries" ? "effect" : category === "appPlatforms" ? "addons" : category;
+    if (optionId !== "none" && RUBY_UNSUPPORTED_CONFIG_KEYS.some((entry) => entry === key)) return RUBY_RECIPE_EXTENSION_REASON;
+  }
+
   if (
     optionId !== "none" &&
     category === "kotlinMobileLibraries" &&
@@ -6104,7 +6113,7 @@ const ISSUE_CODE_BY_CATEGORY: Partial<Record<OptionCategory, string>> = {
   dotnetLibraries: "INCOMPATIBLE_DOTNET_LIBRARY",
 };
 
-const SERVER_ECOSYSTEMS = ["rust", "python", "go", "java", "dotnet", "elixir"] as const;
+const SERVER_ECOSYSTEMS = ["rust", "python", "go", "java", "dotnet", "elixir", "ruby"] as const;
 
 const typeScriptCategories: ReadonlySet<OptionCategory> = new Set(
   getCategoryOrderForEcosystem("typescript"),

@@ -5955,6 +5955,10 @@ export const TECH_OPTIONS: Record<
     },
   ],
   // Elixir ecosystem options
+  rubyWebFramework: [
+    { id: "sinatra", name: "Sinatra", description: "Experimental JSON HTTP service with Bundler, Puma, and Minitest/Rack tests", icon: "https://cdn.simpleicons.org/ruby/CC342D", color: "from-red-500 to-red-700", default: true },
+    { id: "none", name: "No Ruby backend", description: "Disable the Ruby service", icon: "", color: "from-gray-400 to-gray-600" },
+  ],
   elixirWebFramework: [
     {
       id: "phoenix",
@@ -7740,6 +7744,7 @@ export const ECOSYSTEMS: {
     icon: "/icon/java.svg",
     color: "from-red-500 to-orange-600",
   },
+  { id: "ruby", name: "Ruby", description: "Experimental Sinatra HTTP recipe", icon: "https://cdn.simpleicons.org/ruby/CC342D", color: "from-red-500 to-red-700" },
   {
     id: "elixir",
     name: "Elixir",

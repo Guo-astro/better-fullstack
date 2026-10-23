@@ -1,3 +1,4 @@
+import { resolveRubyWebFrameworkPrompt } from "@/prompts/ecosystems/ruby-ecosystem";
 import {
   AI_VALUES,
   ANIMATION_VALUES,
@@ -40,6 +41,8 @@ import {
   ELIXIR_REALTIME_VALUES,
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
+  RUBY_WEB_FRAMEWORK_VALUES,
+  RubyWebFrameworkSchema,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   EMAIL_VALUES,
   FILE_UPLOAD_VALUES,
@@ -753,6 +756,7 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
     resolve: ({ value }: { value?: string[] } = {}) => resolveDotnetLibrariesPrompt(value as any),
     coverageContexts: [{}, { value: ["none"] }],
   },
+  rubyWebFramework: { schemaValues: RUBY_WEB_FRAMEWORK_VALUES, resolve: ({ value }: { value?: string } = {}) => resolveRubyWebFrameworkPrompt(value === undefined ? undefined : RubyWebFrameworkSchema.parse(value)), coverageContexts: [{}, { value: "none" }] },
   elixirWebFramework: {
     schemaValues: ELIXIR_WEB_FRAMEWORK_VALUES,
     resolve: ({ value }: { value?: string } = {}) => resolveElixirWebFrameworkPrompt(value as any),

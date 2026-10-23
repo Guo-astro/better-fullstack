@@ -35,6 +35,10 @@ The proof writes `generated-project-proof.json` and `capability-runtime-receipt.
 `testing/.smoke-output/generated-project-proof/`. A release receipt embeds the capability receipt
 only when all eight recipes pass from a clean, full-SHA checkout.
 
+## Experimental Ruby observation
+
+Ruby's Sinatra recipe uses a separate `testing/ruby-runtime-proof.ts` gate with Ruby 3.4.11 and Bundler 4.0.21. It exercises install, syntax checks, Minitest/Rack tests, live JSON HTTP, rejected input, and shutdown. The output remains an unqualified observation. Ruby stays listed and experimental until a current revision-matched receipt qualifies it. The eight golden recipes and historical upgrade receipt schema stay unchanged.
+
 ## Freshness and producer changes
 
 Evidence fails closed under these conditions:

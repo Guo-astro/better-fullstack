@@ -12,6 +12,7 @@ import { commitInitialScaffold, initializeGit } from "@/helpers/core/git";
 import {
   installDependencies,
   runCargoBuild,
+  runBundleInstall,
   runDotnetRestore,
   runGradleTests,
   runMavenTests,
@@ -202,6 +203,11 @@ export async function createProject(options: ProjectConfig, cliInput: CreateProj
         options.javaBuildTool === "gradle"
           ? await runGradleTests({ projectDir })
           : await runMavenTests({ projectDir });
+      if (!result.success) setupFailures.push(result);
+    }
+
+    if (options.install && !usesGraph && installEcosystem === "ruby") {
+      const result = await runBundleInstall({ projectDir });
       if (!result.success) setupFailures.push(result);
     }
 

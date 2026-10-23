@@ -1,3 +1,5 @@
+import { getRubyDatabaseSelectionIssue, RUBY_RECIPE_EXTENSION_REASON } from "@/stack/ruby-compatibility";
+
 import type {
   Ecosystem,
   ProjectConfig,
@@ -60,6 +62,7 @@ import {
   ELIXIR_REALTIME_VALUES,
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
+  RUBY_WEB_FRAMEWORK_VALUES,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   EFFECT_VALUES,
   EMAIL_VALUES,
@@ -333,6 +336,7 @@ const LEGACY_BACKEND_CATEGORY_BY_ECOSYSTEM = {
   go: "goWebFramework",
   java: "javaWebFramework",
   dotnet: "dotnetWebFramework",
+  ruby: "rubyWebFramework",
   elixir: "elixirWebFramework",
 } as const satisfies Record<LegacyBackendEcosystem, keyof ProjectConfig>;
 
@@ -366,6 +370,7 @@ const LEGACY_CAPABILITY_CATEGORIES_BY_ECOSYSTEM = {
     observability: "observability",
   },
   dotnet: { orm: "dotnetOrm", api: "dotnetApi", auth: "dotnetAuth" },
+  ruby: {},
   elixir: { orm: "elixirOrm", api: "elixirApi", auth: "elixirAuth" },
 } as const satisfies Record<
   LegacyBackendEcosystem,
@@ -448,6 +453,7 @@ const LEGACY_BACKEND_ARRAY_CATEGORIES_BY_ECOSYSTEM = {
     observability: "dotnetObservability",
     libraries: "dotnetLibraries",
   },
+  ruby: {},
   elixir: { libraries: "elixirLibraries" },
 } as const satisfies Record<
   LegacyBackendEcosystem,
@@ -772,6 +778,7 @@ const LEGACY_EXTRA_CATEGORIES_BY_ECOSYSTEM = {
     deploy: "dotnetDeploy",
     validation: "dotnetValidation",
   },
+  ruby: {},
   elixir: {
     realtime: "elixirRealtime",
     jobQueue: "elixirJobs",
@@ -812,6 +819,7 @@ const LEGACY_SHARED_BACKEND_SINGLE_CATEGORIES_BY_ECOSYSTEM = {
     search: "search",
   },
   dotnet: {},
+  ruby: {},
   elixir: {},
 } as const satisfies Record<
   LegacyBackendEcosystem,
@@ -1202,6 +1210,7 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ...defineTools(DOTNET_LIBRARIES_VALUES, "libraries", "dotnet", "dotnetLibraries", {
     allowMultiple: true,
   }),
+  ...defineTools(RUBY_WEB_FRAMEWORK_VALUES, "backend", "ruby", "rubyWebFramework"),
   ...defineTools(ELIXIR_WEB_FRAMEWORK_VALUES, "backend", "elixir", "elixirWebFramework"),
   ...defineTools(ELIXIR_ORM_VALUES, "orm", "elixir", "elixirOrm"),
   ...defineTools(ELIXIR_AUTH_VALUES, "auth", "elixir", "elixirAuth"),
@@ -3010,6 +3019,16 @@ function getStackPartCompatibilityIssue(
     Partial<Pick<StackPart, "source">>,
   context: StackPartOptionContext,
 ): StackGraphIssue | undefined {
+  if ((part.role === "database" || (part.role === "backend" && part.ecosystem === "ruby")) && getRubyDatabaseSelectionIssue([...(context.parts ?? []), part])) {
+    return createStackGraphIssue({ code: "INCOMPATIBLE_GRAPH_SELECTION", partId: part.id, role: part.role, toolId: part.toolId, message: RUBY_RECIPE_EXTENSION_REASON });
+  }
+  if (part.source !== "provided" && getToolingCapability(part.toolId) && context.parts?.some((candidate) => candidate.role === "backend" && candidate.ecosystem === "ruby") && !hasJavaScriptWorkspaceRoot(context.parts)) {
+    return createStackGraphIssue({ code: "INCOMPATIBLE_GRAPH_SELECTION", partId: part.id, role: part.role, toolId: part.toolId, message: RUBY_RECIPE_EXTENSION_REASON });
+  }
+  if (context.ownerEcosystem === "ruby" && part.source !== "provided" && part.toolId !== "none") {
+    return createStackGraphIssue({ code: "UNSUPPORTED_ROLE_BINDING", partId: part.id, role: part.role, toolId: part.toolId, message: RUBY_RECIPE_EXTENSION_REASON });
+  }
+
   if (
     context.ownerEcosystem &&
     part.ecosystem !== context.ownerEcosystem &&
@@ -4388,7 +4407,7 @@ export function validateStackParts(parts: readonly StackPart[]): StackGraphValid
         partId: part.id,
         role: part.role,
         toolId: part.toolId,
-        message: `Only one ${group.label} is currently supported. Named repeated backend services are supported for Rust, Python, Go, Java/Kotlin, .NET, and Elixir.`,
+        message: `Only one ${group.label} is currently supported. Named repeated backend services are supported for Rust, Python, Go, Java/Kotlin, .NET, Elixir, and Ruby.`,
       });
     }
   }

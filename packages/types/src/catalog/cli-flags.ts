@@ -1091,6 +1091,13 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
     ],
   },
   {
+    id: "ruby",
+    title: "Ruby flags",
+    description: "Flags for `--ecosystem ruby`.",
+    ecosystem: "ruby",
+    flags: [{ flag: "ruby-web-framework", summary: "Ruby HTTP framework.", source: { kind: "category", category: "rubyWebFramework" }, configKey: "rubyWebFramework" }],
+  },
+  {
     id: "elixir",
     title: "Elixir flags",
     description: "Flags for `--ecosystem elixir`.",

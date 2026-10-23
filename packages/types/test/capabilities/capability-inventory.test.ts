@@ -51,6 +51,7 @@ describe("capability inventory", () => {
       "go",
       "java",
       "dotnet",
+      "ruby",
       "elixir",
     ].reduce(
       (total, ecosystem) =>
