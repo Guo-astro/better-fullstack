@@ -3075,9 +3075,13 @@ function getStackPartCompatibilityIssue(
     });
   }
   if (
-    part.ecosystem === "php" &&
-    part.role === "backend" &&
-    context.primaryToolIdsByRole?.database &&
+    ((part.ecosystem === "php" &&
+      part.role === "backend" &&
+      context.primaryToolIdsByRole?.database) ||
+      (part.role === "database" &&
+        part.toolId !== "none" &&
+        context.primaryToolIdsByRole?.backend &&
+        context.primaryEcosystemsByRole?.backend === "php")) &&
     !context.parts?.some(
       (candidate) =>
         candidate.role === "backend" &&

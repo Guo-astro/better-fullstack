@@ -1,11 +1,49 @@
+import { EMBEDDED_TEMPLATES, generateVirtualProject } from "@better-fullstack/template-generator";
+import { parseStackPartSpecs, validateStackParts } from "@better-fullstack/types";
+import { parseStackSelectionFromUrlRecord } from "@better-fullstack/types/stack-translation";
 import { describe, expect, it } from "bun:test";
 
+import { getInitialComposerSpecs } from "@/components/stack-builder/stack-builder";
 import { getDisabledReason } from "@/components/stack-builder/utils";
 import { stackStateToProjectConfig } from "@/lib/builder/preview-config";
 import { DEFAULT_STACK, ECOSYSTEMS, TECH_OPTIONS } from "@/lib/stack/constant";
+import { parseStackShareSlug } from "@/lib/stack/stack-share-paths";
 import { generateStackCommand } from "@/lib/stack/stack-utils";
 
 describe("PHP builder recipe", () => {
+  it("preserves a standalone PHP service when enabling composer mode", () => {
+    const stack = parseStackShareSlug("php");
+    if (!stack) throw new Error("Missing PHP share selection");
+    const specs = getInitialComposerSpecs(stack);
+    const parts = parseStackPartSpecs(specs);
+    expect(parts.filter((part) => part.role === "frontend")).toEqual([]);
+    expect(parts.filter((part) => part.role === "backend").map((part) => part.ecosystem)).toEqual([
+      "php",
+    ]);
+    expect(validateStackParts(parts).issues).toEqual([]);
+  });
+
+  it.each(["compact", "query"])(
+    "generates a native service from the %s PHP entry",
+    async (entry) => {
+      const stack =
+        entry === "compact"
+          ? parseStackShareSlug("php")
+          : parseStackSelectionFromUrlRecord({ eco: "php" });
+      if (!stack) throw new Error("Missing PHP share selection");
+      const config = stackStateToProjectConfig(stack);
+      expect(config.database).toBe("none");
+      expect(config.frontend).toEqual([]);
+      expect(config.addons).toEqual([]);
+      const result = await generateVirtualProject({ config, templates: EMBEDDED_TEMPLATES });
+      expect(result.success).toBe(true);
+      expect(result.tree?.root.children.some((node) => node.name === "composer.json")).toBe(true);
+      expect(result.tree?.root.children.some((node) => node.name === "package.json")).toBe(false);
+      expect(generateStackCommand(stack)).toContain("--database none");
+      expect(generateStackCommand(stack)).not.toContain("--database sqlite");
+    },
+  );
+
   it("uses the shared Slim selection for preview and CLI", () => {
     const stack = {
       ...DEFAULT_STACK,

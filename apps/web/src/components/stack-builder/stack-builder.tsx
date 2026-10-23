@@ -24,6 +24,7 @@ import {
   type StackPartRole,
 } from "@better-fullstack/types";
 import {
+  getEcosystemDefaultStackSelection,
   patchGraphScopedSelections,
   projectGraphScopedSelections,
   usesVirtualNoneStackSelection as usesVirtualNoneSelection,
@@ -178,6 +179,7 @@ import {
   composerUsesJavaScript,
   getComposerReviewParts,
   getComposerEditorSpecs,
+  getComposerParts,
   hasComposerApplication,
   reconcileComposerSpecs,
 } from "@/lib/builder/composer-graph";
@@ -1117,7 +1119,7 @@ function getSoloBackendSelection(stack: StackState): GraphSelection {
         ? stack.rustFrontend
         : frontendEcosystem === "dotnet"
           ? (stack.dotnetFrontend ?? "none")
-          : getSelectedOptionId(stack.webFrontend, "tanstack-router"),
+          : getSelectedOptionId(stack.webFrontend),
     mobileEcosystem:
       (stack.swiftMobile ?? "none") !== "none"
         ? "swift"
@@ -1237,6 +1239,12 @@ function graphSelectionToSpecs(selection: GraphSelection): string[] {
     specs.push(`database:universal:${selection.database}`);
   }
   return specs;
+}
+
+export function getInitialComposerSpecs(stack: StackState): string[] {
+  return stack.stackPartSpecs.length > 0
+    ? stack.stackPartSpecs
+    : graphSelectionToSpecs(getGraphSelection(stack));
 }
 
 function getGraphBackendAdvancedCategoryOrder(
@@ -2368,7 +2376,11 @@ function CreationModeComposer({
         (option) => !isKotlinIncompatibleOption("javaWebFramework", option.id),
       )
     : allBackendOptions;
-  const databaseOptions = getGraphToolOptions("database", "database", "universal");
+  const databaseOptions = getGraphToolOptions("database", "database", "universal", {
+    parts: getComposerParts(stack.stackPartSpecs),
+    primaryToolIdsByRole,
+    primaryEcosystemsByRole: { backend: graphSelection.backendEcosystem },
+  });
   const allBackendOrmOptions = backendConfig.ormCategory
     ? getGraphToolOptions(
         backendConfig.ormCategory,
@@ -2524,6 +2536,19 @@ function CreationModeComposer({
       },
       getBackendContextForSelection(selection),
     );
+  };
+
+  const reconcileBackendDatabase = (selection: GraphSelection) => {
+    if (selection.backendEcosystem !== "php" || selection.backend === "none")
+      return selection.database;
+    const hasOtherDatabaseBackend = getComposerParts(stack.stackPartSpecs).some(
+      (part) =>
+        part.role === "backend" &&
+        part.source !== "provided" &&
+        part.id !== selection.rootIds?.backend &&
+        part.ecosystem !== "php",
+    );
+    return hasOtherDatabaseBackend ? selection.database : "none";
   };
 
   const reconcileBackendCapabilities = (
@@ -2949,6 +2974,7 @@ function CreationModeComposer({
                       backendEcosystem: config.ecosystem,
                       backendLanguage: config.javaLanguage,
                       backend,
+                      database: reconcileBackendDatabase(nextSelection),
                       ...reconcileBackendCapabilities(nextSelection, config),
                     });
                   },
@@ -2974,6 +3000,7 @@ function CreationModeComposer({
                 };
                 updateGraphSelection({
                   backend,
+                  database: reconcileBackendDatabase(nextSelection),
                   ...reconcileBackendCapabilities(nextSelection, backendConfig),
                 });
               }}
@@ -4215,10 +4242,7 @@ const StackBuilderInner = ({ initialStack }: { initialStack?: StackState }) => {
   };
 
   const enableMultiMode = () => {
-    const specs =
-      stack.stackPartSpecs.length > 0
-        ? stack.stackPartSpecs
-        : graphSelectionToSpecs(getGraphSelection(stack));
+    const specs = getInitialComposerSpecs(stack);
     setStack((current) => ({
       ...stackPatchFromGraphSpecs(specs),
       projectName: current.projectName,
@@ -4262,7 +4286,7 @@ const StackBuilderInner = ({ initialStack }: { initialStack?: StackState }) => {
       // webFrontend, hiding the Run tab back on TS) and stale
       // foreign-ecosystem params in the URL.
       setStack({
-        ...DEFAULT_STACK,
+        ...getEcosystemDefaultStackSelection((isKotlin ? "java" : ecosystemId) as Ecosystem),
         projectName: stack.projectName,
         packageManager: stack.packageManager,
         git: stack.git,
@@ -4270,21 +4294,6 @@ const StackBuilderInner = ({ initialStack }: { initialStack?: StackState }) => {
         yolo: stack.yolo,
         ecosystem: (isKotlin ? "java" : ecosystemId) as Ecosystem,
         ...(isKotlin ? { javaLanguage: "kotlin" as const } : {}),
-        ...(ecosystemId === "php"
-          ? {
-              database: "none",
-              backend: "none",
-              runtime: "none",
-              orm: "none",
-              auth: "none",
-              api: "none",
-              webFrontend: ["none"],
-              nativeFrontend: ["none"],
-              appPlatforms: [],
-              codeQuality: [],
-              documentation: [],
-            }
-          : {}),
         stackMode: "solo",
         stackPartSpecs: [],
       });

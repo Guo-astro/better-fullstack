@@ -5,6 +5,7 @@ import { CreateInputSchema, EcosystemSchema } from "@/config/schemas";
 import { getPhpRecipeIssue, PHP_RECIPE_REASONS } from "@/stack/php-compatibility";
 import {
   legacyProjectConfigToStackParts,
+  getStackPartOptions,
   parseStackPartSpecs,
   stackPartsToLegacyProjectConfigPartial,
   validateStackParts,
@@ -14,6 +15,7 @@ import {
   cliInputToProjectConfigPartial,
   createStackSelectionSearchParams,
   generateStackSelectionCommand,
+  getEcosystemDefaultStackSelection,
   parseStackSelectionFromUrlRecord,
 } from "@/stack/stack-translation";
 
@@ -31,6 +33,34 @@ const native = {
 };
 
 describe("PHP graph and transport contract", () => {
+  it("offers databases only when another backend can own their integration", () => {
+    const parts = parseStackPartSpecs(["backend:php:slim"]);
+    const context = {
+      role: "database" as const,
+      ecosystem: "universal" as const,
+      primaryToolIdsByRole: { backend: "slim" },
+      primaryEcosystemsByRole: { backend: "php" as const },
+    };
+    expect(getStackPartOptions({ ...context, parts })).not.toContain("sqlite");
+    expect(
+      getStackPartOptions({
+        ...context,
+        parts: parseStackPartSpecs(["backend:php:slim", "backend:go:gin"]),
+      }),
+    ).toContain("sqlite");
+  });
+
+  it("uses native defaults while preserving explicit PHP URL overrides", () => {
+    const defaults = getEcosystemDefaultStackSelection("php");
+    const params = createStackSelectionSearchParams(defaults);
+    expect(params.get("eco")).toBe("php");
+    expect(parseStackSelectionFromUrlRecord(Object.fromEntries(params))).toEqual(defaults);
+    const unsupported = { ...defaults, database: "sqlite" };
+    const explicit = createStackSelectionSearchParams(unsupported);
+    expect(explicit.get("db")).toBe("sqlite");
+    expect(parseStackSelectionFromUrlRecord(Object.fromEntries(explicit)).database).toBe("sqlite");
+  });
+
   it("accepts PHP and Slim in the shared create schema", () => {
     expect(EcosystemSchema.parse("php")).toBe("php");
     expect(

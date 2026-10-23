@@ -18,6 +18,7 @@ import {
   type CliDefaultProjectConfigBase,
 } from "@/config/defaults";
 import { analyzeStackCompatibility, type CompatibilityInput } from "@/stack/compatibility";
+import { PHP_UNSUPPORTED_BACKEND_FIELDS } from "@/stack/php-compatibility";
 import {
   formatStackPartSpec,
   hasJavaScriptWorkspaceRoot,
@@ -565,15 +566,47 @@ function parseScalarSelectionValue(value: StackSelectionUrlValue, defaultValue: 
   return defaultValue;
 }
 
+export function getEcosystemDefaultStackSelection(
+  ecosystem: StackSelectionState["ecosystem"],
+): StackSelectionState {
+  const defaults = { ...cloneDefaultStackSelection(), ecosystem };
+  if (ecosystem !== "php") return defaults;
+  const capabilities = Object.fromEntries(
+    PHP_UNSUPPORTED_BACKEND_FIELDS.map((key) => [key === "ai" ? "aiSdk" : key, "none"]),
+  );
+  return {
+    ...defaults,
+    ...capabilities,
+    phpWebFramework: "slim",
+    database: "none",
+    backend: "none",
+    runtime: "none",
+    backendLibraries: "none",
+    forms: "none",
+    testing: "none",
+    validation: "none",
+    webFrontend: ["none"],
+    nativeFrontend: ["none"],
+    cssFramework: "none",
+    uiLibrary: "none",
+    appPlatforms: [],
+    codeQuality: [],
+    documentation: [],
+  };
+}
+
 export function parseStackSelectionFromUrlRecord(
   params: StackSelectionUrlRecord,
 ): StackSelectionState {
-  const parsed = cloneDefaultStackSelection() as Record<string, unknown>;
+  const defaults = getEcosystemDefaultStackSelection(
+    parseScalarSelectionValue(params.eco, "typescript") === "php" ? "php" : "typescript",
+  );
+  const parsed = structuredClone(defaults) as Record<string, unknown>;
 
   for (const stackKey of STACK_SELECTION_KEYS) {
     const urlKey = STACK_SELECTION_URL_KEYS[stackKey];
     const rawValue = params[urlKey];
-    const defaultValue = DEFAULT_STACK_SELECTION[stackKey];
+    const defaultValue = defaults[stackKey];
 
     if (isArrayStackSelectionKey(stackKey)) {
       parsed[stackKey] = parseArraySelectionValue(rawValue, defaultValue as string[]);
@@ -618,11 +651,16 @@ export function createStackSelectionSearchParams(
 ): URLSearchParams {
   const includeDefaults = options?.includeDefaults ?? false;
   const params = new URLSearchParams();
+  const defaults =
+    selection.ecosystem === "php"
+      ? getEcosystemDefaultStackSelection("php")
+      : DEFAULT_STACK_SELECTION;
 
   for (const stackKey of STACK_SELECTION_KEYS) {
     const urlKey = STACK_SELECTION_URL_KEYS[stackKey];
     const value = selection[stackKey];
-    const defaultValue = DEFAULT_STACK_SELECTION[stackKey];
+    const defaultValue =
+      stackKey === "ecosystem" ? DEFAULT_STACK_SELECTION[stackKey] : defaults[stackKey];
 
     if (Array.isArray(value)) {
       const serialized = value.join(",");
@@ -1884,7 +1922,7 @@ function buildProjectConfigBase(
     orm: stack.orm as ProjectConfig["orm"],
     backend: mapBackendToCli(stack.backend) as ProjectConfig["backend"],
     runtime: stack.runtime as ProjectConfig["runtime"],
-    frontend: frontend.length > 0 ? frontend : ["tanstack-router"],
+    frontend: frontend.length > 0 || stack.ecosystem === "php" ? frontend : ["tanstack-router"],
     addons: [
       ...toUniqueNonNoneArray(stack.codeQuality),
       ...toUniqueNonNoneArray(stack.documentation),

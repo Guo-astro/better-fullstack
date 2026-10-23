@@ -27,7 +27,18 @@ final class Application
             if ($mediaType !== 'application/json') {
                 return self::json($response, ['error' => 'unsupported_media_type'], 415);
             }
-            $body = (string) $request->getBody();
+            $stream = $request->getBody();
+            if ($stream->isSeekable()) {
+                $stream->rewind();
+            }
+            $body = '';
+            while (strlen($body) < 4097 && !$stream->eof()) {
+                $chunk = $stream->read(4097 - strlen($body));
+                if ($chunk === '') {
+                    break;
+                }
+                $body .= $chunk;
+            }
             if (strlen($body) > 4096) {
                 return self::json($response, ['error' => 'payload_too_large'], 413);
             }

@@ -50,6 +50,33 @@ final class ApplicationTest extends TestCase
         self::assertSame(404, Application::create()->handle($factory->createServerRequest('GET', '/missing'))->getStatusCode());
     }
 
+    public function testRejectsLargeStreamWithoutReadingTheWholeBody(): void
+    {
+        $resource = fopen('php://temp', 'w+');
+        self::assertNotFalse($resource);
+        self::assertTrue(ftruncate($resource, 8_388_608));
+        $stream = (new StreamFactory())->createStreamFromResource($resource);
+        $request = (new ServerRequestFactory())->createServerRequest('POST', '/api/greetings')
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($stream);
+        $response = Application::create()->handle($request);
+        self::assertSame(413, $response->getStatusCode());
+        self::assertSame('payload_too_large', json_decode((string) $response->getBody(), true, 32, JSON_THROW_ON_ERROR)['error']);
+        self::assertLessThanOrEqual(4097, $stream->tell());
+        $stream->close();
+    }
+
+    public function testAcceptsExactlyTheBodyLimit(): void
+    {
+        $body = str_pad('{"name":"Ada"}', 4096);
+        $request = (new ServerRequestFactory())->createServerRequest('POST', '/api/greetings')
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody((new StreamFactory())->createStream($body));
+        self::assertSame(200, Application::create()->handle($request)->getStatusCode());
+        $oversized = $request->withBody((new StreamFactory())->createStream($body . ' '));
+        self::assertSame(413, Application::create()->handle($oversized)->getStatusCode());
+    }
+
     public function testCorsIsPinnedToConfiguredOrigin(): void
     {
         $request = (new ServerRequestFactory())->createServerRequest('OPTIONS', '/api/greetings')->withHeader('Origin', 'http://localhost:5173');

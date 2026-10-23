@@ -1,6 +1,7 @@
 import { analyzeStackCompatibility } from "@better-fullstack/types";
 import {
   createStackSelectionSearchParams as createStackSearchParams,
+  getEcosystemDefaultStackSelection,
 } from "@better-fullstack/types/stack-translation";
 
 import { DEFAULT_STACK, type StackState } from "@/lib/stack/stack-defaults";
@@ -22,8 +23,7 @@ function withCompatibility(stack: StackState): StackState {
 
 function createEcosystemShareStack(ecosystem: StackState["ecosystem"]): StackState {
   return withCompatibility({
-    ...DEFAULT_STACK,
-    ecosystem,
+    ...getEcosystemDefaultStackSelection(ecosystem),
     stackMode: "solo",
     stackPartSpecs: [],
   });

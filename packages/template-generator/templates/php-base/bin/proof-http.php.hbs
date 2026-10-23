@@ -58,6 +58,8 @@ try {
     requireProof($status === 422 && $body['error'] === 'validation_failed', 'Invalid request accepted.');
     [$status, $body] = requestProof('http://' . $address . '/api/greetings', 'POST', '{');
     requireProof($status === 400 && $body['error'] === 'invalid_json', 'Malformed JSON accepted.');
+    [$status, $body] = requestProof('http://' . $address . '/api/greetings', 'POST', str_repeat(' ', 8192));
+    requireProof($status === 413 && $body['error'] === 'payload_too_large', 'Oversized request accepted.');
     [$status, $body] = requestProof('http://' . $address . '/missing');
     requireProof($status === 404 && $body['error'] === 'not_found', 'Missing route mismatch.');
 } catch (Throwable $error) {
@@ -77,4 +79,4 @@ try {
     unlink($log);
 }
 if ($failure !== null) exit(1);
-echo json_encode(['php' => PHP_VERSION, 'assertions' => ['health', 'parsed-greeting', 'validation-rejection', 'malformed-json', 'missing-route', 'cors', 'shutdown'], 'success' => true], JSON_THROW_ON_ERROR) . "\n";
+echo json_encode(['php' => PHP_VERSION, 'assertions' => ['health', 'parsed-greeting', 'validation-rejection', 'malformed-json', 'oversized-body', 'missing-route', 'cors', 'shutdown'], 'success' => true], JSON_THROW_ON_ERROR) . "\n";
