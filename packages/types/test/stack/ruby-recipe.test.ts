@@ -33,6 +33,15 @@ const rubySelection = () => getEcosystemDefaultStackSelection("ruby");
 
 describe("Ruby recipe contracts", () => {
   it.each([
+    ["codeQuality", "gitleaks"],
+    ["documentation", "starlight"],
+    ["appPlatforms", "turborepo"],
+  ] as const)("rejects %s tooling through the same Ruby addon policy", (category, tool) => {
+    expect(getDisabledReason(rubySelection(), category, tool)).toBe(RUBY_RECIPE_EXTENSION_REASON);
+    expect(getDisabledReason(rubySelection(), category, "none")).toBeNull();
+  });
+
+  it.each([
     { mobileNavigation: "expo-router" },
     { mobileUI: "tamagui" },
     { mobileStorage: "mmkv" },

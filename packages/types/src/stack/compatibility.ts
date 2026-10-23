@@ -2911,7 +2911,14 @@ export const getDisabledReason = (
 ): string | null => {
   if (currentStack.ecosystem === "ruby") {
     if (category === "rubyWebFramework" && optionId === "none") return RUBY_RECIPE_FRAMEWORK_REASON;
-    const key = category === "webFrontend" || category === "nativeFrontend" ? "frontend" : category === "backendLibraries" ? "effect" : category === "appPlatforms" ? "addons" : category;
+    const key =
+      category === "webFrontend" || category === "nativeFrontend"
+        ? "frontend"
+        : category === "backendLibraries"
+          ? "effect"
+          : category === "appPlatforms" || category === "codeQuality" || category === "documentation"
+            ? "addons"
+            : category;
     if (optionId !== "none" && RUBY_UNSUPPORTED_CONFIG_KEYS.some((entry) => entry === key)) return RUBY_RECIPE_EXTENSION_REASON;
   }
 

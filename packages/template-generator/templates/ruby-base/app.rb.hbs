@@ -4,7 +4,7 @@ require_relative "request_body_limit"
 
 module BetterFullstack
   class App < Sinatra::Base
-    use RequestBodyLimit
+    use RequestBodyLimit, -> { allowed_origins }
     set :show_exceptions, false
     set :raise_errors, false
     set :dump_errors, false

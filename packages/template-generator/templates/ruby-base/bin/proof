@@ -39,6 +39,8 @@ begin
     raise "Frontend origin rejected" unless response.code == "200" && response["access-control-allow-origin"] == origin
     response = http.post("/api/greetings", JSON.generate(name: "Ruby"), "Content-Type" => "application/json", "Origin" => origin)
     raise "Frontend POST rejected" unless response.code == "200" && JSON.parse(response.body) == { "greeting" => "Hello, Ruby!" }
+    response = http.post("/api/greetings", JSON.generate(name: "a" * 16_384), "Content-Type" => "application/json", "Origin" => origin)
+    raise "Oversized response lost frontend access" unless response.code == "413" && response["access-control-allow-origin"] == origin && response["vary"] == "Origin" && JSON.parse(response.body).fetch("error") == "body_too_large"
   end
   response = http.get("/health", "Origin" => "http://localhost:9999")
   raise "Untrusted frontend accepted" unless response.code == "403"

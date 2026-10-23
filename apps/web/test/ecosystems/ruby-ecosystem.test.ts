@@ -3,15 +3,34 @@ import {
   createStackSelectionSearchParams,
   parseStackSelectionFromUrlRecord,
 } from "@better-fullstack/types/stack-translation";
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it, spyOn } from "bun:test";
 
-import { getComposerParts } from "@/components/stack-builder/stack-builder";
+import { buildRandomStack, getComposerParts } from "@/components/stack-builder/stack-builder";
 import { stackStateToProjectConfig } from "@/lib/builder/preview-config";
 import { getStackRunSupport } from "@/lib/project/run-support";
 import { ECOSYSTEMS, ECOSYSTEM_CATEGORIES, TECH_OPTIONS } from "@/lib/stack/constant";
 import { parseStackShareSlug, getStackSharePath } from "@/lib/stack/stack-share-paths";
+import { generateStackCommand } from "@/lib/stack/stack-utils";
 
 describe("Ruby builder projections", () => {
+  it.each([0, 0.25, 0.75, 0.99])(
+    "keeps randomized Ruby commands and previews valid at draw %s",
+    (draw) => {
+      const random = spyOn(Math, "random").mockReturnValue(draw);
+      try {
+        const initial = getEcosystemDefaultStackSelection("ruby");
+        const stack = { ...initial, ...buildRandomStack(initial) };
+        expect(stack.codeQuality).toEqual([]);
+        expect(stack.documentation).toEqual([]);
+        expect(stack.appPlatforms).toEqual([]);
+        expect(generateStackCommand(stack)).toContain("--ecosystem ruby");
+        expect(stackStateToProjectConfig(stack).addons).toEqual([]);
+      } finally {
+        random.mockRestore();
+      }
+    },
+  );
+
   it("keeps malformed saved bindings from throwing during composer rendering", () => {
     expect(getComposerParts(["backend:ruby"])).toEqual([]);
     expect(

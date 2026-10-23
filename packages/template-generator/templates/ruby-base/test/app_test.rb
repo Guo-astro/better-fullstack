@@ -61,6 +61,21 @@ class AppTest < Minitest::Test
     assert_equal 413, last_response.status
   end
 
+  def test_oversized_json_keeps_cors_headers_only_for_trusted_origins
+    app.allowed_origins.each do |origin|
+      header "Origin", origin
+      post_json("name" => "a" * 16_384)
+      assert_equal 413, last_response.status
+      assert_equal "body_too_large", JSON.parse(last_response.body).fetch("error")
+      assert_equal origin, last_response.headers["access-control-allow-origin"]
+      assert_equal "Origin", last_response.headers["vary"]
+    end
+    header "Origin", "https://untrusted.example"
+    post_json("name" => "a" * 16_384)
+    assert_equal 413, last_response.status
+    assert_nil last_response.headers["access-control-allow-origin"]
+  end
+
   def test_unknown_route
     get "/missing"
     assert_equal 404, last_response.status

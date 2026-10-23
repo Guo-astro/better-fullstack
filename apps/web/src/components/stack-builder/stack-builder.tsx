@@ -233,7 +233,7 @@ export function buildRandomStack(stack: StackState): Partial<StackState> {
     const compatibleOptions = visibleOptions.filter(
       (option) => getDisabledReason(workingStack, categoryKey, option.id) === null,
     );
-    const options = compatibleOptions.length > 0 ? compatibleOptions : visibleOptions;
+    const options = compatibleOptions;
     if (options.length === 0) continue;
     const catKey = getStackKeyForCategory(categoryKey);
     if (getToolingCategoryForUi(categoryKey) === "codeQuality") {
