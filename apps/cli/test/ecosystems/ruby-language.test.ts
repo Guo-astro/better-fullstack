@@ -13,10 +13,8 @@ import {
   serializeBtsConfig,
   previewBtsConfigUpdate,
 } from "@/config/bts-config";
-import { create, createVirtual } from "@/index";
 import { validateFullConfig } from "@/config/config-validation";
-import { CLIError } from "@/presentation/errors";
-import { runWithContext } from "@/presentation/context";
+import { create, createVirtual } from "@/index";
 import { generateReproducibleCommand } from "@/lifecycle/generate-reproducible-command";
 import { planProjectOperation } from "@/operations/project-create";
 import {
@@ -26,6 +24,8 @@ import {
   validateMcpProjectConfigCompatibility,
 } from "@/operations/stack-helpers";
 import { MCP_PLAN_CREATE_SCHEMA, MCP_STACK_UPDATE_SCHEMA } from "@/operations/stack-input";
+import { runWithContext } from "@/presentation/context";
+import { CLIError } from "@/presentation/errors";
 import { gatherConfig } from "@/prompts/core/config-prompts";
 import { resolveRubyWebFrameworkPrompt } from "@/prompts/ecosystems/ruby-ecosystem";
 import {
@@ -34,6 +34,7 @@ import {
   stackSelectionToProjectConfig,
   parseStackPartSpecs,
   RUBY_RECIPE_EXTENSION_REASON,
+  type ProjectConfig,
 } from "@/types";
 
 const config = () =>
@@ -48,9 +49,24 @@ afterAll(async () => {
 });
 
 describe("Ruby language integration", () => {
+  it.each([
+    { mobilePush: "expo-notifications" },
+    { mobileLibraries: ["expo-camera"] },
+  ] satisfies Partial<ProjectConfig>[])(
+    "rejects mobile integrations instead of returning a partial Ruby project %j",
+    async (mobile) => {
+      const result = await createVirtual({ ecosystem: "ruby", ...mobile });
+      expect(result.success).toBe(false);
+      expect(result.error).toBe(RUBY_RECIPE_EXTENSION_REASON);
+      expect(result.tree).toBeUndefined();
+    },
+  );
+
   it("uses the CLI error contract when normalized Ruby validation fails", () => {
     runWithContext({ silent: true }, () => {
-      expect(() => validateFullConfig({ ...config(), database: "sqlite" }, new Set(), {})).toThrow(CLIError);
+      expect(() => validateFullConfig({ ...config(), database: "sqlite" }, new Set(), {})).toThrow(
+        CLIError,
+      );
     });
   });
 

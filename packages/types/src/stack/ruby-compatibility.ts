@@ -46,6 +46,14 @@ export const RUBY_UNSUPPORTED_CONFIG_KEYS = [
   "cssFramework",
   "uiLibrary",
   "effect",
+  "mobileNavigation",
+  "mobileUI",
+  "mobileStorage",
+  "mobileTesting",
+  "mobilePush",
+  "mobileOTA",
+  "mobileDeepLinking",
+  "mobileLibraries",
   "frontend",
   "addons",
   "examples",
@@ -124,7 +132,7 @@ export function createRubyProjectConfigDefaults(): Partial<ProjectConfig> {
   return Object.fromEntries(
     RUBY_UNSUPPORTED_CONFIG_KEYS.map((key) => [
       key,
-      ["frontend", "addons", "examples"].includes(key) ? [] : "none",
+      ["frontend", "addons", "examples", "mobileLibraries"].includes(key) ? [] : "none",
     ]).concat([["rubyWebFramework", "sinatra"]]),
   );
 }

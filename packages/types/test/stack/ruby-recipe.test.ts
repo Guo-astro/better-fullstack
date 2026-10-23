@@ -1,5 +1,7 @@
 import { describe, expect, it } from "bun:test";
 
+import type { ProjectConfig } from "@/config/types";
+
 import { getCapabilityInventory } from "@/capabilities/capability-inventory";
 import { getCliFlagReference } from "@/catalog/cli-flags";
 import { createCliDefaultProjectConfigBase } from "@/config/defaults";
@@ -30,6 +32,43 @@ import {
 const rubySelection = () => getEcosystemDefaultStackSelection("ruby");
 
 describe("Ruby recipe contracts", () => {
+  it.each([
+    { mobileNavigation: "expo-router" },
+    { mobileUI: "tamagui" },
+    { mobileStorage: "mmkv" },
+    { mobileTesting: "maestro" },
+    { mobilePush: "expo-notifications" },
+    { mobileOTA: "expo-updates" },
+    { mobileDeepLinking: "expo-linking" },
+    { mobileLibraries: ["expo-camera"] },
+  ] satisfies Partial<ProjectConfig>[])(
+    "rejects unsupported flat mobile selections %j",
+    (mobile) => {
+      expect(getRubyRecipeIssue({ ecosystem: "ruby", ...mobile })).toBe(
+        RUBY_RECIPE_EXTENSION_REASON,
+      );
+    },
+  );
+
+  it("keeps disabled mobile defaults valid and preserves mobile owners in mixed graphs", () => {
+    expect(createRubyProjectConfigDefaults().mobileLibraries).toEqual([]);
+    expect(
+      getRubyRecipeIssue({
+        ...createRubyProjectConfigDefaults(),
+        ecosystem: "ruby",
+        mobileLibraries: ["none"],
+      }),
+    ).toBeNull();
+    const parts = parseStackPartSpecs([
+      "backend:ruby:sinatra",
+      "mobile:react-native:native-bare",
+      "mobile.push:react-native:expo-notifications",
+      "mobile.libraries:react-native:expo-camera",
+    ]);
+    expect(getRubyRecipeIssue({ stackParts: parts })).toBeNull();
+    expect(validateStackParts(parts).issues).toEqual([]);
+  });
+
   it.each(["latest", "beta"] as const)(
     "preserves the %s channel in Ruby command replay",
     (versionChannel) => {
