@@ -547,6 +547,7 @@ export function buildCompatibilityInputFromConfig(
     dotnetCaching: asString(config.dotnetCaching),
     dotnetDeploy: asString(config.dotnetDeploy),
     dotnetLibraries: asStringArray(config.dotnetLibraries),
+    phpWebFramework: asString(config.phpWebFramework),
     elixirWebFramework: asString(config.elixirWebFramework),
     elixirOrm: asString(config.elixirOrm),
     elixirAuth: asString(config.elixirAuth),

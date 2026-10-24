@@ -538,6 +538,7 @@ export function getCapabilityInventory(
     "go",
     "java",
     "dotnet",
+    "php",
     "elixir",
   ] as const) {
     for (const category of getCategoryOrderForEcosystem(ecosystem)) {

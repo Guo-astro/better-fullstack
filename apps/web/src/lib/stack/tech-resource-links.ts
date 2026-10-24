@@ -6,6 +6,11 @@ type TechResourceLinks = {
 type LinkMap = Record<string, TechResourceLinks>;
 
 const BASE_LINKS: LinkMap = {
+  php: { docsUrl: "https://www.php.net/manual/en/", githubUrl: "https://github.com/php/php-src" },
+  slim: {
+    docsUrl: "https://www.slimframework.com/docs/v4/",
+    githubUrl: "https://github.com/slimphp/Slim",
+  },
   enabled: {
     docsUrl: "https://developer.chrome.com/docs/ai/webmcp",
     githubUrl: "https://github.com/webmachinelearning/webmcp",

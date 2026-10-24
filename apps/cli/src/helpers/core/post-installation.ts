@@ -100,6 +100,13 @@ export async function displayPostInstallInstructions(
     return;
   }
 
+  if (ecosystem === "php") {
+    consola.box(
+      `Next steps\n\ncd ${relativePath}\n${depsInstalled ? "" : "composer install --no-interaction\n"}composer run build\ncomposer test\ncomposer run proof:http\ncomposer run dev\n\nExperimental PHP recipe. See PHP.md for routes, environment and the verification boundary.`,
+    );
+    return;
+  }
+
   if (ecosystem === "elixir") {
     displayElixirInstructions(config);
     return;
@@ -225,7 +232,7 @@ export async function displayPostInstallInstructions(
   const graphBackendPart = getGraphPart(config, "backend");
   const graphBackendNeedsSetup =
     Boolean(graphBackendUrl) &&
-    ["python", "go", "elixir"].includes(graphBackendPart?.ecosystem ?? "");
+    ["python", "go", "elixir", "php"].includes(graphBackendPart?.ecosystem ?? "");
   let output = graphSummary ? `${pc.bold("Generated:")} ${graphSummary}\n\n` : "";
   output += `${pc.bold("Next steps")}\n${pc.cyan("1.")} ${cdCmd}\n`;
   let stepCounter = 2;

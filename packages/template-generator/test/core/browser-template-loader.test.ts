@@ -31,6 +31,19 @@ function graphConfig(parts: string[]): ProjectConfig {
 }
 
 describe("browser template family loader", () => {
+  it.each([
+    { parts: ["backend:php:slim"] },
+    { parts: ["frontend:typescript:react-vite", "backend:php:slim"] },
+  ])("preserves PHP output through selected browser templates for %j", async ({ parts }) => {
+    const config = graphConfig([...parts]);
+    const selectedTemplates = await loadTemplatesForConfig(config);
+    const files = await generatedFiles(config, selectedTemplates);
+
+    expect(files).toEqual(await generatedFiles(config, EMBEDDED_TEMPLATES));
+    expect(files.some(([path]) => path.endsWith("composer.json"))).toBe(true);
+    expect(files.some(([path]) => path.endsWith("src/Application.php"))).toBe(true);
+  });
+
   it("preserves the complete Plasmo extension in flat, overlay, and mixed selected-template loads", async () => {
     for (const config of [
       makeConfig({ addons: ["plasmo"], database: "none", orm: "none", testing: "none" }),

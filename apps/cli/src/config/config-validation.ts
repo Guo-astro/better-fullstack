@@ -1,3 +1,4 @@
+import { getPhpRecipeIssue } from "@better-fullstack/types";
 import consola from "consola";
 import pc from "picocolors";
 
@@ -269,6 +270,8 @@ function getEcosystemBackend(cfg: Partial<ProjectConfig>) {
       return cfg.dotnetWebFramework && cfg.dotnetWebFramework !== "none"
         ? cfg.dotnetWebFramework
         : undefined;
+    case "php":
+      return cfg.phpWebFramework !== "none" ? cfg.phpWebFramework : undefined;
     case "elixir":
       return cfg.elixirWebFramework && cfg.elixirWebFramework !== "none"
         ? cfg.elixirWebFramework
@@ -1540,6 +1543,8 @@ export function validateFullConfig(
   options: CLIInput,
   partial = false,
 ) {
+  const phpIssue = getPhpRecipeIssue(config);
+  if (phpIssue) exitWithError(phpIssue);
   const browserExtensionIssue = getBrowserExtensionRecipeIssue(config);
   if (browserExtensionIssue) throw new Error(browserExtensionIssue);
   validateCodeQualityConstraints(config, partial);
@@ -1734,6 +1739,8 @@ export function validateFullConfig(
 
 export function validateConfigForProgrammaticUse(config: Partial<ProjectConfig>) {
   try {
+    const phpIssue = getPhpRecipeIssue(config);
+    if (phpIssue) throw new Error(phpIssue);
     validateCodeQualityConstraints(config);
     if (config.stackParts) {
       const graphValidation = validateStackParts(config.stackParts);

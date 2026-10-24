@@ -3,9 +3,9 @@ import { z } from "zod";
 import { PRESET_ALIAS_IDS, PRESET_IDS } from "@/catalog/preset-ids";
 
 export const EcosystemSchema = z
-  .enum(["typescript", "react-native", "rust", "python", "go", "java", "elixir", "dotnet"])
+  .enum(["typescript", "react-native", "rust", "python", "go", "java", "elixir", "dotnet", "php"])
   .describe(
-    "Language ecosystem (typescript, react-native, rust, python, go, java, elixir, or dotnet)",
+    "Language ecosystem (typescript, react-native, rust, python, go, java, elixir, dotnet, or php)",
   );
 
 export const StackPartEcosystemSchema = z
@@ -1008,6 +1008,8 @@ export const DotnetLibrariesSchema = z
   .describe(".NET application libraries");
 
 // Elixir ecosystem schemas
+export const PhpWebFrameworkSchema = z.enum(["slim", "none"]).describe("PHP HTTP framework");
+
 export const ElixirWebFrameworkSchema = z
   .enum(["phoenix", "phoenix-live-view", "none"])
   .describe("Elixir web framework");
@@ -1379,6 +1381,7 @@ const STACK_CONFIG_FIELDS = {
   dotnetDeploy: DotnetDeploySchema,
   dotnetLibraries: z.array(DotnetLibrariesSchema).describe(".NET application libraries"),
   // Elixir ecosystem options
+  phpWebFramework: PhpWebFrameworkSchema.default("none"),
   elixirWebFramework: ElixirWebFrameworkSchema,
   elixirOrm: ElixirOrmSchema,
   elixirAuth: ElixirAuthSchema,
@@ -1663,6 +1666,7 @@ export const DOTNET_VALIDATION_VALUES = DotnetValidationSchema.options;
 export const DOTNET_CACHING_VALUES = DotnetCachingSchema.options;
 export const DOTNET_DEPLOY_VALUES = DotnetDeploySchema.options;
 export const DOTNET_LIBRARIES_VALUES = DotnetLibrariesSchema.options;
+export const PHP_WEB_FRAMEWORK_VALUES = PhpWebFrameworkSchema.options;
 export const ELIXIR_WEB_FRAMEWORK_VALUES = ElixirWebFrameworkSchema.options;
 export const ELIXIR_ORM_VALUES = ElixirOrmSchema.options;
 export const ELIXIR_AUTH_VALUES = ElixirAuthSchema.options;

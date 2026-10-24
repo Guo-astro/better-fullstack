@@ -31,6 +31,8 @@ const VERSION_FILES = [
   "pom.xml",
   "build.gradle",
   "build.gradle.kts",
+  "composer.json",
+  "composer.lock",
   "mix.exs",
   "mix.lock",
 ] as const;

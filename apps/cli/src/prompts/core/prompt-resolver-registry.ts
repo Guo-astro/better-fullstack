@@ -1,3 +1,4 @@
+import { resolvePhpWebFrameworkPrompt } from "@/prompts/ecosystems/php-ecosystem";
 import {
   AI_VALUES,
   ANIMATION_VALUES,
@@ -76,6 +77,7 @@ import {
   OBSERVABILITY_VALUES,
   ORM_VALUES,
   PAYMENTS_VALUES,
+  PhpWebFrameworkSchema,
   PYTHON_AI_VALUES,
   PYTHON_API_VALUES,
   PYTHON_AUTH_VALUES,
@@ -752,6 +754,12 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
     schemaValues: DOTNET_LIBRARIES_VALUES,
     resolve: ({ value }: { value?: string[] } = {}) => resolveDotnetLibrariesPrompt(value as any),
     coverageContexts: [{}, { value: ["none"] }],
+  },
+  phpWebFramework: {
+    schemaValues: PhpWebFrameworkSchema.options,
+    coverageContexts: [{}],
+    resolve: ({ value }: { value?: string } = {}) =>
+      resolvePhpWebFrameworkPrompt(value === undefined ? undefined : PhpWebFrameworkSchema.parse(value)),
   },
   elixirWebFramework: {
     schemaValues: ELIXIR_WEB_FRAMEWORK_VALUES,

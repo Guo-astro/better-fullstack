@@ -1108,6 +1108,20 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
     ],
   },
   {
+    id: "php",
+    title: "PHP flags",
+    description: "Flags for `--ecosystem php`.",
+    ecosystem: "php",
+    flags: [
+      {
+        flag: "php-web-framework",
+        summary: "PHP HTTP framework.",
+        source: { kind: "category", category: "phpWebFramework" },
+        configKey: "phpWebFramework",
+      },
+    ],
+  },
+  {
     id: "elixir",
     title: "Elixir flags",
     description: "Flags for `--ecosystem elixir`.",

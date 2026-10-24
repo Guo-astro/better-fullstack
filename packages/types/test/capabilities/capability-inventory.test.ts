@@ -52,6 +52,7 @@ describe("capability inventory", () => {
       "java",
       "dotnet",
       "elixir",
+      "php",
     ].reduce(
       (total, ecosystem) =>
         total +
@@ -77,6 +78,18 @@ describe("capability inventory", () => {
           record.lastVerifiedVersion === null,
       ),
     ).toBe(true);
+  });
+
+  it("keeps the unexecuted PHP recipe experimental", () => {
+    const php = getCapabilityInventory().find(
+      (record) => record.ecosystem === "php" && record.optionId === "slim",
+    );
+    expect(php).toMatchObject({
+      maturity: "experimental",
+      freshness: "unverified",
+      evidenceLevel: "listed",
+      lastVerifiedVersion: null,
+    });
   });
 
   it("promotes only options covered by current passing recipe receipts", () => {

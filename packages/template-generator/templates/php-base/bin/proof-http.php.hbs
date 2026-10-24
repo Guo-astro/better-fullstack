@@ -1,0 +1,89 @@
+<?php
+
+declare(strict_types=1);
+
+function requireProof(bool $condition, string $message): void
+{
+    if (!$condition) throw new RuntimeException($message);
+}
+
+function requestProof(string $url, string $method = 'GET', ?string $body = null, string $origin = 'http://localhost:5173'): array
+{
+    $context = stream_context_create(['http' => [
+        'method' => $method,
+        'header' => "Content-Type: application/json\r\nOrigin: " . $origin . "\r\n",
+        'content' => $body ?? '',
+        'ignore_errors' => true,
+        'timeout' => 1,
+    ]]);
+    $response = @file_get_contents($url, false, $context);
+    $headers = http_get_last_response_headers() ?? [];
+    if ($response === false || !preg_match('/^HTTP\/\S+ (\d+)/', $headers[0] ?? '', $match)) {
+        throw new RuntimeException('HTTP request failed: ' . $url);
+    }
+    requireProof(count(array_filter($headers, fn (string $header): bool => str_starts_with(strtolower($header), 'content-type: application/json'))) === 1, 'Expected JSON response');
+    return [(int) $match[1], json_decode($response, true, 32, JSON_THROW_ON_ERROR), $headers];
+}
+
+$root = dirname(__DIR__);
+requireProof(is_file($root . '/composer.lock') && is_file($root . '/vendor/autoload.php'), 'Run composer install before HTTP proof.');
+$socket = stream_socket_server('tcp://127.0.0.1:0', $socketError, $socketMessage);
+requireProof(is_resource($socket), 'Cannot reserve a local port.');
+$address = stream_socket_get_name($socket, false);
+fclose($socket);
+requireProof(is_string($address), 'Cannot read local address.');
+$log = tempnam(sys_get_temp_dir(), 'bfs-php-http-');
+requireProof(is_string($log), 'Cannot create server log.');
+$process = proc_open([PHP_BINARY, '-S', $address, '-t', 'public', 'public/index.php'], [0 => ['pipe', 'r'], 1 => ['file', $log, 'a'], 2 => ['file', $log, 'a']], $pipes, $root, array_merge(getenv(), ['CORS_ORIGIN' => 'http://localhost:5173,http://localhost:8080']));
+requireProof(is_resource($process), 'Cannot launch server.');
+fclose($pipes[0]);
+$failure = null;
+try {
+    $deadline = microtime(true) + 10;
+    $ready = false;
+    do {
+        requireProof(proc_get_status($process)['running'], 'Server exited before readiness.');
+        try {
+            [$status, $health] = requestProof('http://' . $address . '/health');
+            $ready = $status === 200 && $health === ['status' => 'ok', 'framework' => 'slim'];
+        } catch (Throwable) {
+            usleep(50000);
+        }
+    } while (!$ready && microtime(true) < $deadline);
+    requireProof($ready, 'Health did not become ready.');
+    [$status, $body, $headers] = requestProof('http://' . $address . '/api/greetings', 'POST', '{"name":"Ada","repetitions":2}');
+    requireProof($status === 200 && $body === ['message' => 'Hello, Ada! Hello, Ada!', 'repetitions' => 2], 'Parsed greeting mismatch.');
+    requireProof(in_array('Access-Control-Allow-Origin: http://localhost:5173', $headers, true), 'CORS origin mismatch.');
+    foreach (['http://localhost:8080', 'http://localhost:51730', 'https://other.example'] as $origin) {
+        [$status, $body, $headers] = requestProof('http://' . $address . '/health', 'GET', null, $origin);
+        requireProof($status === 200, 'CORS health request failed.');
+        $corsHeaders = array_values(array_filter($headers, fn (string $header): bool => str_starts_with(strtolower($header), 'access-control-allow-origin:')));
+        $expected = $origin === 'http://localhost:8080' ? ['Access-Control-Allow-Origin: ' . $origin] : [];
+        requireProof($corsHeaders === $expected, 'CORS allowlist mismatch.');
+    }
+    [$status, $body] = requestProof('http://' . $address . '/api/greetings', 'POST', '{"name":"Ada","repetitions":0}');
+    requireProof($status === 422 && $body['error'] === 'validation_failed', 'Invalid request accepted.');
+    [$status, $body] = requestProof('http://' . $address . '/api/greetings', 'POST', '{');
+    requireProof($status === 400 && $body['error'] === 'invalid_json', 'Malformed JSON accepted.');
+    [$status, $body] = requestProof('http://' . $address . '/api/greetings', 'POST', str_repeat(' ', 8192));
+    requireProof($status === 413 && $body['error'] === 'payload_too_large', 'Oversized request accepted.');
+    [$status, $body] = requestProof('http://' . $address . '/missing');
+    requireProof($status === 404 && $body['error'] === 'not_found', 'Missing route mismatch.');
+} catch (Throwable $error) {
+    $failure = $error->getMessage();
+} finally {
+    proc_terminate($process);
+    $deadline = microtime(true) + 2;
+    while (proc_get_status($process)['running'] && microtime(true) < $deadline) usleep(20000);
+    if (proc_get_status($process)['running']) proc_terminate($process, 9);
+    proc_close($process);
+    $probe = @stream_socket_client('tcp://' . $address, $probeError, $probeMessage, 0.2);
+    if (is_resource($probe)) {
+        fclose($probe);
+        $failure = $failure ?? 'Server still accepts connections after shutdown.';
+    }
+    if ($failure !== null) fwrite(STDERR, $failure . "\n" . file_get_contents($log));
+    unlink($log);
+}
+if ($failure !== null) exit(1);
+echo json_encode(['php' => PHP_VERSION, 'assertions' => ['health', 'parsed-greeting', 'validation-rejection', 'malformed-json', 'oversized-body', 'missing-route', 'cors', 'cors-allowlist', 'shutdown'], 'success' => true], JSON_THROW_ON_ERROR) . "\n";

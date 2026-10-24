@@ -62,6 +62,7 @@ import {
   ELIXIR_REALTIME_VALUES,
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
+  PHP_WEB_FRAMEWORK_VALUES,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   EFFECT_VALUES,
   EMAIL_VALUES,
@@ -181,6 +182,7 @@ import {
   VALIDATION_VALUES,
   WEB_DEPLOY_VALUES,
 } from "@/config/schemas";
+import { PHP_RECIPE_REASONS } from "@/stack/php-compatibility";
 import {
   getDatabaseOrmIncompatibility,
   getDatabaseOrmRequirementIssue,
@@ -335,6 +337,7 @@ const LEGACY_BACKEND_CATEGORY_BY_ECOSYSTEM = {
   go: "goWebFramework",
   java: "javaWebFramework",
   dotnet: "dotnetWebFramework",
+  php: "phpWebFramework",
   elixir: "elixirWebFramework",
 } as const satisfies Record<LegacyBackendEcosystem, keyof ProjectConfig>;
 
@@ -368,6 +371,7 @@ const LEGACY_CAPABILITY_CATEGORIES_BY_ECOSYSTEM = {
     observability: "observability",
   },
   dotnet: { orm: "dotnetOrm", api: "dotnetApi", auth: "dotnetAuth" },
+  php: {},
   elixir: { orm: "elixirOrm", api: "elixirApi", auth: "elixirAuth" },
 } as const satisfies Record<
   LegacyBackendEcosystem,
@@ -450,6 +454,7 @@ const LEGACY_BACKEND_ARRAY_CATEGORIES_BY_ECOSYSTEM = {
     observability: "dotnetObservability",
     libraries: "dotnetLibraries",
   },
+  php: {},
   elixir: { libraries: "elixirLibraries" },
 } as const satisfies Record<
   LegacyBackendEcosystem,
@@ -774,6 +779,7 @@ const LEGACY_EXTRA_CATEGORIES_BY_ECOSYSTEM = {
     deploy: "dotnetDeploy",
     validation: "dotnetValidation",
   },
+  php: {},
   elixir: {
     realtime: "elixirRealtime",
     jobQueue: "elixirJobs",
@@ -814,6 +820,7 @@ const LEGACY_SHARED_BACKEND_SINGLE_CATEGORIES_BY_ECOSYSTEM = {
     search: "search",
   },
   dotnet: {},
+  php: {},
   elixir: {},
 } as const satisfies Record<
   LegacyBackendEcosystem,
@@ -1204,6 +1211,28 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ...defineTools(DOTNET_LIBRARIES_VALUES, "libraries", "dotnet", "dotnetLibraries", {
     allowMultiple: true,
   }),
+  ...defineTools(PHP_WEB_FRAMEWORK_VALUES, "backend", "php", "phpWebFramework").map(
+    (definition) => ({
+      ...definition,
+      provides: [
+        { role: "api", toolId: "rest", overrideable: false },
+        { role: "testing", toolId: "phpunit", overrideable: false },
+        { role: "packageManager", toolId: "composer", overrideable: false },
+      ] satisfies ProvidedCapabilityDefinition[],
+    }),
+  ),
+  ...defineTools(["rest"], "api", "php").map((definition) => ({
+    ...definition,
+    selectable: false,
+  })),
+  ...defineTools(["phpunit"], "testing", "php").map((definition) => ({
+    ...definition,
+    selectable: false,
+  })),
+  ...defineTools(["composer"], "packageManager", "php").map((definition) => ({
+    ...definition,
+    selectable: false,
+  })),
   ...defineTools(ELIXIR_WEB_FRAMEWORK_VALUES, "backend", "elixir", "elixirWebFramework"),
   ...defineTools(ELIXIR_ORM_VALUES, "orm", "elixir", "elixirOrm"),
   ...defineTools(ELIXIR_AUTH_VALUES, "auth", "elixir", "elixirAuth"),
@@ -3034,6 +3063,52 @@ function getStackPartCompatibilityIssue(
     });
   }
 
+  if (context.ownerEcosystem === "php" && part.source !== "provided") {
+    return createStackGraphIssue({
+      code: "INCOMPATIBLE_GRAPH_SELECTION",
+      partId: part.id,
+      role: part.role,
+      toolId: part.toolId,
+      message:
+        part.role === "database" || part.role === "orm"
+          ? PHP_RECIPE_REASONS.database
+          : PHP_RECIPE_REASONS.capability,
+    });
+  }
+  if (part.ecosystem === "php" && context.ownerRole && context.ownerRole !== "backend") {
+    return createStackGraphIssue({
+      code: "INCOMPATIBLE_OWNER_ROLE",
+      partId: part.id,
+      role: part.role,
+      toolId: part.toolId,
+      message: PHP_RECIPE_REASONS.owner,
+    });
+  }
+  if (
+    ((part.ecosystem === "php" &&
+      part.role === "backend" &&
+      context.primaryToolIdsByRole?.database) ||
+      (part.role === "database" &&
+        part.toolId !== "none" &&
+        context.primaryToolIdsByRole?.backend &&
+        context.primaryEcosystemsByRole?.backend === "php")) &&
+    !context.parts?.some(
+      (candidate) =>
+        candidate.role === "backend" &&
+        !candidate.ownerPartId &&
+        candidate.source !== "provided" &&
+        candidate.ecosystem !== "php",
+    )
+  ) {
+    return createStackGraphIssue({
+      code: "INCOMPATIBLE_GRAPH_SELECTION",
+      partId: part.id,
+      role: part.role,
+      toolId: part.toolId,
+      message: PHP_RECIPE_REASONS.database,
+    });
+  }
+
   const expectedOwnerRoles =
     part.ecosystem === "typescript" || part.role === "dbSetup"
       ? OWNER_ROLES_BY_SCOPED_ROLE[part.role]
@@ -4398,7 +4473,7 @@ export function validateStackParts(parts: readonly StackPart[]): StackGraphValid
         partId: part.id,
         role: part.role,
         toolId: part.toolId,
-        message: `Only one ${group.label} is currently supported. Named repeated backend services are supported for Rust, Python, Go, Java/Kotlin, .NET, and Elixir.`,
+        message: `Only one ${group.label} is currently supported. Named repeated backend services are supported for Rust, Python, Go, Java/Kotlin, .NET, Elixir, and PHP.`,
       });
     }
   }

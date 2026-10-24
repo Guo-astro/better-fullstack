@@ -43,6 +43,7 @@ import {
   ELIXIR_REALTIME_VALUES,
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
+  PHP_WEB_FRAMEWORK_VALUES,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   I18N_VALUES,
   CMS_VALUES,
@@ -175,7 +176,8 @@ export type OptionCategoryEcosystem =
   | "go"
   | "java"
   | "dotnet"
-  | "elixir";
+  | "elixir"
+  | "php";
 
 export const TYPESCRIPT_CATEGORY_ORDER = [
   "webFrontend",
@@ -415,6 +417,13 @@ export const DOTNET_CATEGORY_ORDER = [
   "install",
 ] as const satisfies readonly OptionCategory[];
 
+export const PHP_CATEGORY_ORDER = [
+  "phpWebFramework",
+  "aiDocs",
+  "git",
+  "install",
+] as const satisfies readonly OptionCategory[];
+
 export const ELIXIR_CATEGORY_ORDER = [
   "elixirWebFramework",
   "elixirOrm",
@@ -451,6 +460,7 @@ export const CATEGORY_ORDER = [
     ...GO_CATEGORY_ORDER,
     ...JAVA_CATEGORY_ORDER,
     ...DOTNET_CATEGORY_ORDER,
+    ...PHP_CATEGORY_ORDER,
     ...ELIXIR_CATEGORY_ORDER,
   ]),
 ] as OptionCategory[];
@@ -471,6 +481,8 @@ export function getCategoryOrderForEcosystem(
       return JAVA_CATEGORY_ORDER;
     case "dotnet":
       return DOTNET_CATEGORY_ORDER;
+    case "php":
+      return PHP_CATEGORY_ORDER;
     case "elixir":
       return ELIXIR_CATEGORY_ORDER;
     case "typescript":
@@ -866,6 +878,7 @@ const CATEGORY_DEFINITIONS = {
     selectionMode: "multiple",
     displayName: ".NET Libraries",
   },
+  phpWebFramework: { values: PHP_WEB_FRAMEWORK_VALUES, displayName: "PHP web framework" },
   elixirWebFramework: { values: ELIXIR_WEB_FRAMEWORK_VALUES, displayName: "Elixir Web Framework" },
   elixirOrm: { values: ELIXIR_ORM_VALUES, displayName: "Elixir ORM / Database" },
   elixirAuth: { values: ELIXIR_AUTH_VALUES, displayName: "Elixir Auth" },
@@ -1776,6 +1789,7 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
     refit: "Refit",
     "fluent-email": "FluentEmail",
   },
+  phpWebFramework: { slim: "Slim" },
   elixirWebFramework: {
     phoenix: "Phoenix",
     "phoenix-live-view": "Phoenix LiveView",

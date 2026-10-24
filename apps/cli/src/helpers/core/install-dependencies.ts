@@ -342,3 +342,17 @@ export async function runMixCompile({
     return toStepFailure(step, error, errorMessage);
   }
 }
+
+export async function runComposerInstall({
+  projectDir,
+}: {
+  projectDir: string;
+}): Promise<SetupStepResult> {
+  const step = "composer install";
+  try {
+    await $({ cwd: projectDir, stderr: ["inherit", "pipe"] })`composer install --no-interaction`;
+    return { step, success: true };
+  } catch (error) {
+    return toStepFailure(step, error, toErrorMessage(error));
+  }
+}

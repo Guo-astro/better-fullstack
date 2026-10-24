@@ -1,6 +1,7 @@
 import type { ProjectConfig, StackPart } from "@better-fullstack/types";
 
 import {
+  getPhpRecipeIssue,
   parseStackPartSpecs,
   formatStackGraphIssue,
   getCodeQualitySelectionIssue,
@@ -53,6 +54,7 @@ import {
   processGoBaseTemplate,
   processJavaBaseTemplate,
   processDotnetBaseTemplate,
+  processPhpBaseTemplate,
   processElixirBaseTemplate,
   processFrontendTemplates,
   processGraphNativeAppTemplates,
@@ -115,6 +117,7 @@ const ECOSYSTEM_BASE_TEMPLATE_PROCESSORS = {
   go: processGoBaseTemplate,
   java: processJavaBaseTemplate,
   dotnet: processDotnetBaseTemplate,
+  php: processPhpBaseTemplate,
   elixir: processElixirBaseTemplate,
 } satisfies Record<NonTypeScriptTemplateEcosystem, EcosystemBaseTemplateProcessor>;
 
@@ -546,6 +549,14 @@ export async function generateVirtualProject(options: GeneratorOptions): Promise
       }
     }
 
+    const phpIssue = getPhpRecipeIssue(config);
+    if (phpIssue) return { success: false, error: phpIssue };
+    if (config.stackParts?.some((part) => part.ecosystem === "php")) {
+      const phpGraphIssues = validateStackParts(config.stackParts).issues;
+      if (phpGraphIssues.length > 0)
+        return { success: false, error: phpGraphIssues.map(formatStackGraphIssue).join("\n") };
+    }
+
     const vfs = new VirtualFileSystem();
     const generationConfig = resolveGenerationConfig(config);
     const rendersGraph = usesGraphParts && generationConfig === config;
@@ -577,8 +588,10 @@ export async function generateVirtualProject(options: GeneratorOptions): Promise
       generationConfig.ecosystem !== "typescript" &&
       generationConfig.ecosystem !== "react-native"
     ) {
-      await processAddonTemplates(vfs, templates, generationConfig);
-      processEnvVariables(vfs, generationConfig);
+      if (generationConfig.ecosystem !== "php") {
+        await processAddonTemplates(vfs, templates, generationConfig);
+        processEnvVariables(vfs, generationConfig);
+      }
     }
 
     processReadme(vfs, generationConfig);

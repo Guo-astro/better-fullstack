@@ -227,6 +227,22 @@ function getYesBaseConfig(flagConfig: Partial<ProjectConfig>): ProjectConfig {
     );
   }
 
+  if (flagConfig.ecosystem === "php") {
+    return {
+      ...baseConfig,
+      frontend: ["none"],
+      backend: "none",
+      runtime: "none",
+      api: "none",
+      database: "none",
+      orm: "none",
+      auth: "none",
+      addons: [],
+      examples: [],
+      phpWebFramework: "slim",
+    };
+  }
+
   // A disabled Rust backend must not inherit the SeaORM backend default.
   if (flagConfig.ecosystem === "rust" && flagConfig.rustWebFramework === "none") {
     return { ...baseConfig, rustOrm: "none", database: "none" };
@@ -700,6 +716,7 @@ export async function createProjectHandler(
               dotnetCaching: "none",
               dotnetDeploy: "none",
               dotnetLibraries: [],
+              phpWebFramework: "none",
               elixirWebFramework: "none",
               elixirOrm: "none",
               elixirAuth: "none",

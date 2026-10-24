@@ -5963,6 +5963,23 @@ export const TECH_OPTIONS: Record<
     },
   ],
   // Elixir ecosystem options
+  phpWebFramework: [
+    {
+      id: "slim",
+      name: "Slim",
+      description: "Experimental PHP HTTP recipe with validated JSON and PHPUnit",
+      icon: "https://cdn.simpleicons.org/php/777BB4",
+      color: "from-indigo-500 to-indigo-700",
+      default: true,
+    },
+    {
+      id: "none",
+      name: "None",
+      description: "No PHP service",
+      icon: "",
+      color: "from-gray-500 to-gray-700",
+    },
+  ],
   elixirWebFramework: [
     {
       id: "phoenix",
@@ -7747,6 +7764,13 @@ export const ECOSYSTEMS: {
     description: "Modern Java ecosystem",
     icon: "/icon/java.svg",
     color: "from-red-500 to-orange-600",
+  },
+  {
+    id: "php",
+    name: "PHP",
+    description: "Experimental Slim HTTP application",
+    icon: "https://cdn.simpleicons.org/php/777BB4",
+    color: "from-indigo-500 to-indigo-700",
   },
   {
     id: "elixir",

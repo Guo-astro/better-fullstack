@@ -98,10 +98,26 @@ function getFilename(docType: AiDocs): string {
 }
 
 function generateContent(config: ProjectConfig, docType: AiDocs): string {
-  if (docType === "cursorrules") {
-    return generateCursorRules(config);
+  if (config.ecosystem === "php" && !config.stackParts?.length) {
+    return `# PHP application guidance\n\nComposer owns dependencies and scripts. Read PHP.md before changing routes. Keep strict types, validate JSON at the HTTP boundary, and keep PHPUnit request tests aligned with real behavior. Run composer install --no-interaction, composer run build, composer test and composer run proof:http from the PHP service directory. The HTTP proof starts and stops its own process. Never claim runtime verification from generated files alone. No database, auth, migration or deployment adapter is generated.\n`;
   }
-  return generateMarkdownDoc(config, docType);
+  const content =
+    docType === "cursorrules" ? generateCursorRules(config) : generateMarkdownDoc(config, docType);
+  const phpServices = (config.stackParts ?? []).filter(
+    (part) =>
+      part.role === "backend" &&
+      part.ecosystem === "php" &&
+      !part.ownerPartId &&
+      part.source !== "provided",
+  );
+  if (phpServices.length === 0) return content;
+  const guidance = phpServices
+    .map((part) => {
+      const directory = part.targetPath ?? "apps/server";
+      return `- Read ${directory}/PHP.md. Run composer install --no-interaction, composer run build, composer test and composer run proof:http from ${directory}. Composer owns this service; keep TypeScript dependency changes outside it.`;
+    })
+    .join("\n");
+  return `${content}\n## PHP service ownership\n\n${guidance}\n`;
 }
 
 function sanitizeJavaPackageSuffix(projectName: string): string {

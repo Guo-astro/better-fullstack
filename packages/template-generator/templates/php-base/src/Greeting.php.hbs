@@ -1,0 +1,41 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App;
+
+use InvalidArgumentException;
+use stdClass;
+
+final readonly class Greeting
+{
+    private function __construct(public string $name, public int $repetitions)
+    {
+    }
+
+    public static function fromJson(string $json): self
+    {
+        $body = json_decode($json, false, 32, JSON_THROW_ON_ERROR);
+        if (!$body instanceof stdClass) {
+            throw new InvalidArgumentException('Expected a JSON object.');
+        }
+        $fields = get_object_vars($body);
+        if (array_diff(array_keys($fields), ['name', 'repetitions']) !== []) {
+            throw new InvalidArgumentException('Only name and repetitions are accepted.');
+        }
+        $name = $fields['name'] ?? null;
+        $repetitions = array_key_exists('repetitions', $fields) ? $fields['repetitions'] : 1;
+        if (!is_string($name) || trim($name) === '' || strlen(trim($name)) > 80) {
+            throw new InvalidArgumentException('name must contain 1 to 80 bytes of text.');
+        }
+        if (!is_int($repetitions) || $repetitions < 1 || $repetitions > 5) {
+            throw new InvalidArgumentException('repetitions must be an integer from 1 to 5.');
+        }
+        return new self(trim($name), $repetitions);
+    }
+
+    public function message(): string
+    {
+        return implode(' ', array_fill(0, $this->repetitions, "Hello, {$this->name}!"));
+    }
+}

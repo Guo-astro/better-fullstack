@@ -1,0 +1,10 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Application;
+use App\Environment;
+
+require dirname(__DIR__) . '/vendor/autoload.php';
+Environment::load(dirname(__DIR__) . '/.env');
+Application::create(getenv('CORS_ORIGIN') ?: '')->run();

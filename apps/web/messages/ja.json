@@ -583,6 +583,7 @@
   "docsCliSummaryDotnetDotnetCaching": ".NET のキャッシュ。",
   "docsCliSummaryDotnetDotnetDeploy": ".NET のデプロイ先。",
   "docsCliSummaryDotnetDotnetLibraries": "オプションの .NET ライブラリ。",
+  "docsCliSummaryPhpPhpWebFramework": "PHP の HTTP フレームワーク。",
   "docsCliSummaryElixirElixirWebFramework": "Elixir の Web フレームワーク。",
   "docsCliSummaryElixirElixirOrm": "Elixir の ORM / データベース。",
   "docsCliSummaryElixirElixirAuth": "Elixir の認証。",
