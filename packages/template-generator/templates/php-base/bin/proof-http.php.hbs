@@ -7,11 +7,11 @@ function requireProof(bool $condition, string $message): void
     if (!$condition) throw new RuntimeException($message);
 }
 
-function requestProof(string $url, string $method = 'GET', ?string $body = null): array
+function requestProof(string $url, string $method = 'GET', ?string $body = null, string $origin = 'http://localhost:5173'): array
 {
     $context = stream_context_create(['http' => [
         'method' => $method,
-        'header' => "Content-Type: application/json\r\nOrigin: http://localhost:5173\r\n",
+        'header' => "Content-Type: application/json\r\nOrigin: " . $origin . "\r\n",
         'content' => $body ?? '',
         'ignore_errors' => true,
         'timeout' => 1,
@@ -34,7 +34,7 @@ fclose($socket);
 requireProof(is_string($address), 'Cannot read local address.');
 $log = tempnam(sys_get_temp_dir(), 'bfs-php-http-');
 requireProof(is_string($log), 'Cannot create server log.');
-$process = proc_open([PHP_BINARY, '-S', $address, '-t', 'public', 'public/index.php'], [0 => ['pipe', 'r'], 1 => ['file', $log, 'a'], 2 => ['file', $log, 'a']], $pipes, $root, array_merge(getenv(), ['CORS_ORIGIN' => 'http://localhost:5173']));
+$process = proc_open([PHP_BINARY, '-S', $address, '-t', 'public', 'public/index.php'], [0 => ['pipe', 'r'], 1 => ['file', $log, 'a'], 2 => ['file', $log, 'a']], $pipes, $root, array_merge(getenv(), ['CORS_ORIGIN' => 'http://localhost:5173,http://localhost:8080']));
 requireProof(is_resource($process), 'Cannot launch server.');
 fclose($pipes[0]);
 $failure = null;
@@ -54,6 +54,13 @@ try {
     [$status, $body, $headers] = requestProof('http://' . $address . '/api/greetings', 'POST', '{"name":"Ada","repetitions":2}');
     requireProof($status === 200 && $body === ['message' => 'Hello, Ada! Hello, Ada!', 'repetitions' => 2], 'Parsed greeting mismatch.');
     requireProof(in_array('Access-Control-Allow-Origin: http://localhost:5173', $headers, true), 'CORS origin mismatch.');
+    foreach (['http://localhost:8080', 'http://localhost:51730', 'https://other.example'] as $origin) {
+        [$status, $body, $headers] = requestProof('http://' . $address . '/health', 'GET', null, $origin);
+        requireProof($status === 200, 'CORS health request failed.');
+        $corsHeaders = array_values(array_filter($headers, fn (string $header): bool => str_starts_with(strtolower($header), 'access-control-allow-origin:')));
+        $expected = $origin === 'http://localhost:8080' ? ['Access-Control-Allow-Origin: ' . $origin] : [];
+        requireProof($corsHeaders === $expected, 'CORS allowlist mismatch.');
+    }
     [$status, $body] = requestProof('http://' . $address . '/api/greetings', 'POST', '{"name":"Ada","repetitions":0}');
     requireProof($status === 422 && $body['error'] === 'validation_failed', 'Invalid request accepted.');
     [$status, $body] = requestProof('http://' . $address . '/api/greetings', 'POST', '{');
@@ -79,4 +86,4 @@ try {
     unlink($log);
 }
 if ($failure !== null) exit(1);
-echo json_encode(['php' => PHP_VERSION, 'assertions' => ['health', 'parsed-greeting', 'validation-rejection', 'malformed-json', 'oversized-body', 'missing-route', 'cors', 'shutdown'], 'success' => true], JSON_THROW_ON_ERROR) . "\n";
+echo json_encode(['php' => PHP_VERSION, 'assertions' => ['health', 'parsed-greeting', 'validation-rejection', 'malformed-json', 'oversized-body', 'missing-route', 'cors', 'cors-allowlist', 'shutdown'], 'success' => true], JSON_THROW_ON_ERROR) . "\n";

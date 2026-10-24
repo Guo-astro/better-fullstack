@@ -77,6 +77,24 @@ final class ApplicationTest extends TestCase
         self::assertSame(413, Application::create()->handle($oversized)->getStatusCode());
     }
 
+    public function testCorsAllowsEachConfiguredOriginAndRejectsOthers(): void
+    {
+        $app = Application::create('http://localhost:5173, http://localhost:8080');
+        $factory = new ServerRequestFactory();
+        foreach (['http://localhost:5173', 'http://localhost:8080'] as $origin) {
+            foreach (['GET', 'OPTIONS'] as $method) {
+                $request = $factory->createServerRequest($method, '/health')->withHeader('Origin', $origin);
+                $response = $app->handle($request);
+                self::assertSame($origin, $response->getHeaderLine('Access-Control-Allow-Origin'));
+                self::assertSame('Origin', $response->getHeaderLine('Vary'));
+            }
+        }
+        foreach (['', 'http://localhost:51730', 'http://localhost:8080.evil', 'https://other.example'] as $origin) {
+            $request = $factory->createServerRequest('GET', '/health')->withHeader('Origin', $origin);
+            self::assertSame('', $app->handle($request)->getHeaderLine('Access-Control-Allow-Origin'));
+        }
+    }
+
     public function testCorsIsPinnedToConfiguredOrigin(): void
     {
         $request = (new ServerRequestFactory())->createServerRequest('OPTIONS', '/api/greetings')->withHeader('Origin', 'http://localhost:5173');

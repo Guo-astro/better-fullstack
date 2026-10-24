@@ -167,6 +167,21 @@ describe("multi-ecosystem project output", () => {
     }
   });
 
+  it("allows every generated frontend origin on PHP without changing other backend defaults", async () => {
+    const output = await generate([
+      "frontend:dotnet:blazor-webassembly:store",
+      "frontend:rust:leptos:admin",
+      "backend:php:slim:catalog",
+      "backend:go:gin:worker",
+    ]);
+    for (const file of [".env.example", ".env"]) {
+      expect(output.get(`services/catalog/${file}`) ?? "").toContain(
+        "CORS_ORIGIN=http://localhost:5173,http://localhost:8080",
+      );
+      expect(output.get(`services/worker/${file}`) ?? "").not.toMatch(/^CORS_ORIGIN=.+$/m);
+    }
+  });
+
   it("keeps single-frontend backend CORS pinned to its dev origin", async () => {
     const output = await generate(["frontend:dotnet:blazor-webassembly", "backend:go:gin"]);
     expect(output.get("apps/server/.env")).toContain("CORS_ORIGIN=http://localhost:5173");

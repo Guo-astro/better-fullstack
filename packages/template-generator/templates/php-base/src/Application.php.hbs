@@ -57,12 +57,14 @@ final class Application
             $status = $error instanceof HttpException ? $error->getCode() : 500;
             return self::json($app->getResponseFactory()->createResponse(), ['error' => $status === 404 ? 'not_found' : ($status === 405 ? 'method_not_allowed' : 'internal_error')], $status);
         });
-        $app->add(function (ServerRequestInterface $request, RequestHandlerInterface $handler) use ($app, $corsOrigin): ResponseInterface {
+        $corsOrigins = array_map('trim', explode(',', $corsOrigin));
+        $app->add(function (ServerRequestInterface $request, RequestHandlerInterface $handler) use ($app, $corsOrigins): ResponseInterface {
             $response = $request->getMethod() === 'OPTIONS'
                 ? $app->getResponseFactory()->createResponse(204)
                 : $handler->handle($request);
-            if ($corsOrigin !== '' && $request->getHeaderLine('Origin') === $corsOrigin) {
-                $response = $response->withHeader('Access-Control-Allow-Origin', $corsOrigin)
+            $origin = $request->getHeaderLine('Origin');
+            if ($origin !== '' && in_array($origin, $corsOrigins, true)) {
+                $response = $response->withHeader('Access-Control-Allow-Origin', $origin)
                     ->withHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
                     ->withHeader('Access-Control-Allow-Headers', 'Content-Type')
                     ->withHeader('Vary', 'Origin');
