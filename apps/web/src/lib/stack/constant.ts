@@ -2636,6 +2636,14 @@ export const TECH_OPTIONS: Record<
       default: false,
     },
     {
+      id: "plasmo",
+      name: "Plasmo",
+      description: "Chrome Manifest V3 extension with bounded page messaging",
+      icon: "",
+      color: "from-purple-500 to-purple-700",
+      default: false,
+    },
+    {
       id: "wxt",
       name: "WXT",
       description: "Build browser extensions",

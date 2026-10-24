@@ -1,3 +1,5 @@
+import { getBrowserExtensionRecipeIssue, isBrowserExtension } from "@/capabilities/browser-extensions";
+
 import type {
   Ecosystem,
   ProjectConfig,
@@ -488,7 +490,7 @@ function getHistoricalAddonRole(toolId: string): StackPartRole | undefined {
     return "codeQuality";
   }
   if (["starlight", "fumadocs"].includes(toolId)) return "documentation";
-  if (["pwa", "tauri", "electron", "capacitor", "wxt", "opentui"].includes(toolId)) {
+  if (["pwa", "tauri", "electron", "capacitor", "wxt", "plasmo", "opentui"].includes(toolId)) {
     return "appPlatform";
   }
   if (
@@ -3039,6 +3041,14 @@ function getStackPartCompatibilityIssue(
     Partial<Pick<StackPart, "source">>,
   context: StackPartOptionContext,
 ): StackGraphIssue | undefined {
+  if (part.role === "appPlatform" && isBrowserExtension(part.toolId)) {
+    const hasPrimarySelection = context.parts?.some((candidate) => candidate.source !== "provided" && PRIMARY_ROLES.has(candidate.role));
+    const message = getBrowserExtensionRecipeIssue({ stackParts: context.parts }) ??
+      (hasPrimarySelection && !hasJavaScriptWorkspaceRoot(context.parts)
+        ? "Browser extensions require a generated JavaScript application workspace."
+        : null);
+    if (message) return createStackGraphIssue({ code: "INCOMPATIBLE_GRAPH_SELECTION", partId: part.id, role: part.role, toolId: part.toolId, message });
+  }
   if (
     context.ownerEcosystem &&
     part.ecosystem !== context.ownerEcosystem &&

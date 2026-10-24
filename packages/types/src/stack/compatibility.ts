@@ -16,6 +16,7 @@ import type {
   UILibrary,
 } from "@/config/types";
 
+import { getBrowserExtensionSelectionIssue, isBrowserExtension } from "@/capabilities/browser-extensions";
 import { getAuthIncompatibility, normalizeCapabilitySelection } from "@/capabilities/capabilities";
 import {
   getCodeQualitySelectionIssue,
@@ -707,7 +708,7 @@ function usesTanStackStartSolid(stack: Pick<CompatibilityInput, "webFrontend" | 
     stack.backend === "self-tanstack-start-solid"
   );
 }
-const SINGLE_APP_CONTAINER_ADDONS = new Set(["docker-compose", "devcontainer", "kong"]);
+const SINGLE_APP_CONTAINER_ADDONS = new Set(["docker-compose", "devcontainer", "kong", "wxt", "plasmo"]);
 const FULLSTACK_SELF_BACKENDS = new Set([
   "self-next",
   "self-vinext",
@@ -2917,6 +2918,10 @@ export const getDisabledReason = (
       optionId !== "none"
     )
       return PHP_RECIPE_REASONS.capability;
+  }
+  if (category === "appPlatforms" && isBrowserExtension(optionId)) {
+    const issue = getBrowserExtensionSelectionIssue([...currentStack.appPlatforms, optionId], currentStack.workspaceShape);
+    if (issue) return issue;
   }
   if (
     optionId !== "none" &&
@@ -5534,6 +5539,7 @@ const ADDON_COMPATIBILITY: Record<Addons, readonly Frontend[]> = {
   fumadocs: [],
   opentui: [],
   wxt: [],
+  plasmo: [],
   msw: [],
   storybook: ["tanstack-router", "react-router", "react-vite", "next", "nuxt", "svelte", "solid"],
   axios: [

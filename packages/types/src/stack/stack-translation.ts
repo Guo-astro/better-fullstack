@@ -11,6 +11,7 @@ import {
   isToolingOverlayOnly,
   toolingRequiresJavaScriptWorkspace,
 } from "@/capabilities/tooling-capabilities";
+import { serializeGoCliFlags } from "@/catalog/cli-flags";
 import { normalizeOptionId, type OptionCategory } from "@/catalog/option-metadata";
 import {
   CLI_DEFAULT_PROJECT_CONFIG,
@@ -2468,24 +2469,10 @@ function generateGoCommand(selection: StackSelectionInput, projectName: string) 
   const flags: string[] = [
     "--ecosystem go",
     `--database ${selection.database}`,
-    `--go-web-framework ${selection.goWebFramework}`,
-    `--go-orm ${selection.goOrm}`,
-    `--go-api ${selection.goApi}`,
-    `--go-cli ${selection.goCli}`,
-    `--go-logging ${selection.goLogging}`,
-    `--go-auth ${selection.goAuth}`,
-    formatArrayFlag("go-testing", selection.goTesting),
-    `--go-realtime ${selection.goRealtime}`,
-    `--go-message-queue ${selection.goMessageQueue}`,
-    `--go-caching ${selection.goCaching}`,
-    `--go-config ${selection.goConfig}`,
-    `--go-observability ${selection.goObservability}`,
-    `--go-validation ${selection.goValidation}`,
-    `--go-quality ${selection.goQuality}`,
-    `--go-migrations ${selection.goMigrations}`,
-    `--go-templating ${selection.goTemplating}`,
-    `--go-proto-tooling ${selection.goProtoTooling}`,
-    `--go-di ${selection.goDI}`,
+    ...serializeGoCliFlags({
+      ...selection,
+      goTesting: toUniqueNonNoneArray(selection.goTesting),
+    }),
     `--auth ${selection.auth}`,
     `--email ${selection.email}`,
     `--observability ${selection.observability}`,

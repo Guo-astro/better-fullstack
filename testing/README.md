@@ -6,16 +6,17 @@ This file owns scaffold execution, published-package validation, and runtime-pro
 
 ## Lanes
 
-| Command                                                                     | Proof                                                                      |
-| --------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| `bun run test:smoke:pr-core`                                                | Curated core generated-project checks.                                     |
-| `bun run test:smoke:pr-broad`                                               | Additional curated frontend/ecosystem checks.                              |
-| `bun run test:e2e:package-managers`                                         | Default `--yes` path across package managers.                              |
-| `bun test apps/cli/test/e2e/web-command-roundtrip.test.ts --timeout 600000` | Web-produced commands against the built CLI.                               |
-| `bun run testing/generated-project-proof.ts`                                | Named ecosystem recipes crossing live behavior boundaries.                 |
+| Command | Proof |
+| --- | --- |
+| `bun run test:smoke:pr-core` | Curated core generated-project checks. |
+| `bun run test:smoke:pr-broad` | Additional curated frontend/ecosystem checks. |
+| `bun run test:e2e:package-managers` | Default `--yes` path across package managers. |
+| `bun test apps/cli/test/e2e/web-command-roundtrip.test.ts --timeout 600000` | Web-produced commands against the built CLI. |
+| `bun run testing/generated-project-proof.ts` | Named ecosystem recipes crossing live behavior boundaries. |
 | `bun run testing/php-runtime-proof.ts` | Fresh PHP/Slim install, native build/tests, parsed HTTP responses, rejected input, and shutdown. |
-| `bun run test:recipe-runtime`                                               | Generated persistent resource CRUD and ownership checks.                   |
-| `bun run test:published-package -- --specifier <tag-or-version>`            | Already-published npm package through the installed-package smoke harness. |
+| `bun run test:recipe-runtime` | Generated persistent resource CRUD and ownership checks. |
+| `bun run test:elixir-release` | A generated production Mix release with two-node discovery and RPC in both directions. |
+| `bun run test:published-package -- --specifier <tag-or-version>` | Already-published npm package through the installed-package smoke harness. |
 
 Smoke presets use Bun installs except as noted below. Package-manager correctness belongs in its
 dedicated matrix, including Yarn inference and CI immutable/hardened installs. Preset groups in
@@ -94,6 +95,15 @@ runs remove their temporary project; failed runs retain it for diagnosis.
 Results under `testing/.smoke-output/generated-project-proof/` include
 `generated-project-proof.json`, its Markdown summary, and `capability-runtime-receipt.json`.
 Browser ZIP lifecycle checks must also preserve the non-green state of an uninstalled extraction.
+
+## Elixir release proof
+
+Run `bun run test:elixir-release` with Elixir 1.17 or newer, compatible OTP, Hex, Rebar,
+and registry access. This opt-in lane builds the CLI prerequisites, generates an isolated
+headless clustered release, fetches production dependencies, builds the release, and runs
+two nodes over loopback. It checks the shared-cookie requirement, discovery, and RPC in
+both directions, then stops its nodes and removes the generated project. It does not
+deploy to Fly or Gigalixir or build a Docker image.
 
 ## WebContainer proof
 

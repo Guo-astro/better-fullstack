@@ -1203,6 +1203,7 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
     electron: "Electron",
     capacitor: "Capacitor",
     wxt: "WXT",
+    plasmo: "Plasmo",
     opentui: "OpenTUI",
   },
   appPlatforms: {

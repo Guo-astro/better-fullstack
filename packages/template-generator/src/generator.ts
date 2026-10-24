@@ -10,6 +10,9 @@ import {
   getShadcnLintGraphFrontendIssue,
   getStandaloneBackendEcosystem,
   hasJavaScriptWorkspaceRoot,
+  getBrowserExtensionRecipeIssue,
+  getSelectedBrowserExtensions,
+  isBrowserExtension,
   hasVitePlusWorkspaceRoot,
   isToolingOverlayOnly,
   toolingRequiresJavaScriptWorkspace,
@@ -466,7 +469,14 @@ function resolveGenerationConfig(config: ProjectConfig): ProjectConfig {
 
 export async function generateVirtualProject(options: GeneratorOptions): Promise<GeneratorResult> {
   try {
-    const { config, templates } = options;
+    const { config: requestedConfig, templates } = options;
+    const browserExtensions = getSelectedBrowserExtensions(requestedConfig);
+    const config = {
+      ...requestedConfig,
+      addons: [...requestedConfig.addons.filter((addon) => !isBrowserExtension(addon)), ...browserExtensions],
+    };
+    const extensionIssue = getBrowserExtensionRecipeIssue(config);
+    if (extensionIssue) return { success: false, error: extensionIssue };
 
     if (!templates || templates.size === 0) {
       return {

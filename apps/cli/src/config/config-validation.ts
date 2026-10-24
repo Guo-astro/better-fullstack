@@ -45,6 +45,7 @@ import {
 import { exitWithError } from "@/presentation/errors";
 import {
   formatStackGraphIssue,
+  getBrowserExtensionRecipeIssue,
   getDisabledReason,
   getCodeQualitySelectionIssue,
   getDatabaseOrmIncompatibility,
@@ -1544,6 +1545,8 @@ export function validateFullConfig(
 ) {
   const phpIssue = getPhpRecipeIssue(config);
   if (phpIssue) exitWithError(phpIssue);
+  const browserExtensionIssue = getBrowserExtensionRecipeIssue(config);
+  if (browserExtensionIssue) throw new Error(browserExtensionIssue);
   validateCodeQualityConstraints(config, partial);
   if (config.stackParts && !isToolingOverlayOnly(config.stackParts) && !options.yolo) {
     const graphValidation = validateStackParts(config.stackParts);
@@ -1697,6 +1700,7 @@ export function validateFullConfig(
       addonConfig.goApi,
       addonConfig.javaApi,
       hasVitePlusWorkspaceRoot(config.stackParts),
+      config,
     );
     config.addons = [...new Set(config.addons)];
   }
@@ -1748,6 +1752,8 @@ export function validateConfigForProgrammaticUse(config: Partial<ProjectConfig>)
     validateIntegrationsConstraints(config);
     validateJobQueueConstraints(config);
     validateVectorDbConstraints(config);
+    const browserExtensionIssue = getBrowserExtensionRecipeIssue(config);
+    if (browserExtensionIssue) throw new Error(browserExtensionIssue);
     validateContainerAddonConstraints(config);
     const authIssue = getAuthSelectionIssue(config);
     if (authIssue) throw new Error(authIssue);
@@ -1797,6 +1803,7 @@ export function validateConfigForProgrammaticUse(config: Partial<ProjectConfig>)
         addonConfig.goApi,
         addonConfig.javaApi,
         hasVitePlusWorkspaceRoot(config.stackParts),
+        config,
       );
     }
 
