@@ -35,6 +35,11 @@ defmodule {{elixirModuleName}}.Application do
 {{/if}}
 {{#if (or (eq elixirObservability "prom_ex") (eq elixirOrm "ecto-sql") (eq elixirOrm "myxql") (eq elixirOrm "ecto_sqlite3") (ne elixirWebFramework "none") (eq elixirHttp "finch") (eq elixirEmail "swoosh") (ne elixirCaching "none") (eq elixirClustering "libcluster") (ne elixirJobs "none"))}}
     children = [
+{{#if (eq elixirApi "grpc")}}
+      {GRPC.Server.Supervisor,
+       [endpoint: {{elixirModuleName}}.GRPCEndpoint] ++
+         Application.fetch_env!(:{{elixirAppName}}, {{elixirModuleName}}.GRPCEndpoint)},
+{{/if}}
 {{#if (eq elixirObservability "prom_ex")}}
       {{elixirModuleName}}.PromEx{{#if (or (eq elixirOrm "ecto-sql") (eq elixirOrm "myxql") (eq elixirOrm "ecto_sqlite3") (ne elixirWebFramework "none") (eq elixirHttp "finch") (eq elixirEmail "swoosh") (ne elixirCaching "none") (eq elixirClustering "libcluster") (ne elixirJobs "none"))}},{{/if}}
 {{/if}}

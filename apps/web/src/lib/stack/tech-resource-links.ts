@@ -1156,6 +1156,7 @@ const BASE_LINKS: LinkMap = {
   pwa: { docsUrl: "https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps" },
   tauri: { docsUrl: "https://tauri.app/start/", githubUrl: "https://github.com/tauri-apps/tauri" },
   wxt: { docsUrl: "https://wxt.dev/", githubUrl: "https://github.com/wxt-dev/wxt" },
+  plasmo: { docsUrl: "https://docs.plasmo.com/", githubUrl: "https://github.com/PlasmoHQ/plasmo" },
   opentui: { docsUrl: "https://opentui.org/", githubUrl: "https://github.com/sst/opentui" },
   mcp: {
     docsUrl: "https://modelcontextprotocol.io/introduction",

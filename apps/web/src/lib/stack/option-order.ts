@@ -22,7 +22,7 @@ export const OPTION_DISPLAY_ORDER: Readonly<Record<string, readonly string[]>> =
   animation: ["framer-motion", "lottie", "react-spring", "gsap", "auto-animate", "none"],
   api: ["trpc", "apollo-server", "graphql-yoga", "orpc", "openapi", "ts-rest", "garph", "none"],
   apiGateway: ["kong", "none"],
-  appShells: ["electron", "pwa", "capacitor", "tauri", "opentui", "wxt"],
+  appShells: ["electron", "pwa", "capacitor", "tauri", "opentui", "wxt", "plasmo"],
   astroIntegration: ["react", "vue", "solid", "svelte", "none"],
   auth: [
     "supabase-auth",

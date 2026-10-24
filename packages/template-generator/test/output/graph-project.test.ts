@@ -27,7 +27,7 @@ describe("multi-ecosystem project output", () => {
     for (const packageManager of ["bun", "npm", "pnpm", "yarn"] as const) {
       const result = await generateVirtualProject({
         config: {
-          ...configFor(["frontend:typescript:react-vite", "backend:go:gin"]),
+          ...configFor(["frontend:typescript:react-vite", "backend:go:gin", "appPlatform:typescript:wxt"]),
           addons: ["opentui", "wxt"],
           packageManager,
         },
@@ -96,7 +96,7 @@ describe("multi-ecosystem project output", () => {
 
   it("rejects standalone JavaScript app platforms in native-only projects", async () => {
     for (const addon of ["opentui", "wxt"] as const) {
-      const config = { ...configFor(["backend:go:gin"]), addons: [addon] };
+      const config = { ...configFor(["backend:go:gin", ...(addon === "wxt" ? ["appPlatform:typescript:wxt"] : [])]), addons: [addon] };
       const result = await generateVirtualProject({ config, templates: EMBEDDED_TEMPLATES });
       expect(result.success).toBe(false);
       expect(result.error).toContain(`${addon} requires a generated JavaScript application`);
