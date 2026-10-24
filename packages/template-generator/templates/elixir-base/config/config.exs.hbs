@@ -37,6 +37,15 @@ config :{{elixirAppName}},
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
+
+{{#if (eq elixirApi "grpc")}}
+config :{{elixirAppName}}, {{elixirModuleName}}.GRPCEndpoint,
+  port: 50051,
+  start_server: config_env() != :test,
+  max_body_size: 32_768,
+  adapter_opts: [ip: {127, 0, 0, 1}, idle_timeout: 5_000]
+
+{{/if}}
 {{#if (ne elixirWebFramework "none")}}
 
 config :phoenix, :json_library, Jason
@@ -106,10 +115,7 @@ config :sentry,
   root_source_code_paths: [File.cwd!()]
 {{/if}}
 {{#if (eq elixirClustering "libcluster")}}
-
-config :{{elixirAppName}},
-       :cluster_topologies,
-       local_epmd: [strategy: Cluster.Strategy.Epmd, config: [hosts: []]]
+config :{{elixirAppName}}, :cluster_topologies, []
 {{/if}}
 {{#if (eq elixirAuth "pow")}}
 

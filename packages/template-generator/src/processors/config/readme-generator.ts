@@ -91,6 +91,7 @@ export function processReadme(vfs: VirtualFileSystem, config: ProjectConfig): vo
   } else if (config.ecosystem === "java") {
     content = generateJavaReadmeContent(config);
   } else if (config.ecosystem === "elixir") {
+    if (vfs.exists("README.md")) return;
     content = generateElixirReadmeContent(config);
   } else if (config.ecosystem === "dotnet" && vfs.exists("README.md")) {
     return;
