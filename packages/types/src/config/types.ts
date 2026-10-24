@@ -147,6 +147,7 @@ import type {
   DotnetCachingSchema,
   DotnetDeploySchema,
   DotnetLibrariesSchema,
+  PhpWebFrameworkSchema,
   ElixirWebFrameworkSchema,
   ElixirOrmSchema,
   ElixirAuthSchema,
@@ -321,6 +322,7 @@ export type DotnetValidation = z.infer<typeof DotnetValidationSchema>;
 export type DotnetCaching = z.infer<typeof DotnetCachingSchema>;
 export type DotnetDeploy = z.infer<typeof DotnetDeploySchema>;
 export type DotnetLibraries = z.infer<typeof DotnetLibrariesSchema>;
+export type PhpWebFramework = z.infer<typeof PhpWebFrameworkSchema>;
 export type ElixirWebFramework = z.infer<typeof ElixirWebFrameworkSchema>;
 export type ElixirOrm = z.infer<typeof ElixirOrmSchema>;
 export type ElixirAuth = z.infer<typeof ElixirAuthSchema>;

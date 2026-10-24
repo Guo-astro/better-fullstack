@@ -42,6 +42,11 @@ export const ECOSYSTEM_PROMPT_OPTIONS = [
   },
   { value: "ruby" as const, label: "Ruby", hint: "Experimental Sinatra HTTP service with Bundler and Minitest" },
   {
+    value: "php" as const,
+    label: "PHP",
+    hint: "Experimental Slim HTTP application with Composer and PHPUnit",
+  },
+  {
     value: "elixir" as const,
     label: "Elixir",
     hint: "Elixir ecosystem with Phoenix, LiveView, Ecto, and more",

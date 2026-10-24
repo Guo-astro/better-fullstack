@@ -60,6 +60,7 @@ import {
   ElixirTestingSchema,
   ElixirValidationSchema,
   RubyWebFrameworkSchema,
+  PhpWebFrameworkSchema,
   ElixirWebFrameworkSchema,
   JavaAuthSchema,
   JavaBuildToolSchema,
@@ -260,6 +261,10 @@ export function getDotnetLibrariesJsonSchema() {
   return z.toJSONSchema(DotnetLibrariesSchema);
 }
 
+export function getPhpWebFrameworkJsonSchema() {
+  return z.toJSONSchema(PhpWebFrameworkSchema);
+}
+
 export function getElixirWebFrameworkJsonSchema() {
   return z.toJSONSchema(ElixirWebFrameworkSchema);
 }
@@ -386,6 +391,7 @@ export function getAllJsonSchemas() {
     mobileLibraries: getMobileLibrariesJsonSchema(),
     dotnetLibraries: getDotnetLibrariesJsonSchema(),
     rubyWebFramework: z.toJSONSchema(RubyWebFrameworkSchema),
+    phpWebFramework: getPhpWebFrameworkJsonSchema(),
     elixirWebFramework: getElixirWebFrameworkJsonSchema(),
     elixirOrm: getElixirOrmJsonSchema(),
     elixirAuth: getElixirAuthJsonSchema(),

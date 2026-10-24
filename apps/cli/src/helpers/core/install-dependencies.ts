@@ -343,10 +343,28 @@ export async function runMixCompile({
   }
 }
 
-export async function runBundleInstall({ projectDir }: { projectDir: string }): Promise<SetupStepResult> {
+export async function runBundleInstall({
+  projectDir,
+}: {
+  projectDir: string;
+}): Promise<SetupStepResult> {
   const step = "bundle install";
   try {
     await $({ cwd: projectDir, stderr: ["inherit", "pipe"] })`bundle install`;
+    return { step, success: true };
+  } catch (error) {
+    return toStepFailure(step, error, toErrorMessage(error));
+  }
+}
+
+export async function runComposerInstall({
+  projectDir,
+}: {
+  projectDir: string;
+}): Promise<SetupStepResult> {
+  const step = "composer install";
+  try {
+    await $({ cwd: projectDir, stderr: ["inherit", "pipe"] })`composer install --no-interaction`;
     return { step, success: true };
   } catch (error) {
     return toStepFailure(step, error, toErrorMessage(error));

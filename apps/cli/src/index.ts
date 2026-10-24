@@ -20,6 +20,7 @@ export {
 } from "@/run";
 
 import { getRubyRecipeIssue } from "@better-fullstack/types";
+
 import { applyEffectBackendDefaults } from "@/config/config-processing";
 import {
   getAuthSelectionIssue,
@@ -74,8 +75,11 @@ export async function createVirtual(
     const ecosystem = options.ecosystem || "typescript";
     const isRuby = ecosystem === "ruby" && !options.stackParts?.length;
     const isReactNative = ecosystem === "react-native";
-    const frontend = options.frontend || (isRuby ? [] : isReactNative ? ["native-bare"] : ["tanstack-router"]);
-    const backend = options.backend || (isRuby || isReactNative ? "none" : "hono");
+    const isPhp = ecosystem === "php";
+    const frontend =
+      options.frontend ||
+      (isRuby || isPhp ? ["none"] : isReactNative ? ["native-bare"] : ["tanstack-router"]);
+    const backend = options.backend || (isRuby || isReactNative || isPhp ? "none" : "hono");
     const hasNativeFrontend = frontend.some(
       (item) => item === "native-bare" || item === "native-uniwind" || item === "native-unistyles",
     );
@@ -87,7 +91,7 @@ export async function createVirtual(
       database: options.database || "none",
       orm: options.orm || "none",
       backend,
-      runtime: options.runtime || (isRuby || isReactNative ? "none" : "bun"),
+      runtime: options.runtime || (isRuby || isReactNative || isPhp ? "none" : "bun"),
       frontend,
       addons: options.addons || [],
       examples: options.examples || [],
@@ -102,7 +106,7 @@ export async function createVirtual(
       versionChannel: options.versionChannel || "stable",
       install: false,
       dbSetup: options.dbSetup || "none",
-      api: options.api || (isRuby || isReactNative ? "none" : "trpc"),
+      api: options.api || (isRuby || isReactNative || isPhp ? "none" : "trpc"),
       webDeploy: options.webDeploy || "none",
       serverDeploy: options.serverDeploy || "none",
       astroIntegration: options.astroIntegration || "none",
@@ -231,7 +235,9 @@ export async function createVirtual(
       dotnetCaching: options.dotnetCaching || "none",
       dotnetDeploy: options.dotnetDeploy || (options.ecosystem === "dotnet" ? "docker" : "none"),
       dotnetLibraries: options.dotnetLibraries || [],
-      rubyWebFramework: options.rubyWebFramework ?? (options.ecosystem === "ruby" ? "sinatra" : "none"),
+      rubyWebFramework:
+        options.rubyWebFramework ?? (options.ecosystem === "ruby" ? "sinatra" : "none"),
+      phpWebFramework: options.phpWebFramework ?? (options.ecosystem === "php" ? "slim" : "none"),
       elixirWebFramework:
         options.elixirWebFramework || (options.ecosystem === "elixir" ? "phoenix" : "none"),
       elixirOrm: options.elixirOrm || (options.ecosystem === "elixir" ? "ecto-sql" : "none"),

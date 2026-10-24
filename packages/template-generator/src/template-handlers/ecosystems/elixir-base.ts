@@ -30,6 +30,7 @@ export async function processElixirBaseTemplate(
   const hasAbsinthe = hasPhoenix && config.elixirApi === "absinthe" && hasEcto;
   const hasEmail = config.elixirEmail !== "none";
   const hasDocker = ["docker", "fly", "gigalixir", "mix-release"].includes(config.elixirDeploy);
+  const hasReleaseEnvironment = hasDocker || config.elixirClustering === "libcluster";
   const hasHttpClient = config.elixirHttp !== "none";
   const hasNimbleOptions = config.elixirValidation === "nimble-options";
   const hasCacheModule = config.elixirCaching === "nebulex" || config.elixirCaching === "redix";
@@ -81,6 +82,7 @@ export async function processElixirBaseTemplate(
       if (!hasWallaby && templatePath.includes("/features/")) return true;
       if (!hasEmail && templatePath.includes("/mailer.ex")) return true;
       if (!hasDocker && templatePath.includes("Dockerfile")) return true;
+      if (!hasReleaseEnvironment && templatePath.startsWith(`${prefix}rel/`)) return true;
       if (!hasFlyDeploy && templatePath.includes("fly.toml")) return true;
       if (!hasGigalixirDeploy && templatePath.includes("Procfile")) return true;
       if (!hasHttpClient && templatePath.includes("/http_client.ex")) return true;

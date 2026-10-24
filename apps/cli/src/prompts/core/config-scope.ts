@@ -4,7 +4,12 @@ import type { Ecosystem, ProjectConfig } from "@/types";
 
 import { getDefaultConfig } from "@/constants";
 import { exitCancelled } from "@/presentation/errors";
-import { isCancel, isGoBack, navigableMultiselect, navigableSelect } from "@/prompts/core/navigable";
+import {
+  isCancel,
+  isGoBack,
+  navigableMultiselect,
+  navigableSelect,
+} from "@/prompts/core/navigable";
 
 export type ConfigScope = "core" | "full" | "custom";
 
@@ -108,15 +113,7 @@ const typescriptSections = [
   {
     id: "content",
     label: "Content, Analytics & i18n",
-    promptKeys: [
-      "cms",
-      "analytics",
-      "webMcp",
-      "i18n",
-      "featureFlags",
-      "integrations",
-      "ecommerce",
-    ],
+    promptKeys: ["cms", "analytics", "webMcp", "i18n", "featureFlags", "integrations", "ecommerce"],
   },
   {
     id: "deploy",
@@ -330,6 +327,7 @@ export const CONFIG_SCOPE_REGISTRY = {
     ],
   },
   ruby: { core: ["rubyWebFramework"], sections: [] },
+  php: { core: ["phpWebFramework"], sections: [] },
   elixir: {
     core: ["elixirWebFramework", "database", "dbSetup", "elixirOrm", "elixirAuth", "elixirApi"],
     sections: [

@@ -5,7 +5,8 @@ import {
 } from "@better-fullstack/types/stack-translation";
 import { describe, expect, it, spyOn } from "bun:test";
 
-import { buildRandomStack, getComposerParts } from "@/components/stack-builder/stack-builder";
+import { buildRandomStack } from "@/components/stack-builder/stack-builder";
+import { getComposerParts } from "@/lib/builder/composer-graph";
 import { stackStateToProjectConfig } from "@/lib/builder/preview-config";
 import { getStackRunSupport } from "@/lib/project/run-support";
 import { ECOSYSTEMS, ECOSYSTEM_CATEGORIES, TECH_OPTIONS } from "@/lib/stack/constant";

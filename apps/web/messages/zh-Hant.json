@@ -584,6 +584,7 @@
   "docsCliSummaryDotnetDotnetDeploy": ".NET 部署目標。",
   "docsCliSummaryDotnetDotnetLibraries": "選用的 .NET 函式庫。",
   "docsCliSummaryRubyRubyWebFramework": "Ruby HTTP 框架。",
+  "docsCliSummaryPhpPhpWebFramework": "PHP HTTP 框架。",
   "docsCliSummaryElixirElixirWebFramework": "Elixir Web 框架。",
   "docsCliSummaryElixirElixirOrm": "Elixir ORM / 資料庫。",
   "docsCliSummaryElixirElixirAuth": "Elixir 驗證。",

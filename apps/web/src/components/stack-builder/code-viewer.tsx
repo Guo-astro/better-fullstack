@@ -62,6 +62,7 @@ export function getLanguage(extension: string, filePath = ""): BundledLanguage {
     go: "go",
     templ: "templ",
     py: "python",
+    php: "php",
     pyi: "python",
     mako: "jinja",
     java: "java",

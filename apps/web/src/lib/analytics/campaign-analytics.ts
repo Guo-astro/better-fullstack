@@ -25,6 +25,7 @@ const BACKEND_KEY_BY_ECOSYSTEM = {
   go: "goWebFramework",
   java: "javaWebFramework",
   ruby: "rubyWebFramework",
+  php: "phpWebFramework",
   elixir: "elixirWebFramework",
   dotnet: "dotnetWebFramework",
 } as const satisfies Record<Ecosystem, keyof StackState | null>;

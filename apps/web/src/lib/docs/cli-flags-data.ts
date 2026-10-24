@@ -38,6 +38,7 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
           "java",
           "elixir",
           "dotnet",
+          "php",
           "ruby"
         ],
         "valueHint": null,
@@ -2386,6 +2387,24 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
     ]
   },
   {
+    "id": "php",
+    "title": "PHP flags",
+    "description": "Flags for `--ecosystem php`.",
+    "flags": [
+      {
+        "flag": "--php-web-framework",
+        "summary": "PHP HTTP framework.",
+        "values": [
+          "slim",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "slim",
+        "multiple": false
+      }
+    ]
+  },
+  {
     "id": "elixir",
     "title": "Elixir flags",
     "description": "Flags for `--ecosystem elixir`.",
@@ -2826,6 +2845,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "dotnet:--dotnet-deploy": m.docsCliSummaryDotnetDotnetDeploy,
   "dotnet:--dotnet-libraries": m.docsCliSummaryDotnetDotnetLibraries,
   "ruby:--ruby-web-framework": m.docsCliSummaryRubyRubyWebFramework,
+  "php:--php-web-framework": m.docsCliSummaryPhpPhpWebFramework,
   "elixir:--elixir-web-framework": m.docsCliSummaryElixirElixirWebFramework,
   "elixir:--elixir-orm": m.docsCliSummaryElixirElixirOrm,
   "elixir:--elixir-auth": m.docsCliSummaryElixirElixirAuth,

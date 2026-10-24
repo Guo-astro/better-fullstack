@@ -550,7 +550,9 @@ function makeGoDraft(args: GeneratorArgs): CandidateDraft {
       goObservability: sampleScalar(GO_OBSERVABILITY_VALUES, 0.5),
       goValidation: sampleScalar(GO_VALIDATION_VALUES, 0.5),
       goQuality: sampleScalar(GO_QUALITY_VALUES, 0.5),
-      goMigrations: getGoMigrationsIncompatibility(goMigrations, goSelection) ? "none" : goMigrations,
+      goMigrations: getGoMigrationsIncompatibility(goMigrations, goSelection)
+        ? "none"
+        : goMigrations,
       goTemplating: sampleScalar(GO_TEMPLATING_VALUES, 0.5),
       goProtoTooling: sampleScalar(GO_PROTO_TOOLING_VALUES, 0.5),
       goDI: sampleScalar(GO_DI_VALUES, 0.5),
@@ -609,7 +611,16 @@ function makeJavaDraft(args: GeneratorArgs): CandidateDraft {
 }
 
 function makeRubyDraft(args: GeneratorArgs): CandidateDraft {
-  return { ecosystem: "ruby", options: { ...createCommonOptions("ruby", args), rubyWebFramework: "sinatra", database: "none", addons: ["none"], examples: ["none"] } };
+  return {
+    ecosystem: "ruby",
+    options: {
+      ...createCommonOptions("ruby", args),
+      rubyWebFramework: "sinatra",
+      database: "none",
+      addons: ["none"],
+      examples: ["none"],
+    },
+  };
 }
 
 function makeElixirDraft(args: GeneratorArgs): CandidateDraft {
@@ -848,6 +859,7 @@ function createValidationBase(projectName: string, draft: CandidateDraft): Proje
     mobileLibraries: [],
     dotnetLibraries: [],
     rubyWebFramework: "none",
+    phpWebFramework: "none",
     elixirWebFramework: "none",
     elixirOrm: "none",
     elixirAuth: "none",
@@ -978,6 +990,11 @@ function createDraft(ecosystem: Ecosystem, args: GeneratorArgs): CandidateDraft 
       return makeJavaDraft(args);
     case "ruby":
       return makeRubyDraft(args);
+    case "php":
+      return {
+        ecosystem: "php",
+        options: { ...createCommonOptions("php", args), phpWebFramework: "slim", database: "none" },
+      };
     case "elixir":
       return makeElixirDraft(args);
     case "dotnet":

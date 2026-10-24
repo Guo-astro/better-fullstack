@@ -11,6 +11,7 @@ import {
   isToolingOverlayOnly,
   toolingRequiresJavaScriptWorkspace,
 } from "@/capabilities/tooling-capabilities";
+import { serializeGoCliFlags } from "@/catalog/cli-flags";
 import { normalizeOptionId, type OptionCategory } from "@/catalog/option-metadata";
 import {
   CLI_DEFAULT_PROJECT_CONFIG,
@@ -18,6 +19,7 @@ import {
   type CliDefaultProjectConfigBase,
 } from "@/config/defaults";
 import { analyzeStackCompatibility, type CompatibilityInput } from "@/stack/compatibility";
+import { PHP_UNSUPPORTED_BACKEND_FIELDS } from "@/stack/php-compatibility";
 import { createRubyProjectConfigDefaults, getRubyRecipeIssue } from "@/stack/ruby-compatibility";
 import {
   formatStackPartSpec,
@@ -202,6 +204,7 @@ export const STACK_SELECTION_OPTION_CATEGORY_BY_KEY: Record<
   dotnetDeploy: "dotnetDeploy",
   dotnetLibraries: "dotnetLibraries",
   rubyWebFramework: "rubyWebFramework",
+  phpWebFramework: "phpWebFramework",
   elixirWebFramework: "elixirWebFramework",
   elixirOrm: "elixirOrm",
   elixirAuth: "elixirAuth",
@@ -399,6 +402,7 @@ export const STACK_SELECTION_URL_KEYS = {
   dotnetDeploy: "dndeploy",
   dotnetLibraries: "dnlib",
   rubyWebFramework: "rbwf",
+  phpWebFramework: "phwf",
   elixirWebFramework: "ewf",
   elixirOrm: "eorm",
   elixirAuth: "eauth",
@@ -569,25 +573,57 @@ function parseScalarSelectionValue(value: StackSelectionUrlValue, defaultValue: 
 export function getEcosystemDefaultStackSelection(
   ecosystem: StackSelectionState["ecosystem"],
 ): StackSelectionState {
-  const selection = cloneDefaultStackSelection();
-  if (ecosystem !== "ruby") return { ...selection, ecosystem };
-  const defaults = createRubyProjectConfigDefaults();
-  const renamed: Record<string, string> = {
-    frontend: "webFrontend",
-    addons: "appPlatforms",
-    ai: "aiSdk",
-    effect: "backendLibraries",
+  if (ecosystem === "ruby") {
+    const selection = cloneDefaultStackSelection();
+    const defaults = createRubyProjectConfigDefaults();
+    const renamed: Record<string, string> = {
+      frontend: "webFrontend",
+      addons: "appPlatforms",
+      ai: "aiSdk",
+      effect: "backendLibraries",
+    };
+    for (const [key, value] of Object.entries(defaults))
+      (selection as unknown as Record<string, unknown>)[renamed[key] ?? key] = value;
+    return {
+      ...selection,
+      ecosystem,
+      nativeFrontend: ["none"],
+      codeQuality: [],
+      documentation: [],
+    };
+  }
+  const defaults = { ...cloneDefaultStackSelection(), ecosystem };
+  if (ecosystem !== "php") return defaults;
+  const capabilities = Object.fromEntries(
+    PHP_UNSUPPORTED_BACKEND_FIELDS.map((key) => [key === "ai" ? "aiSdk" : key, "none"]),
+  );
+  return {
+    ...defaults,
+    ...capabilities,
+    phpWebFramework: "slim",
+    database: "none",
+    backend: "none",
+    runtime: "none",
+    backendLibraries: "none",
+    forms: "none",
+    testing: "none",
+    validation: "none",
+    webFrontend: ["none"],
+    nativeFrontend: ["none"],
+    cssFramework: "none",
+    uiLibrary: "none",
+    appPlatforms: [],
+    codeQuality: [],
+    documentation: [],
   };
-  for (const [key, value] of Object.entries(defaults))
-    (selection as unknown as Record<string, unknown>)[renamed[key] ?? key] = value;
-  return { ...selection, ecosystem, nativeFrontend: ["none"], codeQuality: [], documentation: [] };
 }
 
 export function parseStackSelectionFromUrlRecord(
   params: StackSelectionUrlRecord,
 ): StackSelectionState {
+  const ecosystem = parseScalarSelectionValue(params.eco, "typescript");
   const defaults = getEcosystemDefaultStackSelection(
-    parseScalarSelectionValue(params.eco, "typescript") === "ruby" ? "ruby" : "typescript",
+    ecosystem === "ruby" ? "ruby" : ecosystem === "php" ? "php" : "typescript",
   );
   const parsed = structuredClone(defaults) as Record<string, unknown>;
 
@@ -639,11 +675,16 @@ export function createStackSelectionSearchParams(
 ): URLSearchParams {
   const includeDefaults = options?.includeDefaults ?? false;
   const params = new URLSearchParams();
+  const defaults =
+    selection.ecosystem === "php"
+      ? getEcosystemDefaultStackSelection("php")
+      : DEFAULT_STACK_SELECTION;
 
   for (const stackKey of STACK_SELECTION_KEYS) {
     const urlKey = STACK_SELECTION_URL_KEYS[stackKey];
     const value = selection[stackKey];
-    const defaultValue = DEFAULT_STACK_SELECTION[stackKey];
+    const defaultValue =
+      stackKey === "ecosystem" ? DEFAULT_STACK_SELECTION[stackKey] : defaults[stackKey];
 
     if (Array.isArray(value)) {
       const serialized = value.join(",");
@@ -806,6 +847,7 @@ const CLI_SCALAR_CONFIG_FIELDS = [
   ["dotnetCaching", "dotnetCaching"],
   ["dotnetDeploy", "dotnetDeploy"],
   ["rubyWebFramework", "rubyWebFramework"],
+  ["phpWebFramework", "phpWebFramework"],
   ["elixirWebFramework", "elixirWebFramework"],
   ["elixirOrm", "elixirOrm"],
   ["elixirAuth", "elixirAuth"],
@@ -1414,7 +1456,9 @@ function expandScopedStackPartSpecs(
   fields: readonly ScopedStackPartField[],
 ) {
   const stackParts = parseStackPartSpecs(specs, "selected");
-  const stackPartSpecs = stackParts.map((part) => formatStackPartSpec(part, stackParts));
+  const stackPartSpecs = stackParts
+    .filter((part) => part.source !== "provided")
+    .map((part) => formatStackPartSpec(part, stackParts));
   const stackPartSpecSet = new Set(stackPartSpecs);
 
   const getPrimary = (
@@ -1809,7 +1853,9 @@ export function cliInputToProjectConfigPartial(
 function getCliGraphStackParts(input: CLIInput): StackPart[] {
   const inputSpecs = [...(input.part ?? [])];
   const stackParts = parseStackPartSpecs(inputSpecs, "selected");
-  const stackPartSpecs = stackParts.map((part) => formatStackPartSpec(part, stackParts));
+  const stackPartSpecs = stackParts
+    .filter((part) => part.source !== "provided")
+    .map((part) => formatStackPartSpec(part, stackParts));
   const stackPartSpecSet = new Set(stackPartSpecs);
 
   const hasPrimary = (role: StackPartRole, ecosystem: StackPartEcosystem) =>
@@ -1904,7 +1950,10 @@ function buildProjectConfigBase(
     orm: stack.orm as ProjectConfig["orm"],
     backend: mapBackendToCli(stack.backend) as ProjectConfig["backend"],
     runtime: stack.runtime as ProjectConfig["runtime"],
-    frontend: frontend.length > 0 || stack.ecosystem === "ruby" ? frontend : ["tanstack-router"],
+    frontend:
+      frontend.length > 0 || stack.ecosystem === "php" || stack.ecosystem === "ruby"
+        ? frontend
+        : ["tanstack-router"],
     addons: [
       ...toUniqueNonNoneArray(stack.codeQuality),
       ...toUniqueNonNoneArray(stack.documentation),
@@ -2059,6 +2108,7 @@ function buildProjectConfigBase(
       stack.dotnetLibraries,
     ) as ProjectConfig["dotnetLibraries"],
     rubyWebFramework: stack.rubyWebFramework as ProjectConfig["rubyWebFramework"],
+    phpWebFramework: stack.phpWebFramework as ProjectConfig["phpWebFramework"],
     elixirWebFramework: stack.elixirWebFramework as ProjectConfig["elixirWebFramework"],
     elixirOrm: stack.elixirOrm as ProjectConfig["elixirOrm"],
     elixirAuth: stack.elixirAuth as ProjectConfig["elixirAuth"],
@@ -2157,6 +2207,7 @@ export function isCliDefaultStackSelection(
           ...JAVA_CONFIG_KEYS,
           ...DOTNET_CONFIG_KEYS,
           "rubyWebFramework",
+          "phpWebFramework",
           ...ELIXIR_CONFIG_KEYS,
           ...(selection.ecosystem === "typescript" ? REACT_NATIVE_CONFIG_KEYS : []),
         ])
@@ -2452,24 +2503,10 @@ function generateGoCommand(selection: StackSelectionInput, projectName: string) 
   const flags: string[] = [
     "--ecosystem go",
     `--database ${selection.database}`,
-    `--go-web-framework ${selection.goWebFramework}`,
-    `--go-orm ${selection.goOrm}`,
-    `--go-api ${selection.goApi}`,
-    `--go-cli ${selection.goCli}`,
-    `--go-logging ${selection.goLogging}`,
-    `--go-auth ${selection.goAuth}`,
-    formatArrayFlag("go-testing", selection.goTesting),
-    `--go-realtime ${selection.goRealtime}`,
-    `--go-message-queue ${selection.goMessageQueue}`,
-    `--go-caching ${selection.goCaching}`,
-    `--go-config ${selection.goConfig}`,
-    `--go-observability ${selection.goObservability}`,
-    `--go-validation ${selection.goValidation}`,
-    `--go-quality ${selection.goQuality}`,
-    `--go-migrations ${selection.goMigrations}`,
-    `--go-templating ${selection.goTemplating}`,
-    `--go-proto-tooling ${selection.goProtoTooling}`,
-    `--go-di ${selection.goDI}`,
+    ...serializeGoCliFlags({
+      ...selection,
+      goTesting: toUniqueNonNoneArray(selection.goTesting),
+    }),
     `--auth ${selection.auth}`,
     `--email ${selection.email}`,
     `--observability ${selection.observability}`,
@@ -2610,6 +2647,17 @@ export function generateStackSelectionCommand(selection: StackSelectionInput): s
       return generateDotnetCommand(selection, projectName);
     case "ruby":
       return generateRubyCommand(selection, projectName);
+    case "php": {
+      const flags = [
+        `--ecosystem php`,
+        `--php-web-framework ${selection.phpWebFramework}`,
+        `--database ${selection.database}`,
+      ];
+      flags.push(formatArrayFlag("ai-docs", selection.aiDocs));
+      if (selection.git === "false") flags.push("--no-git");
+      if (selection.install === "false") flags.push("--no-install");
+      return `${getBaseCommand(selection)} ${projectName} ${flags.join(" ")}`;
+    }
     case "elixir":
       return generateElixirCommand(selection, projectName);
     case "typescript":

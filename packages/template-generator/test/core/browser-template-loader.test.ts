@@ -1,13 +1,18 @@
-import { cliInputToProjectConfigPartial, createRubyProjectConfigDefaults, RUBY_RECIPE_EXTENSION_REASON } from "@better-fullstack/types";
+import type { ProjectConfig } from "@better-fullstack/types";
+
+import {
+  cliInputToProjectConfigPartial,
+  createRubyProjectConfigDefaults,
+  RUBY_RECIPE_EXTENSION_REASON,
+} from "@better-fullstack/types";
 import { makeConfig } from "@test/_fixtures/config-factory";
 import { describe, expect, it } from "bun:test";
 
-import type { ProjectConfig } from "@better-fullstack/types";
+import type { VirtualNode } from "@/types";
 
 import { getRequiredTemplateFamilies, loadTemplatesForConfig } from "@/browser-template-loader";
 import { generateVirtualProject } from "@/generator";
 import { EMBEDDED_TEMPLATES } from "@/templates.generated";
-import type { VirtualNode } from "@/types";
 
 function flattenFiles(node: VirtualNode): [string, string][] {
   if (node.type === "file") return [[node.path, node.content]];
@@ -82,6 +87,45 @@ describe("browser template family loader", () => {
       expect(result.success).toBe(false);
       expect(result.error).toBe(RUBY_RECIPE_EXTENSION_REASON);
       expect(result.tree).toBeUndefined();
+    }
+  });
+
+  it.each([
+    { parts: ["backend:php:slim"] },
+    { parts: ["frontend:typescript:react-vite", "backend:php:slim"] },
+  ])("preserves PHP output through selected browser templates for %j", async ({ parts }) => {
+    const config = graphConfig([...parts]);
+    const selectedTemplates = await loadTemplatesForConfig(config);
+    const files = await generatedFiles(config, selectedTemplates);
+
+    expect(files).toEqual(await generatedFiles(config, EMBEDDED_TEMPLATES));
+    expect(files.some(([path]) => path.endsWith("composer.json"))).toBe(true);
+    expect(files.some(([path]) => path.endsWith("src/Application.php"))).toBe(true);
+  });
+
+  it("preserves the complete Plasmo extension in flat, overlay, and mixed selected-template loads", async () => {
+    for (const config of [
+      makeConfig({ addons: ["plasmo"], database: "none", orm: "none", testing: "none" }),
+      makeConfig({
+        stackParts: cliInputToProjectConfigPartial({ part: ["appPlatform:typescript:plasmo"] })
+          .stackParts,
+        addons: [],
+      }),
+      graphConfig([
+        "frontend:typescript:react-vite:site",
+        "backend:go:gin:api",
+        "appPlatform:typescript:plasmo",
+      ]),
+    ]) {
+      expect(getRequiredTemplateFamilies(config)).toContain("addons");
+      const eager = await generatedFiles(config, EMBEDDED_TEMPLATES);
+      expect(await generatedFiles(config, await loadTemplatesForConfig(config))).toEqual(eager);
+      expect(eager.find(([path]) => path === "apps/extension/src/content.ts")?.[1]).toContain(
+        'matches: ["https://example.com/*"]',
+      );
+      expect(eager.find(([path]) => path === "apps/extension/assets/icon.png")?.[1]).toBe(
+        "[Binary file]",
+      );
     }
   });
 

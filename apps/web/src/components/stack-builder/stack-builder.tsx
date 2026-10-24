@@ -179,6 +179,7 @@ import {
   composerUsesJavaScript,
   getComposerReviewParts,
   getComposerEditorSpecs,
+  getComposerParts,
   hasComposerApplication,
   reconcileComposerSpecs,
 } from "@/lib/builder/composer-graph";
@@ -195,12 +196,7 @@ import {
 } from "@/lib/i18n/builder-copy";
 import { cn } from "@/lib/platform/utils";
 import { getStackRunSupport } from "@/lib/project/run-support";
-import {
-  DEFAULT_STACK,
-  ECOSYSTEMS,
-  type StackState,
-  TECH_OPTIONS,
-} from "@/lib/stack/constant";
+import { DEFAULT_STACK, ECOSYSTEMS, type StackState, TECH_OPTIONS } from "@/lib/stack/constant";
 import { buildPresetStack } from "@/lib/stack/preset-stack";
 import { useStackState } from "@/lib/stack/stack-url-state";
 import {
@@ -326,7 +322,7 @@ type GraphMobileEcosystem = Extract<
 >;
 type GraphBackendEcosystem = Extract<
   StackPartEcosystem,
-  "typescript" | "rust" | "python" | "go" | "java" | "elixir" | "dotnet" | "ruby"
+  "typescript" | "rust" | "python" | "go" | "java" | "elixir" | "dotnet" | "php" | "ruby"
 >;
 type GraphSelection = {
   rootIds?: Partial<Record<ComposerRole, string>>;
@@ -689,6 +685,7 @@ const GRAPH_BACKEND_CONFIGS: GraphBackendConfig[] = [
     ormCategory: "javaOrm",
     authCategory: "javaAuth",
   },
+  { ecosystem: "php", label: "PHP", frameworkCategory: "phpWebFramework" },
   {
     ecosystem: "elixir",
     label: "Elixir",
@@ -970,6 +967,7 @@ const GRAPH_BACKEND_ADVANCED_CATEGORY_ORDER_BY_ECOSYSTEM = {
     "search",
   ],
   ruby: [],
+  php: [],
   elixir: [
     "elixirRealtime",
     "elixirJobs",
@@ -1094,21 +1092,15 @@ function getDefaultGraphTool(
   return toolOptions.find((option) => option.id !== "none")?.id ?? fallback;
 }
 
-export function getComposerParts(specs: readonly string[]) {
-  try {
-    return parseStackPartSpecs([...specs]);
-  } catch {
-    return [];
-  }
-}
-
 function getSoloBackendSelection(stack: StackState): GraphSelection {
   const currentEcosystem = isGraphBackendEcosystem(stack.ecosystem)
     ? stack.ecosystem
     : "typescript";
   const backendConfig = GRAPH_BACKEND_CONFIG_BY_ECOSYSTEM[currentEcosystem];
   const backendValue = stack[getStackKeyForCategory(backendConfig.frameworkCategory)];
-  const ormValue = backendConfig.ormCategory ? stack[getStackKeyForCategory(backendConfig.ormCategory)] : "none";
+  const ormValue = backendConfig.ormCategory
+    ? stack[getStackKeyForCategory(backendConfig.ormCategory)]
+    : "none";
   const apiValue = backendConfig.apiCategory
     ? stack[getStackKeyForCategory(backendConfig.apiCategory)]
     : "none";
@@ -1129,7 +1121,7 @@ function getSoloBackendSelection(stack: StackState): GraphSelection {
         ? stack.rustFrontend
         : frontendEcosystem === "dotnet"
           ? (stack.dotnetFrontend ?? "none")
-          : getSelectedOptionId(stack.webFrontend, stack.ecosystem === "ruby" ? "none" : "tanstack-router"),
+          : getSelectedOptionId(stack.webFrontend),
     mobileEcosystem:
       (stack.swiftMobile ?? "none") !== "none"
         ? "swift"
@@ -1249,6 +1241,12 @@ function graphSelectionToSpecs(selection: GraphSelection): string[] {
     specs.push(`database:universal:${selection.database}`);
   }
   return specs;
+}
+
+export function getInitialComposerSpecs(stack: StackState): string[] {
+  return stack.stackPartSpecs.length > 0
+    ? stack.stackPartSpecs
+    : graphSelectionToSpecs(getGraphSelection(stack));
 }
 
 function getGraphBackendAdvancedCategoryOrder(
@@ -2384,16 +2382,18 @@ function CreationModeComposer({
     stack.stackPartSpecs.length > 0 ? stack.stackPartSpecs : graphSelectionToSpecs(graphSelection),
   );
   const databaseOptions = getGraphToolOptions("database", "database", "universal", {
-    parts: databaseParts.some((part) => part.role === "backend" && part.ecosystem === "ruby")
-      ? databaseParts
-      : undefined,
+    parts: databaseParts,
+    primaryToolIdsByRole,
+    primaryEcosystemsByRole: { backend: graphSelection.backendEcosystem },
   });
-  const allBackendOrmOptions = backendConfig.ormCategory ? getGraphToolOptions(
-    backendConfig.ormCategory,
-    "orm",
-    graphSelection.backendEcosystem,
-    backendCapabilityContext,
-  ) : [];
+  const allBackendOrmOptions = backendConfig.ormCategory
+    ? getGraphToolOptions(
+        backendConfig.ormCategory,
+        "orm",
+        graphSelection.backendEcosystem,
+        backendCapabilityContext,
+      )
+    : [];
   // The Kotlin scaffold only has Kotlin sources for Spring Data JPA -
   // jOOQ/MyBatis are Java-only (mirrors the spring-boot-only framework filter).
   const backendOrmOptions = filterKotlinBackendCapabilityOptions(
@@ -2543,6 +2543,23 @@ function CreationModeComposer({
     );
   };
 
+  const reconcileBackendDatabase = (selection: GraphSelection) => {
+    if (
+      (selection.backendEcosystem !== "php" && selection.backendEcosystem !== "ruby") ||
+      selection.backend === "none"
+    )
+      return selection.database;
+    const hasOtherDatabaseBackend = getComposerParts(stack.stackPartSpecs).some(
+      (part) =>
+        part.role === "backend" &&
+        part.source !== "provided" &&
+        part.id !== selection.rootIds?.backend &&
+        part.ecosystem !== "php" &&
+        part.ecosystem !== "ruby",
+    );
+    return hasOtherDatabaseBackend ? selection.database : "none";
+  };
+
   const reconcileBackendCapabilities = (
     selection: GraphSelection,
     config: GraphBackendConfig,
@@ -2551,24 +2568,28 @@ function CreationModeComposer({
       return { backendOrm: "none", backendApi: "none", backendAuth: "none" };
     }
 
-    const ormOptions = config.ormCategory ? filterKotlinBackendCapabilityOptions(
+    const ormOptions = filterKotlinBackendCapabilityOptions(
       selection,
       "orm",
-      getGraphToolOptions(
-        config.ormCategory,
-        "orm",
-        config.ecosystem,
-        getBackendContextForSelection(selection),
-      ),
-    ) : [];
-    const defaultBackendOrm = config.ormCategory ? getDefaultGraphTool(
-      config.ormCategory,
-      "orm",
-      config.ecosystem,
-      "none",
-      {},
-      getBackendContextForSelection(selection),
-    ) : "none";
+      config.ormCategory
+        ? getGraphToolOptions(
+            config.ormCategory,
+            "orm",
+            config.ecosystem,
+            getBackendContextForSelection(selection),
+          )
+        : [],
+    );
+    const defaultBackendOrm = config.ormCategory
+      ? getDefaultGraphTool(
+          config.ormCategory,
+          "orm",
+          config.ecosystem,
+          "none",
+          {},
+          getBackendContextForSelection(selection),
+        )
+      : "none";
     const backendOrm = ormOptions.some((option) => option.id === selection.backendOrm)
       ? selection.backendOrm
       : ormOptions.some((option) => option.id === defaultBackendOrm)
@@ -2962,6 +2983,7 @@ function CreationModeComposer({
                       backendEcosystem: config.ecosystem,
                       backendLanguage: config.javaLanguage,
                       backend,
+                      database: reconcileBackendDatabase(nextSelection),
                       ...reconcileBackendCapabilities(nextSelection, config),
                     });
                   },
@@ -2987,6 +3009,7 @@ function CreationModeComposer({
                 };
                 updateGraphSelection({
                   backend,
+                  database: reconcileBackendDatabase(nextSelection),
                   ...reconcileBackendCapabilities(nextSelection, backendConfig),
                 });
               }}
@@ -3023,21 +3046,25 @@ function CreationModeComposer({
                 testIdPrefix: "multi-database-dbSetup",
               })}
 
-            {graphSelection.backend !== "none" && backendConfig.ormCategory && backendOrmOptions.length > 0 && (
-              <GraphOptionGroup
-                label={m.builderOrmGroup({ ecosystem: backendLabel })}
-                options={backendOrmOptions}
-                selectedId={graphSelection.backendOrm}
-                dense
-                testIdPrefix="multi-backend-orm"
-                evidenceEcosystem={backendConfig.ecosystem}
-                evidenceCategory={backendConfig.ormCategory}
-                onSelect={(backendOrm) => {
-                  const nextSelection: GraphSelection = { ...graphSelection, backendOrm };
-                  updateGraphSelection(reconcileBackendCapabilities(nextSelection, backendConfig));
-                }}
-              />
-            )}
+            {graphSelection.backend !== "none" &&
+              backendConfig.ormCategory &&
+              backendOrmOptions.length > 0 && (
+                <GraphOptionGroup
+                  label={m.builderOrmGroup({ ecosystem: backendLabel })}
+                  options={backendOrmOptions}
+                  selectedId={graphSelection.backendOrm}
+                  dense
+                  testIdPrefix="multi-backend-orm"
+                  evidenceEcosystem={backendConfig.ecosystem}
+                  evidenceCategory={backendConfig.ormCategory}
+                  onSelect={(backendOrm) => {
+                    const nextSelection: GraphSelection = { ...graphSelection, backendOrm };
+                    updateGraphSelection(
+                      reconcileBackendCapabilities(nextSelection, backendConfig),
+                    );
+                  }}
+                />
+              )}
 
             {graphSelection.backend !== "none" &&
               backendConfig.apiCategory &&
@@ -4224,10 +4251,7 @@ const StackBuilderInner = ({ initialStack }: { initialStack?: StackState }) => {
   };
 
   const enableMultiMode = () => {
-    const specs =
-      stack.stackPartSpecs.length > 0
-        ? stack.stackPartSpecs
-        : graphSelectionToSpecs(getGraphSelection(stack));
+    const specs = getInitialComposerSpecs(stack);
     setStack((current) => ({
       ...stackPatchFromGraphSpecs(specs),
       projectName: current.projectName,
@@ -5453,9 +5477,7 @@ const StackBuilderInner = ({ initialStack }: { initialStack?: StackState }) => {
                                   {index > 0 && " · "}
                                   <span
                                     className={
-                                      item.picked
-                                        ? "text-foreground/80"
-                                        : "text-muted-foreground"
+                                      item.picked ? "text-foreground/80" : "text-muted-foreground"
                                     }
                                   >
                                     {item.label}

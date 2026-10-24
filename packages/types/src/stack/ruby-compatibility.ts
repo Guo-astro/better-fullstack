@@ -67,7 +67,9 @@ export function getRubyDatabaseSelectionIssue(
   const hasRubyBackend = backends.some(
     (part) => part.ecosystem === "ruby" && part.source !== "provided",
   );
-  const hasOtherBackend = backends.some((part) => part.ecosystem !== "ruby");
+  const hasOtherBackend = backends.some(
+    (part) => part.ecosystem !== "ruby" && part.ecosystem !== "php",
+  );
   const hasSelectedDatabase = parts.some(
     (part) => part.role === "database" && part.toolId !== "none" && part.source !== "provided",
   );

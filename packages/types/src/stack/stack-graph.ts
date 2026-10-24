@@ -1,5 +1,3 @@
-import { getRubyDatabaseSelectionIssue, RUBY_RECIPE_EXTENSION_REASON } from "@/stack/ruby-compatibility";
-
 import type {
   Ecosystem,
   ProjectConfig,
@@ -9,6 +7,10 @@ import type {
   StackPartSource,
 } from "@/config/types";
 
+import {
+  getBrowserExtensionRecipeIssue,
+  isBrowserExtension,
+} from "@/capabilities/browser-extensions";
 import { getAuthIncompatibility } from "@/capabilities/capabilities";
 import {
   getCodeQualitySelectionIssue,
@@ -63,6 +65,7 @@ import {
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
   RUBY_WEB_FRAMEWORK_VALUES,
+  PHP_WEB_FRAMEWORK_VALUES,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   EFFECT_VALUES,
   EMAIL_VALUES,
@@ -182,6 +185,11 @@ import {
   VALIDATION_VALUES,
   WEB_DEPLOY_VALUES,
 } from "@/config/schemas";
+import { PHP_RECIPE_REASONS } from "@/stack/php-compatibility";
+import {
+  getRubyDatabaseSelectionIssue,
+  RUBY_RECIPE_EXTENSION_REASON,
+} from "@/stack/ruby-compatibility";
 import {
   getDatabaseOrmIncompatibility,
   getDatabaseOrmRequirementIssue,
@@ -337,6 +345,7 @@ const LEGACY_BACKEND_CATEGORY_BY_ECOSYSTEM = {
   java: "javaWebFramework",
   dotnet: "dotnetWebFramework",
   ruby: "rubyWebFramework",
+  php: "phpWebFramework",
   elixir: "elixirWebFramework",
 } as const satisfies Record<LegacyBackendEcosystem, keyof ProjectConfig>;
 
@@ -371,6 +380,7 @@ const LEGACY_CAPABILITY_CATEGORIES_BY_ECOSYSTEM = {
   },
   dotnet: { orm: "dotnetOrm", api: "dotnetApi", auth: "dotnetAuth" },
   ruby: {},
+  php: {},
   elixir: { orm: "elixirOrm", api: "elixirApi", auth: "elixirAuth" },
 } as const satisfies Record<
   LegacyBackendEcosystem,
@@ -454,6 +464,7 @@ const LEGACY_BACKEND_ARRAY_CATEGORIES_BY_ECOSYSTEM = {
     libraries: "dotnetLibraries",
   },
   ruby: {},
+  php: {},
   elixir: { libraries: "elixirLibraries" },
 } as const satisfies Record<
   LegacyBackendEcosystem,
@@ -489,7 +500,7 @@ function getHistoricalAddonRole(toolId: string): StackPartRole | undefined {
     return "codeQuality";
   }
   if (["starlight", "fumadocs"].includes(toolId)) return "documentation";
-  if (["pwa", "tauri", "electron", "capacitor", "wxt", "opentui"].includes(toolId)) {
+  if (["pwa", "tauri", "electron", "capacitor", "wxt", "plasmo", "opentui"].includes(toolId)) {
     return "appPlatform";
   }
   if (
@@ -779,6 +790,7 @@ const LEGACY_EXTRA_CATEGORIES_BY_ECOSYSTEM = {
     validation: "dotnetValidation",
   },
   ruby: {},
+  php: {},
   elixir: {
     realtime: "elixirRealtime",
     jobQueue: "elixirJobs",
@@ -820,6 +832,7 @@ const LEGACY_SHARED_BACKEND_SINGLE_CATEGORIES_BY_ECOSYSTEM = {
   },
   dotnet: {},
   ruby: {},
+  php: {},
   elixir: {},
 } as const satisfies Record<
   LegacyBackendEcosystem,
@@ -1211,6 +1224,28 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
     allowMultiple: true,
   }),
   ...defineTools(RUBY_WEB_FRAMEWORK_VALUES, "backend", "ruby", "rubyWebFramework"),
+  ...defineTools(PHP_WEB_FRAMEWORK_VALUES, "backend", "php", "phpWebFramework").map(
+    (definition) => ({
+      ...definition,
+      provides: [
+        { role: "api", toolId: "rest", overrideable: false },
+        { role: "testing", toolId: "phpunit", overrideable: false },
+        { role: "packageManager", toolId: "composer", overrideable: false },
+      ] satisfies ProvidedCapabilityDefinition[],
+    }),
+  ),
+  ...defineTools(["rest"], "api", "php").map((definition) => ({
+    ...definition,
+    selectable: false,
+  })),
+  ...defineTools(["phpunit"], "testing", "php").map((definition) => ({
+    ...definition,
+    selectable: false,
+  })),
+  ...defineTools(["composer"], "packageManager", "php").map((definition) => ({
+    ...definition,
+    selectable: false,
+  })),
   ...defineTools(ELIXIR_WEB_FRAMEWORK_VALUES, "backend", "elixir", "elixirWebFramework"),
   ...defineTools(ELIXIR_ORM_VALUES, "orm", "elixir", "elixirOrm"),
   ...defineTools(ELIXIR_AUTH_VALUES, "auth", "elixir", "elixirAuth"),
@@ -3019,16 +3054,62 @@ function getStackPartCompatibilityIssue(
     Partial<Pick<StackPart, "source">>,
   context: StackPartOptionContext,
 ): StackGraphIssue | undefined {
-  if ((part.role === "database" || (part.role === "backend" && part.ecosystem === "ruby")) && getRubyDatabaseSelectionIssue([...(context.parts ?? []), part])) {
-    return createStackGraphIssue({ code: "INCOMPATIBLE_GRAPH_SELECTION", partId: part.id, role: part.role, toolId: part.toolId, message: RUBY_RECIPE_EXTENSION_REASON });
+  if (
+    (part.role === "database" || (part.role === "backend" && part.ecosystem === "ruby")) &&
+    getRubyDatabaseSelectionIssue([...(context.parts ?? []), part])
+  ) {
+    return createStackGraphIssue({
+      code: "INCOMPATIBLE_GRAPH_SELECTION",
+      partId: part.id,
+      role: part.role,
+      toolId: part.toolId,
+      message: RUBY_RECIPE_EXTENSION_REASON,
+    });
   }
-  if (part.source !== "provided" && getToolingCapability(part.toolId) && context.parts?.some((candidate) => candidate.role === "backend" && candidate.ecosystem === "ruby") && !hasJavaScriptWorkspaceRoot(context.parts)) {
-    return createStackGraphIssue({ code: "INCOMPATIBLE_GRAPH_SELECTION", partId: part.id, role: part.role, toolId: part.toolId, message: RUBY_RECIPE_EXTENSION_REASON });
+  if (
+    part.source !== "provided" &&
+    getToolingCapability(part.toolId) &&
+    context.parts?.some(
+      (candidate) => candidate.role === "backend" && candidate.ecosystem === "ruby",
+    ) &&
+    !hasJavaScriptWorkspaceRoot(context.parts)
+  ) {
+    return createStackGraphIssue({
+      code: "INCOMPATIBLE_GRAPH_SELECTION",
+      partId: part.id,
+      role: part.role,
+      toolId: part.toolId,
+      message: RUBY_RECIPE_EXTENSION_REASON,
+    });
   }
   if (context.ownerEcosystem === "ruby" && part.source !== "provided" && part.toolId !== "none") {
-    return createStackGraphIssue({ code: "UNSUPPORTED_ROLE_BINDING", partId: part.id, role: part.role, toolId: part.toolId, message: RUBY_RECIPE_EXTENSION_REASON });
+    return createStackGraphIssue({
+      code: "UNSUPPORTED_ROLE_BINDING",
+      partId: part.id,
+      role: part.role,
+      toolId: part.toolId,
+      message: RUBY_RECIPE_EXTENSION_REASON,
+    });
   }
 
+  if (part.role === "appPlatform" && isBrowserExtension(part.toolId)) {
+    const hasPrimarySelection = context.parts?.some(
+      (candidate) => candidate.source !== "provided" && PRIMARY_ROLES.has(candidate.role),
+    );
+    const message =
+      getBrowserExtensionRecipeIssue({ stackParts: context.parts }) ??
+      (hasPrimarySelection && !hasJavaScriptWorkspaceRoot(context.parts)
+        ? "Browser extensions require a generated JavaScript application workspace."
+        : null);
+    if (message)
+      return createStackGraphIssue({
+        code: "INCOMPATIBLE_GRAPH_SELECTION",
+        partId: part.id,
+        role: part.role,
+        toolId: part.toolId,
+        message,
+      });
+  }
   if (
     context.ownerEcosystem &&
     part.ecosystem !== context.ownerEcosystem &&
@@ -3040,6 +3121,53 @@ function getStackPartCompatibilityIssue(
       role: part.role,
       toolId: part.toolId,
       message: `'${part.toolId}' uses the ${part.ecosystem} adapter but its owner uses ${context.ownerEcosystem}.`,
+    });
+  }
+
+  if (context.ownerEcosystem === "php" && part.source !== "provided") {
+    return createStackGraphIssue({
+      code: "INCOMPATIBLE_GRAPH_SELECTION",
+      partId: part.id,
+      role: part.role,
+      toolId: part.toolId,
+      message:
+        part.role === "database" || part.role === "orm"
+          ? PHP_RECIPE_REASONS.database
+          : PHP_RECIPE_REASONS.capability,
+    });
+  }
+  if (part.ecosystem === "php" && context.ownerRole && context.ownerRole !== "backend") {
+    return createStackGraphIssue({
+      code: "INCOMPATIBLE_OWNER_ROLE",
+      partId: part.id,
+      role: part.role,
+      toolId: part.toolId,
+      message: PHP_RECIPE_REASONS.owner,
+    });
+  }
+  if (
+    ((part.ecosystem === "php" &&
+      part.role === "backend" &&
+      context.primaryToolIdsByRole?.database) ||
+      (part.role === "database" &&
+        part.toolId !== "none" &&
+        context.primaryToolIdsByRole?.backend &&
+        context.primaryEcosystemsByRole?.backend === "php")) &&
+    !context.parts?.some(
+      (candidate) =>
+        candidate.role === "backend" &&
+        !candidate.ownerPartId &&
+        candidate.source !== "provided" &&
+        candidate.ecosystem !== "php" &&
+        candidate.ecosystem !== "ruby",
+    )
+  ) {
+    return createStackGraphIssue({
+      code: "INCOMPATIBLE_GRAPH_SELECTION",
+      partId: part.id,
+      role: part.role,
+      toolId: part.toolId,
+      message: PHP_RECIPE_REASONS.database,
     });
   }
 
@@ -4407,7 +4535,7 @@ export function validateStackParts(parts: readonly StackPart[]): StackGraphValid
         partId: part.id,
         role: part.role,
         toolId: part.toolId,
-        message: `Only one ${group.label} is currently supported. Named repeated backend services are supported for Rust, Python, Go, Java/Kotlin, .NET, Elixir, and Ruby.`,
+        message: `Only one ${group.label} is currently supported. Named repeated backend services are supported for Rust, Python, Go, Java/Kotlin, .NET, Elixir, PHP, and Ruby.`,
       });
     }
   }

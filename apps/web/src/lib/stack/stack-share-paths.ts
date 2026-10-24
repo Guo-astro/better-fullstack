@@ -24,8 +24,7 @@ function withCompatibility(stack: StackState): StackState {
 function createEcosystemShareStack(ecosystem: StackState["ecosystem"]): StackState {
   if (ecosystem === "ruby") return getEcosystemDefaultStackSelection(ecosystem);
   return withCompatibility({
-    ...DEFAULT_STACK,
-    ecosystem,
+    ...getEcosystemDefaultStackSelection(ecosystem),
     stackMode: "solo",
     stackPartSpecs: [],
   });

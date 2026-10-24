@@ -782,6 +782,25 @@ export async function verifyJava(
   return wrapResult("java", comboName, projectDir, steps);
 }
 
+export async function verifyPhp(comboName: string, projectDir: string): Promise<VerifyResult> {
+  const steps: StepResult[] = [];
+  if (!existsSync(join(projectDir, "composer.json"))) {
+    return wrapResult("php", comboName, projectDir, [
+      templateFailure("structure", "Expected Composer manifest"),
+    ]);
+  }
+  for (const [stage, args] of [
+    ["install", ["install", "--no-interaction"]],
+    ["build", ["run", "build"]],
+    ["test", ["test"]],
+    ["http", ["run", "proof:http"]],
+  ] as const) {
+    steps.push(await runStep(stage, "composer", [...args], projectDir));
+    if (!steps.at(-1)!.success) break;
+  }
+  return wrapResult("php", comboName, projectDir, steps);
+}
+
 export async function verifyElixir(
   comboName: string,
   projectDir: string,
@@ -873,6 +892,8 @@ export function getVerifier(
       return verifyJava;
     case "ruby":
       return verifyRuby;
+    case "php":
+      return verifyPhp;
     case "elixir":
       return verifyElixir;
     case "dotnet":

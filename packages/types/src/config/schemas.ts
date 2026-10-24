@@ -5,9 +5,20 @@ import { PRESET_ALIAS_IDS, PRESET_IDS } from "@/catalog/preset-ids";
 export const RubyWebFrameworkSchema = z.enum(["sinatra", "none"]).describe("Ruby HTTP framework");
 
 export const EcosystemSchema = z
-  .enum(["typescript", "react-native", "rust", "python", "go", "java", "elixir", "dotnet", "ruby"])
+  .enum([
+    "typescript",
+    "react-native",
+    "rust",
+    "python",
+    "go",
+    "java",
+    "elixir",
+    "dotnet",
+    "php",
+    "ruby",
+  ])
   .describe(
-    "Language ecosystem (typescript, react-native, rust, python, go, java, elixir, dotnet, or ruby)",
+    "Language ecosystem (typescript, react-native, rust, python, go, java, elixir, dotnet, php, or ruby)",
   );
 
 export const StackPartEcosystemSchema = z
@@ -241,6 +252,7 @@ export const AddonsSchema = z
     "shadcn-lint",
     "opentui",
     "wxt",
+    "plasmo",
     "msw",
     "storybook",
     "swr",
@@ -274,6 +286,7 @@ export const APP_PLATFORM_ADDON_VALUES = [
   "electron",
   "capacitor",
   "wxt",
+  "plasmo",
   "opentui",
 ] as const;
 
@@ -1008,6 +1021,8 @@ export const DotnetLibrariesSchema = z
   .describe(".NET application libraries");
 
 // Elixir ecosystem schemas
+export const PhpWebFrameworkSchema = z.enum(["slim", "none"]).describe("PHP HTTP framework");
+
 export const ElixirWebFrameworkSchema = z
   .enum(["phoenix", "phoenix-live-view", "none"])
   .describe("Elixir web framework");
@@ -1380,6 +1395,7 @@ const STACK_CONFIG_FIELDS = {
   dotnetLibraries: z.array(DotnetLibrariesSchema).describe(".NET application libraries"),
   // Elixir ecosystem options
   rubyWebFramework: RubyWebFrameworkSchema.optional(),
+  phpWebFramework: PhpWebFrameworkSchema.default("none"),
   elixirWebFramework: ElixirWebFrameworkSchema,
   elixirOrm: ElixirOrmSchema,
   elixirAuth: ElixirAuthSchema,
@@ -1664,6 +1680,7 @@ export const DOTNET_VALIDATION_VALUES = DotnetValidationSchema.options;
 export const DOTNET_CACHING_VALUES = DotnetCachingSchema.options;
 export const DOTNET_DEPLOY_VALUES = DotnetDeploySchema.options;
 export const DOTNET_LIBRARIES_VALUES = DotnetLibrariesSchema.options;
+export const PHP_WEB_FRAMEWORK_VALUES = PhpWebFrameworkSchema.options;
 export const ELIXIR_WEB_FRAMEWORK_VALUES = ElixirWebFrameworkSchema.options;
 export const ELIXIR_ORM_VALUES = ElixirOrmSchema.options;
 export const ELIXIR_AUTH_VALUES = ElixirAuthSchema.options;

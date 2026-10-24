@@ -18,6 +18,7 @@ import {
   runMavenTests,
   runPythonInstall,
   runGoModTidy,
+  runComposerInstall,
   runMixCompile,
   type SetupStepResult,
 } from "@/helpers/core/install-dependencies";
@@ -208,6 +209,11 @@ export async function createProject(options: ProjectConfig, cliInput: CreateProj
 
     if (options.install && !usesGraph && installEcosystem === "ruby") {
       const result = await runBundleInstall({ projectDir });
+      if (!result.success) setupFailures.push(result);
+    }
+
+    if (options.install && !usesGraph && installEcosystem === "php") {
+      const result = await runComposerInstall({ projectDir });
       if (!result.success) setupFailures.push(result);
     }
 

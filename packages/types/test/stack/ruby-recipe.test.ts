@@ -231,6 +231,32 @@ describe("Ruby recipe contracts", () => {
     }
   });
 
+  it("requires a database-capable backend alongside Ruby and PHP", () => {
+    for (const backends of [
+      ["backend:ruby:sinatra:ruby-api", "backend:php:slim:php-api"],
+      ["backend:php:slim:php-api", "backend:ruby:sinatra:ruby-api"],
+    ]) {
+      const parts = parseStackPartSpecs(backends);
+      expect(
+        getStackPartOptions({ role: "database", ecosystem: "universal", parts }),
+      ).not.toContain("sqlite");
+      const unsupported = parseStackPartSpecs([...backends, "database:universal:sqlite"]);
+      expect(getRubyRecipeIssue({ stackParts: unsupported })).toBe(RUBY_RECIPE_EXTENSION_REASON);
+      expect(validateStackParts(unsupported).issues.length).toBeGreaterThan(0);
+      const supported = parseStackPartSpecs([
+        ...backends,
+        "backend:go:gin:data-api",
+        "data-api.orm:go:gorm",
+        "database:universal:sqlite",
+      ]);
+      expect(getRubyRecipeIssue({ stackParts: supported })).toBeNull();
+      expect(validateStackParts(supported).issues).toEqual([]);
+      expect(
+        getStackPartOptions({ role: "database", ecosystem: "universal", parts: supported }),
+      ).toContain("sqlite");
+    }
+  });
+
   it("rejects Ruby graph overlays during builder replay before generic tooling filtering", () => {
     const selection = {
       ...rubySelection(),

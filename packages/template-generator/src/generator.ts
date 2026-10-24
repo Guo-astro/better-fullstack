@@ -2,6 +2,7 @@ import type { ProjectConfig, StackPart } from "@better-fullstack/types";
 
 import {
   getRubyRecipeIssue,
+  getPhpRecipeIssue,
   parseStackPartSpecs,
   formatStackGraphIssue,
   getCodeQualitySelectionIssue,
@@ -10,6 +11,9 @@ import {
   getShadcnLintGraphFrontendIssue,
   getStandaloneBackendEcosystem,
   hasJavaScriptWorkspaceRoot,
+  getBrowserExtensionRecipeIssue,
+  getSelectedBrowserExtensions,
+  isBrowserExtension,
   hasVitePlusWorkspaceRoot,
   isToolingOverlayOnly,
   toolingRequiresJavaScriptWorkspace,
@@ -52,6 +56,7 @@ import {
   processJavaBaseTemplate,
   processDotnetBaseTemplate,
   processRubyBaseTemplate,
+  processPhpBaseTemplate,
   processElixirBaseTemplate,
   processFrontendTemplates,
   processGraphNativeAppTemplates,
@@ -115,6 +120,7 @@ const ECOSYSTEM_BASE_TEMPLATE_PROCESSORS = {
   java: processJavaBaseTemplate,
   dotnet: processDotnetBaseTemplate,
   ruby: processRubyBaseTemplate,
+  php: processPhpBaseTemplate,
   elixir: processElixirBaseTemplate,
 } satisfies Record<NonTypeScriptTemplateEcosystem, EcosystemBaseTemplateProcessor>;
 
@@ -338,7 +344,8 @@ async function processGraphTemplates(
             pythonPackageManager: config.pythonPackageManager ?? "uv",
           }
         : projectedConfig;
-    const templateConfig = ecosystem === "ruby" ? { ...backendConfig, stackParts: config.stackParts } : backendConfig;
+    const templateConfig =
+      ecosystem === "ruby" ? { ...backendConfig, stackParts: config.stackParts } : backendConfig;
     await ECOSYSTEM_BASE_TEMPLATE_PROCESSORS[ecosystem](vfs, templates, templateConfig, targetPath);
   }
 
@@ -470,7 +477,17 @@ export async function generateVirtualProject(options: GeneratorOptions): Promise
     const rubyIssue = getRubyRecipeIssue(options.config);
     if (rubyIssue) return { success: false, error: rubyIssue };
 
-    const { config, templates } = options;
+    const { config: requestedConfig, templates } = options;
+    const browserExtensions = getSelectedBrowserExtensions(requestedConfig);
+    const config = {
+      ...requestedConfig,
+      addons: [
+        ...requestedConfig.addons.filter((addon) => !isBrowserExtension(addon)),
+        ...browserExtensions,
+      ],
+    };
+    const extensionIssue = getBrowserExtensionRecipeIssue(config);
+    if (extensionIssue) return { success: false, error: extensionIssue };
 
     if (!templates || templates.size === 0) {
       return {
@@ -543,6 +560,14 @@ export async function generateVirtualProject(options: GeneratorOptions): Promise
       }
     }
 
+    const phpIssue = getPhpRecipeIssue(config);
+    if (phpIssue) return { success: false, error: phpIssue };
+    if (config.stackParts?.some((part) => part.ecosystem === "php")) {
+      const phpGraphIssues = validateStackParts(config.stackParts).issues;
+      if (phpGraphIssues.length > 0)
+        return { success: false, error: phpGraphIssues.map(formatStackGraphIssue).join("\n") };
+    }
+
     const vfs = new VirtualFileSystem();
     const generationConfig = resolveGenerationConfig(config);
     const rendersGraph = usesGraphParts && generationConfig === config;
@@ -574,8 +599,10 @@ export async function generateVirtualProject(options: GeneratorOptions): Promise
       generationConfig.ecosystem !== "typescript" &&
       generationConfig.ecosystem !== "react-native"
     ) {
-      await processAddonTemplates(vfs, templates, generationConfig);
-      processEnvVariables(vfs, generationConfig);
+      if (generationConfig.ecosystem !== "php") {
+        await processAddonTemplates(vfs, templates, generationConfig);
+        processEnvVariables(vfs, generationConfig);
+      }
     }
 
     processReadme(vfs, generationConfig);

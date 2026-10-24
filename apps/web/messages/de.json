@@ -584,6 +584,7 @@
   "docsCliSummaryDotnetDotnetDeploy": "Deployment-Ziel für .NET.",
   "docsCliSummaryDotnetDotnetLibraries": "Optionale .NET-Bibliotheken.",
   "docsCliSummaryRubyRubyWebFramework": "Ruby-HTTP-Framework.",
+  "docsCliSummaryPhpPhpWebFramework": "PHP-HTTP-Framework.",
   "docsCliSummaryElixirElixirWebFramework": "Web-Framework für Elixir.",
   "docsCliSummaryElixirElixirOrm": "ORM / Datenbank für Elixir.",
   "docsCliSummaryElixirElixirAuth": "Authentifizierung für Elixir.",

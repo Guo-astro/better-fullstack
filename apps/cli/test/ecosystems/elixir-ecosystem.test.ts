@@ -36,6 +36,54 @@ const base = {
 };
 
 describe("Elixir library expansion", () => {
+  it("routes Fly gRPC over TLS and HTTP/2 without replacing Phoenix", async () => {
+    const result = await createVirtual({
+      ...base,
+      projectName: "elixir-fly-grpc",
+      elixirApi: "grpc",
+      elixirDeploy: "fly",
+      elixirOrm: "none",
+      elixirAuth: "none",
+    });
+    expect(result.success).toBe(true);
+    const tree = result.tree!;
+    const fly = Bun.TOML.parse(getVirtualTreeFileContent(tree, "fly.toml") ?? "");
+    expect(fly.http_service).toMatchObject({ internal_port: 4000 });
+    expect(fly.env).toMatchObject({ GRPC_PORT: "50051" });
+    expect(fly.services).toEqual([
+      expect.objectContaining({
+        internal_port: 50051,
+        protocol: "tcp",
+        ports: [{ port: 50051, handlers: ["tls", "http"], http_options: { h2_backend: true } }],
+      }),
+    ]);
+    expect(getVirtualTreeFileContent(tree, "config/runtime.exs")).toContain(
+      "adapter_opts: [ip: {0, 0, 0, 0, 0, 0, 0, 0}, ipv6_v6only: false]",
+    );
+    expect(getVirtualTreeFileContent(tree, "README.md")).toContain(".fly.dev:50051");
+  });
+
+  it.each(["none", "docker", "fly", "gigalixir", "mix-release"] as const)(
+    "documents Docker only when the %s clustered release generates it",
+    async (elixirDeploy) => {
+      const result = await createVirtual({
+        ...base,
+        projectName: "elixir-cluster-docs",
+        elixirWebFramework: "none",
+        elixirApi: "none",
+        elixirRealtime: "none",
+        elixirOrm: "none",
+        elixirClustering: "libcluster",
+        elixirDeploy,
+      });
+      expect(result.success).toBe(true);
+      const tree = result.tree!;
+      expect((getVirtualTreeFileContent(tree, "README.md") ?? "").includes("docker build -t")).toBe(
+        hasVirtualFile(tree.root, "Dockerfile"),
+      );
+    },
+  );
+
   it("exposes all twenty roadmap additions through canonical schemas", () => {
     expect(ELIXIR_I18N_VALUES).toContain("gettext");
     expect(ELIXIR_HTTP_SERVER_VALUES).toContain("bandit");
@@ -428,13 +476,36 @@ describe("Elixir library expansion", () => {
         ...(getVirtualTreeFileContent(tree, "Dockerfile") ?? "").matchAll(/^COPY (?!--)(.+) \S+$/gm),
       ].flatMap((match) => match[1].split(" "));
       expect(sources).toContain("lib");
+      expect(sources).toContain("rel");
       const missing = sources.filter(
-        (source) => !paths.some((path) => path === source || path.startsWith(`${source}/`)),
+        (source) => !paths.some((path) => new Bun.Glob(source).match(path) || path.startsWith(`${source}/`)),
       );
       expect(missing).toEqual([]);
     },
   );
 
+
+  it("configures host discovery in a headless release without a database or observability provider", async () => {
+    const result = await createVirtual({
+      ...base,
+      projectName: "cluster-worker",
+      elixirWebFramework: "none",
+      elixirOrm: "none",
+      elixirApi: "none",
+      elixirRealtime: "none",
+      elixirClustering: "libcluster",
+      elixirDeploy: "mix-release",
+      elixirObservability: "none",
+    });
+    expect(result.success).toBe(true);
+    const runtime = getVirtualTreeFileContent(result.tree!, "config/runtime.exs");
+    expect(runtime).toContain('System.get_env("CLUSTER_HOSTS", "")');
+    expect(runtime).toContain(":cluster_topologies, cluster_topologies");
+    expect(runtime).not.toContain("Web.Endpoint");
+    const environment = getVirtualTreeFileContent(result.tree!, "rel/env.sh.eex");
+    expect(environment).toContain("Set RELEASE_COOKIE");
+    expect(environment).toContain("RELEASE_DISTRIBUTION");
+  });
 
   it("serves and boots the LiveView client only for LiveView projects", async () => {
     const liveView = await createVirtual({
