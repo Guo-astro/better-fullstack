@@ -1,4 +1,131 @@
+import { resolveApiPrompt } from "@/prompts/architecture/api";
+import { resolveBackendPrompt } from "@/prompts/architecture/backend";
+import { resolveFrontendPrompt } from "@/prompts/architecture/frontend";
+import {
+  resolveMobileDeepLinkingPrompt,
+  resolveMobileLibrariesPrompt,
+  resolveMobileNavigationPrompt,
+  resolveMobileOTAPrompt,
+  resolveMobilePushPrompt,
+  resolveMobileStoragePrompt,
+  resolveMobileTestingPrompt,
+  resolveMobileUIPrompt,
+} from "@/prompts/architecture/mobile";
+import { resolveRuntimePrompt } from "@/prompts/architecture/runtime";
+import { type PromptResolution } from "@/prompts/core/prompt-contract";
+import { resolveCachingPrompt } from "@/prompts/data/caching";
+import { resolveDatabasePrompt } from "@/prompts/data/database";
+import { resolveDBSetupPrompt } from "@/prompts/data/database-setup";
+import { resolveFileUploadPrompt } from "@/prompts/data/file-upload";
+import { resolveORMPrompt } from "@/prompts/data/orm";
+import { resolveAstroIntegrationPrompt } from "@/prompts/developer/astro-integration";
+import { resolveCSSFrameworkPrompt } from "@/prompts/developer/css-framework";
+import { resolveFormsPrompt } from "@/prompts/developer/forms";
+import { resolveTestingPrompt } from "@/prompts/developer/testing";
+import { resolveUILibraryPrompt } from "@/prompts/developer/ui-library";
+import { resolveValidationPrompt } from "@/prompts/developer/validation";
+import {
+  resolveDotnetApiPrompt,
+  resolveDotnetAuthPrompt,
+  resolveDotnetCachingPrompt,
+  resolveDotnetDeployPrompt,
+  resolveDotnetJobQueuePrompt,
+  resolveDotnetLibrariesPrompt,
+  resolveDotnetObservabilityPrompt,
+  resolveDotnetOrmPrompt,
+  resolveDotnetRealtimePrompt,
+  resolveDotnetTestingPrompt,
+  resolveDotnetWebFrameworkPrompt,
+} from "@/prompts/ecosystems/dotnet-ecosystem";
+import {
+  resolveElixirApiPrompt,
+  resolveElixirAuthPrompt,
+  resolveElixirCachingPrompt,
+  resolveElixirDeployPrompt,
+  resolveElixirEmailPrompt,
+  resolveElixirHttpPrompt,
+  resolveElixirJobsPrompt,
+  resolveElixirJsonPrompt,
+  resolveElixirObservabilityPrompt,
+  resolveElixirOrmPrompt,
+  resolveElixirQualityPrompt,
+  resolveElixirI18nPrompt,
+  resolveElixirHttpServerPrompt,
+  resolveElixirApplicationFrameworkPrompt,
+  resolveElixirDocumentationPrompt,
+  resolveElixirClusteringPrompt,
+  resolveElixirRealtimePrompt,
+  resolveElixirTestingPrompt,
+  resolveElixirValidationPrompt,
+  resolveElixirWebFrameworkPrompt,
+} from "@/prompts/ecosystems/elixir-ecosystem";
+import {
+  resolveGoApiPrompt,
+  resolveGoAuthPrompt,
+  resolveGoCliPrompt,
+  resolveGoDIPrompt,
+  resolveGoLoggingPrompt,
+  resolveGoMigrationsPrompt,
+  resolveGoOrmPrompt,
+  resolveGoProtoToolingPrompt,
+  resolveGoQualityPrompt,
+  resolveGoTemplatingPrompt,
+  resolveGoValidationPrompt,
+  resolveGoWebFrameworkPrompt,
+} from "@/prompts/ecosystems/go-ecosystem";
+import {
+  resolveJavaAuthPrompt,
+  resolveJavaBuildToolPrompt,
+  resolveJavaLibrariesPrompt,
+  resolveJavaOrmPrompt,
+  resolveJavaTestingLibrariesPrompt,
+  resolveJavaWebFrameworkPrompt,
+} from "@/prompts/ecosystems/java-ecosystem";
 import { resolvePhpWebFrameworkPrompt } from "@/prompts/ecosystems/php-ecosystem";
+import {
+  resolvePythonAiPrompt,
+  resolvePythonApiPrompt,
+  resolvePythonAuthPrompt,
+  resolvePythonCloudSdkPrompt,
+  resolvePythonDataPrompt,
+  resolvePythonGraphqlPrompt,
+  resolvePythonHttpClientPrompt,
+  resolvePythonMediaPrompt,
+  resolvePythonMessageQueuePrompt,
+  resolvePythonOrmPrompt,
+  resolvePythonQualityPrompt,
+  resolvePythonPackageManagerPrompt,
+  resolvePythonServerPrompt,
+  resolvePythonTaskQueuePrompt,
+  resolvePythonValidationPrompt,
+  resolvePythonWebFrameworkPrompt,
+} from "@/prompts/ecosystems/python-ecosystem";
+import { resolveRubyWebFrameworkPrompt } from "@/prompts/ecosystems/ruby-ecosystem";
+import {
+  resolveRustApiPrompt,
+  resolveRustCachingPrompt,
+  resolveRustCliPrompt,
+  resolveRustErrorHandlingPrompt,
+  resolveRustFrontendPrompt,
+  resolveRustLibrariesPrompt,
+  resolveRustLoggingPrompt,
+  resolveRustOrmPrompt,
+  resolveRustWebFrameworkPrompt,
+} from "@/prompts/ecosystems/rust-ecosystem";
+import { resolveAIPrompt } from "@/prompts/services/ai";
+import { resolveAnimationPrompt } from "@/prompts/services/animation";
+import { resolveAuthPrompt } from "@/prompts/services/auth";
+import { resolveBotProtectionPrompt } from "@/prompts/services/bot-protection";
+import { resolveCMSPrompt } from "@/prompts/services/cms";
+import { resolveEmailPrompt } from "@/prompts/services/email";
+import { resolveJobQueuePrompt } from "@/prompts/services/job-queue";
+import { resolveLoggingPrompt } from "@/prompts/services/logging";
+import { resolveObservabilityPrompt } from "@/prompts/services/observability";
+import { resolvePaymentsPrompt } from "@/prompts/services/payments";
+import { resolveRateLimitPrompt } from "@/prompts/services/rate-limit";
+import { resolveRealtimePrompt } from "@/prompts/services/realtime";
+import { resolveStateManagementPrompt } from "@/prompts/services/state-management";
+import { resolveWebMcpPrompt } from "@/prompts/services/web-mcp";
 import {
   AI_VALUES,
   ANIMATION_VALUES,
@@ -41,6 +168,8 @@ import {
   ELIXIR_REALTIME_VALUES,
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
+  RUBY_WEB_FRAMEWORK_VALUES,
+  RubyWebFrameworkSchema,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   EMAIL_VALUES,
   FILE_UPLOAD_VALUES,
@@ -113,132 +242,6 @@ import {
   VALIDATION_VALUES,
   WEB_MCP_VALUES,
 } from "@/types";
-import { resolveAIPrompt } from "@/prompts/services/ai";
-import { resolveAnimationPrompt } from "@/prompts/services/animation";
-import { resolveWebMcpPrompt } from "@/prompts/services/web-mcp";
-import { resolveApiPrompt } from "@/prompts/architecture/api";
-import { resolveAstroIntegrationPrompt } from "@/prompts/developer/astro-integration";
-import { resolveAuthPrompt } from "@/prompts/services/auth";
-import { resolveBackendPrompt } from "@/prompts/architecture/backend";
-import { resolveBotProtectionPrompt } from "@/prompts/services/bot-protection";
-import { resolveCachingPrompt } from "@/prompts/data/caching";
-import { resolveCMSPrompt } from "@/prompts/services/cms";
-import { resolveCSSFrameworkPrompt } from "@/prompts/developer/css-framework";
-import { resolveDatabasePrompt } from "@/prompts/data/database";
-import { resolveDBSetupPrompt } from "@/prompts/data/database-setup";
-import {
-  resolveDotnetApiPrompt,
-  resolveDotnetAuthPrompt,
-  resolveDotnetCachingPrompt,
-  resolveDotnetDeployPrompt,
-  resolveDotnetJobQueuePrompt,
-  resolveDotnetLibrariesPrompt,
-  resolveDotnetObservabilityPrompt,
-  resolveDotnetOrmPrompt,
-  resolveDotnetRealtimePrompt,
-  resolveDotnetTestingPrompt,
-  resolveDotnetWebFrameworkPrompt,
-} from "@/prompts/ecosystems/dotnet-ecosystem";
-import {
-  resolveElixirApiPrompt,
-  resolveElixirAuthPrompt,
-  resolveElixirCachingPrompt,
-  resolveElixirDeployPrompt,
-  resolveElixirEmailPrompt,
-  resolveElixirHttpPrompt,
-  resolveElixirJobsPrompt,
-  resolveElixirJsonPrompt,
-  resolveElixirObservabilityPrompt,
-  resolveElixirOrmPrompt,
-  resolveElixirQualityPrompt,
-  resolveElixirI18nPrompt,
-  resolveElixirHttpServerPrompt,
-  resolveElixirApplicationFrameworkPrompt,
-  resolveElixirDocumentationPrompt,
-  resolveElixirClusteringPrompt,
-  resolveElixirRealtimePrompt,
-  resolveElixirTestingPrompt,
-  resolveElixirValidationPrompt,
-  resolveElixirWebFrameworkPrompt,
-} from "@/prompts/ecosystems/elixir-ecosystem";
-import { resolveEmailPrompt } from "@/prompts/services/email";
-import { resolveFileUploadPrompt } from "@/prompts/data/file-upload";
-import { resolveFormsPrompt } from "@/prompts/developer/forms";
-import { resolveFrontendPrompt } from "@/prompts/architecture/frontend";
-import {
-  resolveGoApiPrompt,
-  resolveGoAuthPrompt,
-  resolveGoCliPrompt,
-  resolveGoDIPrompt,
-  resolveGoLoggingPrompt,
-  resolveGoMigrationsPrompt,
-  resolveGoOrmPrompt,
-  resolveGoProtoToolingPrompt,
-  resolveGoQualityPrompt,
-  resolveGoTemplatingPrompt,
-  resolveGoValidationPrompt,
-  resolveGoWebFrameworkPrompt,
-} from "@/prompts/ecosystems/go-ecosystem";
-import {
-  resolveJavaAuthPrompt,
-  resolveJavaBuildToolPrompt,
-  resolveJavaLibrariesPrompt,
-  resolveJavaOrmPrompt,
-  resolveJavaTestingLibrariesPrompt,
-  resolveJavaWebFrameworkPrompt,
-} from "@/prompts/ecosystems/java-ecosystem";
-import { resolveJobQueuePrompt } from "@/prompts/services/job-queue";
-import { resolveLoggingPrompt } from "@/prompts/services/logging";
-import {
-  resolveMobileDeepLinkingPrompt,
-  resolveMobileLibrariesPrompt,
-  resolveMobileNavigationPrompt,
-  resolveMobileOTAPrompt,
-  resolveMobilePushPrompt,
-  resolveMobileStoragePrompt,
-  resolveMobileTestingPrompt,
-  resolveMobileUIPrompt,
-} from "@/prompts/architecture/mobile";
-import { resolveObservabilityPrompt } from "@/prompts/services/observability";
-import { resolveORMPrompt } from "@/prompts/data/orm";
-import { resolvePaymentsPrompt } from "@/prompts/services/payments";
-import { type PromptResolution } from "@/prompts/core/prompt-contract";
-import {
-  resolvePythonAiPrompt,
-  resolvePythonApiPrompt,
-  resolvePythonAuthPrompt,
-  resolvePythonCloudSdkPrompt,
-  resolvePythonDataPrompt,
-  resolvePythonGraphqlPrompt,
-  resolvePythonHttpClientPrompt,
-  resolvePythonMediaPrompt,
-  resolvePythonMessageQueuePrompt,
-  resolvePythonOrmPrompt,
-  resolvePythonQualityPrompt,
-  resolvePythonPackageManagerPrompt,
-  resolvePythonServerPrompt,
-  resolvePythonTaskQueuePrompt,
-  resolvePythonValidationPrompt,
-  resolvePythonWebFrameworkPrompt,
-} from "@/prompts/ecosystems/python-ecosystem";
-import { resolveRateLimitPrompt } from "@/prompts/services/rate-limit";
-import { resolveRealtimePrompt } from "@/prompts/services/realtime";
-import { resolveRuntimePrompt } from "@/prompts/architecture/runtime";
-import {
-  resolveRustApiPrompt,
-  resolveRustCachingPrompt,
-  resolveRustCliPrompt,
-  resolveRustErrorHandlingPrompt,
-  resolveRustFrontendPrompt,
-  resolveRustLibrariesPrompt,
-  resolveRustLoggingPrompt,
-  resolveRustOrmPrompt,
-  resolveRustWebFrameworkPrompt,
-} from "@/prompts/ecosystems/rust-ecosystem";
-import { resolveStateManagementPrompt } from "@/prompts/services/state-management";
-import { resolveTestingPrompt } from "@/prompts/developer/testing";
-import { resolveUILibraryPrompt } from "@/prompts/developer/ui-library";
-import { resolveValidationPrompt } from "@/prompts/developer/validation";
 
 type SingleOrMultiValue = string | string[];
 
@@ -373,7 +376,10 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
   jobQueue: {
     schemaValues: JOB_QUEUE_VALUES,
     resolve: resolveJobQueuePrompt,
-    coverageContexts: [{ backend: "hono", runtime: "bun", database: "postgres" }, { backend: "none" }],
+    coverageContexts: [
+      { backend: "hono", runtime: "bun", database: "postgres" },
+      { backend: "none" },
+    ],
   },
   logging: {
     schemaValues: LOGGING_VALUES,
@@ -755,11 +761,22 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
     resolve: ({ value }: { value?: string[] } = {}) => resolveDotnetLibrariesPrompt(value as any),
     coverageContexts: [{}, { value: ["none"] }],
   },
+  rubyWebFramework: {
+    schemaValues: RUBY_WEB_FRAMEWORK_VALUES,
+    resolve: ({ value, allowNone }: { value?: string; allowNone?: boolean } = {}) =>
+      resolveRubyWebFrameworkPrompt(
+        value === undefined ? undefined : RubyWebFrameworkSchema.parse(value),
+        allowNone,
+      ),
+    coverageContexts: [{}, { allowNone: true }],
+  },
   phpWebFramework: {
     schemaValues: PhpWebFrameworkSchema.options,
     coverageContexts: [{}],
     resolve: ({ value }: { value?: string } = {}) =>
-      resolvePhpWebFrameworkPrompt(value === undefined ? undefined : PhpWebFrameworkSchema.parse(value)),
+      resolvePhpWebFrameworkPrompt(
+        value === undefined ? undefined : PhpWebFrameworkSchema.parse(value),
+      ),
   },
   elixirWebFramework: {
     schemaValues: ELIXIR_WEB_FRAMEWORK_VALUES,

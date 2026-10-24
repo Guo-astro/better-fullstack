@@ -6,6 +6,9 @@ import {
   type ProjectConfig,
 } from "@better-fullstack/types";
 
+import { getGraphBackendConnections } from "@/graph/graph-backend";
+import { getGraphProjectTasks } from "@/graph/graph-project";
+
 import type { VirtualFileSystem } from "@/core/virtual-fs";
 
 const JAVA_GROUP_ID = "com.example";
@@ -295,6 +298,8 @@ function generateTechStackSection(config: ProjectConfig): string {
     }
   }
 
+  if (config.ecosystem === "ruby") lines.push("- Experimental Ruby Sinatra HTTP recipe; Bundler owns Gemfile and Gemfile.lock; Puma serves JSON routes; Minitest/Rack tests cover request validation.");
+
   if (config.ecosystem === "rust") {
     if (config.rustWebFramework !== "none")
       lines.push(`- Web Framework: ${config.rustWebFramework}`);
@@ -420,6 +425,8 @@ function generateStructureSection(config: ProjectConfig): string {
       );
     }
     lines.push("```");
+  } else if (config.ecosystem === "ruby") {
+    lines.push("Gemfile, app.rb, config.ru, bin/server, bin/proof, Rakefile, test/app_test.rb");
   } else if (config.ecosystem === "python") {
     lines.push("```");
     lines.push(`${config.projectName}/`);
@@ -485,6 +492,20 @@ function generateStructureSection(config: ProjectConfig): string {
 function generateCommandsSection(config: ProjectConfig): string {
   const lines: string[] = ["\n## Common Commands\n"];
 
+  const rubyConnections = getGraphBackendConnections(config).filter((connection) => connection.ecosystem === "ruby");
+  if (rubyConnections.length > 0) {
+    lines.push("Each service owns its native manifest, environment, and tests. Run native commands from that service directory.");
+    for (const task of getGraphProjectTasks(config)) {
+      if (task.setup) lines.push(`- Install ${task.label}: \`${task.setup}\``);
+      if (task.dev) lines.push(`- Start ${task.label}: \`${task.dev}\``);
+    }
+    for (const service of rubyConnections) {
+      lines.push(`- Check Ruby syntax: \`${service.checkCommand}\``, `- Run Minitest/Rack tests: \`${service.testCommand}\``, `- Prove live HTTP and shutdown: \`cd ${service.targetPath} && bundle exec ruby bin/proof\``);
+    }
+    lines.push("Ruby services use Bundler, Sinatra, and Puma. Do not add TypeScript dependencies or authentication/database adapters to them. Ruby remains experimental until a current revision-matched runtime receipt proves the recipe.");
+    return lines.join("\n");
+  }
+
   if (config.ecosystem === "typescript") {
     const pm = config.packageManager;
     const run = pm === "npm" ? "npm run" : pm;
@@ -539,6 +560,8 @@ function generateCommandsSection(config: ProjectConfig): string {
       lines.push(`- \`${pythonRun}ruff check .\` - Run linter`);
       lines.push(`- \`${pythonRun}ruff format .\` - Format code`);
     }
+  } else if (config.ecosystem === "ruby") {
+    lines.push("- `bundle install` - Install native dependencies", "- `bundle exec rake build` - Check Ruby syntax", "- `bundle exec rake test` - Run Minitest/Rack integration tests", "- `bundle exec ruby bin/proof` - Exercise real HTTP and shutdown", "- `bundle exec ruby bin/server` - Start Puma");
   } else if (config.ecosystem === "go") {
     lines.push(`- \`go mod tidy\` - Install dependencies`);
     lines.push(`- \`go run cmd/server/main.go\` - Start server`);
@@ -640,6 +663,8 @@ function generateCursorRules(config: ProjectConfig): string {
     if (config.pythonLogging && config.pythonLogging !== "none") {
       rules.push(`Logging: ${config.pythonLogging}, configured in src/app/logging_config.py`);
     }
+  } else if (config.ecosystem === "ruby") {
+    rules.push("Keep Ruby routes in app.rb and Minitest/Rack coverage in test/app_test.rb. Bundler owns native dependencies. No database or auth adapters are generated. Environment variables are read from the process; .env.example is documentation. Run bundle exec rake and bundle exec ruby bin/proof before claiming runtime verification.");
   } else if (config.ecosystem === "go") {
     rules.push(`You are working on a Go project.`);
     if (config.goWebFramework !== "none") rules.push(`Web framework: ${config.goWebFramework}`);

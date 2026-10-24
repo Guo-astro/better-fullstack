@@ -96,6 +96,15 @@ Results under `testing/.smoke-output/generated-project-proof/` include
 `generated-project-proof.json`, its Markdown summary, and `capability-runtime-receipt.json`.
 Browser ZIP lifecycle checks must also preserve the non-green state of an uninstalled extraction.
 
+## Ruby HTTP proof
+
+Ruby has a separate experimental Sinatra proof. Use Ruby 3.4.11 and Bundler 4.0.21, build the repository producers above, then run:
+
+```sh
+bun run testing/ruby-runtime-proof.ts --output testing/.smoke-output/ruby-runtime-proof
+```
+
+The runner installs the generated native service, checks syntax, runs Minitest/Rack tests, and verifies live JSON responses, invalid-input rejection, and shutdown. It records toolchains, producer identity, the generated lockfile, and step results. CI and release preparation require this separate gate. Its observation does not change the eight golden runtime recipes, historical upgrade fixtures, or public capability qualification.
 ## Elixir release proof
 
 Run `bun run test:elixir-release` with Elixir 1.17 or newer, compatible OTP, Hex, Rebar,

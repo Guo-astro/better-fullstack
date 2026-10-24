@@ -11,6 +11,7 @@ const STACK_SHARE_LABELS = {
   python: "Python",
   go: "Go",
   java: "Java",
+  ruby: "Ruby",
   php: "PHP",
   elixir: "Elixir",
   dotnet: ".NET",

@@ -89,6 +89,11 @@ jobs:
         with:
           dotnet-version: 10.0.100
 
+      - name: Setup pinned Ruby and Bundler
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4.11"
+          bundler: "4.0.21"
       - name: Setup pinned PHP and Composer
         uses: shivammathur/setup-php@v2
         with:
@@ -140,6 +145,11 @@ jobs:
           BTS_TELEMETRY: 0
         run: bun run testing/generated-project-proof.ts --output "$PROOF_DIR"
 
+      - name: Run native Ruby HTTP proof
+        env:
+          PROOF_DIR: ${{ runner.temp }}/ruby-runtime-proof
+          BTS_TELEMETRY: 0
+        run: bun run testing/ruby-runtime-proof.ts --output "$PROOF_DIR"
       - name: Run native PHP HTTP proof
         env:
           PHP_PROOF_DIR: ${{ runner.temp }}/php-runtime-proof

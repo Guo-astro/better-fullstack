@@ -72,6 +72,11 @@ jobs:
           otp-version: 28.0.2
           elixir-version: 1.19.0
 
+      - name: Setup Ruby and Bundler
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4.11"
+          bundler: "4.0.21"
       - name: Setup PHP and Composer
         uses: shivammathur/setup-php@v2
         with:
@@ -114,6 +119,9 @@ jobs:
       - name: Run generated project runtime proof
         run: bun run testing/generated-project-proof.ts
 
+      - name: Run native Ruby HTTP proof
+        run: bun run testing/ruby-runtime-proof.ts --output testing/.smoke-output/ruby-runtime-proof
+
       - name: Publish job summary
         if: always()
         run: |
@@ -128,6 +136,7 @@ jobs:
           name: generated-project-proof-${{ github.sha }}
           path: |
             testing/.smoke-output/generated-project-proof/
+            testing/.smoke-output/ruby-runtime-proof/
             testing/.smoke-output/php-runtime-proof/
           include-hidden-files: true
           if-no-files-found: error

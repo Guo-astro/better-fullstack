@@ -51,6 +51,7 @@ describe("capability inventory", () => {
       "go",
       "java",
       "dotnet",
+      "ruby",
       "elixir",
       "php",
     ].reduce(
@@ -193,6 +194,30 @@ describe("capability inventory", () => {
       freshness: "quarantined",
       limitation: "The runtime recipe is failing.",
     });
+  });
+
+  it("preserves hidden quarantine maturity for experimental Ruby", () => {
+    const quarantine: CapabilityQuarantineEntry[] = [
+      {
+        ecosystem: "ruby",
+        category: "rubyWebFramework",
+        optionId: "sinatra",
+        reason: "Native recipe failed",
+        maintenanceOwner: "@runtime-owner",
+        restorationRecipeId: "ruby-sinatra",
+        visibility: "hidden",
+      },
+    ];
+    expect(
+      getCapabilityInventory({ quarantine }).some(
+        (record) => record.id === "ruby:rubyWebFramework:sinatra",
+      ),
+    ).toBe(false);
+    expect(
+      getCapabilityInventory({ quarantine, includeHidden: true }).find(
+        (record) => record.id === "ruby:rubyWebFramework:sinatra",
+      ),
+    ).toMatchObject({ maturity: "quarantined", freshness: "quarantined", public: false });
   });
 
   it("reports recurring recipe maintenance costs", () => {

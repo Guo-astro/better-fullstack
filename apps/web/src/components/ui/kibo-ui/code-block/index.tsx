@@ -83,6 +83,7 @@ const LANGUAGE_LOADERS = {
   groovy: () => import("shiki/dist/langs/groovy.mjs"),
   csharp: () => import("shiki/dist/langs/csharp.mjs"),
   razor: () => import("shiki/dist/langs/razor.mjs"),
+  ruby: () => import("shiki/dist/langs/ruby.mjs"),
   elixir: () => import("shiki/dist/langs/elixir.mjs"),
   dockerfile: () => import("shiki/dist/langs/dockerfile.mjs"),
   dotenv: () => import("shiki/dist/langs/dotenv.mjs"),

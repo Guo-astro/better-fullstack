@@ -1,7 +1,7 @@
 import { analyzeStackCompatibility } from "@better-fullstack/types";
 import {
-  createStackSelectionSearchParams as createStackSearchParams,
   getEcosystemDefaultStackSelection,
+  createStackSelectionSearchParams as createStackSearchParams,
 } from "@better-fullstack/types/stack-translation";
 
 import { DEFAULT_STACK, type StackState } from "@/lib/stack/stack-defaults";
@@ -22,6 +22,7 @@ function withCompatibility(stack: StackState): StackState {
 }
 
 function createEcosystemShareStack(ecosystem: StackState["ecosystem"]): StackState {
+  if (ecosystem === "ruby") return getEcosystemDefaultStackSelection(ecosystem);
   return withCompatibility({
     ...getEcosystemDefaultStackSelection(ecosystem),
     stackMode: "solo",
@@ -56,6 +57,7 @@ export function createDefaultMultiEcosystemShareStack(): StackState {
     javaWebFramework: "none",
     javaOrm: "none",
     javaAuth: "none",
+    rubyWebFramework: "none",
     elixirWebFramework: "none",
     elixirOrm: "none",
     elixirApi: "none",

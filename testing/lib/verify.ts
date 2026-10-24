@@ -860,6 +860,20 @@ export async function verifyDotnet(comboName: string, projectDir: string): Promi
   return wrapResult("dotnet", comboName, projectDir, steps);
 }
 
+export async function verifyRuby(comboName: string, projectDir: string): Promise<VerifyResult> {
+  const steps: StepResult[] = [];
+  for (const [step, args] of [
+    ["install", ["install"]],
+    ["build", ["exec", "rake", "build"]],
+    ["test", ["exec", "rake", "test"]],
+    ["runtime", ["exec", "ruby", "bin/proof"]],
+  ] as const) {
+    steps.push(await runStep(step, "bundle", [...args], projectDir));
+    if (!steps.at(-1)?.success) break;
+  }
+  return wrapResult("ruby", comboName, projectDir, steps);
+}
+
 export function getVerifier(
   ecosystem: Ecosystem,
 ): (comboName: string, projectDir: string, options?: VerifyOptions) => Promise<VerifyResult> {
@@ -876,6 +890,8 @@ export function getVerifier(
       return verifyGo;
     case "java":
       return verifyJava;
+    case "ruby":
+      return verifyRuby;
     case "php":
       return verifyPhp;
     case "elixir":

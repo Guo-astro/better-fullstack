@@ -40,6 +40,10 @@ It checks Composer installation, the native build, PHPUnit, parsed HTTP response
 CORS, and shutdown. Its observation does not promote public evidence or change the versioned
 eight-case upgrade fixture. Database, authentication, and production hosting remain outside it.
 
+## Experimental Ruby observation
+
+Ruby's Sinatra recipe uses a separate `testing/ruby-runtime-proof.ts` gate with Ruby 3.4.11 and Bundler 4.0.21. It exercises install, syntax checks, Minitest/Rack tests, live JSON HTTP, rejected input, and shutdown. The output remains an unqualified observation. Ruby stays listed and experimental until a current revision-matched receipt qualifies it. The eight golden recipes and historical upgrade receipt schema stay unchanged.
+
 ## Freshness and producer changes
 
 Evidence fails closed under these conditions:

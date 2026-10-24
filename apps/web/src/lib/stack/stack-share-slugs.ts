@@ -12,6 +12,7 @@ export const ECOSYSTEM_SHARE_SLUGS = {
   python: "python",
   go: "go",
   java: "java",
+  ruby: "ruby",
   php: "php",
   elixir: "elixir",
   dotnet: "dotnet",

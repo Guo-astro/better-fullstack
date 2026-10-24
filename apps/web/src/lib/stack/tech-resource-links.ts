@@ -6,6 +6,14 @@ type TechResourceLinks = {
 type LinkMap = Record<string, TechResourceLinks>;
 
 const BASE_LINKS: LinkMap = {
+  ruby: {
+    docsUrl: "https://www.ruby-lang.org/en/documentation/",
+    githubUrl: "https://github.com/ruby/ruby",
+  },
+  sinatra: {
+    docsUrl: "https://sinatrarb.com/intro.html",
+    githubUrl: "https://github.com/sinatra/sinatra",
+  },
   php: { docsUrl: "https://www.php.net/manual/en/", githubUrl: "https://github.com/php/php-src" },
   slim: {
     docsUrl: "https://www.slimframework.com/docs/v4/",

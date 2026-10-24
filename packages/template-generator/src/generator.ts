@@ -1,6 +1,7 @@
 import type { ProjectConfig, StackPart } from "@better-fullstack/types";
 
 import {
+  getRubyRecipeIssue,
   getPhpRecipeIssue,
   parseStackPartSpecs,
   formatStackGraphIssue,
@@ -54,6 +55,7 @@ import {
   processGoBaseTemplate,
   processJavaBaseTemplate,
   processDotnetBaseTemplate,
+  processRubyBaseTemplate,
   processPhpBaseTemplate,
   processElixirBaseTemplate,
   processFrontendTemplates,
@@ -117,6 +119,7 @@ const ECOSYSTEM_BASE_TEMPLATE_PROCESSORS = {
   go: processGoBaseTemplate,
   java: processJavaBaseTemplate,
   dotnet: processDotnetBaseTemplate,
+  ruby: processRubyBaseTemplate,
   php: processPhpBaseTemplate,
   elixir: processElixirBaseTemplate,
 } satisfies Record<NonTypeScriptTemplateEcosystem, EcosystemBaseTemplateProcessor>;
@@ -341,7 +344,9 @@ async function processGraphTemplates(
             pythonPackageManager: config.pythonPackageManager ?? "uv",
           }
         : projectedConfig;
-    await ECOSYSTEM_BASE_TEMPLATE_PROCESSORS[ecosystem](vfs, templates, backendConfig, targetPath);
+    const templateConfig =
+      ecosystem === "ruby" ? { ...backendConfig, stackParts: config.stackParts } : backendConfig;
+    await ECOSYSTEM_BASE_TEMPLATE_PROCESSORS[ecosystem](vfs, templates, templateConfig, targetPath);
   }
 
   // Pin the backend's CORS to the web frontend's dev origin (must run after the
@@ -469,11 +474,17 @@ function resolveGenerationConfig(config: ProjectConfig): ProjectConfig {
 
 export async function generateVirtualProject(options: GeneratorOptions): Promise<GeneratorResult> {
   try {
+    const rubyIssue = getRubyRecipeIssue(options.config);
+    if (rubyIssue) return { success: false, error: rubyIssue };
+
     const { config: requestedConfig, templates } = options;
     const browserExtensions = getSelectedBrowserExtensions(requestedConfig);
     const config = {
       ...requestedConfig,
-      addons: [...requestedConfig.addons.filter((addon) => !isBrowserExtension(addon)), ...browserExtensions],
+      addons: [
+        ...requestedConfig.addons.filter((addon) => !isBrowserExtension(addon)),
+        ...browserExtensions,
+      ],
     };
     const extensionIssue = getBrowserExtensionRecipeIssue(config);
     if (extensionIssue) return { success: false, error: extensionIssue };

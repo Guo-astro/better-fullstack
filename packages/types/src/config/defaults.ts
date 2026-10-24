@@ -142,6 +142,7 @@ export const CLI_DEFAULT_PROJECT_CONFIG = {
   dotnetCaching: "none",
   dotnetDeploy: "docker",
   dotnetLibraries: [],
+  rubyWebFramework: "sinatra",
   phpWebFramework: "slim",
   elixirWebFramework: "phoenix",
   elixirOrm: "ecto-sql",

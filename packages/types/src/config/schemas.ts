@@ -2,10 +2,23 @@ import { z } from "zod";
 
 import { PRESET_ALIAS_IDS, PRESET_IDS } from "@/catalog/preset-ids";
 
+export const RubyWebFrameworkSchema = z.enum(["sinatra", "none"]).describe("Ruby HTTP framework");
+
 export const EcosystemSchema = z
-  .enum(["typescript", "react-native", "rust", "python", "go", "java", "elixir", "dotnet", "php"])
+  .enum([
+    "typescript",
+    "react-native",
+    "rust",
+    "python",
+    "go",
+    "java",
+    "elixir",
+    "dotnet",
+    "php",
+    "ruby",
+  ])
   .describe(
-    "Language ecosystem (typescript, react-native, rust, python, go, java, elixir, dotnet, or php)",
+    "Language ecosystem (typescript, react-native, rust, python, go, java, elixir, dotnet, php, or ruby)",
   );
 
 export const StackPartEcosystemSchema = z
@@ -1381,6 +1394,7 @@ const STACK_CONFIG_FIELDS = {
   dotnetDeploy: DotnetDeploySchema,
   dotnetLibraries: z.array(DotnetLibrariesSchema).describe(".NET application libraries"),
   // Elixir ecosystem options
+  rubyWebFramework: RubyWebFrameworkSchema.optional(),
   phpWebFramework: PhpWebFrameworkSchema.default("none"),
   elixirWebFramework: ElixirWebFrameworkSchema,
   elixirOrm: ElixirOrmSchema,
@@ -1696,3 +1710,5 @@ export const SHADCN_COLOR_THEME_VALUES = ShadcnColorThemeSchema.options;
 export const SHADCN_BASE_COLOR_VALUES = ShadcnBaseColorSchema.options;
 export const SHADCN_FONT_VALUES = ShadcnFontSchema.options;
 export const SHADCN_RADIUS_VALUES = ShadcnRadiusSchema.options;
+
+export const RUBY_WEB_FRAMEWORK_VALUES = RubyWebFrameworkSchema.options;

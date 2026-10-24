@@ -179,15 +179,18 @@ const GO_CLI_FLAG_DEFINITIONS = [
 
 type GoCliConfigKey = (typeof GO_CLI_FLAG_DEFINITIONS)[number]["configKey"];
 type GoCliSerializationInput = {
-  [Key in GoCliConfigKey]?: CliDefaultConfig[Key] extends readonly string[] ? readonly string[] : string;
+  [Key in GoCliConfigKey]?: CliDefaultConfig[Key] extends readonly string[]
+    ? readonly string[]
+    : string;
 };
 
 export function serializeGoCliFlags(config: GoCliSerializationInput) {
   return GO_CLI_FLAG_DEFINITIONS.map(({ flag, configKey }) => {
     const value = config[configKey];
-    const serializedValue = typeof value === "string"
-      ? value
-      : value?.filter((entry) => entry !== "none").join(" ") || "none";
+    const serializedValue =
+      typeof value === "string"
+        ? value
+        : value?.filter((entry) => entry !== "none").join(" ") || "none";
     return `--${flag} ${serializedValue}`;
   });
 }
@@ -1104,6 +1107,20 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         source: { kind: "category", category: "dotnetLibraries" },
         configKey: "dotnetLibraries",
         multiple: true,
+      },
+    ],
+  },
+  {
+    id: "ruby",
+    title: "Ruby flags",
+    description: "Flags for `--ecosystem ruby`.",
+    ecosystem: "ruby",
+    flags: [
+      {
+        flag: "ruby-web-framework",
+        summary: "Ruby HTTP framework.",
+        source: { kind: "category", category: "rubyWebFramework" },
+        configKey: "rubyWebFramework",
       },
     ],
   },

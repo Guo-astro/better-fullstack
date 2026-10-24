@@ -120,6 +120,8 @@ async function ecosystemManifestExists(
       return fs.pathExists(path.join(dir, "Cargo.toml"));
     case "python":
       return fs.pathExists(path.join(dir, "pyproject.toml"));
+    case "ruby":
+      return fs.pathExists(path.join(dir, "Gemfile"));
     case "php":
       return fs.pathExists(path.join(dir, "composer.json"));
     case "elixir":
@@ -272,6 +274,7 @@ export function configForGeneratedTarget(
     "python",
     "go",
     "java",
+    "ruby",
     "php",
     "elixir",
     "dotnet",
@@ -450,6 +453,16 @@ async function commandsForTarget(
       };
     case "python":
       return pythonCommands(config, target);
+    case "ruby":
+      return {
+        toolchain: "Ruby + Bundler",
+        required: ["ruby", "bundle"],
+        commands: [
+          display("bundle", ["check"]),
+          display("bundle", ["exec", "rake", "build"]),
+          display("bundle", ["exec", "rake", "test"]),
+        ],
+      };
     case "php":
       return {
         toolchain: "PHP + Composer",

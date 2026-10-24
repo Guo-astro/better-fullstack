@@ -229,7 +229,7 @@ export function buildRandomStack(stack: StackState): Partial<StackState> {
     const compatibleOptions = visibleOptions.filter(
       (option) => getDisabledReason(workingStack, categoryKey, option.id) === null,
     );
-    const options = compatibleOptions.length > 0 ? compatibleOptions : visibleOptions;
+    const options = compatibleOptions;
     if (options.length === 0) continue;
     const catKey = getStackKeyForCategory(categoryKey);
     if (getToolingCategoryForUi(categoryKey) === "codeQuality") {
@@ -322,7 +322,7 @@ type GraphMobileEcosystem = Extract<
 >;
 type GraphBackendEcosystem = Extract<
   StackPartEcosystem,
-  "typescript" | "rust" | "python" | "go" | "java" | "elixir" | "dotnet" | "php"
+  "typescript" | "rust" | "python" | "go" | "java" | "elixir" | "dotnet" | "php" | "ruby"
 >;
 type GraphSelection = {
   rootIds?: Partial<Record<ComposerRole, string>>;
@@ -645,6 +645,7 @@ const APP_PLATFORM_OPTION_GROUPS = [
 ] as const;
 
 const GRAPH_BACKEND_CONFIGS: GraphBackendConfig[] = [
+  { ecosystem: "ruby", label: "Ruby", frameworkCategory: "rubyWebFramework" },
   {
     ecosystem: "typescript",
     label: "TypeScript",
@@ -965,6 +966,7 @@ const GRAPH_BACKEND_ADVANCED_CATEGORY_ORDER_BY_ECOSYSTEM = {
     "caching",
     "search",
   ],
+  ruby: [],
   php: [],
   elixir: [
     "elixirRealtime",
@@ -2376,8 +2378,11 @@ function CreationModeComposer({
         (option) => !isKotlinIncompatibleOption("javaWebFramework", option.id),
       )
     : allBackendOptions;
+  const databaseParts = getComposerParts(
+    stack.stackPartSpecs.length > 0 ? stack.stackPartSpecs : graphSelectionToSpecs(graphSelection),
+  );
   const databaseOptions = getGraphToolOptions("database", "database", "universal", {
-    parts: getComposerParts(stack.stackPartSpecs),
+    parts: databaseParts,
     primaryToolIdsByRole,
     primaryEcosystemsByRole: { backend: graphSelection.backendEcosystem },
   });
@@ -2539,14 +2544,18 @@ function CreationModeComposer({
   };
 
   const reconcileBackendDatabase = (selection: GraphSelection) => {
-    if (selection.backendEcosystem !== "php" || selection.backend === "none")
+    if (
+      (selection.backendEcosystem !== "php" && selection.backendEcosystem !== "ruby") ||
+      selection.backend === "none"
+    )
       return selection.database;
     const hasOtherDatabaseBackend = getComposerParts(stack.stackPartSpecs).some(
       (part) =>
         part.role === "backend" &&
         part.source !== "provided" &&
         part.id !== selection.rootIds?.backend &&
-        part.ecosystem !== "php",
+        part.ecosystem !== "php" &&
+        part.ecosystem !== "ruby",
     );
     return hasOtherDatabaseBackend ? selection.database : "none";
   };
@@ -5468,9 +5477,7 @@ const StackBuilderInner = ({ initialStack }: { initialStack?: StackState }) => {
                                   {index > 0 && " · "}
                                   <span
                                     className={
-                                      item.picked
-                                        ? "text-foreground/80"
-                                        : "text-muted-foreground"
+                                      item.picked ? "text-foreground/80" : "text-muted-foreground"
                                     }
                                   >
                                     {item.label}

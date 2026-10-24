@@ -1,4 +1,4 @@
-import { getPhpRecipeIssue } from "@better-fullstack/types";
+import { getPhpRecipeIssue, getRubyRecipeIssue } from "@better-fullstack/types";
 import consola from "consola";
 import pc from "picocolors";
 
@@ -269,6 +269,10 @@ function getEcosystemBackend(cfg: Partial<ProjectConfig>) {
     case "dotnet":
       return cfg.dotnetWebFramework && cfg.dotnetWebFramework !== "none"
         ? cfg.dotnetWebFramework
+        : undefined;
+    case "ruby":
+      return cfg.rubyWebFramework && cfg.rubyWebFramework !== "none"
+        ? cfg.rubyWebFramework
         : undefined;
     case "php":
       return cfg.phpWebFramework !== "none" ? cfg.phpWebFramework : undefined;
@@ -1543,6 +1547,8 @@ export function validateFullConfig(
   options: CLIInput,
   partial = false,
 ) {
+  const rubyIssue = getRubyRecipeIssue(config);
+  if (rubyIssue) exitWithError(rubyIssue);
   const phpIssue = getPhpRecipeIssue(config);
   if (phpIssue) exitWithError(phpIssue);
   const browserExtensionIssue = getBrowserExtensionRecipeIssue(config);
@@ -1739,6 +1745,8 @@ export function validateFullConfig(
 
 export function validateConfigForProgrammaticUse(config: Partial<ProjectConfig>) {
   try {
+    const rubyIssue = getRubyRecipeIssue(config);
+    if (rubyIssue) throw new Error(rubyIssue);
     const phpIssue = getPhpRecipeIssue(config);
     if (phpIssue) throw new Error(phpIssue);
     validateCodeQualityConstraints(config);

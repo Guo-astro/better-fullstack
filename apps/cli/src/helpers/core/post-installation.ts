@@ -100,6 +100,13 @@ export async function displayPostInstallInstructions(
     return;
   }
 
+  if (ecosystem === "ruby") {
+    consola.box(
+      `Next steps\n\ncd ${relativePath}\n${depsInstalled ? "" : "bundle install\n"}bundle exec rake build\nbundle exec rake test\nbundle exec ruby bin/server\n\nHTTP: http://127.0.0.1:4567/health\nRuntime proof: bundle exec ruby bin/proof\nExperimental recipe. Database and authentication adapters are not generated.`,
+    );
+    return;
+  }
+
   if (ecosystem === "php") {
     consola.box(
       `Next steps\n\ncd ${relativePath}\n${depsInstalled ? "" : "composer install --no-interaction\n"}composer run build\ncomposer test\ncomposer run proof:http\ncomposer run dev\n\nExperimental PHP recipe. See PHP.md for routes, environment and the verification boundary.`,

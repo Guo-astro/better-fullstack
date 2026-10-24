@@ -1,3 +1,5 @@
+import { getRubyRecipeIssue } from "@better-fullstack/types";
+
 import type { ProjectConfig, StackPartRole } from "@/types";
 
 import {
@@ -1252,6 +1254,19 @@ export function generateReproducibleCommand(config: ProjectConfig) {
     case "dotnet":
       flags = getDotnetFlags(config);
       break;
+    case "ruby": {
+      const issue = getRubyRecipeIssue(config);
+      if (issue) throw new Error(issue);
+      flags = [
+        "--ecosystem ruby",
+        `--ruby-web-framework ${config.rubyWebFramework}`,
+        "--database none",
+        "--addons none",
+        "--examples none",
+      ];
+      appendCommonFlags(flags, config);
+      break;
+    }
     case "php":
       flags = [
         "--ecosystem php",

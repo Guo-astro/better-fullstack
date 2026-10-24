@@ -95,6 +95,21 @@ export async function getinstallChoice(
     return response;
   }
 
+  if (ecosystem === "ruby") {
+    if (!(await commandExists("bundle"))) {
+      log.warn(
+        "Bundler is required. Install Ruby and Bundler from https://www.ruby-lang.org/en/documentation/installation/",
+      );
+      return false;
+    }
+    const response = await navigableConfirm({
+      message: "Run bundle install?",
+      initialValue: DEFAULT_CONFIG.install,
+    });
+    if (isCancel(response)) return exitCancelled("Operation cancelled");
+    return response;
+  }
+
   if (ecosystem === "php") {
     if (!(await commandExists("php")) || !(await commandExists("composer"))) {
       log.warn(

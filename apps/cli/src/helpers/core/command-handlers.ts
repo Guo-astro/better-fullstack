@@ -79,6 +79,7 @@ import {
 import {
   getProvidedFlags,
   assertShapeInputIsUsable,
+  assertRubyInputIsUsable,
   processAndValidateFlags,
   processProvidedFlagsWithoutValidation,
   validateConfigCompatibility,
@@ -379,9 +380,7 @@ function rejectAdjustedRequestedFlags(
     (providedFlags.has("vectorDb")
       ? getRequestedVectorDbRejection(config.vectorDb, adjustedConfig)
       : null) ??
-    (providedFlags.has("auth")
-      ? getRequestedAuthRejection(config.auth, adjustedConfig)
-      : null) ??
+    (providedFlags.has("auth") ? getRequestedAuthRejection(config.auth, adjustedConfig) : null) ??
     getRequestedDatabaseSetupRejection(
       {
         database: isRequested("database") ? config.database : undefined,
@@ -527,6 +526,7 @@ export async function createProjectHandler(
 
       // Input-only, so it runs before any directory is resolved, cleared, or
       // created. A rejected shape must never cost the user their files.
+      assertRubyInputIsUsable(originalInput);
       assertShapeInputIsUsable(originalInput, providedFlags);
 
       failureStage = "directory_preparation";
@@ -716,6 +716,7 @@ export async function createProjectHandler(
               dotnetCaching: "none",
               dotnetDeploy: "none",
               dotnetLibraries: [],
+              rubyWebFramework: "none",
               phpWebFramework: "none",
               elixirWebFramework: "none",
               elixirOrm: "none",

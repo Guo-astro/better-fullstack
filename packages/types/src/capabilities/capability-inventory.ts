@@ -538,6 +538,7 @@ export function getCapabilityInventory(
     "go",
     "java",
     "dotnet",
+    "ruby",
     "php",
     "elixir",
   ] as const) {
@@ -591,9 +592,11 @@ export function getCapabilityInventory(
           ? quarantineEntry.visibility === "hidden"
             ? "quarantined"
             : "experimental"
-          : recipeIds.length > 0 || CONTROL_CATEGORIES.has(category)
-            ? "stable"
-            : "experimental";
+          : ecosystem === "ruby"
+            ? "experimental"
+            : recipeIds.length > 0 || CONTROL_CATEGORIES.has(category)
+              ? "stable"
+              : "experimental";
         const freshness: CapabilityFreshness = quarantineEntry
           ? "quarantined"
           : failedRecipe

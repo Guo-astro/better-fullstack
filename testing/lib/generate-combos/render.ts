@@ -368,6 +368,9 @@ export function buildCommand(name: string, config: ProjectConfig): string {
     case "java":
       orderedFlags.push(...sharedServiceFlags, ...javaFlags);
       break;
+    case "ruby":
+      orderedFlags.push(["ruby-web-framework", config.rubyWebFramework]);
+      break;
     case "php":
       orderedFlags.push(["php-web-framework", config.phpWebFramework]);
       break;

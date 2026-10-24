@@ -57,6 +57,7 @@ const BACKEND_LABELS: Record<string, string> = {
   "aspnet-minimal": ".NET ASP.NET Core Minimal APIs",
   "aspnet-mvc": ".NET ASP.NET Core MVC",
   "aspnet-blazor": ".NET ASP.NET Core Blazor",
+  sinatra: "Ruby Sinatra",
   slim: "PHP Slim",
   phoenix: "Elixir Phoenix",
   "phoenix-live-view": "Elixir Phoenix LiveView",
@@ -90,6 +91,22 @@ function getRawGraphBackendConnection(config: ProjectConfig): GraphBackendConnec
   const webOrigin = graphFrontends.length <= 1 && webPort ? `http://localhost:${webPort}` : null;
 
   switch (backend.ecosystem) {
+    case "ruby":
+      return {
+        partId: backend.id,
+        ecosystem: backend.ecosystem,
+        toolId: backend.toolId,
+        label,
+        targetPath,
+        webOrigin,
+        serverUrl: "http://localhost:4567",
+        healthPath: "/health",
+        healthUrl: "http://localhost:4567/health",
+        setupCommand: `cd ${targetPath} && bundle install`,
+        devCommand: `cd ${targetPath} && bundle exec ruby bin/server`,
+        checkCommand: `cd ${targetPath} && bundle exec rake build`,
+        testCommand: `cd ${targetPath} && bundle exec rake test`,
+      };
     case "php":
       return {
         partId: backend.id,

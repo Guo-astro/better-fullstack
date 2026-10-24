@@ -65,6 +65,7 @@ import type {
   SearchSchema,
   VectorDbSchema,
   FileStorageSchema,
+  RubyWebFrameworkSchema,
   EcosystemSchema,
   RustWebFrameworkSchema,
   RustFrontendSchema,
@@ -385,3 +386,5 @@ export type NativeFrontend = Extract<
   Frontend,
   "native-bare" | "native-uniwind" | "native-unistyles" | "none"
 >;
+
+export type RubyWebFramework = z.infer<typeof RubyWebFrameworkSchema>;

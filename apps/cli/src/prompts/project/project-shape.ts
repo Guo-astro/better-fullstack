@@ -77,7 +77,7 @@ const BACKEND_SHAPE_YES_DEFAULTS: Partial<Record<Ecosystem, Partial<ProjectConfi
 export const SHAPE_ECOSYSTEMS = {
   fullstack: ECOSYSTEM_VALUES,
   frontend: ["typescript", "rust", "dotnet"],
-  backend: ["typescript", "go", "rust", "python", "java", "dotnet", "elixir", "php"],
+  backend: ["typescript", "go", "rust", "python", "java", "dotnet", "elixir", "php", "ruby"],
   mobile: ["react-native"],
 } as const satisfies Record<ProjectShape, readonly Ecosystem[]>;
 
@@ -102,6 +102,7 @@ const SHAPE_REQUIRED_HALF: Record<"frontend" | "backend", Partial<Record<Ecosyst
     python: "pythonWebFramework",
     java: "javaWebFramework",
     dotnet: "dotnetWebFramework",
+    ruby: "rubyWebFramework",
     php: "phpWebFramework",
     elixir: "elixirWebFramework",
   },
@@ -165,7 +166,8 @@ export function shapeFlagsForEcosystem(
  */
 export function shapeControlledFlags(shape: ProjectShape): Record<string, unknown> {
   if (shape === "mobile") return { ...MOBILE_ONLY_FLAGS };
-  const source = shape === "frontend" ? FRONTEND_ONLY_FLAGS : shape === "backend" ? BACKEND_ONLY_FLAGS : {};
+  const source =
+    shape === "frontend" ? FRONTEND_ONLY_FLAGS : shape === "backend" ? BACKEND_ONLY_FLAGS : {};
   return Object.assign({}, ...Object.values(source));
 }
 

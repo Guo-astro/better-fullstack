@@ -77,6 +77,7 @@ export function getLanguage(extension: string, filePath = ""): BundledLanguage {
     targets: "xml",
     xml: "xml",
     razor: "razor",
+    rb: "ruby",
     ex: "elixir",
     exs: "elixir",
     eex: "elixir",

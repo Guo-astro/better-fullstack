@@ -1,5 +1,3 @@
-import { getBrowserExtensionRecipeIssue, isBrowserExtension } from "@/capabilities/browser-extensions";
-
 import type {
   Ecosystem,
   ProjectConfig,
@@ -9,6 +7,10 @@ import type {
   StackPartSource,
 } from "@/config/types";
 
+import {
+  getBrowserExtensionRecipeIssue,
+  isBrowserExtension,
+} from "@/capabilities/browser-extensions";
 import { getAuthIncompatibility } from "@/capabilities/capabilities";
 import {
   getCodeQualitySelectionIssue,
@@ -62,6 +64,7 @@ import {
   ELIXIR_REALTIME_VALUES,
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
+  RUBY_WEB_FRAMEWORK_VALUES,
   PHP_WEB_FRAMEWORK_VALUES,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   EFFECT_VALUES,
@@ -183,6 +186,10 @@ import {
   WEB_DEPLOY_VALUES,
 } from "@/config/schemas";
 import { PHP_RECIPE_REASONS } from "@/stack/php-compatibility";
+import {
+  getRubyDatabaseSelectionIssue,
+  RUBY_RECIPE_EXTENSION_REASON,
+} from "@/stack/ruby-compatibility";
 import {
   getDatabaseOrmIncompatibility,
   getDatabaseOrmRequirementIssue,
@@ -337,6 +344,7 @@ const LEGACY_BACKEND_CATEGORY_BY_ECOSYSTEM = {
   go: "goWebFramework",
   java: "javaWebFramework",
   dotnet: "dotnetWebFramework",
+  ruby: "rubyWebFramework",
   php: "phpWebFramework",
   elixir: "elixirWebFramework",
 } as const satisfies Record<LegacyBackendEcosystem, keyof ProjectConfig>;
@@ -371,6 +379,7 @@ const LEGACY_CAPABILITY_CATEGORIES_BY_ECOSYSTEM = {
     observability: "observability",
   },
   dotnet: { orm: "dotnetOrm", api: "dotnetApi", auth: "dotnetAuth" },
+  ruby: {},
   php: {},
   elixir: { orm: "elixirOrm", api: "elixirApi", auth: "elixirAuth" },
 } as const satisfies Record<
@@ -454,6 +463,7 @@ const LEGACY_BACKEND_ARRAY_CATEGORIES_BY_ECOSYSTEM = {
     observability: "dotnetObservability",
     libraries: "dotnetLibraries",
   },
+  ruby: {},
   php: {},
   elixir: { libraries: "elixirLibraries" },
 } as const satisfies Record<
@@ -779,6 +789,7 @@ const LEGACY_EXTRA_CATEGORIES_BY_ECOSYSTEM = {
     deploy: "dotnetDeploy",
     validation: "dotnetValidation",
   },
+  ruby: {},
   php: {},
   elixir: {
     realtime: "elixirRealtime",
@@ -820,6 +831,7 @@ const LEGACY_SHARED_BACKEND_SINGLE_CATEGORIES_BY_ECOSYSTEM = {
     search: "search",
   },
   dotnet: {},
+  ruby: {},
   php: {},
   elixir: {},
 } as const satisfies Record<
@@ -1211,6 +1223,7 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ...defineTools(DOTNET_LIBRARIES_VALUES, "libraries", "dotnet", "dotnetLibraries", {
     allowMultiple: true,
   }),
+  ...defineTools(RUBY_WEB_FRAMEWORK_VALUES, "backend", "ruby", "rubyWebFramework"),
   ...defineTools(PHP_WEB_FRAMEWORK_VALUES, "backend", "php", "phpWebFramework").map(
     (definition) => ({
       ...definition,
@@ -3041,13 +3054,61 @@ function getStackPartCompatibilityIssue(
     Partial<Pick<StackPart, "source">>,
   context: StackPartOptionContext,
 ): StackGraphIssue | undefined {
+  if (
+    (part.role === "database" || (part.role === "backend" && part.ecosystem === "ruby")) &&
+    getRubyDatabaseSelectionIssue([...(context.parts ?? []), part])
+  ) {
+    return createStackGraphIssue({
+      code: "INCOMPATIBLE_GRAPH_SELECTION",
+      partId: part.id,
+      role: part.role,
+      toolId: part.toolId,
+      message: RUBY_RECIPE_EXTENSION_REASON,
+    });
+  }
+  if (
+    part.source !== "provided" &&
+    getToolingCapability(part.toolId) &&
+    context.parts?.some(
+      (candidate) => candidate.role === "backend" && candidate.ecosystem === "ruby",
+    ) &&
+    !hasJavaScriptWorkspaceRoot(context.parts)
+  ) {
+    return createStackGraphIssue({
+      code: "INCOMPATIBLE_GRAPH_SELECTION",
+      partId: part.id,
+      role: part.role,
+      toolId: part.toolId,
+      message: RUBY_RECIPE_EXTENSION_REASON,
+    });
+  }
+  if (context.ownerEcosystem === "ruby" && part.source !== "provided" && part.toolId !== "none") {
+    return createStackGraphIssue({
+      code: "UNSUPPORTED_ROLE_BINDING",
+      partId: part.id,
+      role: part.role,
+      toolId: part.toolId,
+      message: RUBY_RECIPE_EXTENSION_REASON,
+    });
+  }
+
   if (part.role === "appPlatform" && isBrowserExtension(part.toolId)) {
-    const hasPrimarySelection = context.parts?.some((candidate) => candidate.source !== "provided" && PRIMARY_ROLES.has(candidate.role));
-    const message = getBrowserExtensionRecipeIssue({ stackParts: context.parts }) ??
+    const hasPrimarySelection = context.parts?.some(
+      (candidate) => candidate.source !== "provided" && PRIMARY_ROLES.has(candidate.role),
+    );
+    const message =
+      getBrowserExtensionRecipeIssue({ stackParts: context.parts }) ??
       (hasPrimarySelection && !hasJavaScriptWorkspaceRoot(context.parts)
         ? "Browser extensions require a generated JavaScript application workspace."
         : null);
-    if (message) return createStackGraphIssue({ code: "INCOMPATIBLE_GRAPH_SELECTION", partId: part.id, role: part.role, toolId: part.toolId, message });
+    if (message)
+      return createStackGraphIssue({
+        code: "INCOMPATIBLE_GRAPH_SELECTION",
+        partId: part.id,
+        role: part.role,
+        toolId: part.toolId,
+        message,
+      });
   }
   if (
     context.ownerEcosystem &&
@@ -3097,7 +3158,8 @@ function getStackPartCompatibilityIssue(
         candidate.role === "backend" &&
         !candidate.ownerPartId &&
         candidate.source !== "provided" &&
-        candidate.ecosystem !== "php",
+        candidate.ecosystem !== "php" &&
+        candidate.ecosystem !== "ruby",
     )
   ) {
     return createStackGraphIssue({
@@ -4473,7 +4535,7 @@ export function validateStackParts(parts: readonly StackPart[]): StackGraphValid
         partId: part.id,
         role: part.role,
         toolId: part.toolId,
-        message: `Only one ${group.label} is currently supported. Named repeated backend services are supported for Rust, Python, Go, Java/Kotlin, .NET, Elixir, and PHP.`,
+        message: `Only one ${group.label} is currently supported. Named repeated backend services are supported for Rust, Python, Go, Java/Kotlin, .NET, Elixir, PHP, and Ruby.`,
       });
     }
   }
