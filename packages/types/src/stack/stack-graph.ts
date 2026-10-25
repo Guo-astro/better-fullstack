@@ -3590,6 +3590,25 @@ function usesFixedJavaScriptPath(part: PrimaryPartPathInput) {
   );
 }
 
+function getFixedWorkspaceTargetPath(part: StackPart, parts: readonly StackPart[]) {
+  if (usesFixedJavaScriptPath(part)) return getRoleTargetPath(part.role);
+  if (part.role !== "database") return undefined;
+  const backend = parts.find(
+    (candidate) =>
+      candidate.role === "backend" &&
+      candidate.ecosystem === "typescript" &&
+      !candidate.ownerPartId &&
+      candidate.source !== "provided" &&
+      candidate.toolId !== "none",
+  );
+  const orm = getSelectedScopedPart(parts, backend, "orm");
+  return part.toolId === "redis" ||
+    part.toolId === "edgedb" ||
+    (orm?.ecosystem === "typescript" && orm.toolId !== "none")
+    ? getRoleTargetPath("database")
+    : undefined;
+}
+
 function allocatePrimaryPartTargetPaths(parts: readonly PrimaryPartPathInput[]) {
   const primaryRoleCounts = new Map<StackPartRole, number>();
   for (const part of parts) {
@@ -4627,7 +4646,14 @@ export function validateStackParts(parts: readonly StackPart[]): StackGraphValid
       PRIMARY_ROLES.has(part.role),
   );
   const targetPaths: { part: StackPart; targetPath: string }[] = [];
-  for (const part of selectedPrimaryParts) {
+  const targetPathParts = parts.filter(
+    (part) =>
+      part.source !== "provided" &&
+      part.toolId !== "none" &&
+      ((!part.ownerPartId && PRIMARY_ROLES.has(part.role)) ||
+        (part.role === "database" && getFixedWorkspaceTargetPath(part, parts))),
+  );
+  for (const part of targetPathParts) {
     const requestedPath = part.targetPath ?? getRoleTargetPath(part.role);
     if (!requestedPath) continue;
     let targetPath: string;
@@ -4645,17 +4671,18 @@ export function validateStackParts(parts: readonly StackPart[]): StackGraphValid
       );
       continue;
     }
-    const fixedPath = getRoleTargetPath(part.role);
-    if (usesFixedJavaScriptPath(part) && targetPath !== fixedPath)
+    const fixedPath = getFixedWorkspaceTargetPath(part, parts);
+    if (fixedPath && targetPath !== fixedPath)
       issues.push(
         createStackGraphIssue({
           code: "UNSUPPORTED_TARGET_PATH",
           role: part.role,
           toolId: part.toolId,
           partId: part.id,
-          message: `JavaScript application '${part.id}' must use '${fixedPath}' because its templates require that directory.`,
+          message: `Stack part '${part.id}' must use '${fixedPath}' because JavaScript workspace generation requires that directory.`,
         }),
       );
+    if (part.ownerPartId) continue;
     const collision = targetPaths.find(
       (entry) =>
         entry.targetPath === targetPath ||

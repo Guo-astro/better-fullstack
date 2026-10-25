@@ -181,6 +181,46 @@ function getTypeScriptApiOptionsForFrontend(frontend: string) {
 }
 
 describe("stack graph", () => {
+  it("keeps JavaScript database packages at their supported workspace path", () => {
+    for (const [database, capabilities] of [
+      ["postgres", ["backend.orm:typescript:drizzle"]],
+      ["postgres", ["backend.orm:typescript:prisma"]],
+      ["redis", []],
+      ["edgedb", []],
+    ] as const) {
+      const specs = ["backend:typescript:hono", ...capabilities];
+      const parts = parseStackPartSpecs([...specs, `database:universal:${database}@services/data`]);
+      expect(validateStackParts(parts).issues).toContainEqual(
+        expect.objectContaining({
+          code: "UNSUPPORTED_TARGET_PATH",
+          message: expect.stringContaining("packages/db"),
+        }),
+      );
+      expect(
+        validateStackParts(
+          parseStackPartSpecs([...specs, `database:universal:${database}@packages/db`]),
+        ).issues,
+      ).toEqual([]);
+    }
+    const scoped = parseStackPartSpecs([
+      "backend:typescript:hono",
+      "backend.orm:typescript:drizzle",
+      "backend.database:universal:postgres",
+    ]).map((part) => (part.role === "database" ? { ...part, targetPath: "services/data" } : part));
+    expect(validateStackParts(scoped).issues).toContainEqual(
+      expect.objectContaining({ code: "UNSUPPORTED_TARGET_PATH" }),
+    );
+    expect(
+      validateStackParts(
+        parseStackPartSpecs([
+          "backend:go:gin",
+          "backend.orm:go:gorm",
+          "database:universal:postgres@data/native",
+        ]),
+      ).issues,
+    ).toEqual([]);
+  });
+
   it("rejects custom JavaScript application directories from specs and saved parts", () => {
     for (const [spec, defaultPath] of [
       ["frontend:typescript:react-vite", "apps/web"],

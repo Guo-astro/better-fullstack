@@ -23,6 +23,40 @@ async function generate(part: string[]) {
 }
 
 describe("multi-ecosystem project output", () => {
+  it("rejects relocated JavaScript database packages and wires their default directory", async () => {
+    const specs = ["backend:typescript:hono", "backend.orm:typescript:drizzle"];
+    const result = await generateVirtualProject({
+      config: configFor([...specs, "database:universal:postgres@services/data"]),
+      templates: EMBEDDED_TEMPLATES,
+    });
+    expect(result.success).toBe(false);
+    expect(result.error).toContain("packages/db");
+    expect(result.tree).toBeUndefined();
+
+    const output = await generate([...specs, "database:universal:postgres@packages/db"]);
+    const root = JSON.parse(output.get("package.json") ?? "{}") as {
+      workspaces: string[] | { packages: string[] };
+    };
+    const database = JSON.parse(output.get("packages/db/package.json") ?? "{}") as {
+      dependencies: Record<string, string>;
+      devDependencies: Record<string, string>;
+    };
+    expect(Array.isArray(root.workspaces) ? root.workspaces : root.workspaces.packages).toContain(
+      "packages/*",
+    );
+    expect(database.dependencies[`@${configFor(specs).projectName}/env`]).toBe("workspace:*");
+    expect(database.devDependencies[`@${configFor(specs).projectName}/config`]).toBe("workspace:*");
+
+    const native = await generate([
+      "backend:go:gin",
+      "backend:crystal:kemal:audit",
+      "backend.orm:go:gorm",
+      "database:universal:postgres@data/native",
+    ]);
+    expect(native.has("data/native/README.md")).toBe(true);
+    expect(native.has("data/native/package.json")).toBe(false);
+  });
+
   it("rejects custom JavaScript paths before they can overwrite native applications", async () => {
     for (const specs of [
       ["frontend:typescript:react-vite@services/client", "backend:crystal:kemal@apps/web"],
@@ -34,7 +68,9 @@ describe("multi-ecosystem project output", () => {
         templates: EMBEDDED_TEMPLATES,
       });
       expect(result.success).toBe(false);
-      expect(result.error).toContain("because its templates require that directory");
+      expect(result.error).toContain(
+        "because JavaScript workspace generation requires that directory",
+      );
       expect(result.tree).toBeUndefined();
     }
   });

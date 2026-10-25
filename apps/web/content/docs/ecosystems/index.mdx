@@ -68,6 +68,8 @@ Append a relative directory to a binding, such as `backend:crystal:kemal:audit@s
 
 TypeScript frontends and backends use `apps/web` and `apps/server`. React Native apps use `apps/native`. Custom directories for these applications are rejected because their templates require the default paths.
 
+Database packages using a TypeScript ORM, Redis, or EdgeDB must use `packages/db` so workspace dependencies and commands can find them. Native database marker directories can use custom paths.
+
 Database, authentication, deployment, and native addon adapters are unsupported. Use an explicit mixed graph for independent applications. Environment variables come from the process; the example environment file is not loaded automatically. CORS covers configured exact origins for GET requests. Cross-origin POST, credentials, production hosting, and Windows runtime behavior remain unqualified.
 
 ## TypeScript
