@@ -23,11 +23,83 @@ async function generate(part: string[]) {
 }
 
 describe("multi-ecosystem project output", () => {
+  it("rejects relocated JavaScript database packages and wires their default directory", async () => {
+    const specs = ["backend:typescript:hono", "backend.orm:typescript:drizzle"];
+    const result = await generateVirtualProject({
+      config: configFor([...specs, "database:universal:postgres@services/data"]),
+      templates: EMBEDDED_TEMPLATES,
+    });
+    expect(result.success).toBe(false);
+    expect(result.error).toContain("packages/db");
+    expect(result.tree).toBeUndefined();
+
+    const output = await generate([...specs, "database:universal:postgres@packages/db"]);
+    const root = JSON.parse(output.get("package.json") ?? "{}") as {
+      workspaces: string[] | { packages: string[] };
+    };
+    const database = JSON.parse(output.get("packages/db/package.json") ?? "{}") as {
+      dependencies: Record<string, string>;
+      devDependencies: Record<string, string>;
+    };
+    expect(Array.isArray(root.workspaces) ? root.workspaces : root.workspaces.packages).toContain(
+      "packages/*",
+    );
+    expect(database.dependencies[`@${configFor(specs).projectName}/env`]).toBe("workspace:*");
+    expect(database.devDependencies[`@${configFor(specs).projectName}/config`]).toBe("workspace:*");
+
+    const native = await generate([
+      "backend:go:gin",
+      "backend:crystal:kemal:audit",
+      "backend.orm:go:gorm",
+      "database:universal:postgres@data/native",
+    ]);
+    expect(native.has("data/native/README.md")).toBe(true);
+    expect(native.has("data/native/package.json")).toBe(false);
+  });
+
+  it("rejects custom JavaScript paths before they can overwrite native applications", async () => {
+    for (const specs of [
+      ["frontend:typescript:react-vite@services/client", "backend:crystal:kemal@apps/web"],
+      ["backend:typescript:hono@services/api", "backend:crystal:kemal@apps/server"],
+      ["mobile:react-native:native-bare@apps/phone", "backend:crystal:kemal@apps/native"],
+    ]) {
+      const result = await generateVirtualProject({
+        config: configFor(specs),
+        templates: EMBEDDED_TEMPLATES,
+      });
+      expect(result.success).toBe(false);
+      expect(result.error).toContain(
+        "because JavaScript workspace generation requires that directory",
+      );
+      expect(result.tree).toBeUndefined();
+    }
+  });
+
+  it("passes every generated frontend origin to Crystal's native launch command", async () => {
+    const specs = [
+      "frontend:dotnet:blazor-webassembly:admin",
+      "frontend:rust:leptos:site",
+      "backend:crystal:kemal:api",
+    ];
+    const config = configFor(specs);
+    const output = await generate(specs);
+    expect(output.get("apps/server/.env.example")).toContain(
+      "CORS_ORIGIN=http://localhost:5173,http://localhost:8080",
+    );
+    expect(getGraphBackendConnections(config)[0]?.devCommand).toContain(
+      "export CORS_ORIGIN=http://localhost:5173,http://localhost:8080",
+    );
+  });
+
   it("starts standalone JavaScript app workspaces alongside native services", async () => {
     for (const packageManager of ["bun", "npm", "pnpm", "yarn"] as const) {
       const result = await generateVirtualProject({
         config: {
-          ...configFor(["frontend:typescript:react-vite", "backend:go:gin", "appPlatform:typescript:wxt"]),
+          ...configFor([
+            "frontend:typescript:react-vite",
+            "backend:go:gin",
+            "appPlatform:typescript:wxt",
+          ]),
           addons: ["opentui", "wxt"],
           packageManager,
         },
@@ -96,7 +168,13 @@ describe("multi-ecosystem project output", () => {
 
   it("rejects standalone JavaScript app platforms in native-only projects", async () => {
     for (const addon of ["opentui", "wxt"] as const) {
-      const config = { ...configFor(["backend:go:gin", ...(addon === "wxt" ? ["appPlatform:typescript:wxt"] : [])]), addons: [addon] };
+      const config = {
+        ...configFor([
+          "backend:go:gin",
+          ...(addon === "wxt" ? ["appPlatform:typescript:wxt"] : []),
+        ]),
+        addons: [addon],
+      };
       const result = await generateVirtualProject({ config, templates: EMBEDDED_TEMPLATES });
       expect(result.success).toBe(false);
       expect(result.error).toContain(`${addon} requires a generated JavaScript application`);

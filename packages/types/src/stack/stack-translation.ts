@@ -18,6 +18,11 @@ import {
   createCliDefaultProjectConfigBase,
   type CliDefaultProjectConfigBase,
 } from "@/config/defaults";
+import {
+  CRYSTAL_UNSUPPORTED_FIELDS,
+  getCrystalSelectionIssue,
+  getCrystalRequestedIssue,
+} from "@/platform/crystal-project";
 import { analyzeStackCompatibility, type CompatibilityInput } from "@/stack/compatibility";
 import { PHP_UNSUPPORTED_BACKEND_FIELDS } from "@/stack/php-compatibility";
 import { createRubyProjectConfigDefaults, getRubyRecipeIssue } from "@/stack/ruby-compatibility";
@@ -183,6 +188,7 @@ export const STACK_SELECTION_OPTION_CATEGORY_BY_KEY: Record<
   goProtoTooling: "goProtoTooling",
   goDI: "goDI",
   javaLanguage: "javaLanguage",
+  crystalWebFramework: "crystalWebFramework",
   javaWebFramework: "javaWebFramework",
   javaBuildTool: "javaBuildTool",
   javaOrm: "javaOrm",
@@ -381,6 +387,7 @@ export const STACK_SELECTION_URL_KEYS = {
   goProtoTooling: "gproto",
   goDI: "gdi",
   javaLanguage: "jlang",
+  crystalWebFramework: "cwf",
   javaWebFramework: "jwf",
   javaBuildTool: "jbt",
   javaOrm: "jorm",
@@ -488,6 +495,27 @@ export function cloneDefaultStackSelection(): StackSelectionState {
   return cloned as StackSelectionState;
 }
 
+export function createCrystalStackSelection(
+  overrides: Partial<StackSelectionState> = {},
+): StackSelectionState {
+  const defaults = cloneDefaultStackSelection() as unknown as Record<string, unknown>;
+  for (const key of CRYSTAL_UNSUPPORTED_FIELDS) {
+    if (key in defaults) defaults[key] = Array.isArray(defaults[key]) ? [] : "none";
+  }
+  return {
+    ...defaults,
+    ecosystem: "crystal",
+    webFrontend: ["none"],
+    nativeFrontend: ["none"],
+    codeQuality: [],
+    documentation: [],
+    appPlatforms: [],
+    backendLibraries: "none",
+    aiSdk: "none",
+    ...overrides,
+  } as StackSelectionState;
+}
+
 export function normalizeStackSelectionValue<K extends StackSelectionKey>(
   key: K,
   value: StackSelectionState[K],
@@ -573,6 +601,7 @@ function parseScalarSelectionValue(value: StackSelectionUrlValue, defaultValue: 
 export function getEcosystemDefaultStackSelection(
   ecosystem: StackSelectionState["ecosystem"],
 ): StackSelectionState {
+  if (ecosystem === "crystal") return createCrystalStackSelection();
   if (ecosystem === "ruby") {
     const selection = cloneDefaultStackSelection();
     const defaults = createRubyProjectConfigDefaults();
@@ -623,7 +652,13 @@ export function parseStackSelectionFromUrlRecord(
 ): StackSelectionState {
   const ecosystem = parseScalarSelectionValue(params.eco, "typescript");
   const defaults = getEcosystemDefaultStackSelection(
-    ecosystem === "ruby" ? "ruby" : ecosystem === "php" ? "php" : "typescript",
+    ecosystem === "ruby"
+      ? "ruby"
+      : ecosystem === "php"
+        ? "php"
+        : ecosystem === "crystal"
+          ? "crystal"
+          : "typescript",
   );
   const parsed = structuredClone(defaults) as Record<string, unknown>;
 
@@ -831,6 +866,7 @@ const CLI_SCALAR_CONFIG_FIELDS = [
   ["goProtoTooling", "goProtoTooling"],
   ["goDI", "goDI"],
   ["javaLanguage", "javaLanguage"],
+  ["crystalWebFramework", "crystalWebFramework"],
   ["javaWebFramework", "javaWebFramework"],
   ["javaBuildTool", "javaBuildTool"],
   ["javaOrm", "javaOrm"],
@@ -973,6 +1009,10 @@ const GO_CONFIG_KEYS = [
   "goTemplating",
   "goProtoTooling",
   "goDI",
+] as const satisfies readonly (keyof CliDefaultProjectConfigBase)[];
+
+const CRYSTAL_CONFIG_KEYS = [
+  "crystalWebFramework",
 ] as const satisfies readonly (keyof CliDefaultProjectConfigBase)[];
 
 const JAVA_CONFIG_KEYS = [
@@ -1683,7 +1723,9 @@ export function patchGraphScopedSelections(
     );
     changedFields.push({ ...field, ownerPartId: owner?.id, value: [...newValues] });
   }
-  const specs = parts.map((part) => formatStackPartSpec(part, parts));
+  const specs = parts
+    .filter((part) => part.source !== "provided")
+    .map((part) => formatStackPartSpec(part, parts));
   return { ...updates, stackPartSpecs: expandScopedStackPartSpecs(specs, changedFields) };
 }
 
@@ -1722,6 +1764,8 @@ function getGraphStackParts(selection: StackSelectionInput) {
   const rubyIssue = getRubyRecipeIssue({ stackParts: selectedParts });
   if (rubyIssue) throw new Error(rubyIssue);
   const hasJavaScript = hasJavaScriptWorkspaceRoot(selectedParts);
+  const crystalIssue = getCrystalSelectionIssue({ stackParts: selectedParts });
+  if (crystalIssue) throw new Error(crystalIssue);
   const fields = getSelectionScopedPartFields(selection).map((field) => ({
     ...field,
     value: (Array.isArray(field.value) ? field.value : [field.value]).filter(
@@ -1853,6 +1897,8 @@ export function cliInputToProjectConfigPartial(
 function getCliGraphStackParts(input: CLIInput): StackPart[] {
   const inputSpecs = [...(input.part ?? [])];
   const stackParts = parseStackPartSpecs(inputSpecs, "selected");
+  const crystalIssue = getCrystalRequestedIssue(input, stackParts);
+  if (crystalIssue) throw new Error(crystalIssue);
   const stackPartSpecs = stackParts
     .filter((part) => part.source !== "provided")
     .map((part) => formatStackPartSpec(part, stackParts));
@@ -1951,7 +1997,10 @@ function buildProjectConfigBase(
     backend: mapBackendToCli(stack.backend) as ProjectConfig["backend"],
     runtime: stack.runtime as ProjectConfig["runtime"],
     frontend:
-      frontend.length > 0 || stack.ecosystem === "php" || stack.ecosystem === "ruby"
+      frontend.length > 0 ||
+      stack.ecosystem === "php" ||
+      stack.ecosystem === "ruby" ||
+      stack.ecosystem === "crystal"
         ? frontend
         : ["tanstack-router"],
     addons: [
@@ -2081,6 +2130,7 @@ function buildProjectConfigBase(
     goProtoTooling: stack.goProtoTooling as ProjectConfig["goProtoTooling"],
     goDI: stack.goDI as ProjectConfig["goDI"],
     javaLanguage: stack.javaLanguage as ProjectConfig["javaLanguage"],
+    crystalWebFramework: stack.crystalWebFramework as ProjectConfig["crystalWebFramework"],
     javaWebFramework: stack.javaWebFramework as ProjectConfig["javaWebFramework"],
     javaBuildTool: stack.javaBuildTool as ProjectConfig["javaBuildTool"],
     javaOrm: stack.javaOrm as ProjectConfig["javaOrm"],
@@ -2204,6 +2254,7 @@ export function isCliDefaultStackSelection(
           ...RUST_CONFIG_KEYS,
           ...PYTHON_CONFIG_KEYS,
           ...GO_CONFIG_KEYS,
+          ...CRYSTAL_CONFIG_KEYS,
           ...JAVA_CONFIG_KEYS,
           ...DOTNET_CONFIG_KEYS,
           "rubyWebFramework",
@@ -2641,6 +2692,8 @@ export function generateStackSelectionCommand(selection: StackSelectionInput): s
       return generatePythonCommand(selection, projectName);
     case "go":
       return generateGoCommand(selection, projectName);
+    case "crystal":
+      return `${getBaseCommand(selection)} ${projectName} --ecosystem crystal --crystal-web-framework ${selection.crystalWebFramework} --package-manager ${selection.packageManager} --workspace-shape ${selection.workspaceShape} --version-channel ${selection.versionChannel} --addons none --examples none ${formatArrayFlag("ai-docs", selection.aiDocs)} ${selection.git === "false" ? "--no-git" : "--git"} ${selection.install === "false" ? "--no-install" : "--install"}`;
     case "java":
       return generateJavaCommand(selection, projectName);
     case "dotnet":

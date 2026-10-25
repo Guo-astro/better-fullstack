@@ -1,4 +1,5 @@
 import { lifecycleResult } from "@better-fullstack/project-lifecycle/contracts";
+import { CRYSTAL_PROJECT_DEFAULTS } from "@better-fullstack/types";
 import { intro, log, note, outro } from "@clack/prompts";
 import consola from "consola";
 import fs from "fs-extra";
@@ -79,6 +80,7 @@ import {
 import {
   getProvidedFlags,
   assertShapeInputIsUsable,
+  assertCrystalInputIsUsable,
   assertRubyInputIsUsable,
   processAndValidateFlags,
   processProvidedFlagsWithoutValidation,
@@ -217,6 +219,8 @@ async function showBuilderRecommendationPrompt() {
 }
 
 function getYesBaseConfig(flagConfig: Partial<ProjectConfig>): ProjectConfig {
+  if (flagConfig.ecosystem === "crystal")
+    return { ...getDefaultConfig(), ...CRYSTAL_PROJECT_DEFAULTS };
   const baseConfig = getDefaultConfig();
   if (
     flagConfig.stackParts?.length &&
@@ -526,6 +530,7 @@ export async function createProjectHandler(
 
       // Input-only, so it runs before any directory is resolved, cleared, or
       // created. A rejected shape must never cost the user their files.
+      assertCrystalInputIsUsable(originalInput);
       assertRubyInputIsUsable(originalInput);
       assertShapeInputIsUsable(originalInput, providedFlags);
 
@@ -556,13 +561,13 @@ export async function createProjectHandler(
 
       let finalResolvedPath: string;
       let finalBaseName: string;
+      let shouldClearDirectory = false;
 
       if (input.dryRun) {
         finalBaseName = path.basename(currentPathInput);
         finalResolvedPath = path.resolve(process.cwd(), currentPathInput);
       } else {
         let finalPathInput: string;
-        let shouldClearDirectory: boolean;
 
         try {
           if (input.directoryConflict) {
@@ -696,6 +701,7 @@ export async function createProjectHandler(
               goTemplating: "none",
               goProtoTooling: "none",
               goDI: "none",
+              crystalWebFramework: "none",
               javaWebFramework: "none",
               javaBuildTool: "none",
               javaOrm: "none",
@@ -750,7 +756,7 @@ export async function createProjectHandler(
           };
         }
 
-        const setupResult = await setupProjectDirectory(finalPathInput, shouldClearDirectory);
+        const setupResult = await setupProjectDirectory(finalPathInput, false);
         finalResolvedPath = setupResult.finalResolvedPath;
         finalBaseName = setupResult.finalBaseName;
         currentPathInput = finalPathInput;
@@ -988,6 +994,7 @@ export async function createProjectHandler(
 
       failureStage = "directory_preparation";
       const createResult = await createProject(config, {
+        clearExistingDirectory: shouldClearDirectory,
         manualDb: cliInput.manualDb ?? input.manualDb,
         yolo: cliInput.yolo,
       });

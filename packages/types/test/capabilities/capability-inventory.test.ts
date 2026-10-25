@@ -4,6 +4,7 @@ import {
   CAPABILITY_EVIDENCE_SCHEMA_VERSION,
   CAPABILITY_RECEIPT_SCHEMA_VERSION,
   GOLDEN_RUNTIME_RECIPES,
+  EcosystemSchema,
   OPTION_CATEGORY_METADATA,
   getCapabilityInventory,
   getCapabilityMaintenanceCosts,
@@ -43,18 +44,7 @@ function receipt(overrides: Partial<CapabilityEvidenceReceipt> = {}): Capability
 describe("capability inventory", () => {
   it("gives every public option an owner, maturity, freshness, and limitation", () => {
     const records = getCapabilityInventory();
-    const expected = [
-      "typescript",
-      "react-native",
-      "rust",
-      "python",
-      "go",
-      "java",
-      "dotnet",
-      "ruby",
-      "elixir",
-      "php",
-    ].reduce(
+    const expected = EcosystemSchema.options.reduce(
       (total, ecosystem) =>
         total +
         getCategoryOrderForEcosystem(ecosystem).reduce(
@@ -218,6 +208,30 @@ describe("capability inventory", () => {
         (record) => record.id === "ruby:rubyWebFramework:sinatra",
       ),
     ).toMatchObject({ maturity: "quarantined", freshness: "quarantined", public: false });
+  });
+
+  it("preserves Crystal quarantine metadata ahead of its experimental defaults", () => {
+    const quarantine: CapabilityQuarantineEntry[] = [
+      {
+        ecosystem: "crystal",
+        category: "crystalWebFramework",
+        optionId: "kemal",
+        reason: "The Crystal runtime recipe is failing.",
+        maintenanceOwner: "@runtime-owner",
+        restorationRecipeId: "crystal-kemal",
+        visibility: "hidden",
+      },
+    ];
+    expect(
+      getCapabilityInventory({ quarantine, includeHidden: true }).find(
+        (record) => record.id === "crystal:crystalWebFramework:kemal",
+      ),
+    ).toMatchObject({
+      maturity: "quarantined",
+      freshness: "quarantined",
+      public: false,
+      limitation: "The Crystal runtime recipe is failing.",
+    });
   });
 
   it("reports recurring recipe maintenance costs", () => {

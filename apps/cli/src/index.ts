@@ -19,7 +19,7 @@ export {
   recovery,
 } from "@/run";
 
-import { getRubyRecipeIssue } from "@better-fullstack/types";
+import { CRYSTAL_PROJECT_DEFAULTS, getRubyRecipeIssue } from "@better-fullstack/types";
 
 import { applyEffectBackendDefaults } from "@/config/config-processing";
 import {
@@ -75,6 +75,9 @@ export async function createVirtual(
     const ecosystem = options.ecosystem || "typescript";
     const isRuby = ecosystem === "ruby" && !options.stackParts?.length;
     const isReactNative = ecosystem === "react-native";
+    if (ecosystem === "crystal") {
+      options = { ...CRYSTAL_PROJECT_DEFAULTS, ...options };
+    }
     const isPhp = ecosystem === "php";
     const frontend =
       options.frontend ||
@@ -208,6 +211,8 @@ export async function createVirtual(
       goTemplating: options.goTemplating || "none",
       goProtoTooling: options.goProtoTooling || "none",
       goDI: options.goDI || "none",
+      crystalWebFramework:
+        options.crystalWebFramework ?? (ecosystem === "crystal" ? "kemal" : "none"),
       javaWebFramework:
         options.javaWebFramework || (options.ecosystem === "java" ? "spring-boot" : "none"),
       javaLanguage: options.javaLanguage || "java",

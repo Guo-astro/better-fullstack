@@ -848,6 +848,7 @@ function createValidationBase(projectName: string, draft: CandidateDraft): Proje
     goTemplating: "none",
     goProtoTooling: "none",
     goDI: "none",
+    crystalWebFramework: "none",
     javaWebFramework: "none",
     javaBuildTool: "none",
     javaOrm: "none",
@@ -986,6 +987,8 @@ function createDraft(ecosystem: Ecosystem, args: GeneratorArgs): CandidateDraft 
       return makePythonDraft(args);
     case "go":
       return makeGoDraft(args);
+    case "crystal":
+      return { ecosystem: "crystal", options: { ...createCommonOptions("crystal", args), crystalWebFramework: "kemal" } };
     case "java":
       return makeJavaDraft(args);
     case "ruby":

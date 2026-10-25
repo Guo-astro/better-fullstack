@@ -16,7 +16,8 @@ export function processGraphBackendEnv(vfs: VirtualFileSystem, config: ProjectCo
   );
   for (const connection of getGraphBackendConnections(config)) {
     const corsOrigin =
-      connection.ecosystem === "php" && frontendOrigins.length > 0
+      (connection.ecosystem === "php" || connection.ecosystem === "crystal") &&
+      frontendOrigins.length > 0
         ? [...new Set(frontendOrigins)].join(",")
         : connection.webOrigin;
     if (!corsOrigin || !vfs.directoryExists(connection.targetPath)) continue;
@@ -40,7 +41,7 @@ export function processGraphBackendEnv(vfs: VirtualFileSystem, config: ProjectCo
       } else {
         const separator = current.length > 0 && !current.endsWith("\n") ? "\n" : "";
         const comment =
-          connection.ecosystem === "php"
+          connection.ecosystem === "php" || connection.ecosystem === "crystal"
             ? ""
             : "# Web frontend dev origin (unset or empty = allow any origin)\n";
         next = `${current}${separator}${current.length > 0 ? "\n" : ""}${comment}${line}\n`;

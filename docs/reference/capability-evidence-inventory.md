@@ -44,6 +44,10 @@ eight-case upgrade fixture. Database, authentication, and production hosting rem
 
 Ruby's Sinatra recipe uses a separate `testing/ruby-runtime-proof.ts` gate with Ruby 3.4.11 and Bundler 4.0.21. It exercises install, syntax checks, Minitest/Rack tests, live JSON HTTP, rejected input, and shutdown. The output remains an unqualified observation. Ruby stays listed and experimental until a current revision-matched receipt qualifies it. The eight golden recipes and historical upgrade receipt schema stay unchanged.
 
+## Experimental Crystal observation
+
+Crystal's Kemal recipe uses the separate `testing/crystal-runtime-proof.ts` gate with Crystal 1.22.1 and Shards 0.20.0. It scaffolds through the built CLI, installs dependencies, compiles, runs native specs, and checks live JSON HTTP, rejected input, and shutdown. Its revision, toolchain, lockfile, and result remain an unqualified observation. Crystal stays listed and experimental; the eight golden recipes and historical upgrade receipt schema are unchanged.
+
 ## Freshness and producer changes
 
 Evidence fails closed under these conditions:

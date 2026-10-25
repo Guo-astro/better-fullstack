@@ -1,4 +1,8 @@
-import { getPhpRecipeIssue, getRubyRecipeIssue } from "@better-fullstack/types";
+import {
+  getCrystalSelectionIssue,
+  getPhpRecipeIssue,
+  getRubyRecipeIssue,
+} from "@better-fullstack/types";
 import consola from "consola";
 import pc from "picocolors";
 
@@ -1547,6 +1551,8 @@ export function validateFullConfig(
   options: CLIInput,
   partial = false,
 ) {
+  const crystalIssue = getCrystalSelectionIssue(config);
+  if (crystalIssue) exitWithError(crystalIssue);
   const rubyIssue = getRubyRecipeIssue(config);
   if (rubyIssue) exitWithError(rubyIssue);
   const phpIssue = getPhpRecipeIssue(config);
@@ -1745,6 +1751,8 @@ export function validateFullConfig(
 
 export function validateConfigForProgrammaticUse(config: Partial<ProjectConfig>) {
   try {
+    const crystalIssue = getCrystalSelectionIssue(config);
+    if (crystalIssue) throw new Error(crystalIssue);
     const rubyIssue = getRubyRecipeIssue(config);
     if (rubyIssue) throw new Error(rubyIssue);
     const phpIssue = getPhpRecipeIssue(config);

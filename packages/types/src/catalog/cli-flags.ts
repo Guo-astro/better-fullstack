@@ -958,6 +958,13 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
     flags: GO_CLI_FLAG_DEFINITIONS,
   },
   {
+    id: "crystal",
+    title: "Crystal flags",
+    description: "Experimental Kemal HTTP service with Crystal and Shards.",
+    ecosystem: "crystal",
+    flags: [{ flag: "crystal-web-framework", summary: "Crystal HTTP framework.", source: { kind: "category", category: "crystalWebFramework" }, configKey: "crystalWebFramework" }],
+  },
+  {
     id: "java",
     title: "Java flags",
     description: "Flags for `--ecosystem java`.",

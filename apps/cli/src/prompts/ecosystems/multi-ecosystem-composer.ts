@@ -46,6 +46,7 @@ import { getAstroIntegrationChoice } from "@/prompts/developer/astro-integration
 import { getCSSFrameworkChoice } from "@/prompts/developer/css-framework";
 import { getShadcnOptions, type ShadcnOptions } from "@/prompts/developer/shadcn-options";
 import { getUILibraryChoice } from "@/prompts/developer/ui-library";
+import { getCrystalWebFrameworkChoice } from "@/prompts/ecosystems/crystal-ecosystem";
 import {
   getDotnetApiChoice,
   getDotnetAuthChoice,
@@ -186,7 +187,16 @@ import {
 type CompositionMode = "single" | "multi";
 export type BackendEcosystem = Extract<
   Ecosystem,
-  "typescript" | "go" | "rust" | "python" | "java" | "dotnet" | "elixir" | "php" | "ruby"
+  | "typescript"
+  | "go"
+  | "rust"
+  | "python"
+  | "java"
+  | "dotnet"
+  | "elixir"
+  | "php"
+  | "ruby"
+  | "crystal"
 >;
 export type FrontendEcosystem = "typescript" | "rust" | "dotnet";
 export type MobileEcosystem = "none" | "react-native" | "kotlin" | "swift" | "dart";
@@ -235,6 +245,7 @@ export async function selectBackendEcosystem(
       { value: "go", label: "Go", hint: "Gin, Echo, Fiber, Chi" },
       { value: "rust", label: "Rust", hint: "Axum, Actix Web, Rocket" },
       { value: "python", label: "Python", hint: "FastAPI, Django, Flask" },
+      { value: "crystal", label: "Crystal", hint: "Experimental Kemal HTTP service" },
       { value: "java", label: "Java / Kotlin", hint: "Spring Boot, Ktor, Quarkus" },
       { value: "dotnet", label: ".NET", hint: "ASP.NET Core, EF Core, SignalR" },
       { value: "ruby", label: "Ruby", hint: "Experimental Sinatra JSON service" },
@@ -1235,6 +1246,11 @@ export async function gatherMultiEcosystemConfig(
       stackPartSpecs.push(`backend.packageManager:python:${pythonPackageManager}`);
     if (pythonMessageQueue !== "none")
       stackPartSpecs.push(`backend.messageQueue:python:${pythonMessageQueue}`);
+  }
+
+  if (backendEcosystem === "crystal") {
+    const framework = promptValue(await getCrystalWebFrameworkChoice(flags.crystalWebFramework));
+    if (framework !== "none") stackPartSpecs.push(`backend:crystal:${framework}`);
   }
 
   if (backendEcosystem === "java") {

@@ -1,6 +1,7 @@
 import type { ProjectConfig, StackPart } from "@better-fullstack/types";
 
 import {
+  getCrystalSelectionIssue,
   getRubyRecipeIssue,
   getPhpRecipeIssue,
   parseStackPartSpecs,
@@ -53,6 +54,7 @@ import {
   processRustBaseTemplate,
   processPythonBaseTemplate,
   processGoBaseTemplate,
+  processCrystalBaseTemplate,
   processJavaBaseTemplate,
   processDotnetBaseTemplate,
   processRubyBaseTemplate,
@@ -117,6 +119,7 @@ const ECOSYSTEM_BASE_TEMPLATE_PROCESSORS = {
   rust: processRustBaseTemplate,
   python: processPythonBaseTemplate,
   go: processGoBaseTemplate,
+  crystal: processCrystalBaseTemplate,
   java: processJavaBaseTemplate,
   dotnet: processDotnetBaseTemplate,
   ruby: processRubyBaseTemplate,
@@ -156,7 +159,10 @@ function validateGraphContainerAddons(config: ProjectConfig): string[] {
 
 function validateGraphRenderingSupport(config: ProjectConfig): string[] {
   return validateStackParts(config.stackParts ?? [])
-    .issues.filter((issue) => issue.code === "UNSUPPORTED_REPEATED_PRIMARY")
+    .issues.filter(
+      (issue) =>
+        issue.code === "UNSUPPORTED_REPEATED_PRIMARY" || issue.code === "UNSUPPORTED_TARGET_PATH",
+    )
     .map(formatStackGraphIssue);
 }
 
@@ -495,6 +501,9 @@ export async function generateVirtualProject(options: GeneratorOptions): Promise
         error: "No templates provided. Templates must be passed via the templates option.",
       };
     }
+
+    const crystalIssue = getCrystalSelectionIssue(config);
+    if (crystalIssue) return { success: false, error: crystalIssue };
 
     const usesGraphParts =
       Boolean(config.stackParts?.length) && !isToolingOverlayOnly(config.stackParts);

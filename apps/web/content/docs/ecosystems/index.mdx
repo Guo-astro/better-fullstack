@@ -2,7 +2,7 @@
 translationStatus: pending
 title: Ecosystems
 description: Supported language ecosystems, what Better Fullstack scaffolds for each one, and the compatibility rules that apply.
-updated: 2026-10-22
+updated: 2026-10-24
 ---
 
 One CLI covers solo ecosystems and additional languages for composed projects. Each ecosystem ships its own templates, toolchain checks, and compatibility rules.
@@ -18,7 +18,8 @@ One CLI covers solo ecosystems and additional languages for composed projects. E
 | [Elixir](#elixir)                   | Phoenix and LiveView apps with Ecto, Absinthe, realtime, jobs, and deploy files.                | Mix                 |
 | [.NET](#net)                        | ASP.NET Core services with EF Core or Dapper, Identity, Minimal APIs, SignalR, jobs, and tests. | .NET SDK 10         |
 | [PHP](#php)                         | Experimental Slim JSON services with validated requests, PHPUnit, and a live HTTP proof.        | PHP 8.5, Composer 2 |
-| [Ruby](#ruby) | Experimental Sinatra JSON HTTP service with Minitest/Rack integration tests. | Bundler |
+| [Ruby](#ruby)                       | Experimental Sinatra JSON HTTP service with Minitest/Rack integration tests.                    | Bundler             |
+| [Crystal](#crystal)                 | Experimental native Kemal HTTP services and framework-free programs.                            | Crystal, Shards     |
 
 For product stacks that span languages, use [Multi-Ecosystem mode](/docs/ecosystems/multi-ecosystem/), which models the project as stack parts such as `frontend:typescript:next` and `backend:go:gin`. That mode also unlocks Kotlin/Compose, SwiftUI, Flutter, Blazor, and standalone Rust web frontends; see [Native and Additional Apps](/docs/ecosystems/native-apps/).
 
@@ -47,6 +48,29 @@ Accepting all defaults creates a TypeScript web project. The package manager fol
 Runtime and package manager are separate choices: a generated TypeScript project can install with npm while selecting Bun as its application runtime.
 
 Some flags are global because they live in one project config, but not every flag applies to every ecosystem. The generated tables on [CLI Create](/docs/cli/create/) are the exact current inventory per ecosystem.
+
+## Crystal
+
+The experimental Crystal recipe generates a native Kemal JSON HTTP service. It requires Crystal 1.22.1 and Shards 0.20.0, and pins Kemal 1.15.0. Public capability evidence stays listed until a current receipt qualifies the recipe.
+
+```sh
+bunx create-better-fullstack@latest crystal-api --ecosystem crystal --crystal-web-framework kemal --database none --addons none --examples none --ai-docs agents-md --no-install --no-git
+cd crystal-api
+shards install
+shards build --release
+crystal spec
+crystal run scripts/http_proof.cr
+```
+
+The service exposes `/health`, a validated greeting at `/api/hello?name=Crystal`, and a JSON POST endpoint at `/api/echo`. The HTTP proof checks parsed responses, rejected input, the body limit, SIGTERM shutdown, and port release. `crystalWebFramework=none` instead creates a native greeting program without Kemal.
+
+Append a relative directory to a binding, such as `backend:crystal:kemal:audit@services/audit%20api`. Directory segments accept ASCII letters, digits, spaces, dots, underscores, hyphens, `@`, `:`, and `%`. Encode special characters in the binding. Applications cannot share a destination or nest one destination inside another.
+
+TypeScript frontends and backends use `apps/web` and `apps/server`. React Native apps use `apps/native`. Custom directories for these applications are rejected because their templates require the default paths.
+
+Database packages using a TypeScript ORM, Redis, or EdgeDB must use `packages/db` so workspace dependencies and commands can find them. Native database marker directories can use custom paths.
+
+Database, authentication, deployment, and native addon adapters are unsupported. Use an explicit mixed graph for independent applications. Environment variables come from the process; the example environment file is not loaded automatically. CORS covers configured exact origins for GET requests. Cross-origin POST, credentials, production hosting, and Windows runtime behavior remain unqualified.
 
 ## TypeScript
 
@@ -234,6 +258,7 @@ GET `/health` returns JSON. POST `/api/greetings` accepts exactly `{"name":"Ruby
 For a composed project, select `backend:ruby:sinatra` alongside an existing frontend. Each named Ruby service keeps its own Gemfile, source, commands, and assigned port. The shared graph rejects unsupported capabilities attached to Ruby while retaining capabilities owned by other services. The browser preview and ZIP export generate native Ruby source; the browser Run tab cannot execute Ruby.
 
 The recipe remains experimental and listed until current, revision-matched evidence proves the declared boundaries. See [Sinatra 4.2.1 source](https://github.com/sinatra/sinatra/tree/v4.2.1) for the pinned framework API.
+
 ## PHP
 
 The experimental PHP recipe generates a Slim application with Composer dependencies, PSR-4 classes, PHPUnit request tests, and a bounded HTTP proof. It requires PHP 8.5.12 or a later 8.5 patch and Composer 2. It provides REST and testing; database, authentication, migrations, and deployment integrations are outside this recipe.

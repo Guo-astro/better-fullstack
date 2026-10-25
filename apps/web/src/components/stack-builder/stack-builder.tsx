@@ -322,7 +322,16 @@ type GraphMobileEcosystem = Extract<
 >;
 type GraphBackendEcosystem = Extract<
   StackPartEcosystem,
-  "typescript" | "rust" | "python" | "go" | "java" | "elixir" | "dotnet" | "php" | "ruby"
+  | "typescript"
+  | "rust"
+  | "python"
+  | "go"
+  | "java"
+  | "elixir"
+  | "dotnet"
+  | "php"
+  | "ruby"
+  | "crystal"
 >;
 type GraphSelection = {
   rootIds?: Partial<Record<ComposerRole, string>>;
@@ -679,6 +688,11 @@ const GRAPH_BACKEND_CONFIGS: GraphBackendConfig[] = [
     authCategory: "pythonAuth",
   },
   {
+    ecosystem: "crystal",
+    label: "Crystal",
+    frameworkCategory: "crystalWebFramework",
+  },
+  {
     ecosystem: "java",
     label: "Java",
     frameworkCategory: "javaWebFramework",
@@ -955,6 +969,7 @@ const GRAPH_BACKEND_ADVANCED_CATEGORY_ORDER_BY_ECOSYSTEM = {
     "caching",
     "search",
   ],
+  crystal: [],
   java: [
     "javaBuildTool",
     "javaApi",
@@ -2365,10 +2380,14 @@ function CreationModeComposer({
     "mobile",
     mobileConfig.ecosystem,
   );
+  const composerParts = getComposerParts(
+    stack.stackPartSpecs.length > 0 ? stack.stackPartSpecs : graphSelectionToSpecs(graphSelection),
+  );
   const allBackendOptions = getGraphToolOptions(
     backendConfig.frameworkCategory,
     "backend",
     graphSelection.backendEcosystem,
+    { parts: composerParts },
   );
   const backendOptions = isKotlinBackendSelection(
     graphSelection.backendEcosystem,
@@ -2545,7 +2564,7 @@ function CreationModeComposer({
 
   const reconcileBackendDatabase = (selection: GraphSelection) => {
     if (
-      (selection.backendEcosystem !== "php" && selection.backendEcosystem !== "ruby") ||
+      !["php", "ruby", "crystal"].includes(selection.backendEcosystem) ||
       selection.backend === "none"
     )
       return selection.database;
@@ -2554,8 +2573,7 @@ function CreationModeComposer({
         part.role === "backend" &&
         part.source !== "provided" &&
         part.id !== selection.rootIds?.backend &&
-        part.ecosystem !== "php" &&
-        part.ecosystem !== "ruby",
+        !["php", "ruby", "crystal"].includes(part.ecosystem),
     );
     return hasOtherDatabaseBackend ? selection.database : "none";
   };

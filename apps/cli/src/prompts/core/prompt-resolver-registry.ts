@@ -24,6 +24,7 @@ import { resolveFormsPrompt } from "@/prompts/developer/forms";
 import { resolveTestingPrompt } from "@/prompts/developer/testing";
 import { resolveUILibraryPrompt } from "@/prompts/developer/ui-library";
 import { resolveValidationPrompt } from "@/prompts/developer/validation";
+import { resolveCrystalWebFrameworkPrompt } from "@/prompts/ecosystems/crystal-ecosystem";
 import {
   resolveDotnetApiPrompt,
   resolveDotnetAuthPrompt,
@@ -672,6 +673,11 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
   goDI: {
     schemaValues: GO_DI_VALUES,
     resolve: ({ value }: { value?: string } = {}) => resolveGoDIPrompt(value as any),
+    coverageContexts: [{}],
+  },
+  crystalWebFramework: {
+    schemaValues: ["kemal", "none"],
+    resolve: ({ value }: { value?: string } = {}) => resolveCrystalWebFrameworkPrompt(value),
     coverageContexts: [{}],
   },
   javaWebFramework: {

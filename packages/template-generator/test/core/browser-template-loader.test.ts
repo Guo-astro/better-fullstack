@@ -36,6 +36,20 @@ function graphConfig(parts: string[]): ProjectConfig {
 }
 
 describe("browser template family loader", () => {
+  it("preserves named Crystal services and the same files with selected templates", async () => {
+    const config = graphConfig([
+      "frontend:typescript:react-vite",
+      "backend:crystal:kemal:reports@services/reports",
+    ]);
+    const selected = await loadTemplatesForConfig(config);
+    expect(getRequiredTemplateFamilies(config)).toContain("crystal-base");
+    const files = await generatedFiles(config, selected);
+    expect(files).toEqual(await generatedFiles(config, EMBEDDED_TEMPLATES));
+    expect(files.some(([path]) => path.endsWith("services/reports/shard.yml"))).toBe(true);
+    expect(files.some(([path]) => path.endsWith("apps/web/package.json"))).toBe(true);
+    expect(files.some(([path]) => path.endsWith("services/reports/package.json"))).toBe(false);
+  });
+
   it("loads the native Ruby family with the same complete output as the eager map", async () => {
     const config = makeConfig({
       ...createRubyProjectConfigDefaults(),

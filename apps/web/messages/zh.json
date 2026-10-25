@@ -764,5 +764,6 @@
   "builderComposerProjectTitle": "设置项目",
   "builderComposerReviewTitle": "检查 {name}",
   "builderComposerJsWorkspace": "JavaScript 工作区",
-  "builderComposerNativeToolchains": "原生工具链"
+  "builderComposerNativeToolchains": "原生工具链",
+  "docsCliSummaryCrystalCrystalWebFramework": "实验性 Crystal HTTP 框架。"
 }

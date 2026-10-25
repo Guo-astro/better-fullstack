@@ -764,5 +764,6 @@
   "builderComposerProjectTitle": "프로젝트 설정",
   "builderComposerReviewTitle": "{name} 검토",
   "builderComposerJsWorkspace": "JavaScript 워크스페이스",
-  "builderComposerNativeToolchains": "네이티브 툴체인"
+  "builderComposerNativeToolchains": "네이티브 툴체인",
+  "docsCliSummaryCrystalCrystalWebFramework": "실험적 Crystal HTTP 프레임워크."
 }

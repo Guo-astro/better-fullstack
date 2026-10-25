@@ -416,6 +416,7 @@ export type CompatibilityInput = {
     | "php"
     | "elixir"
     | "dotnet"
+    | "crystal"
     | "ruby";
   projectName: string | null;
   webFrontend: string[];
@@ -545,6 +546,7 @@ export type CompatibilityInput = {
   goProtoTooling: string;
   goDI: string;
   javaLanguage: string;
+  crystalWebFramework: string;
   javaWebFramework: string;
   javaBuildTool: string;
   javaOrm: string;
@@ -815,6 +817,7 @@ export const analyzeStackCompatibility = (
   stack: CompatibilityInput,
   options: { normalizeCodeQualityProfiles?: boolean } = {},
 ): CompatibilityAnalysisResult => {
+  if (stack.ecosystem === "crystal") return { adjustedStack: null, notes: {}, changes: [] };
   // Skip all validation if YOLO mode is enabled
   if (stack.yolo === "true") {
     return {
@@ -2926,6 +2929,27 @@ export const getDisabledReason = (
   category: CompatibilityCategory,
   optionId: string,
 ): string | null => {
+  if (
+    currentStack.ecosystem === "crystal" &&
+    optionId !== "none" &&
+    ![
+      "crystalWebFramework",
+      "aiDocs",
+      "git",
+      "install",
+      "workspaceShape",
+      "packageManager",
+      "versionChannel",
+    ].includes(category)
+  ) {
+    return "Crystal's bounded recipe supports Kemal HTTP only. Use a mixed graph for independently owned tools.";
+  }
+  if (
+    category === "crystalWebFramework" &&
+    optionId !== "none" &&
+    currentStack.ecosystem !== "crystal"
+  )
+    return "Kemal requires the Crystal ecosystem or a Crystal backend part.";
   if (currentStack.ecosystem === "ruby") {
     if (category === "rubyWebFramework" && optionId === "none") return RUBY_RECIPE_FRAMEWORK_REASON;
     const key =
@@ -6163,6 +6187,7 @@ const SERVER_ECOSYSTEMS = [
   "elixir",
   "php",
   "ruby",
+  "crystal",
 ] as const;
 
 const typeScriptCategories: ReadonlySet<OptionCategory> = new Set(

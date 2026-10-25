@@ -18,7 +18,12 @@ import {
   shapeRequiredHalfKeys,
   shapeSupportsEcosystem,
 } from "@/prompts/project/project-shape";
-import { ProjectNameSchema, cliInputToProjectConfigPartial, getRubyRecipeIssue } from "@/types";
+import {
+  ProjectNameSchema,
+  cliInputToProjectConfigPartial,
+  getCrystalSelectionIssue,
+  getRubyRecipeIssue,
+} from "@/types";
 
 const CORE_STACK_FLAGS = new Set([
   "database",
@@ -56,6 +61,20 @@ function isSameStackValue(provided: unknown, offValue: unknown) {
 
 function toFlagName(configKey: string) {
   return `--${configKey.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`;
+}
+
+export function assertCrystalInputIsUsable(options: CLIInput) {
+  if (
+    options.ecosystem !== "crystal" &&
+    !options.part?.some((spec) => spec.startsWith("backend:crystal:"))
+  )
+    return;
+  try {
+    const issue = getCrystalSelectionIssue(cliInputToProjectConfigPartial(options));
+    if (issue) exitWithError(issue);
+  } catch (error) {
+    exitWithError(error instanceof Error ? error.message : "Invalid Crystal recipe input");
+  }
 }
 
 export function assertRubyInputIsUsable(options: CLIInput) {

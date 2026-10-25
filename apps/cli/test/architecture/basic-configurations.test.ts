@@ -23,6 +23,7 @@ describe("Basic Configurations", () => {
       "ruby",
       "php",
       "elixir",
+      "crystal",
     ]);
   });
 

@@ -764,5 +764,6 @@
   "builderComposerProjectTitle": "プロジェクトを設定",
   "builderComposerReviewTitle": "{name} を確認",
   "builderComposerJsWorkspace": "JavaScript ワークスペース",
-  "builderComposerNativeToolchains": "ネイティブツールチェーン"
+  "builderComposerNativeToolchains": "ネイティブツールチェーン",
+  "docsCliSummaryCrystalCrystalWebFramework": "実験的な Crystal HTTP フレームワーク。"
 }

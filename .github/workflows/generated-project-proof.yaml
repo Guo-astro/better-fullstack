@@ -72,6 +72,11 @@ jobs:
           otp-version: 28.0.2
           elixir-version: 1.19.0
 
+      - name: Setup pinned Crystal and Shards
+        uses: crystal-lang/install-crystal@v1
+        with:
+          crystal: "1.22.1"
+          shards: "0.20.0"
       - name: Setup Ruby and Bundler
         uses: ruby/setup-ruby@v1
         with:
@@ -119,6 +124,8 @@ jobs:
       - name: Run generated project runtime proof
         run: bun run testing/generated-project-proof.ts
 
+      - name: Run native Crystal HTTP proof
+        run: bun run testing/crystal-runtime-proof.ts --output testing/.smoke-output/crystal-runtime-proof
       - name: Run native Ruby HTTP proof
         run: bun run testing/ruby-runtime-proof.ts --output testing/.smoke-output/ruby-runtime-proof
 
@@ -136,6 +143,7 @@ jobs:
           name: generated-project-proof-${{ github.sha }}
           path: |
             testing/.smoke-output/generated-project-proof/
+            testing/.smoke-output/crystal-runtime-proof/
             testing/.smoke-output/ruby-runtime-proof/
             testing/.smoke-output/php-runtime-proof/
           include-hidden-files: true
