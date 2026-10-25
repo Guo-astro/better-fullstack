@@ -583,6 +583,8 @@
   "docsCliSummaryDotnetDotnetCaching": "Caché en .NET.",
   "docsCliSummaryDotnetDotnetDeploy": "Destino de despliegue .NET.",
   "docsCliSummaryDotnetDotnetLibraries": "Bibliotecas opcionales de .NET.",
+  "docsCliSummaryRubyRubyWebFramework": "Framework HTTP de Ruby.",
+  "docsCliSummaryPhpPhpWebFramework": "Framework HTTP de PHP.",
   "docsCliSummaryElixirElixirWebFramework": "Framework web Elixir.",
   "docsCliSummaryElixirElixirOrm": "ORM / base de datos Elixir.",
   "docsCliSummaryElixirElixirAuth": "Autenticación en Elixir.",
@@ -762,5 +764,6 @@
   "builderComposerProjectTitle": "Configura tu proyecto",
   "builderComposerReviewTitle": "Revisar {name}",
   "builderComposerJsWorkspace": "Workspace de JavaScript",
-  "builderComposerNativeToolchains": "Toolchains nativas"
+  "builderComposerNativeToolchains": "Toolchains nativas",
+  "docsCliSummaryCrystalCrystalWebFramework": "Framework HTTP experimental de Crystal."
 }

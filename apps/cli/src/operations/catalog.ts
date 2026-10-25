@@ -82,6 +82,7 @@ function getGuidance() {
       java: "Backend/API: Spring Boot with Maven or Gradle Wrapper, optional Spring Data JPA, Spring Security, app libraries, and Java testing libraries.",
       dotnet:
         "Backend/API: ASP.NET Core Minimal APIs, MVC, or Blazor with EF Core/Dapper, Identity/Auth0, SignalR, xUnit, and Docker-ready output.",
+      ruby: "Experimental Sinatra HTTP service with Bundler, Puma, validated JSON routes, and Minitest/Rack tests. No database, authentication, or deployment adapters.",
       elixir:
         "Phoenix: Phoenix or Phoenix LiveView with Ecto SQL, PostgreSQL-ready config, REST or Absinthe, Channels/Presence, Oban, and Mix releases/Docker.",
     },

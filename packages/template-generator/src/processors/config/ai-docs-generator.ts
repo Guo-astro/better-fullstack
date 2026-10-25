@@ -6,6 +6,9 @@ import {
   type ProjectConfig,
 } from "@better-fullstack/types";
 
+import { getGraphBackendConnections } from "@/graph/graph-backend";
+import { getGraphProjectTasks } from "@/graph/graph-project";
+
 import type { VirtualFileSystem } from "@/core/virtual-fs";
 
 const JAVA_GROUP_ID = "com.example";
@@ -73,6 +76,14 @@ const JAVA_RESERVED_WORDS = new Set([
 export function processAiDocs(vfs: VirtualFileSystem, config: ProjectConfig): void {
   if (!config.aiDocs || config.aiDocs.length === 0) return;
 
+  if (config.ecosystem === "crystal" && !config.stackParts?.some(part => part.ecosystem !== "crystal" && ["backend", "frontend", "mobile"].includes(part.role))) {
+    for (const docType of config.aiDocs) {
+      const filename = getFilename(docType);
+      if (filename) vfs.writeFile(filename, "# Crystal project\n\nUse Crystal 1.22.1, Shards 0.20.0, and Kemal 1.15.0. Run shards install, shards build --release, and crystal spec. For Kemal run crystal run scripts/http_proof.cr after building. Read README.md for the bounded HTTP contract and native environment variables. Keep dependencies in shard.yml and commit shard.lock after installation. This experimental recipe has no recorded build or runtime receipt. Do not add JavaScript dependencies to this native service.\n");
+    }
+    return;
+  }
+
   for (const docType of config.aiDocs) {
     if (docType === "none") continue;
 
@@ -98,10 +109,26 @@ function getFilename(docType: AiDocs): string {
 }
 
 function generateContent(config: ProjectConfig, docType: AiDocs): string {
-  if (docType === "cursorrules") {
-    return generateCursorRules(config);
+  if (config.ecosystem === "php" && !config.stackParts?.length) {
+    return `# PHP application guidance\n\nComposer owns dependencies and scripts. Read PHP.md before changing routes. Keep strict types, validate JSON at the HTTP boundary, and keep PHPUnit request tests aligned with real behavior. Run composer install --no-interaction, composer run build, composer test and composer run proof:http from the PHP service directory. The HTTP proof starts and stops its own process. Never claim runtime verification from generated files alone. No database, auth, migration or deployment adapter is generated.\n`;
   }
-  return generateMarkdownDoc(config, docType);
+  const content =
+    docType === "cursorrules" ? generateCursorRules(config) : generateMarkdownDoc(config, docType);
+  const phpServices = (config.stackParts ?? []).filter(
+    (part) =>
+      part.role === "backend" &&
+      part.ecosystem === "php" &&
+      !part.ownerPartId &&
+      part.source !== "provided",
+  );
+  if (phpServices.length === 0) return content;
+  const guidance = phpServices
+    .map((part) => {
+      const directory = part.targetPath ?? "apps/server";
+      return `- Read ${directory}/PHP.md. Run composer install --no-interaction, composer run build, composer test and composer run proof:http from ${directory}. Composer owns this service; keep TypeScript dependency changes outside it.`;
+    })
+    .join("\n");
+  return `${content}\n## PHP service ownership\n\n${guidance}\n`;
 }
 
 function sanitizeJavaPackageSuffix(projectName: string): string {
@@ -279,6 +306,8 @@ function generateTechStackSection(config: ProjectConfig): string {
     }
   }
 
+  if (config.ecosystem === "ruby") lines.push("- Experimental Ruby Sinatra HTTP recipe; Bundler owns Gemfile and Gemfile.lock; Puma serves JSON routes; Minitest/Rack tests cover request validation.");
+
   if (config.ecosystem === "rust") {
     if (config.rustWebFramework !== "none")
       lines.push(`- Web Framework: ${config.rustWebFramework}`);
@@ -404,6 +433,8 @@ function generateStructureSection(config: ProjectConfig): string {
       );
     }
     lines.push("```");
+  } else if (config.ecosystem === "ruby") {
+    lines.push("Gemfile, app.rb, config.ru, bin/server, bin/proof, Rakefile, test/app_test.rb");
   } else if (config.ecosystem === "python") {
     lines.push("```");
     lines.push(`${config.projectName}/`);
@@ -469,6 +500,20 @@ function generateStructureSection(config: ProjectConfig): string {
 function generateCommandsSection(config: ProjectConfig): string {
   const lines: string[] = ["\n## Common Commands\n"];
 
+  const rubyConnections = getGraphBackendConnections(config).filter((connection) => connection.ecosystem === "ruby");
+  if (rubyConnections.length > 0) {
+    lines.push("Each service owns its native manifest, environment, and tests. Run native commands from that service directory.");
+    for (const task of getGraphProjectTasks(config)) {
+      if (task.setup) lines.push(`- Install ${task.label}: \`${task.setup}\``);
+      if (task.dev) lines.push(`- Start ${task.label}: \`${task.dev}\``);
+    }
+    for (const service of rubyConnections) {
+      lines.push(`- Check Ruby syntax: \`${service.checkCommand}\``, `- Run Minitest/Rack tests: \`${service.testCommand}\``, `- Prove live HTTP and shutdown: \`cd ${service.targetPath} && bundle exec ruby bin/proof\``);
+    }
+    lines.push("Ruby services use Bundler, Sinatra, and Puma. Do not add TypeScript dependencies or authentication/database adapters to them. Ruby remains experimental until a current revision-matched runtime receipt proves the recipe.");
+    return lines.join("\n");
+  }
+
   if (config.ecosystem === "typescript") {
     const pm = config.packageManager;
     const run = pm === "npm" ? "npm run" : pm;
@@ -523,6 +568,8 @@ function generateCommandsSection(config: ProjectConfig): string {
       lines.push(`- \`${pythonRun}ruff check .\` - Run linter`);
       lines.push(`- \`${pythonRun}ruff format .\` - Format code`);
     }
+  } else if (config.ecosystem === "ruby") {
+    lines.push("- `bundle install` - Install native dependencies", "- `bundle exec rake build` - Check Ruby syntax", "- `bundle exec rake test` - Run Minitest/Rack integration tests", "- `bundle exec ruby bin/proof` - Exercise real HTTP and shutdown", "- `bundle exec ruby bin/server` - Start Puma");
   } else if (config.ecosystem === "go") {
     lines.push(`- \`go mod tidy\` - Install dependencies`);
     lines.push(`- \`go run cmd/server/main.go\` - Start server`);
@@ -624,6 +671,8 @@ function generateCursorRules(config: ProjectConfig): string {
     if (config.pythonLogging && config.pythonLogging !== "none") {
       rules.push(`Logging: ${config.pythonLogging}, configured in src/app/logging_config.py`);
     }
+  } else if (config.ecosystem === "ruby") {
+    rules.push("Keep Ruby routes in app.rb and Minitest/Rack coverage in test/app_test.rb. Bundler owns native dependencies. No database or auth adapters are generated. Environment variables are read from the process; .env.example is documentation. Run bundle exec rake and bundle exec ruby bin/proof before claiming runtime verification.");
   } else if (config.ecosystem === "go") {
     rules.push(`You are working on a Go project.`);
     if (config.goWebFramework !== "none") rules.push(`Web framework: ${config.goWebFramework}`);

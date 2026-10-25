@@ -1,0 +1,29 @@
+# {{projectName}}
+
+Experimental Ruby Sinatra HTTP service. This recipe has no database, authentication, jobs, or deployment adapter. It does not require a TypeScript runtime.
+
+## Setup
+
+Use Ruby 3.4.11 and Bundler 4.0.21. The Gemfile accepts Ruby 3.3 through 3.x. Puma compiles a native extension and needs your platform's compiler toolchain.
+
+```sh
+bundle install
+bundle exec rake build
+bundle exec rake test
+bundle exec ruby bin/proof
+bundle exec ruby bin/server
+```
+
+`build` checks every Ruby entry point's syntax. `test` runs Minitest through Rack::Test. `bin/proof` starts a real Puma process on an available loopback port, parses its JSON response, rejects an invalid request, and stops the process. Commit the generated Gemfile.lock after installation to pin transitive dependencies. No lockfile is fabricated by the generator.
+
+## HTTP contract
+
+- GET `/health` returns `{"status":"ok","service":"sinatra"}`.
+- POST `/api/greetings` accepts exactly `{"name":"Ruby"}` and returns `{"greeting":"Hello, Ruby!"}`.
+- Blank, non-string, unknown-field, and over-80-character names return 422. Malformed JSON returns 400, non-JSON content returns 415, and bodies over 16 KiB return 413.
+
+The server binds to `127.0.0.1:{{rubyPort}}`. `HOST`, `PORT`, `RACK_ENV`, and `ALLOWED_ORIGIN` are process environment variables. `.env.example` documents values and is not loaded automatically. CORS permits the generated frontend origins `{{rubyWebOrigin}}` by default. Set ALLOWED_ORIGIN to a comma-separated list of trusted frontend origins to override them. Host authorization accepts localhost and loopback addresses. Configure explicit trusted hosts before public hosting.
+
+Use Ctrl-C to stop the foreground server. Add future routes in `app.rb` and behavior tests in `test/app_test.rb`. Keep Gemfile ownership inside this service when composed with other languages.
+
+This source recipe is experimental. Generation, build, and runtime claims require proof for the exact producer revision and toolchains.

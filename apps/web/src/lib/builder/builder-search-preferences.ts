@@ -49,7 +49,7 @@ export function saveBuilderSearchPreferences(
   try {
     storage.setItem(BUILDER_SEARCH_STORAGE_KEY, JSON.stringify(preferences));
   } catch {
-    // Search still works in memory when persistence is blocked or storage is full.
+    return;
   }
 }
 

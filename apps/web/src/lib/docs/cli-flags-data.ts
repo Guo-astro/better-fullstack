@@ -37,7 +37,10 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
           "go",
           "java",
           "elixir",
-          "dotnet"
+          "dotnet",
+          "php",
+          "ruby",
+          "crystal"
         ],
         "valueHint": null,
         "defaultValue": "typescript",
@@ -1283,7 +1286,7 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
           "none"
         ],
         "valueHint": null,
-        "defaultValue": "none",
+        "defaultValue": "axum",
         "multiple": false
       },
       {
@@ -1312,7 +1315,7 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
           "none"
         ],
         "valueHint": null,
-        "defaultValue": "none",
+        "defaultValue": "sea-orm",
         "multiple": false
       },
       {
@@ -2016,6 +2019,24 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
     ]
   },
   {
+    "id": "crystal",
+    "title": "Crystal flags",
+    "description": "Experimental Kemal HTTP service with Crystal and Shards.",
+    "flags": [
+      {
+        "flag": "--crystal-web-framework",
+        "summary": "Crystal HTTP framework.",
+        "values": [
+          "kemal",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "kemal",
+        "multiple": false
+      }
+    ]
+  },
+  {
     "id": "java",
     "title": "Java flags",
     "description": "Flags for `--ecosystem java`.",
@@ -2363,6 +2384,42 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "none",
         "multiple": true
+      }
+    ]
+  },
+  {
+    "id": "ruby",
+    "title": "Ruby flags",
+    "description": "Flags for `--ecosystem ruby`.",
+    "flags": [
+      {
+        "flag": "--ruby-web-framework",
+        "summary": "Ruby HTTP framework.",
+        "values": [
+          "sinatra",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "sinatra",
+        "multiple": false
+      }
+    ]
+  },
+  {
+    "id": "php",
+    "title": "PHP flags",
+    "description": "Flags for `--ecosystem php`.",
+    "flags": [
+      {
+        "flag": "--php-web-framework",
+        "summary": "PHP HTTP framework.",
+        "values": [
+          "slim",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "slim",
+        "multiple": false
       }
     ]
   },
@@ -2784,6 +2841,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "go:--go-templating": m.docsCliSummaryGoGoTemplating,
   "go:--go-proto-tooling": m.docsCliSummaryGoGoProtoTooling,
   "go:--go-di": m.docsCliSummaryGoGoDi,
+  "crystal:--crystal-web-framework": m.docsCliSummaryCrystalCrystalWebFramework,
   "java:--java-web-framework": m.docsCliSummaryJavaJavaWebFramework,
   "java:--java-language": m.docsCliSummaryJavaJavaLanguage,
   "java:--java-build-tool": m.docsCliSummaryJavaJavaBuildTool,
@@ -2806,6 +2864,8 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "dotnet:--dotnet-caching": m.docsCliSummaryDotnetDotnetCaching,
   "dotnet:--dotnet-deploy": m.docsCliSummaryDotnetDotnetDeploy,
   "dotnet:--dotnet-libraries": m.docsCliSummaryDotnetDotnetLibraries,
+  "ruby:--ruby-web-framework": m.docsCliSummaryRubyRubyWebFramework,
+  "php:--php-web-framework": m.docsCliSummaryPhpPhpWebFramework,
   "elixir:--elixir-web-framework": m.docsCliSummaryElixirElixirWebFramework,
   "elixir:--elixir-orm": m.docsCliSummaryElixirElixirOrm,
   "elixir:--elixir-auth": m.docsCliSummaryElixirElixirAuth,

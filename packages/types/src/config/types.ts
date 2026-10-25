@@ -65,6 +65,7 @@ import type {
   SearchSchema,
   VectorDbSchema,
   FileStorageSchema,
+  RubyWebFrameworkSchema,
   EcosystemSchema,
   RustWebFrameworkSchema,
   RustFrontendSchema,
@@ -125,6 +126,7 @@ import type {
   GoTemplatingSchema,
   GoProtoToolingSchema,
   GoDISchema,
+  CrystalWebFrameworkSchema,
   JavaLanguageSchema,
   JavaWebFrameworkSchema,
   JavaBuildToolSchema,
@@ -146,6 +148,7 @@ import type {
   DotnetCachingSchema,
   DotnetDeploySchema,
   DotnetLibrariesSchema,
+  PhpWebFrameworkSchema,
   ElixirWebFrameworkSchema,
   ElixirOrmSchema,
   ElixirAuthSchema,
@@ -299,6 +302,7 @@ export type GoMigrations = z.infer<typeof GoMigrationsSchema>;
 export type GoTemplating = z.infer<typeof GoTemplatingSchema>;
 export type GoProtoTooling = z.infer<typeof GoProtoToolingSchema>;
 export type GoDI = z.infer<typeof GoDISchema>;
+export type CrystalWebFramework = z.infer<typeof CrystalWebFrameworkSchema>;
 export type JavaLanguage = z.infer<typeof JavaLanguageSchema>;
 export type JavaWebFramework = z.infer<typeof JavaWebFrameworkSchema>;
 export type JavaBuildTool = z.infer<typeof JavaBuildToolSchema>;
@@ -320,6 +324,7 @@ export type DotnetValidation = z.infer<typeof DotnetValidationSchema>;
 export type DotnetCaching = z.infer<typeof DotnetCachingSchema>;
 export type DotnetDeploy = z.infer<typeof DotnetDeploySchema>;
 export type DotnetLibraries = z.infer<typeof DotnetLibrariesSchema>;
+export type PhpWebFramework = z.infer<typeof PhpWebFrameworkSchema>;
 export type ElixirWebFramework = z.infer<typeof ElixirWebFrameworkSchema>;
 export type ElixirOrm = z.infer<typeof ElixirOrmSchema>;
 export type ElixirAuth = z.infer<typeof ElixirAuthSchema>;
@@ -383,3 +388,5 @@ export type NativeFrontend = Extract<
   Frontend,
   "native-bare" | "native-uniwind" | "native-unistyles" | "none"
 >;
+
+export type RubyWebFramework = z.infer<typeof RubyWebFrameworkSchema>;

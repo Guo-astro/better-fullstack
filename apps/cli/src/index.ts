@@ -19,6 +19,8 @@ export {
   recovery,
 } from "@/run";
 
+import { CRYSTAL_PROJECT_DEFAULTS, getRubyRecipeIssue } from "@better-fullstack/types";
+
 import { applyEffectBackendDefaults } from "@/config/config-processing";
 import {
   getAuthSelectionIssue,
@@ -71,9 +73,16 @@ export async function createVirtual(
 ): Promise<{ success: boolean; tree?: VirtualFileTree; error?: string }> {
   try {
     const ecosystem = options.ecosystem || "typescript";
+    const isRuby = ecosystem === "ruby" && !options.stackParts?.length;
     const isReactNative = ecosystem === "react-native";
-    const frontend = options.frontend || (isReactNative ? ["native-bare"] : ["tanstack-router"]);
-    const backend = options.backend || (isReactNative ? "none" : "hono");
+    if (ecosystem === "crystal") {
+      options = { ...CRYSTAL_PROJECT_DEFAULTS, ...options };
+    }
+    const isPhp = ecosystem === "php";
+    const frontend =
+      options.frontend ||
+      (isRuby || isPhp ? ["none"] : isReactNative ? ["native-bare"] : ["tanstack-router"]);
+    const backend = options.backend || (isRuby || isReactNative || isPhp ? "none" : "hono");
     const hasNativeFrontend = frontend.some(
       (item) => item === "native-bare" || item === "native-uniwind" || item === "native-unistyles",
     );
@@ -85,7 +94,7 @@ export async function createVirtual(
       database: options.database || "none",
       orm: options.orm || "none",
       backend,
-      runtime: options.runtime || (isReactNative ? "none" : "bun"),
+      runtime: options.runtime || (isRuby || isReactNative || isPhp ? "none" : "bun"),
       frontend,
       addons: options.addons || [],
       examples: options.examples || [],
@@ -100,12 +109,12 @@ export async function createVirtual(
       versionChannel: options.versionChannel || "stable",
       install: false,
       dbSetup: options.dbSetup || "none",
-      api: options.api || (isReactNative ? "none" : "trpc"),
+      api: options.api || (isRuby || isReactNative || isPhp ? "none" : "trpc"),
       webDeploy: options.webDeploy || "none",
       serverDeploy: options.serverDeploy || "none",
       astroIntegration: options.astroIntegration || "none",
-      cssFramework: options.cssFramework || (isReactNative ? "none" : "tailwind"),
-      uiLibrary: options.uiLibrary || (isReactNative ? "none" : "shadcn-ui"),
+      cssFramework: options.cssFramework || (isRuby || isReactNative ? "none" : "tailwind"),
+      uiLibrary: options.uiLibrary || (isRuby || isReactNative ? "none" : "shadcn-ui"),
       shadcnBase: options.shadcnBase ?? "radix",
       shadcnStyle: options.shadcnStyle ?? "nova",
       shadcnIconLibrary: options.shadcnIconLibrary ?? "lucide",
@@ -115,9 +124,9 @@ export async function createVirtual(
       shadcnRadius: options.shadcnRadius ?? "default",
       ai: options.ai || "none",
       stateManagement: options.stateManagement || "none",
-      forms: options.forms || (isReactNative ? "none" : "react-hook-form"),
-      testing: options.testing || (isReactNative ? "none" : "vitest"),
-      validation: options.validation || "zod",
+      forms: options.forms || (isRuby || isReactNative ? "none" : "react-hook-form"),
+      testing: options.testing || (isRuby || isReactNative ? "none" : "vitest"),
+      validation: options.validation || (isRuby ? "none" : "zod"),
       realtime: options.realtime || "none",
       jobQueue: options.jobQueue || "none",
       animation: options.animation || "none",
@@ -202,6 +211,8 @@ export async function createVirtual(
       goTemplating: options.goTemplating || "none",
       goProtoTooling: options.goProtoTooling || "none",
       goDI: options.goDI || "none",
+      crystalWebFramework:
+        options.crystalWebFramework ?? (ecosystem === "crystal" ? "kemal" : "none"),
       javaWebFramework:
         options.javaWebFramework || (options.ecosystem === "java" ? "spring-boot" : "none"),
       javaLanguage: options.javaLanguage || "java",
@@ -229,6 +240,9 @@ export async function createVirtual(
       dotnetCaching: options.dotnetCaching || "none",
       dotnetDeploy: options.dotnetDeploy || (options.ecosystem === "dotnet" ? "docker" : "none"),
       dotnetLibraries: options.dotnetLibraries || [],
+      rubyWebFramework:
+        options.rubyWebFramework ?? (options.ecosystem === "ruby" ? "sinatra" : "none"),
+      phpWebFramework: options.phpWebFramework ?? (options.ecosystem === "php" ? "slim" : "none"),
       elixirWebFramework:
         options.elixirWebFramework || (options.ecosystem === "elixir" ? "phoenix" : "none"),
       elixirOrm: options.elixirOrm || (options.ecosystem === "elixir" ? "ecto-sql" : "none"),
@@ -261,6 +275,8 @@ export async function createVirtual(
     if (options.stackParts) {
       config.stackParts = options.stackParts;
     }
+    const rubyIssue = getRubyRecipeIssue(config);
+    if (rubyIssue) return { success: false, error: rubyIssue };
     Object.assign(config, getProviderDataLayer(config, options));
     applyEffectBackendDefaults(config, new Set(Object.keys(options)));
 

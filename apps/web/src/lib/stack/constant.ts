@@ -18,7 +18,8 @@ const AUTH_TECH_OPTIONS = getCapabilityDefinitions("auth").map((cap) => ({
 }));
 
 const TOOLING_ICONS: Record<string, string> = {
-  "vite-plus": "https://raw.githubusercontent.com/voidzero-dev/vite-plus/main/docs/public/favicon.svg",
+  "vite-plus":
+    "https://raw.githubusercontent.com/voidzero-dev/vite-plus/main/docs/public/favicon.svg",
   turborepo: "https://cdn.simpleicons.org/turborepo/EF4444",
   nx: "https://cdn.simpleicons.org/nx/143055",
   biome: "https://cdn.simpleicons.org/biome/60A5FA",
@@ -2633,6 +2634,14 @@ export const TECH_OPTIONS: Record<
       description: "Make your app installable and work offline",
       icon: "",
       color: "from-blue-500 to-blue-700",
+      default: false,
+    },
+    {
+      id: "plasmo",
+      name: "Plasmo",
+      description: "Chrome Manifest V3 extension with bounded page messaging",
+      icon: "",
+      color: "from-purple-500 to-purple-700",
       default: false,
     },
     {
@@ -5955,6 +5964,40 @@ export const TECH_OPTIONS: Record<
     },
   ],
   // Elixir ecosystem options
+  rubyWebFramework: [
+    {
+      id: "sinatra",
+      name: "Sinatra",
+      description: "Experimental JSON HTTP service with Bundler, Puma, and Minitest/Rack tests",
+      icon: "https://cdn.simpleicons.org/ruby/CC342D",
+      color: "from-red-500 to-red-700",
+      default: true,
+    },
+    {
+      id: "none",
+      name: "No Ruby backend",
+      description: "Disable the Ruby service",
+      icon: "",
+      color: "from-gray-400 to-gray-600",
+    },
+  ],
+  phpWebFramework: [
+    {
+      id: "slim",
+      name: "Slim",
+      description: "Experimental PHP HTTP recipe with validated JSON and PHPUnit",
+      icon: "https://cdn.simpleicons.org/php/777BB4",
+      color: "from-indigo-500 to-indigo-700",
+      default: true,
+    },
+    {
+      id: "none",
+      name: "None",
+      description: "No PHP service",
+      icon: "",
+      color: "from-gray-500 to-gray-700",
+    },
+  ],
   elixirWebFramework: [
     {
       id: "phoenix",
@@ -6566,6 +6609,10 @@ export const TECH_OPTIONS: Record<
     },
   ],
   // Java ecosystem options
+  crystalWebFramework: [
+    { id: "kemal", name: "Kemal", description: "Experimental native Crystal HTTP service", icon: "https://cdn.simpleicons.org/crystal", color: "from-slate-500 to-zinc-600", default: true },
+    { id: "none", name: "None", description: "Crystal source project", icon: "", color: "from-gray-400 to-gray-600", default: false },
+  ],
   javaWebFramework: [
     {
       id: "ktor",
@@ -7734,11 +7781,32 @@ export const ECOSYSTEMS: {
     color: "from-cyan-500 to-blue-600",
   },
   {
+    id: "crystal",
+    name: "Crystal",
+    description: "Experimental Kemal HTTP service",
+    icon: "https://cdn.simpleicons.org/crystal",
+    color: "from-slate-500 to-zinc-600",
+  },
+  {
     id: "java",
     name: "Java",
     description: "Modern Java ecosystem",
     icon: "/icon/java.svg",
     color: "from-red-500 to-orange-600",
+  },
+  {
+    id: "ruby",
+    name: "Ruby",
+    description: "Experimental Sinatra HTTP recipe",
+    icon: "https://cdn.simpleicons.org/ruby/CC342D",
+    color: "from-red-500 to-red-700",
+  },
+  {
+    id: "php",
+    name: "PHP",
+    description: "Experimental Slim HTTP application",
+    icon: "https://cdn.simpleicons.org/php/777BB4",
+    color: "from-indigo-500 to-indigo-700",
   },
   {
     id: "elixir",

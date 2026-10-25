@@ -113,6 +113,7 @@ export function makeBaseConfig(name: string, ecosystem: Ecosystem): ProjectConfi
     goTemplating: "none",
     goProtoTooling: "none",
     goDI: "none",
+    crystalWebFramework: "none",
     javaWebFramework: "none",
     javaBuildTool: "none",
     javaOrm: "none",
@@ -121,6 +122,8 @@ export function makeBaseConfig(name: string, ecosystem: Ecosystem): ProjectConfi
     javaLogging: "none",
     javaLibraries: [],
     javaTestingLibraries: [],
+    rubyWebFramework: ecosystem === "ruby" ? "sinatra" : "none",
+    phpWebFramework: ecosystem === "php" ? "slim" : "none",
     elixirWebFramework: "none",
     elixirOrm: "none",
     elixirAuth: "none",
@@ -168,6 +171,7 @@ type PresetDef = {
 export type PresetGroupId = "pr-core" | "pr-broad" | "all";
 
 const SMOKE_TEST_PRESETS: Record<string, PresetDef> = {
+  "ruby-sinatra": { ecosystem: "ruby", overrides: { rubyWebFramework: "sinatra" } },
   "tanstack-fullstack": {
     ecosystem: "typescript",
     overrides: {
@@ -1062,6 +1066,7 @@ const PRESET_GROUPS = {
     "hono-node-prisma-docker",
   ],
   "pr-broad": [
+    "ruby-sinatra",
     "nextjs-minimal",
     "next-payload",
     "sveltekit",

@@ -1,4 +1,10 @@
 import {
+  CRYSTAL_PROJECT_DEFAULTS,
+  getCrystalSelectionIssue,
+  getCrystalRequestedIssue,
+  CreateInputSchema,
+  createRubyProjectConfigDefaults,
+  getRubyRecipeIssue,
   DEFAULT_STACK_SELECTION,
   BackendSchema,
   type BetterTStackConfig,
@@ -16,6 +22,7 @@ import {
   analyzeStackCompatibility,
   formatStackPartSpec,
   getCategoryOrderForEcosystem,
+  getPhpRecipeIssue,
   getCodeQualitySelectionIssue,
   getJobQueueIncompatibility,
   getReplacedCodeQualityTools,
@@ -166,6 +173,7 @@ export function getInstallCommand(
   javaBuildTool?: string,
   javaWebFramework?: string,
   pythonPackageManager?: string,
+  crystalWebFramework?: string,
 ): string {
   switch (ecosystem) {
     case "rust":
@@ -181,6 +189,12 @@ export function getInstallCommand(
       return `cd ${projectName} && uv sync --extra dev`;
     case "go":
       return `cd ${projectName} && go mod tidy`;
+    case "crystal":
+      return `cd ${projectName} && shards install && shards build --release && crystal spec${crystalWebFramework === "none" ? "" : " && crystal run scripts/http_proof.cr"}`;
+    case "ruby":
+      return `cd ${projectName} && bundle install`;
+    case "php":
+      return `cd ${projectName} && composer install --no-interaction && composer run build && composer test`;
     case "elixir":
       return `cd ${projectName} && mix deps.get && mix compile && mix test`;
     case "java":
@@ -303,10 +317,15 @@ function applyMcpInputDefaults<TDefaults extends Record<string, string | string[
   defaults: TDefaults,
   input: Record<string, unknown>,
 ) {
+  const rubyDefaults = createRubyProjectConfigDefaults();
   return Object.fromEntries(
     Object.entries(defaults).map(([key, fallback]) => [
       key,
-      input[key] ?? cloneMcpInputDefault(fallback),
+      input[key] ??
+        (input.ecosystem === "ruby" && (!Array.isArray(input.part) || input.part.length === 0)
+          ? rubyDefaults[key as keyof ProjectConfig]
+          : undefined) ??
+        cloneMcpInputDefault(fallback),
     ]),
   );
 }
@@ -347,6 +366,12 @@ export function validateMcpProjectConfigCompatibility(
       >
     >,
 ): void {
+  const crystalIssue = getCrystalSelectionIssue(config);
+  if (crystalIssue) throw new Error(crystalIssue);
+  const rubyIssue = getRubyRecipeIssue(config);
+  if (rubyIssue) throw new Error(rubyIssue);
+  const phpIssue = getPhpRecipeIssue(config);
+  if (phpIssue) throw new Error(phpIssue);
   const qualityIssue = getCodeQualitySelectionIssue(config.addons ?? []);
   if (qualityIssue) throw new Error(qualityIssue);
   const pythonLoggingIssue = getPythonLoggingSelectionIssue(config);
@@ -403,6 +428,17 @@ export function buildProjectConfig(
   input: Record<string, unknown>,
   overrides?: { projectDir: string },
 ): ProjectConfig {
+  const requestedParts = Array.isArray(input.part)
+    ? parseStackPartSpecs(
+        input.part.filter((part): part is string => typeof part === "string"),
+        "selected",
+      )
+    : [];
+  if (requestedParts.some((part) => part.ecosystem === "crystal")) {
+    const issue = getCrystalRequestedIssue(CreateInputSchema.parse(input), requestedParts);
+    if (issue) throw new Error(issue);
+  }
+  if (input.ecosystem === "crystal") input = { ...CRYSTAL_PROJECT_DEFAULTS, ...input };
   const projectName = (input.projectName as string) ?? "my-project";
   const ecosystem = (input.ecosystem as ProjectConfig["ecosystem"]) ?? "typescript";
   const frontend =
@@ -515,6 +551,8 @@ export function buildProjectConfig(
 
   Object.assign(config, getProviderDataLayer(config, input));
   applyEffectBackendDefaults(config, new Set(Object.keys(input)));
+  const crystalIssue = getCrystalSelectionIssue(config);
+  if (crystalIssue) throw new Error(crystalIssue);
   validateMcpProjectConfigCompatibility(config);
   if (
     config.workspaceShape === "single-app" &&
@@ -574,6 +612,7 @@ export function mergeLegacyAddonParts(
 }
 
 export function buildMcpCompatibilityInput(input: Record<string, unknown>): CompatibilityInput {
+  if (input.ecosystem === "crystal") input = { ...CRYSTAL_PROJECT_DEFAULTS, ...input };
   const frontend = input.frontend as string[] | undefined;
   const webFrontend = (frontend ?? []).filter((item) => !item.startsWith("native-"));
   const nativeFrontend = (frontend ?? []).filter((item) => item.startsWith("native-"));

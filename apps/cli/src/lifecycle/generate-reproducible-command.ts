@@ -1,3 +1,5 @@
+import { getRubyRecipeIssue } from "@better-fullstack/types";
+
 import type { ProjectConfig, StackPartRole } from "@/types";
 
 import {
@@ -7,6 +9,7 @@ import {
   isToolingOverlayOnly,
   legacyProjectConfigToStackParts,
   projectStackPartSettingsToProjectConfig,
+  serializeGoCliFlags,
   toolingRequiresJavaScriptWorkspace,
 } from "@/types";
 
@@ -1128,24 +1131,7 @@ function getGoFlags(config: ProjectConfig) {
   const flags = ["--ecosystem go"];
 
   flags.push(`--database ${config.database}`);
-  flags.push(`--go-web-framework ${config.goWebFramework}`);
-  flags.push(`--go-orm ${config.goOrm}`);
-  flags.push(`--go-api ${config.goApi}`);
-  flags.push(`--go-cli ${config.goCli}`);
-  flags.push(`--go-logging ${config.goLogging}`);
-  flags.push(`--go-auth ${config.goAuth}`);
-  flags.push(formatArrayFlag("go-testing", config.goTesting));
-  flags.push(`--go-realtime ${config.goRealtime}`);
-  flags.push(`--go-message-queue ${config.goMessageQueue}`);
-  flags.push(`--go-caching ${config.goCaching}`);
-  flags.push(`--go-config ${config.goConfig}`);
-  flags.push(`--go-observability ${config.goObservability}`);
-  flags.push(`--go-validation ${config.goValidation ?? "none"}`);
-  flags.push(`--go-quality ${config.goQuality ?? "none"}`);
-  flags.push(`--go-migrations ${config.goMigrations ?? "none"}`);
-  flags.push(`--go-templating ${config.goTemplating ?? "none"}`);
-  flags.push(`--go-proto-tooling ${config.goProtoTooling ?? "none"}`);
-  flags.push(`--go-di ${config.goDI ?? "none"}`);
+  flags.push(...serializeGoCliFlags(config));
   flags.push(`--auth ${config.auth}`);
   appendSharedNonTypeScriptFlags(flags, config);
 
@@ -1262,11 +1248,36 @@ export function generateReproducibleCommand(config: ProjectConfig) {
     case "go":
       flags = getGoFlags(config);
       break;
+    case "crystal":
+      flags = ["--ecosystem crystal", `--crystal-web-framework ${config.crystalWebFramework}`, "--addons none", "--examples none"];
+      appendCommonFlags(flags, config);
+      break;
     case "java":
       flags = getJavaFlags(config);
       break;
     case "dotnet":
       flags = getDotnetFlags(config);
+      break;
+    case "ruby": {
+      const issue = getRubyRecipeIssue(config);
+      if (issue) throw new Error(issue);
+      flags = [
+        "--ecosystem ruby",
+        `--ruby-web-framework ${config.rubyWebFramework}`,
+        "--database none",
+        "--addons none",
+        "--examples none",
+      ];
+      appendCommonFlags(flags, config);
+      break;
+    }
+    case "php":
+      flags = [
+        "--ecosystem php",
+        `--php-web-framework ${config.phpWebFramework}`,
+        "--database none",
+      ];
+      appendCommonFlags(flags, config);
       break;
     case "elixir":
       flags = getElixirFlags(config);

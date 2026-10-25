@@ -583,6 +583,8 @@
   "docsCliSummaryDotnetDotnetCaching": ".NET 缓存。",
   "docsCliSummaryDotnetDotnetDeploy": ".NET 部署目标。",
   "docsCliSummaryDotnetDotnetLibraries": "可选的 .NET 库。",
+  "docsCliSummaryRubyRubyWebFramework": "Ruby HTTP 框架。",
+  "docsCliSummaryPhpPhpWebFramework": "PHP HTTP 框架。",
   "docsCliSummaryElixirElixirWebFramework": "Elixir Web 框架。",
   "docsCliSummaryElixirElixirOrm": "Elixir ORM / 数据库。",
   "docsCliSummaryElixirElixirAuth": "Elixir 认证。",
@@ -762,5 +764,6 @@
   "builderComposerProjectTitle": "设置项目",
   "builderComposerReviewTitle": "检查 {name}",
   "builderComposerJsWorkspace": "JavaScript 工作区",
-  "builderComposerNativeToolchains": "原生工具链"
+  "builderComposerNativeToolchains": "原生工具链",
+  "docsCliSummaryCrystalCrystalWebFramework": "实验性 Crystal HTTP 框架。"
 }

@@ -1,6 +1,9 @@
 import type { ProjectConfig, StackPart } from "@better-fullstack/types";
 
 import {
+  getCrystalSelectionIssue,
+  getRubyRecipeIssue,
+  getPhpRecipeIssue,
   parseStackPartSpecs,
   formatStackGraphIssue,
   getCodeQualitySelectionIssue,
@@ -9,6 +12,9 @@ import {
   getShadcnLintGraphFrontendIssue,
   getStandaloneBackendEcosystem,
   hasJavaScriptWorkspaceRoot,
+  getBrowserExtensionRecipeIssue,
+  getSelectedBrowserExtensions,
+  isBrowserExtension,
   hasVitePlusWorkspaceRoot,
   isToolingOverlayOnly,
   toolingRequiresJavaScriptWorkspace,
@@ -48,8 +54,11 @@ import {
   processRustBaseTemplate,
   processPythonBaseTemplate,
   processGoBaseTemplate,
+  processCrystalBaseTemplate,
   processJavaBaseTemplate,
   processDotnetBaseTemplate,
+  processRubyBaseTemplate,
+  processPhpBaseTemplate,
   processElixirBaseTemplate,
   processFrontendTemplates,
   processGraphNativeAppTemplates,
@@ -110,8 +119,11 @@ const ECOSYSTEM_BASE_TEMPLATE_PROCESSORS = {
   rust: processRustBaseTemplate,
   python: processPythonBaseTemplate,
   go: processGoBaseTemplate,
+  crystal: processCrystalBaseTemplate,
   java: processJavaBaseTemplate,
   dotnet: processDotnetBaseTemplate,
+  ruby: processRubyBaseTemplate,
+  php: processPhpBaseTemplate,
   elixir: processElixirBaseTemplate,
 } satisfies Record<NonTypeScriptTemplateEcosystem, EcosystemBaseTemplateProcessor>;
 
@@ -147,7 +159,10 @@ function validateGraphContainerAddons(config: ProjectConfig): string[] {
 
 function validateGraphRenderingSupport(config: ProjectConfig): string[] {
   return validateStackParts(config.stackParts ?? [])
-    .issues.filter((issue) => issue.code === "UNSUPPORTED_REPEATED_PRIMARY")
+    .issues.filter(
+      (issue) =>
+        issue.code === "UNSUPPORTED_REPEATED_PRIMARY" || issue.code === "UNSUPPORTED_TARGET_PATH",
+    )
     .map(formatStackGraphIssue);
 }
 
@@ -335,7 +350,9 @@ async function processGraphTemplates(
             pythonPackageManager: config.pythonPackageManager ?? "uv",
           }
         : projectedConfig;
-    await ECOSYSTEM_BASE_TEMPLATE_PROCESSORS[ecosystem](vfs, templates, backendConfig, targetPath);
+    const templateConfig =
+      ecosystem === "ruby" ? { ...backendConfig, stackParts: config.stackParts } : backendConfig;
+    await ECOSYSTEM_BASE_TEMPLATE_PROCESSORS[ecosystem](vfs, templates, templateConfig, targetPath);
   }
 
   // Pin the backend's CORS to the web frontend's dev origin (must run after the
@@ -463,7 +480,20 @@ function resolveGenerationConfig(config: ProjectConfig): ProjectConfig {
 
 export async function generateVirtualProject(options: GeneratorOptions): Promise<GeneratorResult> {
   try {
-    const { config, templates } = options;
+    const rubyIssue = getRubyRecipeIssue(options.config);
+    if (rubyIssue) return { success: false, error: rubyIssue };
+
+    const { config: requestedConfig, templates } = options;
+    const browserExtensions = getSelectedBrowserExtensions(requestedConfig);
+    const config = {
+      ...requestedConfig,
+      addons: [
+        ...requestedConfig.addons.filter((addon) => !isBrowserExtension(addon)),
+        ...browserExtensions,
+      ],
+    };
+    const extensionIssue = getBrowserExtensionRecipeIssue(config);
+    if (extensionIssue) return { success: false, error: extensionIssue };
 
     if (!templates || templates.size === 0) {
       return {
@@ -471,6 +501,9 @@ export async function generateVirtualProject(options: GeneratorOptions): Promise
         error: "No templates provided. Templates must be passed via the templates option.",
       };
     }
+
+    const crystalIssue = getCrystalSelectionIssue(config);
+    if (crystalIssue) return { success: false, error: crystalIssue };
 
     const usesGraphParts =
       Boolean(config.stackParts?.length) && !isToolingOverlayOnly(config.stackParts);
@@ -536,6 +569,14 @@ export async function generateVirtualProject(options: GeneratorOptions): Promise
       }
     }
 
+    const phpIssue = getPhpRecipeIssue(config);
+    if (phpIssue) return { success: false, error: phpIssue };
+    if (config.stackParts?.some((part) => part.ecosystem === "php")) {
+      const phpGraphIssues = validateStackParts(config.stackParts).issues;
+      if (phpGraphIssues.length > 0)
+        return { success: false, error: phpGraphIssues.map(formatStackGraphIssue).join("\n") };
+    }
+
     const vfs = new VirtualFileSystem();
     const generationConfig = resolveGenerationConfig(config);
     const rendersGraph = usesGraphParts && generationConfig === config;
@@ -567,8 +608,10 @@ export async function generateVirtualProject(options: GeneratorOptions): Promise
       generationConfig.ecosystem !== "typescript" &&
       generationConfig.ecosystem !== "react-native"
     ) {
-      await processAddonTemplates(vfs, templates, generationConfig);
-      processEnvVariables(vfs, generationConfig);
+      if (generationConfig.ecosystem !== "php") {
+        await processAddonTemplates(vfs, templates, generationConfig);
+        processEnvVariables(vfs, generationConfig);
+      }
     }
 
     processReadme(vfs, generationConfig);

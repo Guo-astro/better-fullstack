@@ -86,6 +86,7 @@ export function formatNameFromFingerprint(fingerprint: TemplateFingerprint): str
       typeof fingerprint.goProtoTooling === "string" ? fingerprint.goProtoTooling : undefined,
       typeof fingerprint.goDI === "string" ? fingerprint.goDI : undefined,
     ],
+    crystal: [typeof fingerprint.crystalWebFramework === "string" ? fingerprint.crystalWebFramework : undefined],
     java: [
       typeof fingerprint.javaWebFramework === "string" ? fingerprint.javaWebFramework : undefined,
       typeof fingerprint.javaBuildTool === "string" ? fingerprint.javaBuildTool : undefined,
@@ -97,6 +98,9 @@ export function formatNameFromFingerprint(fingerprint: TemplateFingerprint): str
       Array.isArray(fingerprint.javaTestingLibraries)
         ? fingerprint.javaTestingLibraries.filter((value) => value !== "none").join("-")
         : undefined,
+    ],
+    php: [
+      typeof fingerprint.phpWebFramework === "string" ? fingerprint.phpWebFramework : undefined,
     ],
     elixir: [
       typeof fingerprint.elixirWebFramework === "string"
@@ -362,8 +366,17 @@ export function buildCommand(name: string, config: ProjectConfig): string {
     case "go":
       orderedFlags.push(...sharedServiceFlags, ...goFlags);
       break;
+    case "crystal":
+      orderedFlags.push(["crystal-web-framework", config.crystalWebFramework]);
+      break;
     case "java":
       orderedFlags.push(...sharedServiceFlags, ...javaFlags);
+      break;
+    case "ruby":
+      orderedFlags.push(["ruby-web-framework", config.rubyWebFramework]);
+      break;
+    case "php":
+      orderedFlags.push(["php-web-framework", config.phpWebFramework]);
       break;
     case "elixir":
       orderedFlags.push(...elixirFlags);

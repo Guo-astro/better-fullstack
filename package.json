@@ -23,6 +23,7 @@
     "test:plugin-bundle": "bun run scripts/validation/validate-plugin-bundle.ts",
     "test:agent-docs": "bun run scripts/validation/validate-agent-docs.ts",
     "test:recipe-runtime": "bun run testing/recipe-generation-proof.ts",
+    "test:elixir-release": "bun run build:core && bun run testing/elixir-release-proof.ts",
     "test:external-upgrades": "bun run scripts/validation/validate-external-upgrades.ts",
     "test:published-package": "bun run scripts/release/published-package-smoke.ts",
     "check": "oxfmt . && oxlint .",

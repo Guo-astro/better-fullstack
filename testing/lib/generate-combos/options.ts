@@ -550,7 +550,9 @@ function makeGoDraft(args: GeneratorArgs): CandidateDraft {
       goObservability: sampleScalar(GO_OBSERVABILITY_VALUES, 0.5),
       goValidation: sampleScalar(GO_VALIDATION_VALUES, 0.5),
       goQuality: sampleScalar(GO_QUALITY_VALUES, 0.5),
-      goMigrations: getGoMigrationsIncompatibility(goMigrations, goSelection) ? "none" : goMigrations,
+      goMigrations: getGoMigrationsIncompatibility(goMigrations, goSelection)
+        ? "none"
+        : goMigrations,
       goTemplating: sampleScalar(GO_TEMPLATING_VALUES, 0.5),
       goProtoTooling: sampleScalar(GO_PROTO_TOOLING_VALUES, 0.5),
       goDI: sampleScalar(GO_DI_VALUES, 0.5),
@@ -604,6 +606,19 @@ function makeJavaDraft(args: GeneratorArgs): CandidateDraft {
         ? sampleScalar(CROSS_ECOSYSTEM_CACHING_VALUES, 0.75, "caching")
         : "none",
       search: usesBuildTool ? sampleScalar(CROSS_ECOSYSTEM_SEARCH_VALUES, 0.75, "search") : "none",
+    },
+  };
+}
+
+function makeRubyDraft(args: GeneratorArgs): CandidateDraft {
+  return {
+    ecosystem: "ruby",
+    options: {
+      ...createCommonOptions("ruby", args),
+      rubyWebFramework: "sinatra",
+      database: "none",
+      addons: ["none"],
+      examples: ["none"],
     },
   };
 }
@@ -833,6 +848,7 @@ function createValidationBase(projectName: string, draft: CandidateDraft): Proje
     goTemplating: "none",
     goProtoTooling: "none",
     goDI: "none",
+    crystalWebFramework: "none",
     javaWebFramework: "none",
     javaBuildTool: "none",
     javaOrm: "none",
@@ -843,6 +859,8 @@ function createValidationBase(projectName: string, draft: CandidateDraft): Proje
     javaTestingLibraries: [],
     mobileLibraries: [],
     dotnetLibraries: [],
+    rubyWebFramework: "none",
+    phpWebFramework: "none",
     elixirWebFramework: "none",
     elixirOrm: "none",
     elixirAuth: "none",
@@ -969,8 +987,17 @@ function createDraft(ecosystem: Ecosystem, args: GeneratorArgs): CandidateDraft 
       return makePythonDraft(args);
     case "go":
       return makeGoDraft(args);
+    case "crystal":
+      return { ecosystem: "crystal", options: { ...createCommonOptions("crystal", args), crystalWebFramework: "kemal" } };
     case "java":
       return makeJavaDraft(args);
+    case "ruby":
+      return makeRubyDraft(args);
+    case "php":
+      return {
+        ecosystem: "php",
+        options: { ...createCommonOptions("php", args), phpWebFramework: "slim", database: "none" },
+      };
     case "elixir":
       return makeElixirDraft(args);
     case "dotnet":

@@ -2268,6 +2268,7 @@ function buildCMSVars(
 }
 
 export function processEnvVariables(vfs: VirtualFileSystem, config: ProjectConfig): void {
+  if (config.ecosystem === "ruby") return;
   const {
     backend,
     frontend,

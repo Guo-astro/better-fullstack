@@ -65,6 +65,136 @@ export type ResolvedCliFlagGroup = {
   readonly flags: readonly ResolvedCliFlag[];
 };
 
+const GO_CLI_FLAG_DEFINITIONS = [
+  {
+    flag: "go-web-framework",
+    summary: "Go web framework.",
+    source: { kind: "category", category: "goWebFramework" },
+    configKey: "goWebFramework",
+  },
+  {
+    flag: "go-orm",
+    summary: "Go ORM / database.",
+    source: { kind: "category", category: "goOrm" },
+    configKey: "goOrm",
+  },
+  {
+    flag: "go-api",
+    summary: "Go API layer.",
+    source: { kind: "category", category: "goApi" },
+    configKey: "goApi",
+  },
+  {
+    flag: "go-cli",
+    summary: "Go CLI tooling.",
+    source: { kind: "category", category: "goCli" },
+    configKey: "goCli",
+  },
+  {
+    flag: "go-logging",
+    summary: "Go logging.",
+    source: { kind: "category", category: "goLogging" },
+    configKey: "goLogging",
+  },
+  {
+    flag: "go-auth",
+    summary: "Go-native auth helpers.",
+    source: { kind: "category", category: "goAuth" },
+    configKey: "goAuth",
+  },
+  {
+    flag: "go-testing",
+    summary: "Go testing libraries.",
+    source: { kind: "category", category: "goTesting" },
+    configKey: "goTesting",
+    multiple: true,
+  },
+  {
+    flag: "go-realtime",
+    summary: "Go realtime.",
+    source: { kind: "category", category: "goRealtime" },
+    configKey: "goRealtime",
+  },
+  {
+    flag: "go-message-queue",
+    summary: "Go message queue.",
+    source: { kind: "category", category: "goMessageQueue" },
+    configKey: "goMessageQueue",
+  },
+  {
+    flag: "go-caching",
+    summary: "Go caching.",
+    source: { kind: "category", category: "goCaching" },
+    configKey: "goCaching",
+  },
+  {
+    flag: "go-config",
+    summary: "Go config loader.",
+    source: { kind: "category", category: "goConfig" },
+    configKey: "goConfig",
+  },
+  {
+    flag: "go-observability",
+    summary: "Go observability.",
+    source: { kind: "category", category: "goObservability" },
+    configKey: "goObservability",
+  },
+  {
+    flag: "go-validation",
+    summary: "Go validation.",
+    source: { kind: "category", category: "goValidation" },
+    configKey: "goValidation",
+  },
+  {
+    flag: "go-quality",
+    summary: "Go code quality.",
+    source: { kind: "category", category: "goQuality" },
+    configKey: "goQuality",
+  },
+  {
+    flag: "go-migrations",
+    summary: "Go database migrations.",
+    source: { kind: "category", category: "goMigrations" },
+    configKey: "goMigrations",
+  },
+  {
+    flag: "go-templating",
+    summary: "Go templating.",
+    source: { kind: "category", category: "goTemplating" },
+    configKey: "goTemplating",
+  },
+  {
+    flag: "go-proto-tooling",
+    summary: "Go protobuf tooling.",
+    source: { kind: "category", category: "goProtoTooling" },
+    configKey: "goProtoTooling",
+  },
+  {
+    flag: "go-di",
+    summary: "Go dependency injection.",
+    source: { kind: "category", category: "goDI" },
+    configKey: "goDI",
+  },
+] as const satisfies readonly CliFlagDefinition[];
+
+type GoCliConfigKey = (typeof GO_CLI_FLAG_DEFINITIONS)[number]["configKey"];
+type GoCliSerializationInput = {
+  [Key in GoCliConfigKey]?: CliDefaultConfig[Key] extends readonly string[]
+    ? readonly string[]
+    : string;
+};
+
+export function serializeGoCliFlags(config: GoCliSerializationInput) {
+  return GO_CLI_FLAG_DEFINITIONS.map(({ flag, configKey }) => {
+    const value = config[configKey];
+    const serializedValue =
+      typeof value === "string"
+        ? value
+        : value?.filter((entry) => entry !== "none").join(" ") || "none";
+    return `--${flag} ${serializedValue}`;
+  });
+}
+
 export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
   {
     id: "common",
@@ -825,117 +955,14 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
     title: "Go flags",
     description: "Flags for `--ecosystem go`. Global `--auth` also applies.",
     ecosystem: "go",
-    flags: [
-      {
-        flag: "go-web-framework",
-        summary: "Go web framework.",
-        source: { kind: "category", category: "goWebFramework" },
-        configKey: "goWebFramework",
-      },
-      {
-        flag: "go-orm",
-        summary: "Go ORM / database.",
-        source: { kind: "category", category: "goOrm" },
-        configKey: "goOrm",
-      },
-      {
-        flag: "go-api",
-        summary: "Go API layer.",
-        source: { kind: "category", category: "goApi" },
-        configKey: "goApi",
-      },
-      {
-        flag: "go-cli",
-        summary: "Go CLI tooling.",
-        source: { kind: "category", category: "goCli" },
-        configKey: "goCli",
-      },
-      {
-        flag: "go-logging",
-        summary: "Go logging.",
-        source: { kind: "category", category: "goLogging" },
-        configKey: "goLogging",
-      },
-      {
-        flag: "go-auth",
-        summary: "Go-native auth helpers.",
-        source: { kind: "category", category: "goAuth" },
-        configKey: "goAuth",
-      },
-      {
-        flag: "go-testing",
-        summary: "Go testing libraries.",
-        source: { kind: "category", category: "goTesting" },
-        configKey: "goTesting",
-        multiple: true,
-      },
-      {
-        flag: "go-realtime",
-        summary: "Go realtime.",
-        source: { kind: "category", category: "goRealtime" },
-        configKey: "goRealtime",
-      },
-      {
-        flag: "go-message-queue",
-        summary: "Go message queue.",
-        source: { kind: "category", category: "goMessageQueue" },
-        configKey: "goMessageQueue",
-      },
-      {
-        flag: "go-caching",
-        summary: "Go caching.",
-        source: { kind: "category", category: "goCaching" },
-        configKey: "goCaching",
-      },
-      {
-        flag: "go-config",
-        summary: "Go config loader.",
-        source: { kind: "category", category: "goConfig" },
-        configKey: "goConfig",
-      },
-      {
-        flag: "go-observability",
-        summary: "Go observability.",
-        source: { kind: "category", category: "goObservability" },
-        configKey: "goObservability",
-      },
-      {
-        flag: "go-validation",
-        summary: "Go validation.",
-        source: { kind: "category", category: "goValidation" },
-        configKey: "goValidation",
-      },
-      {
-        flag: "go-quality",
-        summary: "Go code quality.",
-        source: { kind: "category", category: "goQuality" },
-        configKey: "goQuality",
-      },
-      {
-        flag: "go-migrations",
-        summary: "Go database migrations.",
-        source: { kind: "category", category: "goMigrations" },
-        configKey: "goMigrations",
-      },
-      {
-        flag: "go-templating",
-        summary: "Go templating.",
-        source: { kind: "category", category: "goTemplating" },
-        configKey: "goTemplating",
-      },
-      {
-        flag: "go-proto-tooling",
-        summary: "Go protobuf tooling.",
-        source: { kind: "category", category: "goProtoTooling" },
-        configKey: "goProtoTooling",
-      },
-      {
-        flag: "go-di",
-        summary: "Go dependency injection.",
-        source: { kind: "category", category: "goDI" },
-        configKey: "goDI",
-      },
-    ],
+    flags: GO_CLI_FLAG_DEFINITIONS,
+  },
+  {
+    id: "crystal",
+    title: "Crystal flags",
+    description: "Experimental Kemal HTTP service with Crystal and Shards.",
+    ecosystem: "crystal",
+    flags: [{ flag: "crystal-web-framework", summary: "Crystal HTTP framework.", source: { kind: "category", category: "crystalWebFramework" }, configKey: "crystalWebFramework" }],
   },
   {
     id: "java",
@@ -1087,6 +1114,34 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         source: { kind: "category", category: "dotnetLibraries" },
         configKey: "dotnetLibraries",
         multiple: true,
+      },
+    ],
+  },
+  {
+    id: "ruby",
+    title: "Ruby flags",
+    description: "Flags for `--ecosystem ruby`.",
+    ecosystem: "ruby",
+    flags: [
+      {
+        flag: "ruby-web-framework",
+        summary: "Ruby HTTP framework.",
+        source: { kind: "category", category: "rubyWebFramework" },
+        configKey: "rubyWebFramework",
+      },
+    ],
+  },
+  {
+    id: "php",
+    title: "PHP flags",
+    description: "Flags for `--ecosystem php`.",
+    ecosystem: "php",
+    flags: [
+      {
+        flag: "php-web-framework",
+        summary: "PHP HTTP framework.",
+        source: { kind: "category", category: "phpWebFramework" },
+        configKey: "phpWebFramework",
       },
     ],
   },

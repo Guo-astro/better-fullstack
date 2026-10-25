@@ -79,18 +79,29 @@ const JAVA_RESERVED_WORDS = new Set([
 ]);
 
 export function processReadme(vfs: VirtualFileSystem, config: ProjectConfig): void {
+  if (
+    config.ecosystem === "php" &&
+    !config.stackParts?.some((part) => part.role === "frontend" || part.role === "mobile") &&
+    vfs.exists("README.md")
+  )
+    return;
   let content: string;
   if (config.stackParts?.length && !isToolingOverlayOnly(config.stackParts)) {
     content = generateGraphReadmeContent(config);
+  } else if (config.ecosystem === "ruby" && vfs.exists("README.md")) {
+    return;
   } else if (config.ecosystem === "rust") {
     content = generateRustReadmeContent(config);
   } else if (config.ecosystem === "python") {
     content = generatePythonReadmeContent(config);
   } else if (config.ecosystem === "go") {
     content = generateGoReadmeContent(config);
+  } else if (config.ecosystem === "crystal" && vfs.exists("README.md")) {
+    return;
   } else if (config.ecosystem === "java") {
     content = generateJavaReadmeContent(config);
   } else if (config.ecosystem === "elixir") {
+    if (vfs.exists("README.md")) return;
     content = generateElixirReadmeContent(config);
   } else if (config.ecosystem === "dotnet" && vfs.exists("README.md")) {
     return;

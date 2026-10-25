@@ -583,6 +583,8 @@
   "docsCliSummaryDotnetDotnetCaching": ".NET のキャッシュ。",
   "docsCliSummaryDotnetDotnetDeploy": ".NET のデプロイ先。",
   "docsCliSummaryDotnetDotnetLibraries": "オプションの .NET ライブラリ。",
+  "docsCliSummaryRubyRubyWebFramework": "Ruby の HTTP フレームワーク。",
+  "docsCliSummaryPhpPhpWebFramework": "PHP の HTTP フレームワーク。",
   "docsCliSummaryElixirElixirWebFramework": "Elixir の Web フレームワーク。",
   "docsCliSummaryElixirElixirOrm": "Elixir の ORM / データベース。",
   "docsCliSummaryElixirElixirAuth": "Elixir の認証。",
@@ -762,5 +764,6 @@
   "builderComposerProjectTitle": "プロジェクトを設定",
   "builderComposerReviewTitle": "{name} を確認",
   "builderComposerJsWorkspace": "JavaScript ワークスペース",
-  "builderComposerNativeToolchains": "ネイティブツールチェーン"
+  "builderComposerNativeToolchains": "ネイティブツールチェーン",
+  "docsCliSummaryCrystalCrystalWebFramework": "実験的な Crystal HTTP フレームワーク。"
 }

@@ -16,6 +16,10 @@ import type {
   UILibrary,
 } from "@/config/types";
 
+import {
+  getBrowserExtensionSelectionIssue,
+  isBrowserExtension,
+} from "@/capabilities/browser-extensions";
 import { getAuthIncompatibility, normalizeCapabilitySelection } from "@/capabilities/capabilities";
 import {
   getCodeQualitySelectionIssue,
@@ -32,6 +36,12 @@ import {
   type OptionCategory,
 } from "@/catalog/option-metadata";
 import { ANALYTICS_VALUES } from "@/config/schemas";
+import { PHP_RECIPE_REASONS, PHP_UNSUPPORTED_BACKEND_FIELDS } from "@/stack/php-compatibility";
+import {
+  RUBY_RECIPE_EXTENSION_REASON,
+  RUBY_RECIPE_FRAMEWORK_REASON,
+  RUBY_UNSUPPORTED_CONFIG_KEYS,
+} from "@/stack/ruby-compatibility";
 import {
   getDatabaseOrmIncompatibility,
   getDatabaseOrmRequirementIssue,
@@ -403,8 +413,11 @@ export type CompatibilityInput = {
     | "python"
     | "go"
     | "java"
+    | "php"
     | "elixir"
-    | "dotnet";
+    | "dotnet"
+    | "crystal"
+    | "ruby";
   projectName: string | null;
   webFrontend: string[];
   nativeFrontend: string[];
@@ -533,6 +546,7 @@ export type CompatibilityInput = {
   goProtoTooling: string;
   goDI: string;
   javaLanguage: string;
+  crystalWebFramework: string;
   javaWebFramework: string;
   javaBuildTool: string;
   javaOrm: string;
@@ -553,6 +567,8 @@ export type CompatibilityInput = {
   dotnetCaching: string;
   dotnetDeploy: string;
   dotnetLibraries: string[];
+  rubyWebFramework: string;
+  phpWebFramework: string;
   elixirWebFramework: string;
   elixirOrm: string;
   elixirAuth: string;
@@ -704,7 +720,13 @@ function usesTanStackStartSolid(stack: Pick<CompatibilityInput, "webFrontend" | 
     stack.backend === "self-tanstack-start-solid"
   );
 }
-const SINGLE_APP_CONTAINER_ADDONS = new Set(["docker-compose", "devcontainer", "kong"]);
+const SINGLE_APP_CONTAINER_ADDONS = new Set([
+  "docker-compose",
+  "devcontainer",
+  "kong",
+  "wxt",
+  "plasmo",
+]);
 const FULLSTACK_SELF_BACKENDS = new Set([
   "self-next",
   "self-vinext",
@@ -795,6 +817,7 @@ export const analyzeStackCompatibility = (
   stack: CompatibilityInput,
   options: { normalizeCodeQualityProfiles?: boolean } = {},
 ): CompatibilityAnalysisResult => {
+  if (stack.ecosystem === "crystal") return { adjustedStack: null, notes: {}, changes: [] };
   // Skip all validation if YOLO mode is enabled
   if (stack.yolo === "true") {
     return {
@@ -2906,6 +2929,56 @@ export const getDisabledReason = (
   category: CompatibilityCategory,
   optionId: string,
 ): string | null => {
+  if (
+    currentStack.ecosystem === "crystal" &&
+    optionId !== "none" &&
+    ![
+      "crystalWebFramework",
+      "aiDocs",
+      "git",
+      "install",
+      "workspaceShape",
+      "packageManager",
+      "versionChannel",
+    ].includes(category)
+  ) {
+    return "Crystal's bounded recipe supports Kemal HTTP only. Use a mixed graph for independently owned tools.";
+  }
+  if (
+    category === "crystalWebFramework" &&
+    optionId !== "none" &&
+    currentStack.ecosystem !== "crystal"
+  )
+    return "Kemal requires the Crystal ecosystem or a Crystal backend part.";
+  if (currentStack.ecosystem === "ruby") {
+    if (category === "rubyWebFramework" && optionId === "none") return RUBY_RECIPE_FRAMEWORK_REASON;
+    const key =
+      category === "webFrontend" || category === "nativeFrontend"
+        ? "frontend"
+        : category === "backendLibraries"
+          ? "effect"
+          : category === "appPlatforms" ||
+              category === "codeQuality" ||
+              category === "documentation"
+            ? "addons"
+            : category;
+    if (optionId !== "none" && RUBY_UNSUPPORTED_CONFIG_KEYS.some((entry) => entry === key))
+      return RUBY_RECIPE_EXTENSION_REASON;
+  }
+
+  if (currentStack.ecosystem === "php") {
+    if (category === "phpWebFramework" && optionId === "none") return PHP_RECIPE_REASONS.framework;
+    if (category === "database" && optionId !== "none") return PHP_RECIPE_REASONS.database;
+    if (PHP_UNSUPPORTED_BACKEND_FIELDS.some((field) => field === category) && optionId !== "none")
+      return PHP_RECIPE_REASONS.capability;
+  }
+  if (category === "appPlatforms" && isBrowserExtension(optionId)) {
+    const issue = getBrowserExtensionSelectionIssue(
+      [...currentStack.appPlatforms, optionId],
+      currentStack.workspaceShape,
+    );
+    if (issue) return issue;
+  }
   if (
     optionId !== "none" &&
     category === "kotlinMobileLibraries" &&
@@ -5522,6 +5595,7 @@ const ADDON_COMPATIBILITY: Record<Addons, readonly Frontend[]> = {
   fumadocs: [],
   opentui: [],
   wxt: [],
+  plasmo: [],
   msw: [],
   storybook: ["tanstack-router", "react-router", "react-vite", "next", "nuxt", "svelte", "solid"],
   axios: [
@@ -6104,7 +6178,17 @@ const ISSUE_CODE_BY_CATEGORY: Partial<Record<OptionCategory, string>> = {
   dotnetLibraries: "INCOMPATIBLE_DOTNET_LIBRARY",
 };
 
-const SERVER_ECOSYSTEMS = ["rust", "python", "go", "java", "dotnet", "elixir"] as const;
+const SERVER_ECOSYSTEMS = [
+  "rust",
+  "python",
+  "go",
+  "java",
+  "dotnet",
+  "elixir",
+  "php",
+  "ruby",
+  "crystal",
+] as const;
 
 const typeScriptCategories: ReadonlySet<OptionCategory> = new Set(
   getCategoryOrderForEcosystem("typescript"),

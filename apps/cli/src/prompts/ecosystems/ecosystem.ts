@@ -40,11 +40,18 @@ export const ECOSYSTEM_PROMPT_OPTIONS = [
     label: ".NET",
     hint: "ASP.NET Core ecosystem with Minimal APIs, EF Core, SignalR, and more",
   },
+  { value: "ruby" as const, label: "Ruby", hint: "Experimental Sinatra HTTP service with Bundler and Minitest" },
+  {
+    value: "php" as const,
+    label: "PHP",
+    hint: "Experimental Slim HTTP application with Composer and PHPUnit",
+  },
   {
     value: "elixir" as const,
     label: "Elixir",
     hint: "Elixir ecosystem with Phoenix, LiveView, Ecto, and more",
   },
+  { value: "crystal" as const, label: "Crystal", hint: "Experimental Kemal HTTP service" },
 ];
 
 export async function getEcosystemChoice(ecosystem?: Ecosystem, auth?: Auth) {

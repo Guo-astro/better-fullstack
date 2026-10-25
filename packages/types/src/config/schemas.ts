@@ -2,10 +2,24 @@ import { z } from "zod";
 
 import { PRESET_ALIAS_IDS, PRESET_IDS } from "@/catalog/preset-ids";
 
+export const RubyWebFrameworkSchema = z.enum(["sinatra", "none"]).describe("Ruby HTTP framework");
+
 export const EcosystemSchema = z
-  .enum(["typescript", "react-native", "rust", "python", "go", "java", "elixir", "dotnet"])
+  .enum([
+    "typescript",
+    "react-native",
+    "rust",
+    "python",
+    "go",
+    "java",
+    "elixir",
+    "dotnet",
+    "php",
+    "ruby",
+    "crystal",
+  ])
   .describe(
-    "Language ecosystem (typescript, react-native, rust, python, go, java, elixir, or dotnet)",
+    "Language ecosystem (typescript, react-native, rust, python, go, java, elixir, dotnet, php, ruby, or crystal)",
   );
 
 export const StackPartEcosystemSchema = z
@@ -239,6 +253,7 @@ export const AddonsSchema = z
     "shadcn-lint",
     "opentui",
     "wxt",
+    "plasmo",
     "msw",
     "storybook",
     "swr",
@@ -272,6 +287,7 @@ export const APP_PLATFORM_ADDON_VALUES = [
   "electron",
   "capacitor",
   "wxt",
+  "plasmo",
   "opentui",
 ] as const;
 
@@ -851,6 +867,10 @@ export const GoProtoToolingSchema = z.enum(["buf", "none"]).describe("Go Protoco
 export const GoDISchema = z.enum(["fx", "none"]).describe("Go dependency injection library");
 
 // Java ecosystem schemas
+export const CrystalWebFrameworkSchema = z
+  .enum(["kemal", "none"])
+  .describe("Experimental Crystal HTTP framework");
+
 export const JavaLanguageSchema = z
   .enum(["java", "kotlin"])
   .describe("JVM language variant for the Java ecosystem (java or kotlin)");
@@ -1006,6 +1026,8 @@ export const DotnetLibrariesSchema = z
   .describe(".NET application libraries");
 
 // Elixir ecosystem schemas
+export const PhpWebFrameworkSchema = z.enum(["slim", "none"]).describe("PHP HTTP framework");
+
 export const ElixirWebFrameworkSchema = z
   .enum(["phoenix", "phoenix-live-view", "none"])
   .describe("Elixir web framework");
@@ -1352,6 +1374,7 @@ const STACK_CONFIG_FIELDS = {
   goProtoTooling: GoProtoToolingSchema,
   goDI: GoDISchema,
   // Java ecosystem options
+  crystalWebFramework: CrystalWebFrameworkSchema.default("none"),
   javaLanguage: JavaLanguageSchema.optional(),
   javaWebFramework: JavaWebFrameworkSchema,
   javaBuildTool: JavaBuildToolSchema,
@@ -1377,6 +1400,8 @@ const STACK_CONFIG_FIELDS = {
   dotnetDeploy: DotnetDeploySchema,
   dotnetLibraries: z.array(DotnetLibrariesSchema).describe(".NET application libraries"),
   // Elixir ecosystem options
+  rubyWebFramework: RubyWebFrameworkSchema.optional(),
+  phpWebFramework: PhpWebFrameworkSchema.default("none"),
   elixirWebFramework: ElixirWebFrameworkSchema,
   elixirOrm: ElixirOrmSchema,
   elixirAuth: ElixirAuthSchema,
@@ -1439,7 +1464,9 @@ export const CreateInputSchema = z.object({
   part: z
     .array(z.string())
     .optional()
-    .describe("Stack graph part binding, e.g. frontend:typescript:next or backend.orm:go:gorm"),
+    .describe(
+      "Stack graph binding role:ecosystem:tool[:id][@relative-path], e.g. frontend:typescript:next or backend:crystal:kemal:reports@services/reports",
+    ),
 });
 
 export const AddInputSchema = CreateInputSchema.omit({
@@ -1641,6 +1668,7 @@ export const GO_TEMPLATING_VALUES = GoTemplatingSchema.options;
 export const GO_PROTO_TOOLING_VALUES = GoProtoToolingSchema.options;
 export const GO_DI_VALUES = GoDISchema.options;
 export const JAVA_LANGUAGE_VALUES = JavaLanguageSchema.options;
+export const CRYSTAL_WEB_FRAMEWORK_VALUES = CrystalWebFrameworkSchema.options;
 export const JAVA_WEB_FRAMEWORK_VALUES = JavaWebFrameworkSchema.options;
 export const JAVA_BUILD_TOOL_VALUES = JavaBuildToolSchema.options;
 export const JAVA_ORM_VALUES = JavaOrmSchema.options;
@@ -1661,6 +1689,7 @@ export const DOTNET_VALIDATION_VALUES = DotnetValidationSchema.options;
 export const DOTNET_CACHING_VALUES = DotnetCachingSchema.options;
 export const DOTNET_DEPLOY_VALUES = DotnetDeploySchema.options;
 export const DOTNET_LIBRARIES_VALUES = DotnetLibrariesSchema.options;
+export const PHP_WEB_FRAMEWORK_VALUES = PhpWebFrameworkSchema.options;
 export const ELIXIR_WEB_FRAMEWORK_VALUES = ElixirWebFrameworkSchema.options;
 export const ELIXIR_ORM_VALUES = ElixirOrmSchema.options;
 export const ELIXIR_AUTH_VALUES = ElixirAuthSchema.options;
@@ -1690,3 +1719,5 @@ export const SHADCN_COLOR_THEME_VALUES = ShadcnColorThemeSchema.options;
 export const SHADCN_BASE_COLOR_VALUES = ShadcnBaseColorSchema.options;
 export const SHADCN_FONT_VALUES = ShadcnFontSchema.options;
 export const SHADCN_RADIUS_VALUES = ShadcnRadiusSchema.options;
+
+export const RUBY_WEB_FRAMEWORK_VALUES = RubyWebFrameworkSchema.options;
