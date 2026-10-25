@@ -343,13 +343,50 @@ export async function runMixCompile({
   }
 }
 
-export async function runShardsInstall({ projectDir }: { projectDir: string }): Promise<SetupStepResult> {
+export async function runShardsInstall({
+  projectDir,
+}: {
+  projectDir: string;
+}): Promise<SetupStepResult> {
   const step = "Install Crystal shards";
   if (!(await commandExists("crystal")) || !(await commandExists("shards"))) {
-    return { step, success: false, errorMessage: "Install Crystal 1.22.1 and Shards 0.20.0 from https://crystal-lang.org/install/" };
+    return {
+      step,
+      success: false,
+      errorMessage:
+        "Install Crystal 1.22.1 and Shards 0.20.0 from https://crystal-lang.org/install/",
+    };
   }
   try {
     await $({ cwd: projectDir, stderr: ["inherit", "pipe"] })`shards install`;
+    return { step, success: true };
+  } catch (error) {
+    return toStepFailure(step, error, toErrorMessage(error));
+  }
+}
+
+export async function runBundleInstall({
+  projectDir,
+}: {
+  projectDir: string;
+}): Promise<SetupStepResult> {
+  const step = "bundle install";
+  try {
+    await $({ cwd: projectDir, stderr: ["inherit", "pipe"] })`bundle install`;
+    return { step, success: true };
+  } catch (error) {
+    return toStepFailure(step, error, toErrorMessage(error));
+  }
+}
+
+export async function runComposerInstall({
+  projectDir,
+}: {
+  projectDir: string;
+}): Promise<SetupStepResult> {
+  const step = "composer install";
+  try {
+    await $({ cwd: projectDir, stderr: ["inherit", "pipe"] })`composer install --no-interaction`;
     return { step, success: true };
   } catch (error) {
     return toStepFailure(step, error, toErrorMessage(error));

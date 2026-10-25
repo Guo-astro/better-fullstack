@@ -36,6 +36,46 @@ const config = () => ({
 });
 
 describe("bounded Crystal HTTP recipe", () => {
+  it("ignores disabled frontend and owned capability selections", () => {
+    for (const spec of ["frontend:typescript:none", "backend.auth:crystal:none"]) {
+      const parts = parseStackPartSpecs(["backend:crystal:kemal", spec]);
+      expect(getCrystalSelectionIssue({ stackParts: parts })).toBeNull();
+    }
+  });
+
+  it("rejects unsafe and malformed custom directories with a part-specific error", () => {
+    for (const suffix of [
+      "services/api;touch /tmp/pwn",
+      "services/$(whoami)",
+      "services/api%0Aecho",
+      "100%",
+      "services/../api",
+    ]) {
+      expect(() => parseStackPartSpecs([`backend:go:gin@${suffix}`])).toThrow(
+        "Invalid --part target path",
+      );
+    }
+  });
+
+  it("rejects normalized duplicate and overlapping application destinations", () => {
+    for (const paths of [
+      ["services/shared", "services/shared"],
+      ["services/a", "services//a/"],
+      ["services/a", "services/a/worker"],
+    ]) {
+      const parts = parseStackPartSpecs([
+        `backend:go:gin:api@${paths[0]}`,
+        `backend:rust:axum:worker@${paths[1]}`,
+      ]);
+      expect(
+        validateStackParts(parts).issues.some((issue) => issue.code === "OVERLAPPING_TARGET_PATH"),
+      ).toBe(true);
+    }
+    expect(parseStackPartSpecs(["backend:go:gin@services//api/"])[0]?.targetPath).toBe(
+      "services/api",
+    );
+  });
+
   it("does not treat a disabled frontend as an application that can own tooling", () => {
     const parts = parseStackPartSpecs([
       "backend:crystal:kemal",
@@ -44,6 +84,23 @@ describe("bounded Crystal HTTP recipe", () => {
     ]);
     expect(getCrystalSelectionIssue({ stackParts: parts })).toContain("overlays");
     expect(getCrystalRequestedIssue({ database: "sqlite" }, parts)).toContain("database");
+  });
+
+  it("requires a database-capable backend alongside other bounded native recipes", () => {
+    const specs = [
+      "backend:crystal:kemal:api",
+      "backend:ruby:sinatra:ruby-api",
+      "backend:php:slim:php-api",
+      "database:universal:sqlite",
+    ];
+    expect(getCrystalSelectionIssue({ stackParts: parseStackPartSpecs(specs) })).toContain(
+      "database adapter",
+    );
+    expect(
+      validateStackParts(
+        parseStackPartSpecs([...specs, "backend:go:gin:data-api", "data-api.orm:go:gorm"]),
+      ).issues,
+    ).toEqual([]);
   });
 
   it("lifts and lowers Kemal without JavaScript selections", () => {

@@ -599,6 +599,8 @@
   "docsCliSummaryDotnetDotnetCaching": ".NET caching.",
   "docsCliSummaryDotnetDotnetDeploy": ".NET deploy target.",
   "docsCliSummaryDotnetDotnetLibraries": "Optional .NET libraries.",
+  "docsCliSummaryRubyRubyWebFramework": "Ruby HTTP framework.",
+  "docsCliSummaryPhpPhpWebFramework": "PHP HTTP framework.",
   "docsCliSummaryElixirElixirWebFramework": "Elixir web framework.",
   "docsCliSummaryElixirElixirOrm": "Elixir ORM / database.",
   "docsCliSummaryElixirElixirAuth": "Elixir auth.",

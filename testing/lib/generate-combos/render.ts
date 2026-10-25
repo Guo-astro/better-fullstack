@@ -99,6 +99,9 @@ export function formatNameFromFingerprint(fingerprint: TemplateFingerprint): str
         ? fingerprint.javaTestingLibraries.filter((value) => value !== "none").join("-")
         : undefined,
     ],
+    php: [
+      typeof fingerprint.phpWebFramework === "string" ? fingerprint.phpWebFramework : undefined,
+    ],
     elixir: [
       typeof fingerprint.elixirWebFramework === "string"
         ? fingerprint.elixirWebFramework
@@ -368,6 +371,12 @@ export function buildCommand(name: string, config: ProjectConfig): string {
       break;
     case "java":
       orderedFlags.push(...sharedServiceFlags, ...javaFlags);
+      break;
+    case "ruby":
+      orderedFlags.push(["ruby-web-framework", config.rubyWebFramework]);
+      break;
+    case "php":
+      orderedFlags.push(["php-web-framework", config.phpWebFramework]);
       break;
     case "elixir":
       orderedFlags.push(...elixirFlags);

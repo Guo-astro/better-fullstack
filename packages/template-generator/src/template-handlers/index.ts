@@ -45,3 +45,6 @@ export { processSearchTemplates } from "@/template-handlers/features/search";
 export { processVectorDbTemplates } from "@/template-handlers/features/vector-db";
 export { processFileStorageTemplates } from "@/template-handlers/features/file-storage";
 export { processTestingTemplates } from "@/template-handlers/features/testing";
+
+export { processRubyBaseTemplate } from "./ecosystems/ruby-base";
+export { processPhpBaseTemplate } from "./ecosystems/php-base";

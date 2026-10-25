@@ -33,6 +33,8 @@ export const DEFAULT_ECOSYSTEM_WEIGHTS: Record<Ecosystem, number> = {
   go: 2,
   crystal: 1,
   java: 2,
+  ruby: 1,
+  php: 1,
   elixir: 2,
   dotnet: 2,
 };
@@ -129,6 +131,8 @@ export const TEMPLATE_FINGERPRINT_KEYS = [
   "javaLibraries",
   "javaTestingLibraries",
   "dotnetLibraries",
+  "rubyWebFramework",
+  "phpWebFramework",
   "elixirWebFramework",
   "elixirOrm",
   "elixirAuth",

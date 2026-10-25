@@ -10,35 +10,35 @@ const en_docsclisummarycrystalcrystalwebframework6 = /** @type {(inputs: Docscli
 };
 
 const es_docsclisummarycrystalcrystalwebframework6 = /** @type {(inputs: Docsclisummarycrystalcrystalwebframework6Inputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Experimental Crystal HTTP framework.`)
+	return /** @type {LocalizedString} */ (`Framework HTTP experimental de Crystal.`)
 };
 
 const zh_docsclisummarycrystalcrystalwebframework6 = /** @type {(inputs: Docsclisummarycrystalcrystalwebframework6Inputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Experimental Crystal HTTP framework.`)
+	return /** @type {LocalizedString} */ (`实验性 Crystal HTTP 框架。`)
 };
 
 const ja_docsclisummarycrystalcrystalwebframework6 = /** @type {(inputs: Docsclisummarycrystalcrystalwebframework6Inputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Experimental Crystal HTTP framework.`)
+	return /** @type {LocalizedString} */ (`実験的な Crystal HTTP フレームワーク。`)
 };
 
 const ko_docsclisummarycrystalcrystalwebframework6 = /** @type {(inputs: Docsclisummarycrystalcrystalwebframework6Inputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Experimental Crystal HTTP framework.`)
+	return /** @type {LocalizedString} */ (`실험적 Crystal HTTP 프레임워크.`)
 };
 
 const zh_hant1_docsclisummarycrystalcrystalwebframework6 = /** @type {(inputs: Docsclisummarycrystalcrystalwebframework6Inputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Experimental Crystal HTTP framework.`)
+	return /** @type {LocalizedString} */ (`實驗性 Crystal HTTP 框架。`)
 };
 
 const de_docsclisummarycrystalcrystalwebframework6 = /** @type {(inputs: Docsclisummarycrystalcrystalwebframework6Inputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Experimental Crystal HTTP framework.`)
+	return /** @type {LocalizedString} */ (`Experimentelles Crystal-HTTP-Framework.`)
 };
 
 const fr_docsclisummarycrystalcrystalwebframework6 = /** @type {(inputs: Docsclisummarycrystalcrystalwebframework6Inputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Experimental Crystal HTTP framework.`)
+	return /** @type {LocalizedString} */ (`Framework HTTP expérimental Crystal.`)
 };
 
 const uk_docsclisummarycrystalcrystalwebframework6 = /** @type {(inputs: Docsclisummarycrystalcrystalwebframework6Inputs) => LocalizedString} */ () => {
-	return /** @type {LocalizedString} */ (`Experimental Crystal HTTP framework.`)
+	return /** @type {LocalizedString} */ (`Експериментальний HTTP-фреймворк Crystal.`)
 };
 
 /**

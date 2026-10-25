@@ -17,8 +17,8 @@ Kemal.config.shutdown_timeout = 2.seconds
 
 before_all do |env|
   env.response.content_type = "application/json"
-  if origin = ENV["CORS_ORIGIN"]?
-    if env.request.headers["Origin"]? == origin
+  if origin = env.request.headers["Origin"]?
+    if ENV.fetch("CORS_ORIGIN", "").split(",").map(&.strip).includes?(origin)
       env.response.headers["Access-Control-Allow-Origin"] = origin
       env.response.headers["Vary"] = "Origin"
     end

@@ -74,7 +74,7 @@ await writeFile(join(outputDir, "scaffold.json"), JSON.stringify(scaffold, null,
 if (!scaffold.ok)
   throw new Error(formatCliScaffoldFailure(scaffold, { header: "Crystal recipe scaffold failed" }));
 const result = await verifyCrystal("crystal-http", scaffold.projectDir);
-const lockfile = await readFile(join(scaffold.projectDir, "shard.lock"), "utf8").catch(() => null);
+const lockfile = await readFile(join(scaffold.projectDir, "shard.lock"), "utf8");
 const cliSha256 = createHash("sha256")
   .update(await readFile(cliPath))
   .digest("hex");

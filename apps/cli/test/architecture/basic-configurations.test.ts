@@ -20,6 +20,8 @@ describe("Basic Configurations", () => {
       "go",
       "java",
       "dotnet",
+      "ruby",
+      "php",
       "elixir",
       "crystal",
     ]);

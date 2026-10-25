@@ -86,7 +86,9 @@ export function getCrystalDatabaseSelectionIssue(
     (part) => part.role === "backend" && part.toolId !== "none" && part.source !== "provided",
   );
   const hasCrystal = backends.some((part) => part.ecosystem === "crystal");
-  const hasOtherBackend = backends.some((part) => part.ecosystem !== "crystal");
+  const hasOtherBackend = backends.some(
+    (part) => !["crystal", "ruby", "php"].includes(part.ecosystem),
+  );
   const hasDatabase = parts.some(
     (part) => part.role === "database" && part.toolId !== "none" && part.source !== "provided",
   );
@@ -119,7 +121,10 @@ export function getCrystalSelectionIssue(config: Partial<ProjectConfig>): string
       return `Crystal service target path is shared by another application: ${collision.targetPath}.`;
     const backendIds = new Set(backends.map((part) => part.id));
     const unsupported = parts.find(
-      (part) => part.source !== "provided" && backendIds.has(part.ownerPartId ?? ""),
+      (part) =>
+        part.source !== "provided" &&
+        part.toolId !== "none" &&
+        backendIds.has(part.ownerPartId ?? ""),
     );
     if (unsupported)
       return `Crystal Kemal does not support the owned '${unsupported.toolId}' selection.`;
@@ -134,7 +139,9 @@ export function getCrystalSelectionIssue(config: Partial<ProjectConfig>): string
         ["frontend", "backend", "mobile"].includes(part.role),
     );
     if (!hasOtherApplication) {
-      const overlay = parts.find((part) => part.source !== "provided" && !backendIds.has(part.id));
+      const overlay = parts.find(
+        (part) => part.source !== "provided" && part.toolId !== "none" && !backendIds.has(part.id),
+      );
       if (overlay)
         return `Crystal-only projects do not support '${overlay.toolId}' overlays or databases.`;
       if ((config.addons ?? []).some(selected))

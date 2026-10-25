@@ -1808,6 +1808,10 @@ function getInstallCommand(config: ProjectConfig): string {
       return config.javaBuildTool === "gradle" ? "./gradlew test" : "./mvnw test";
     case "crystal":
       return "shards install";
+    case "ruby":
+      return "bundle install";
+    case "php":
+      return "composer install --no-interaction";
     case "elixir":
       return "mix deps.get && mix compile";
     default:

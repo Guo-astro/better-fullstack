@@ -43,6 +43,8 @@ import {
   ELIXIR_REALTIME_VALUES,
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
+  RUBY_WEB_FRAMEWORK_VALUES,
+  PHP_WEB_FRAMEWORK_VALUES,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   I18N_VALUES,
   CMS_VALUES,
@@ -177,6 +179,8 @@ export type OptionCategoryEcosystem =
   | "java"
   | "dotnet"
   | "elixir"
+  | "ruby"
+  | "php"
   | "crystal";
 
 export const TYPESCRIPT_CATEGORY_ORDER = [
@@ -417,6 +421,13 @@ export const DOTNET_CATEGORY_ORDER = [
   "install",
 ] as const satisfies readonly OptionCategory[];
 
+export const PHP_CATEGORY_ORDER = [
+  "phpWebFramework",
+  "aiDocs",
+  "git",
+  "install",
+] as const satisfies readonly OptionCategory[];
+
 export const ELIXIR_CATEGORY_ORDER = [
   "elixirWebFramework",
   "elixirOrm",
@@ -444,6 +455,13 @@ export const ELIXIR_CATEGORY_ORDER = [
   "install",
 ] as const satisfies readonly OptionCategory[];
 
+export const RUBY_CATEGORY_ORDER = [
+  "rubyWebFramework",
+  "aiDocs",
+  "git",
+  "install",
+] as const satisfies readonly OptionCategory[];
+
 export const CATEGORY_ORDER = [
   ...new Set([
     ...TYPESCRIPT_CATEGORY_ORDER,
@@ -454,6 +472,8 @@ export const CATEGORY_ORDER = [
     "crystalWebFramework",
     ...JAVA_CATEGORY_ORDER,
     ...DOTNET_CATEGORY_ORDER,
+    ...RUBY_CATEGORY_ORDER,
+    ...PHP_CATEGORY_ORDER,
     ...ELIXIR_CATEGORY_ORDER,
   ]),
 ] as OptionCategory[];
@@ -476,6 +496,10 @@ export function getCategoryOrderForEcosystem(
       return JAVA_CATEGORY_ORDER;
     case "dotnet":
       return DOTNET_CATEGORY_ORDER;
+    case "ruby":
+      return RUBY_CATEGORY_ORDER;
+    case "php":
+      return PHP_CATEGORY_ORDER;
     case "elixir":
       return ELIXIR_CATEGORY_ORDER;
     case "typescript":
@@ -831,7 +855,10 @@ const CATEGORY_DEFINITIONS = {
   goProtoTooling: { values: GO_PROTO_TOOLING_VALUES, displayName: "Go Protobuf Tooling" },
   goDI: { values: GO_DI_VALUES, displayName: "Go Dependency Injection" },
   javaLanguage: { values: JAVA_LANGUAGE_VALUES, displayName: "Java Language" },
-  crystalWebFramework: { values: CRYSTAL_WEB_FRAMEWORK_VALUES, displayName: "Crystal HTTP framework" },
+  crystalWebFramework: {
+    values: CRYSTAL_WEB_FRAMEWORK_VALUES,
+    displayName: "Crystal HTTP framework",
+  },
   javaWebFramework: { values: JAVA_WEB_FRAMEWORK_VALUES, displayName: "Java Web Framework" },
   javaBuildTool: { values: JAVA_BUILD_TOOL_VALUES, displayName: "Java Build Tool" },
   javaOrm: { values: JAVA_ORM_VALUES, displayName: "Java ORM / Database" },
@@ -872,6 +899,8 @@ const CATEGORY_DEFINITIONS = {
     selectionMode: "multiple",
     displayName: ".NET Libraries",
   },
+  rubyWebFramework: { values: RUBY_WEB_FRAMEWORK_VALUES, displayName: "Ruby web framework" },
+  phpWebFramework: { values: PHP_WEB_FRAMEWORK_VALUES, displayName: "PHP web framework" },
   elixirWebFramework: { values: ELIXIR_WEB_FRAMEWORK_VALUES, displayName: "Elixir Web Framework" },
   elixirOrm: { values: ELIXIR_ORM_VALUES, displayName: "Elixir ORM / Database" },
   elixirAuth: { values: ELIXIR_AUTH_VALUES, displayName: "Elixir Auth" },
@@ -1196,6 +1225,7 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
     electron: "Electron",
     capacitor: "Capacitor",
     wxt: "WXT",
+    plasmo: "Plasmo",
     opentui: "OpenTUI",
   },
   appPlatforms: {
@@ -1782,6 +1812,8 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
     refit: "Refit",
     "fluent-email": "FluentEmail",
   },
+  rubyWebFramework: { sinatra: "Sinatra" },
+  phpWebFramework: { slim: "Slim" },
   elixirWebFramework: {
     phoenix: "Phoenix",
     "phoenix-live-view": "Phoenix LiveView",

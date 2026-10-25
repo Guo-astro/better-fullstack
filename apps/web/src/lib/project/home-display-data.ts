@@ -38,6 +38,7 @@ export const HOME_FEATURE_OPTIONS = {
     "goWebFramework",
     "crystalWebFramework",
     "javaWebFramework",
+    "rubyWebFramework",
     "elixirWebFramework",
     "dotnetWebFramework",
   ]),

@@ -21,7 +21,7 @@ Commit `shard.lock` after the first successful install. It pins transitive shard
 {{#if hasKemal}}
 `GET /health` returns `{"status":"ok"}`. `GET /api/hello?name=Crystal` and `POST /api/echo` with `{"name":"Crystal"}` return `{"message":"Hello, Crystal!"}`. Blank or more than 80 characters returns 422; malformed JSON returns 400; request bodies larger than 4096 bytes return 413. Unknown routes use Kemal's default 404 behavior.
 
-`PORT` accepts canonical decimal integers from 1 through 65535; invalid values exit 2 before binding. `HOST` defaults to loopback. `KEMAL_ENV` defaults to production. Configure `CORS_ORIGIN` to allow that exact origin for GET requests. Cross-origin POST/preflight and browser credentials are outside this recipe. Environment values are read from the process; `.env.example` is documentation and is not loaded automatically.
+`PORT` accepts canonical decimal integers from 1 through 65535; invalid values exit 2 before binding. `HOST` defaults to loopback. `KEMAL_ENV` defaults to production. Configure `CORS_ORIGIN` with a comma-separated list of exact frontend origins for GET requests. Cross-origin POST/preflight and browser credentials are outside this recipe. Environment values are read from the process; `.env.example` is documentation and is not loaded automatically.
 
 The proof chooses a free loopback port, starts the compiled server, parses real HTTP JSON, rejects invalid input, sends SIGTERM, waits at most five seconds, and checks the port can be rebound. Cleanup kills only its child process on failure. Port selection has a small close/bind race. The proof uses POSIX signals and targets macOS/Linux. Kemal drains active requests for at most two seconds; long-lived request draining has not been qualified.
 {{/if}}

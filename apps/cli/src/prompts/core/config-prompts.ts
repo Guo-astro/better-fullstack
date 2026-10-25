@@ -1,5 +1,8 @@
-import { getCrystalWebFrameworkChoice } from "@/prompts/ecosystems/crystal-ecosystem";
-import { CRYSTAL_PROJECT_DEFAULTS, getCrystalSelectionIssue } from "@better-fullstack/types";
+import {
+  CRYSTAL_PROJECT_DEFAULTS,
+  getCrystalSelectionIssue,
+  getPhpRecipeIssue,
+} from "@better-fullstack/types";
 import { log } from "@clack/prompts";
 
 import type {
@@ -47,6 +50,8 @@ import type {
   ElixirRealtime,
   ElixirTesting,
   ElixirValidation,
+  RubyWebFramework,
+  PhpWebFramework,
   ElixirWebFramework,
   I18n,
   Database,
@@ -204,6 +209,7 @@ import { getShadcnOptions, type ShadcnOptions } from "@/prompts/developer/shadcn
 import { getTestingChoice } from "@/prompts/developer/testing";
 import { getUILibraryChoice } from "@/prompts/developer/ui-library";
 import { getValidationChoice } from "@/prompts/developer/validation";
+import { getCrystalWebFrameworkChoice } from "@/prompts/ecosystems/crystal-ecosystem";
 import {
   getDotnetApiChoice,
   getDotnetAuthChoice,
@@ -277,6 +283,7 @@ import {
   gatherMultiEcosystemConfig,
   getCompositionModeChoice,
 } from "@/prompts/ecosystems/multi-ecosystem-composer";
+import { getPhpWebFrameworkChoice } from "@/prompts/ecosystems/php-ecosystem";
 import {
   getPythonAiChoice,
   getPythonApiChoice,
@@ -301,6 +308,7 @@ import {
   getPythonValidationChoice,
   getPythonWebFrameworkChoice,
 } from "@/prompts/ecosystems/python-ecosystem";
+import { getRubyWebFrameworkChoice } from "@/prompts/ecosystems/ruby-ecosystem";
 import {
   getRustApiChoice,
   getRustCliChoice,
@@ -484,6 +492,8 @@ type PromptGroupResults = {
   dotnetDeploy: DotnetDeploy;
   dotnetLibraries: DotnetLibraries[];
   // Elixir ecosystem
+  rubyWebFramework: RubyWebFramework;
+  phpWebFramework: PhpWebFramework;
   elixirWebFramework: ElixirWebFramework;
   elixirOrm: ElixirOrm;
   elixirAuth: ElixirAuth;
@@ -666,6 +676,8 @@ const CONFIG_PROMPT_ENTRY_KEY_MAP = {
   dotnetCaching: true,
   dotnetDeploy: true,
   dotnetLibraries: true,
+  rubyWebFramework: true,
+  phpWebFramework: true,
   elixirWebFramework: true,
   elixirOrm: true,
   elixirAuth: true,
@@ -706,7 +718,17 @@ export function hasStackPromptFlags(flags: Partial<ProjectConfig>) {
   });
 }
 
-const SERVER_ECOSYSTEMS = new Set<Ecosystem>(["rust", "python", "go", "java", "dotnet", "elixir", "crystal"]);
+const SERVER_ECOSYSTEMS = new Set<Ecosystem>([
+  "rust",
+  "python",
+  "go",
+  "java",
+  "dotnet",
+  "elixir",
+  "php",
+  "ruby",
+  "crystal",
+]);
 
 export function resolveDatabaseFlagForEcosystem(
   ecosystem: Ecosystem | undefined,
@@ -887,6 +909,32 @@ function scopedPrompt<K extends PromptGroupKey>(
   }) => Promise<PromptGroupResults[K] | symbol | undefined> | undefined,
 ) {
   return (opts: { results: Partial<PromptGroupResults> }) => {
+    if (key === "rubyWebFramework" && opts.results.ecosystem !== "ruby")
+      return Promise.resolve("none" as PromptGroupResults[K]);
+    if (
+      opts.results.ecosystem === "ruby" &&
+      !CONFIG_SCOPE_META_KEYS.has(key) &&
+      ![
+        "rubyWebFramework",
+        "aiDocs",
+        "git",
+        "install",
+        "packageManager",
+        "workspaceShape",
+      ].includes(key)
+    ) {
+      const supplied = flags[key as keyof ProjectConfig];
+      const value =
+        supplied ??
+        (key === "javaLanguage"
+          ? "java"
+          : key === "shadcnOptions" || key === "astroIntegration"
+            ? undefined
+            : Array.isArray(getDefaultPromptValue(key as ConfigPromptKey))
+              ? []
+              : "none");
+      return Promise.resolve(value as PromptGroupResults[K]);
+    }
     if (
       !CONFIG_SCOPE_META_KEYS.has(key) &&
       !shouldAskConfigPromptKey(
@@ -910,6 +958,8 @@ export async function gatherConfig(
   relativePath: string,
   shape?: ProjectShape,
 ) {
+  const phpIssue = getPhpRecipeIssue(inputFlags);
+  if (phpIssue) return exitWithError(phpIssue);
   const shapeResolution = shape
     ? await resolveProjectShape(shape, inputFlags, projectName, projectDir, relativePath)
     : undefined;
@@ -931,9 +981,14 @@ export async function gatherConfig(
     ecosystem: async () => {
       const ecosystem = await getEcosystemChoice(flags.ecosystem, flags.auth);
       if (ecosystem === "crystal") {
-        const issue = getCrystalSelectionIssue({ ...CRYSTAL_PROJECT_DEFAULTS, ...flags, ecosystem });
+        const issue = getCrystalSelectionIssue({
+          ...CRYSTAL_PROJECT_DEFAULTS,
+          ...flags,
+          ecosystem,
+        });
         if (issue) throw new Error(issue);
-        const { crystalWebFramework: _frameworkDefault, ...nativeDefaults } = CRYSTAL_PROJECT_DEFAULTS;
+        const { crystalWebFramework: _frameworkDefault, ...nativeDefaults } =
+          CRYSTAL_PROJECT_DEFAULTS;
         Object.assign(flags, { ...nativeDefaults, ...flags });
       }
       return ecosystem;
@@ -1642,7 +1697,10 @@ export async function gatherConfig(
       return getGoDIChoice(flags.goDI);
     },
     // Java ecosystem prompts (skip if not Java)
-    crystalWebFramework: ({ results }) => results.ecosystem === "crystal" ? getCrystalWebFrameworkChoice(flags.crystalWebFramework) : Promise.resolve("none" as const),
+    crystalWebFramework: ({ results }) =>
+      results.ecosystem === "crystal"
+        ? getCrystalWebFrameworkChoice(flags.crystalWebFramework)
+        : Promise.resolve("none" as const),
     javaWebFramework: ({ results }) => {
       if (results.ecosystem !== "java") return Promise.resolve("none" as JavaWebFramework);
       return getJavaWebFrameworkChoice(flags.javaWebFramework);
@@ -1794,6 +1852,14 @@ export async function gatherConfig(
       return getDotnetLibrariesChoice(flags.dotnetLibraries);
     },
     // Elixir ecosystem prompts (skip if not Elixir)
+    rubyWebFramework: ({ results }) =>
+      results.ecosystem === "ruby"
+        ? getRubyWebFrameworkChoice(flags.rubyWebFramework)
+        : Promise.resolve("none" as const),
+    phpWebFramework: ({ results }) =>
+      results.ecosystem === "php"
+        ? getPhpWebFrameworkChoice(flags.phpWebFramework)
+        : Promise.resolve("none" as const),
     elixirWebFramework: ({ results }) => {
       if (results.ecosystem !== "elixir") return Promise.resolve("none" as ElixirWebFramework);
       return getElixirWebFrameworkChoice(flags.elixirWebFramework);
@@ -1893,7 +1959,9 @@ export async function gatherConfig(
         results.ecosystem === "go" ||
         results.ecosystem === "java" ||
         results.ecosystem === "dotnet" ||
+        results.ecosystem === "ruby" ||
         results.ecosystem === "elixir" ||
+        results.ecosystem === "php" ||
         results.ecosystem === "crystal"
       )
         return Promise.resolve(flags.packageManager ?? getUserPkgManager());
@@ -2058,6 +2126,8 @@ export async function gatherConfig(
     dotnetDeploy: result.dotnetDeploy,
     dotnetLibraries: result.dotnetLibraries,
     // Elixir ecosystem options
+    rubyWebFramework: result.rubyWebFramework,
+    phpWebFramework: result.phpWebFramework,
     elixirWebFramework: result.elixirWebFramework,
     elixirOrm: result.elixirOrm,
     elixirAuth: result.elixirAuth,

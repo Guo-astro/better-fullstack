@@ -315,6 +315,14 @@ export const SECTIONS_BY_ECOSYSTEM: Record<Ecosystem, readonly BuilderSectionDef
   crystal: [section("frameworkBuild", "Framework & Build", ["crystalWebFramework"]), section("deployScaffold", "Deploy & Scaffold", ["aiDocs", "git", "install"])],
   java: JAVA_SECTIONS,
   dotnet: DOTNET_SECTIONS,
+  ruby: [
+    section("frameworkBuild", "Framework & Build", ["rubyWebFramework"]),
+    section("deployScaffold", "Deploy & Scaffold", ["aiDocs", "git", "install"]),
+  ],
+  php: [
+    section("backend", "PHP HTTP application", ["phpWebFramework"]),
+    section("deployScaffold", "Scaffold", ["aiDocs", "git", "install"]),
+  ],
   elixir: ELIXIR_SECTIONS,
 };
 

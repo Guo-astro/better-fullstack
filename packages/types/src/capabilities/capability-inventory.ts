@@ -538,6 +538,8 @@ export function getCapabilityInventory(
     "go",
     "java",
     "dotnet",
+    "ruby",
+    "php",
     "elixir",
     "crystal",
   ] as const) {
@@ -591,7 +593,7 @@ export function getCapabilityInventory(
           ? quarantineEntry.visibility === "hidden"
             ? "quarantined"
             : "experimental"
-          : ecosystem === "crystal"
+          : ecosystem === "crystal" || ecosystem === "ruby"
             ? "experimental"
             : recipeIds.length > 0 || CONTROL_CATEGORIES.has(category)
               ? "stable"

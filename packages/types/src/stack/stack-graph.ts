@@ -7,6 +7,10 @@ import type {
   StackPartSource,
 } from "@/config/types";
 
+import {
+  getBrowserExtensionRecipeIssue,
+  isBrowserExtension,
+} from "@/capabilities/browser-extensions";
 import { getAuthIncompatibility } from "@/capabilities/capabilities";
 import {
   getCodeQualitySelectionIssue,
@@ -60,6 +64,8 @@ import {
   ELIXIR_REALTIME_VALUES,
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
+  RUBY_WEB_FRAMEWORK_VALUES,
+  PHP_WEB_FRAMEWORK_VALUES,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   EFFECT_VALUES,
   EMAIL_VALUES,
@@ -184,6 +190,11 @@ import {
   getCrystalSelectionIssue,
   getCrystalDatabaseSelectionIssue,
 } from "@/platform/crystal-project";
+import { PHP_RECIPE_REASONS } from "@/stack/php-compatibility";
+import {
+  getRubyDatabaseSelectionIssue,
+  RUBY_RECIPE_EXTENSION_REASON,
+} from "@/stack/ruby-compatibility";
 import {
   getDatabaseOrmIncompatibility,
   getDatabaseOrmRequirementIssue,
@@ -339,6 +350,8 @@ const LEGACY_BACKEND_CATEGORY_BY_ECOSYSTEM = {
   crystal: "crystalWebFramework",
   java: "javaWebFramework",
   dotnet: "dotnetWebFramework",
+  ruby: "rubyWebFramework",
+  php: "phpWebFramework",
   elixir: "elixirWebFramework",
 } as const satisfies Record<LegacyBackendEcosystem, keyof ProjectConfig>;
 
@@ -373,6 +386,8 @@ const LEGACY_CAPABILITY_CATEGORIES_BY_ECOSYSTEM = {
     observability: "observability",
   },
   dotnet: { orm: "dotnetOrm", api: "dotnetApi", auth: "dotnetAuth" },
+  ruby: {},
+  php: {},
   elixir: { orm: "elixirOrm", api: "elixirApi", auth: "elixirAuth" },
 } as const satisfies Record<
   LegacyBackendEcosystem,
@@ -456,6 +471,8 @@ const LEGACY_BACKEND_ARRAY_CATEGORIES_BY_ECOSYSTEM = {
     observability: "dotnetObservability",
     libraries: "dotnetLibraries",
   },
+  ruby: {},
+  php: {},
   elixir: { libraries: "elixirLibraries" },
 } as const satisfies Record<
   LegacyBackendEcosystem,
@@ -491,7 +508,7 @@ function getHistoricalAddonRole(toolId: string): StackPartRole | undefined {
     return "codeQuality";
   }
   if (["starlight", "fumadocs"].includes(toolId)) return "documentation";
-  if (["pwa", "tauri", "electron", "capacitor", "wxt", "opentui"].includes(toolId)) {
+  if (["pwa", "tauri", "electron", "capacitor", "wxt", "plasmo", "opentui"].includes(toolId)) {
     return "appPlatform";
   }
   if (
@@ -781,6 +798,8 @@ const LEGACY_EXTRA_CATEGORIES_BY_ECOSYSTEM = {
     deploy: "dotnetDeploy",
     validation: "dotnetValidation",
   },
+  ruby: {},
+  php: {},
   elixir: {
     realtime: "elixirRealtime",
     jobQueue: "elixirJobs",
@@ -822,6 +841,8 @@ const LEGACY_SHARED_BACKEND_SINGLE_CATEGORIES_BY_ECOSYSTEM = {
     search: "search",
   },
   dotnet: {},
+  ruby: {},
+  php: {},
   elixir: {},
 } as const satisfies Record<
   LegacyBackendEcosystem,
@@ -1213,6 +1234,29 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ...defineTools(DOTNET_LIBRARIES_VALUES, "libraries", "dotnet", "dotnetLibraries", {
     allowMultiple: true,
   }),
+  ...defineTools(RUBY_WEB_FRAMEWORK_VALUES, "backend", "ruby", "rubyWebFramework"),
+  ...defineTools(PHP_WEB_FRAMEWORK_VALUES, "backend", "php", "phpWebFramework").map(
+    (definition) => ({
+      ...definition,
+      provides: [
+        { role: "api", toolId: "rest", overrideable: false },
+        { role: "testing", toolId: "phpunit", overrideable: false },
+        { role: "packageManager", toolId: "composer", overrideable: false },
+      ] satisfies ProvidedCapabilityDefinition[],
+    }),
+  ),
+  ...defineTools(["rest"], "api", "php").map((definition) => ({
+    ...definition,
+    selectable: false,
+  })),
+  ...defineTools(["phpunit"], "testing", "php").map((definition) => ({
+    ...definition,
+    selectable: false,
+  })),
+  ...defineTools(["composer"], "packageManager", "php").map((definition) => ({
+    ...definition,
+    selectable: false,
+  })),
   ...defineTools(ELIXIR_WEB_FRAMEWORK_VALUES, "backend", "elixir", "elixirWebFramework"),
   ...defineTools(ELIXIR_ORM_VALUES, "orm", "elixir", "elixirOrm"),
   ...defineTools(ELIXIR_AUTH_VALUES, "auth", "elixir", "elixirAuth"),
@@ -3033,6 +3077,62 @@ function getStackPartCompatibilityIssue(
       });
   }
   if (
+    (part.role === "database" || (part.role === "backend" && part.ecosystem === "ruby")) &&
+    getRubyDatabaseSelectionIssue([...(context.parts ?? []), part])
+  ) {
+    return createStackGraphIssue({
+      code: "INCOMPATIBLE_GRAPH_SELECTION",
+      partId: part.id,
+      role: part.role,
+      toolId: part.toolId,
+      message: RUBY_RECIPE_EXTENSION_REASON,
+    });
+  }
+  if (
+    part.source !== "provided" &&
+    getToolingCapability(part.toolId) &&
+    context.parts?.some(
+      (candidate) => candidate.role === "backend" && candidate.ecosystem === "ruby",
+    ) &&
+    !hasJavaScriptWorkspaceRoot(context.parts)
+  ) {
+    return createStackGraphIssue({
+      code: "INCOMPATIBLE_GRAPH_SELECTION",
+      partId: part.id,
+      role: part.role,
+      toolId: part.toolId,
+      message: RUBY_RECIPE_EXTENSION_REASON,
+    });
+  }
+  if (context.ownerEcosystem === "ruby" && part.source !== "provided" && part.toolId !== "none") {
+    return createStackGraphIssue({
+      code: "UNSUPPORTED_ROLE_BINDING",
+      partId: part.id,
+      role: part.role,
+      toolId: part.toolId,
+      message: RUBY_RECIPE_EXTENSION_REASON,
+    });
+  }
+
+  if (part.role === "appPlatform" && isBrowserExtension(part.toolId)) {
+    const hasPrimarySelection = context.parts?.some(
+      (candidate) => candidate.source !== "provided" && PRIMARY_ROLES.has(candidate.role),
+    );
+    const message =
+      getBrowserExtensionRecipeIssue({ stackParts: context.parts }) ??
+      (hasPrimarySelection && !hasJavaScriptWorkspaceRoot(context.parts)
+        ? "Browser extensions require a generated JavaScript application workspace."
+        : null);
+    if (message)
+      return createStackGraphIssue({
+        code: "INCOMPATIBLE_GRAPH_SELECTION",
+        partId: part.id,
+        role: part.role,
+        toolId: part.toolId,
+        message,
+      });
+  }
+  if (
     context.ownerEcosystem &&
     part.ecosystem !== context.ownerEcosystem &&
     !allowsCrossEcosystemOwner(part, context)
@@ -3043,6 +3143,52 @@ function getStackPartCompatibilityIssue(
       role: part.role,
       toolId: part.toolId,
       message: `'${part.toolId}' uses the ${part.ecosystem} adapter but its owner uses ${context.ownerEcosystem}.`,
+    });
+  }
+
+  if (context.ownerEcosystem === "php" && part.source !== "provided") {
+    return createStackGraphIssue({
+      code: "INCOMPATIBLE_GRAPH_SELECTION",
+      partId: part.id,
+      role: part.role,
+      toolId: part.toolId,
+      message:
+        part.role === "database" || part.role === "orm"
+          ? PHP_RECIPE_REASONS.database
+          : PHP_RECIPE_REASONS.capability,
+    });
+  }
+  if (part.ecosystem === "php" && context.ownerRole && context.ownerRole !== "backend") {
+    return createStackGraphIssue({
+      code: "INCOMPATIBLE_OWNER_ROLE",
+      partId: part.id,
+      role: part.role,
+      toolId: part.toolId,
+      message: PHP_RECIPE_REASONS.owner,
+    });
+  }
+  if (
+    ((part.ecosystem === "php" &&
+      part.role === "backend" &&
+      context.primaryToolIdsByRole?.database) ||
+      (part.role === "database" &&
+        part.toolId !== "none" &&
+        context.primaryToolIdsByRole?.backend &&
+        context.primaryEcosystemsByRole?.backend === "php")) &&
+    !context.parts?.some(
+      (candidate) =>
+        candidate.role === "backend" &&
+        !candidate.ownerPartId &&
+        candidate.source !== "provided" &&
+        !["php", "ruby", "crystal"].includes(candidate.ecosystem),
+    )
+  ) {
+    return createStackGraphIssue({
+      code: "INCOMPATIBLE_GRAPH_SELECTION",
+      partId: part.id,
+      role: part.role,
+      toolId: part.toolId,
+      message: PHP_RECIPE_REASONS.database,
     });
   }
 
@@ -3462,8 +3608,7 @@ function allocatePrimaryPartTargetPaths(parts: readonly PrimaryPartPathInput[]) 
         return targetPath ? [targetPath] : [];
       }),
   );
-  for (const part of parts)
-    if (part.targetPath) usedTargetPaths.add(part.targetPath);
+  for (const part of parts) if (part.targetPath) usedTargetPaths.add(part.targetPath);
   return parts.map((part) => {
     let targetPath = part.targetPath;
     if (
@@ -3485,6 +3630,24 @@ function allocatePrimaryPartTargetPaths(parts: readonly PrimaryPartPathInput[]) 
   });
 }
 
+function normalizeStackPartTargetPath(targetPath: string): string {
+  const segments = targetPath.split("/").filter(Boolean);
+  if (
+    targetPath.startsWith("/") ||
+    /^[a-zA-Z]:/.test(targetPath) ||
+    segments.length === 0 ||
+    segments.some(
+      (segment) =>
+        segment === "." ||
+        segment === ".." ||
+        !/^[a-zA-Z0-9._@:%][a-zA-Z0-9._ @:%-]*$/.test(segment),
+    )
+  ) {
+    throw new Error("Use a relative path without traversal or shell syntax.");
+  }
+  return segments.join("/");
+}
+
 export function parseStackPartSpecs(
   specs: readonly string[],
   source: StackPartSource = "selected",
@@ -3492,19 +3655,17 @@ export function parseStackPartSpecs(
   const unresolved = specs.map((spec) => {
     const pathSeparator = spec.lastIndexOf("@");
     const binding = pathSeparator < 0 ? spec : spec.slice(0, pathSeparator);
-    const targetPath =
-      pathSeparator < 0 ? undefined : decodeURIComponent(spec.slice(pathSeparator + 1));
-    if (
-      targetPath !== undefined &&
-      (!targetPath ||
-        targetPath.startsWith("/") ||
-        /^[a-zA-Z]:/.test(targetPath) ||
-        targetPath.includes("\\") ||
-        targetPath.split("/").some((segment) => segment === ".." || segment === "."))
-    ) {
-      throw new Error(
-        `Invalid --part target path in '${spec}'. Use a relative path without traversal.`,
-      );
+    let targetPath: string | undefined;
+    if (pathSeparator >= 0) {
+      try {
+        targetPath = normalizeStackPartTargetPath(
+          decodeURIComponent(spec.slice(pathSeparator + 1)),
+        );
+      } catch {
+        throw new Error(
+          `Invalid --part target path in '${spec}'. Use a relative path without traversal or shell syntax.`,
+        );
+      }
     }
     const [rolePath, ecosystem, toolId, customId] = binding.split(":");
     if (!rolePath || !ecosystem || !toolId || binding.split(":").length > 4) {
@@ -4455,8 +4616,49 @@ export function validateStackParts(parts: readonly StackPart[]): StackGraphValid
   const seenPartIds = new Set<string>();
 
   const selectedPrimaryParts = parts.filter(
-    (part) => !part.ownerPartId && part.source !== "provided" && PRIMARY_ROLES.has(part.role),
+    (part) =>
+      !part.ownerPartId &&
+      part.source !== "provided" &&
+      part.toolId !== "none" &&
+      PRIMARY_ROLES.has(part.role),
   );
+  const targetPaths: { part: StackPart; targetPath: string }[] = [];
+  for (const part of selectedPrimaryParts) {
+    const requestedPath = part.targetPath ?? getRoleTargetPath(part.role);
+    if (!requestedPath) continue;
+    let targetPath: string;
+    try {
+      targetPath = normalizeStackPartTargetPath(requestedPath);
+    } catch {
+      issues.push(
+        createStackGraphIssue({
+          code: "INVALID_TARGET_PATH",
+          role: part.role,
+          toolId: part.toolId,
+          partId: part.id,
+          message: `Invalid target path for '${part.id}'. Use a relative path without traversal or shell syntax.`,
+        }),
+      );
+      continue;
+    }
+    const collision = targetPaths.find(
+      (entry) =>
+        entry.targetPath === targetPath ||
+        entry.targetPath.startsWith(`${targetPath}/`) ||
+        targetPath.startsWith(`${entry.targetPath}/`),
+    );
+    if (collision)
+      issues.push(
+        createStackGraphIssue({
+          code: "OVERLAPPING_TARGET_PATH",
+          role: part.role,
+          toolId: part.toolId,
+          partId: part.id,
+          message: `Application target paths overlap: '${collision.part.id}' at '${collision.targetPath}' and '${part.id}' at '${targetPath}'.`,
+        }),
+      );
+    targetPaths.push({ part, targetPath });
+  }
   const unsupportedRepeatedPrimaryGroups = [
     {
       label: "TypeScript web frontend",
@@ -4495,7 +4697,7 @@ export function validateStackParts(parts: readonly StackPart[]): StackGraphValid
         partId: part.id,
         role: part.role,
         toolId: part.toolId,
-        message: `Only one ${group.label} is currently supported. Named repeated backend services are supported for Rust, Python, Go, Java/Kotlin, .NET, and Elixir.`,
+        message: `Only one ${group.label} is currently supported. Named repeated backend services are supported for Rust, Python, Go, Java/Kotlin, .NET, Elixir, PHP, and Ruby.`,
       });
     }
   }

@@ -782,6 +782,25 @@ export async function verifyJava(
   return wrapResult("java", comboName, projectDir, steps);
 }
 
+export async function verifyPhp(comboName: string, projectDir: string): Promise<VerifyResult> {
+  const steps: StepResult[] = [];
+  if (!existsSync(join(projectDir, "composer.json"))) {
+    return wrapResult("php", comboName, projectDir, [
+      templateFailure("structure", "Expected Composer manifest"),
+    ]);
+  }
+  for (const [stage, args] of [
+    ["install", ["install", "--no-interaction"]],
+    ["build", ["run", "build"]],
+    ["test", ["test"]],
+    ["http", ["run", "proof:http"]],
+  ] as const) {
+    steps.push(await runStep(stage, "composer", [...args], projectDir));
+    if (!steps.at(-1)!.success) break;
+  }
+  return wrapResult("php", comboName, projectDir, steps);
+}
+
 export async function verifyElixir(
   comboName: string,
   projectDir: string,
@@ -844,7 +863,9 @@ export async function verifyDotnet(comboName: string, projectDir: string): Promi
 export async function verifyCrystal(comboName: string, projectDir: string): Promise<VerifyResult> {
   const steps: StepResult[] = [];
   if (!existsSync(join(projectDir, "shard.yml"))) {
-    return wrapResult("crystal", comboName, projectDir, [templateFailure("structure", "Expected Crystal shard.yml")]);
+    return wrapResult("crystal", comboName, projectDir, [
+      templateFailure("structure", "Expected Crystal shard.yml"),
+    ]);
   }
   for (const [step, command, args] of [
     ["install", "shards", ["install"]],
@@ -855,9 +876,25 @@ export async function verifyCrystal(comboName: string, projectDir: string): Prom
     if (!steps.at(-1)!.success) return wrapResult("crystal", comboName, projectDir, steps);
   }
   if (existsSync(join(projectDir, "scripts/http_proof.cr"))) {
-    steps.push(await runStep("http-proof", "crystal", ["run", "scripts/http_proof.cr"], projectDir));
+    steps.push(
+      await runStep("http-proof", "crystal", ["run", "scripts/http_proof.cr"], projectDir),
+    );
   }
   return wrapResult("crystal", comboName, projectDir, steps);
+}
+
+export async function verifyRuby(comboName: string, projectDir: string): Promise<VerifyResult> {
+  const steps: StepResult[] = [];
+  for (const [step, args] of [
+    ["install", ["install"]],
+    ["build", ["exec", "rake", "build"]],
+    ["test", ["exec", "rake", "test"]],
+    ["runtime", ["exec", "ruby", "bin/proof"]],
+  ] as const) {
+    steps.push(await runStep(step, "bundle", [...args], projectDir));
+    if (!steps.at(-1)?.success) break;
+  }
+  return wrapResult("ruby", comboName, projectDir, steps);
 }
 
 export function getVerifier(
@@ -878,6 +915,10 @@ export function getVerifier(
       return verifyCrystal;
     case "java":
       return verifyJava;
+    case "ruby":
+      return verifyRuby;
+    case "php":
+      return verifyPhp;
     case "elixir":
       return verifyElixir;
     case "dotnet":

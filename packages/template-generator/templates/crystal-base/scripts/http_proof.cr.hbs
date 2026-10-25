@@ -25,7 +25,7 @@ when timeout(5.seconds)
 end
 raise "invalid PORT diagnostic missing" unless invalid_output.to_s.includes?("PORT must be an integer")
 
-process = Process.new("./bin/server", env: {"HOST" => "127.0.0.1", "PORT" => port.to_s, "KEMAL_ENV" => "production", "CORS_ORIGIN" => "http://localhost:5173"}, output: Process::Redirect::Inherit, error: Process::Redirect::Inherit)
+process = Process.new("./bin/server", env: {"HOST" => "127.0.0.1", "PORT" => port.to_s, "KEMAL_ENV" => "production", "CORS_ORIGIN" => "http://localhost:5173,http://localhost:8080"}, output: Process::Redirect::Inherit, error: Process::Redirect::Inherit)
 exited = Channel(Process::Status).new(1)
 spawn { exited.send(process.wait) }
 finished = false
@@ -49,6 +49,12 @@ begin
   raise "valid greeting failed" unless valid.status_code == 200 && JSON.parse(valid.body)["message"].as_s == "Hello, Crystal!"
   raise "CORS origin failed" unless valid.headers["Access-Control-Allow-Origin"]? == "http://localhost:5173"
   raise "content type failed" unless valid.headers["Content-Type"].starts_with?("application/json")
+  second_origin = client.get("/health", HTTP::Headers{"Origin" => "http://localhost:8080"})
+  raise "second CORS origin failed" unless second_origin.headers["Access-Control-Allow-Origin"]? == "http://localhost:8080"
+  ["http://localhost:9999", "http://localhost:51730"].each do |origin|
+    rejected = client.get("/health", HTTP::Headers{"Origin" => origin})
+    raise "untrusted CORS origin accepted" unless rejected.headers["Access-Control-Allow-Origin"]?.nil?
+  end
 
   invalid_name = client.get("/api/hello?name=%20%20")
   raise "invalid name accepted" unless invalid_name.status_code == 422 && JSON.parse(invalid_name.body)["error"].as_s.includes?("name")
@@ -78,7 +84,7 @@ begin
   rescue ex : Socket::Error
     raise "listener remained open: #{ex.message}"
   end
-  puts ({proof: "crystal-kemal-http-v1", success: true, assertions: ["invalid-port", "health-json", "hello-json", "cors", "content-type", "blank-name-422", "post-json", "malformed-json-400", "wrong-type-422", "body-limit-413", "sigterm-exit", "port-released"]}).to_json
+  puts ({proof: "crystal-kemal-http-v1", success: true, assertions: ["invalid-port", "health-json", "hello-json", "cors", "cors-allowlist", "content-type", "blank-name-422", "post-json", "malformed-json-400", "wrong-type-422", "body-limit-413", "sigterm-exit", "port-released"]}).to_json
 ensure
   unless finished
     if process.exists?

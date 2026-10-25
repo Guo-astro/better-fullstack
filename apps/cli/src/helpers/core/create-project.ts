@@ -12,12 +12,14 @@ import { commitInitialScaffold, initializeGit } from "@/helpers/core/git";
 import {
   installDependencies,
   runCargoBuild,
+  runBundleInstall,
   runDotnetRestore,
   runGradleTests,
   runMavenTests,
   runPythonInstall,
   runGoModTidy,
   runShardsInstall,
+  runComposerInstall,
   runMixCompile,
   type SetupStepResult,
 } from "@/helpers/core/install-dependencies";
@@ -34,6 +36,7 @@ import { ProjectCreationError, type CreationStage } from "@/telemetry/creation-f
 import { getStandaloneBackendEcosystem, isToolingOverlayOnly, type ProjectConfig } from "@/types";
 
 export interface CreateProjectOptions {
+  clearExistingDirectory?: boolean;
   manualDb?: boolean;
   yolo?: boolean;
   allowExistingDirectory?: boolean;
@@ -85,6 +88,7 @@ export async function createProject(options: ProjectConfig, cliInput: CreateProj
     }
 
     failureStage = "file_write";
+    if (cliInput.clearExistingDirectory) await fs.emptyDir(projectDir);
     await writeTreeToFilesystem(result.tree, projectDir);
     failureStage = "project_configuration";
     if (await fs.pathExists(path.join(projectDir, "package.json"))) {
@@ -208,6 +212,16 @@ export async function createProject(options: ProjectConfig, cliInput: CreateProj
 
     if (options.install && !usesGraph && installEcosystem === "crystal") {
       const result = await runShardsInstall({ projectDir });
+      if (!result.success) setupFailures.push(result);
+    }
+
+    if (options.install && !usesGraph && installEcosystem === "ruby") {
+      const result = await runBundleInstall({ projectDir });
+      if (!result.success) setupFailures.push(result);
+    }
+
+    if (options.install && !usesGraph && installEcosystem === "php") {
+      const result = await runComposerInstall({ projectDir });
       if (!result.success) setupFailures.push(result);
     }
 

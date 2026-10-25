@@ -77,7 +77,7 @@ export const createProjectOperation = defineOperation({
         createProject(config, { allowExistingDirectory: false }),
       );
       failureStage = "post_installation";
-      const installCmd = getInstallCommand(
+      let installCmd = getInstallCommand(
         config.ecosystem,
         projectName,
         config.packageManager,
@@ -86,6 +86,13 @@ export const createProjectOperation = defineOperation({
         config.pythonPackageManager,
         config.crystalWebFramework,
       );
+      if (input.part?.length) {
+        const { getGraphProjectTasks } = await import("@better-fullstack/template-generator");
+        const setup = getGraphProjectTasks(config).flatMap((task) =>
+          task.setup ? [`(${task.setup})`] : [],
+        );
+        if (setup.length > 0) installCmd = `cd ${projectName} && ${setup.join(" && ")}`;
+      }
       await trackProjectCreation(config, false, {
         source: "mcp",
         success: true,

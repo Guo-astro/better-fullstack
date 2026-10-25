@@ -18,6 +18,7 @@ const PR_CORE_PRESET_NAMES = [
 ];
 
 const PR_BROAD_PRESET_NAMES = [
+  "preset-ruby-sinatra",
   "preset-nextjs-minimal",
   "preset-next-payload",
   "preset-sveltekit",

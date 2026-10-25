@@ -71,6 +71,18 @@ describe("capability inventory", () => {
     ).toBe(true);
   });
 
+  it("keeps the unexecuted PHP recipe experimental", () => {
+    const php = getCapabilityInventory().find(
+      (record) => record.ecosystem === "php" && record.optionId === "slim",
+    );
+    expect(php).toMatchObject({
+      maturity: "experimental",
+      freshness: "unverified",
+      evidenceLevel: "listed",
+      lastVerifiedVersion: null,
+    });
+  });
+
   it("promotes only options covered by current passing recipe receipts", () => {
     const records = getCapabilityInventory({
       receipt: receipt(),
@@ -172,6 +184,30 @@ describe("capability inventory", () => {
       freshness: "quarantined",
       limitation: "The runtime recipe is failing.",
     });
+  });
+
+  it("preserves hidden quarantine maturity for experimental Ruby", () => {
+    const quarantine: CapabilityQuarantineEntry[] = [
+      {
+        ecosystem: "ruby",
+        category: "rubyWebFramework",
+        optionId: "sinatra",
+        reason: "Native recipe failed",
+        maintenanceOwner: "@runtime-owner",
+        restorationRecipeId: "ruby-sinatra",
+        visibility: "hidden",
+      },
+    ];
+    expect(
+      getCapabilityInventory({ quarantine }).some(
+        (record) => record.id === "ruby:rubyWebFramework:sinatra",
+      ),
+    ).toBe(false);
+    expect(
+      getCapabilityInventory({ quarantine, includeHidden: true }).find(
+        (record) => record.id === "ruby:rubyWebFramework:sinatra",
+      ),
+    ).toMatchObject({ maturity: "quarantined", freshness: "quarantined", public: false });
   });
 
   it("preserves Crystal quarantine metadata ahead of its experimental defaults", () => {

@@ -6,6 +6,19 @@ type TechResourceLinks = {
 type LinkMap = Record<string, TechResourceLinks>;
 
 const BASE_LINKS: LinkMap = {
+  ruby: {
+    docsUrl: "https://www.ruby-lang.org/en/documentation/",
+    githubUrl: "https://github.com/ruby/ruby",
+  },
+  sinatra: {
+    docsUrl: "https://sinatrarb.com/intro.html",
+    githubUrl: "https://github.com/sinatra/sinatra",
+  },
+  php: { docsUrl: "https://www.php.net/manual/en/", githubUrl: "https://github.com/php/php-src" },
+  slim: {
+    docsUrl: "https://www.slimframework.com/docs/v4/",
+    githubUrl: "https://github.com/slimphp/Slim",
+  },
   enabled: {
     docsUrl: "https://developer.chrome.com/docs/ai/webmcp",
     githubUrl: "https://github.com/webmachinelearning/webmcp",
@@ -1158,6 +1171,7 @@ const BASE_LINKS: LinkMap = {
   pwa: { docsUrl: "https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps" },
   tauri: { docsUrl: "https://tauri.app/start/", githubUrl: "https://github.com/tauri-apps/tauri" },
   wxt: { docsUrl: "https://wxt.dev/", githubUrl: "https://github.com/wxt-dev/wxt" },
+  plasmo: { docsUrl: "https://docs.plasmo.com/", githubUrl: "https://github.com/PlasmoHQ/plasmo" },
   opentui: { docsUrl: "https://opentui.org/", githubUrl: "https://github.com/sst/opentui" },
   mcp: {
     docsUrl: "https://modelcontextprotocol.io/introduction",

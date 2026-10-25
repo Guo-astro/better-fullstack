@@ -188,6 +188,9 @@ function normalizeGraphConfigForPersistence(
     normalized.dotnetLibraries = [];
   }
 
+  if (!selectedEcosystems.has("ruby")) normalized.rubyWebFramework = "none";
+
+  if (!selectedEcosystems.has("php")) normalized.phpWebFramework = "none";
   if (!selectedEcosystems.has("elixir")) {
     normalized.elixirWebFramework = "none";
     normalized.elixirOrm = "none";
@@ -504,6 +507,8 @@ export function buildBtsConfigForPersistence(
     dotnetCaching: persistedConfig.dotnetCaching,
     dotnetDeploy: persistedConfig.dotnetDeploy,
     dotnetLibraries: persistedConfig.dotnetLibraries,
+    rubyWebFramework: persistedConfig.rubyWebFramework,
+    phpWebFramework: persistedConfig.phpWebFramework,
     elixirWebFramework: persistedConfig.elixirWebFramework,
     elixirOrm: persistedConfig.elixirOrm,
     elixirAuth: persistedConfig.elixirAuth,
@@ -701,6 +706,8 @@ export function serializeBtsConfig(
     dotnetCaching: btsConfig.dotnetCaching,
     dotnetDeploy: btsConfig.dotnetDeploy,
     dotnetLibraries: btsConfig.dotnetLibraries,
+    rubyWebFramework: btsConfig.rubyWebFramework,
+    phpWebFramework: btsConfig.phpWebFramework,
     elixirWebFramework: btsConfig.elixirWebFramework,
     elixirOrm: btsConfig.elixirOrm,
     elixirAuth: btsConfig.elixirAuth,

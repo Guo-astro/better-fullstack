@@ -22,6 +22,7 @@ import {
   ProjectNameSchema,
   cliInputToProjectConfigPartial,
   getCrystalSelectionIssue,
+  getRubyRecipeIssue,
 } from "@/types";
 
 const CORE_STACK_FLAGS = new Set([
@@ -73,6 +74,20 @@ export function assertCrystalInputIsUsable(options: CLIInput) {
     if (issue) exitWithError(issue);
   } catch (error) {
     exitWithError(error instanceof Error ? error.message : "Invalid Crystal recipe input");
+  }
+}
+
+export function assertRubyInputIsUsable(options: CLIInput) {
+  if (
+    options.ecosystem !== "ruby" &&
+    !options.part?.some((spec) => spec.startsWith("backend:ruby:"))
+  )
+    return;
+  try {
+    const issue = getRubyRecipeIssue(cliInputToProjectConfigPartial(options));
+    if (issue) exitWithError(issue);
+  } catch (error) {
+    exitWithError(error instanceof Error ? error.message : "Invalid Ruby recipe input");
   }
 }
 

@@ -1,0 +1,144 @@
+ENV["RACK_ENV"] = "test"
+
+require "minitest/autorun"
+require "rack/test"
+require_relative "../app"
+
+class AppTest < Minitest::Test
+  include Rack::Test::Methods
+
+  def app
+    BetterFullstack::App
+  end
+
+  def setup
+    header "Host", "localhost"
+  end
+
+  def post_json(value)
+    post "/api/greetings", JSON.generate(value), "CONTENT_TYPE" => "application/json"
+  end
+
+  def test_health
+    get "/health"
+    assert_equal 200, last_response.status
+    assert_equal({ "status" => "ok", "service" => "sinatra" }, JSON.parse(last_response.body))
+  end
+
+  def test_greeting_trims_the_validated_name
+    post_json("name" => "  Ruby  ")
+    assert_equal 200, last_response.status
+    assert_equal({ "greeting" => "Hello, Ruby!" }, JSON.parse(last_response.body))
+  end
+
+  def test_invalid_request_shapes
+    [nil, [], {}, { "name" => 2 }, { "name" => " " }, { "name" => "a" * 81 }, { "name" => "Ruby", "admin" => true }].each do |value|
+      post_json(value)
+      assert_equal 422, last_response.status
+      assert JSON.parse(last_response.body).key?("error")
+    end
+  end
+
+  def test_malformed_json
+    post "/api/greetings", "{", "CONTENT_TYPE" => "application/json"
+    assert_equal 400, last_response.status
+    assert_equal "invalid_json", JSON.parse(last_response.body).fetch("error")
+  end
+
+  def test_empty_json_body
+    post "/api/greetings", "", "CONTENT_TYPE" => "application/json"
+    assert_equal 400, last_response.status
+    assert_equal "invalid_json", JSON.parse(last_response.body).fetch("error")
+  end
+
+  def test_non_json_content_type
+    post "/api/greetings", "name=Ruby"
+    assert_equal 415, last_response.status
+  end
+
+  def test_body_size_limit
+    post_json("name" => "a" * 16_384)
+    assert_equal 413, last_response.status
+  end
+
+  def test_oversized_json_keeps_cors_headers_only_for_trusted_origins
+    app.allowed_origins.each do |origin|
+      header "Origin", origin
+      post_json("name" => "a" * 16_384)
+      assert_equal 413, last_response.status
+      assert_equal "body_too_large", JSON.parse(last_response.body).fetch("error")
+      assert_equal origin, last_response.headers["access-control-allow-origin"]
+      assert_equal "Origin", last_response.headers["vary"]
+    end
+    header "Origin", "https://untrusted.example"
+    post_json("name" => "a" * 16_384)
+    assert_equal 413, last_response.status
+    assert_nil last_response.headers["access-control-allow-origin"]
+  end
+
+  def test_unknown_route
+    get "/missing"
+    assert_equal 404, last_response.status
+    assert_equal "not_found", JSON.parse(last_response.body).fetch("error")
+  end
+
+  def test_oversized_form_is_rejected_before_reading_declared_input
+    input = StringIO.new("name=" + "a" * 1_048_576)
+    env = Rack::MockRequest.env_for("/api/greetings", method: "POST")
+    env["HTTP_HOST"] = "localhost"
+    env["CONTENT_TYPE"] = "application/x-www-form-urlencoded"
+    env["CONTENT_LENGTH"] = input.size.to_s
+    env["rack.input"] = input
+    status, _, body = app.call(env)
+    assert_equal 413, status
+    assert_equal "body_too_large", JSON.parse(body.to_a.join).fetch("error")
+    assert_equal 0, input.pos
+    body.close if body.respond_to?(:close)
+  end
+
+  def test_oversized_form_without_a_declared_length_is_bounded
+    input = StringIO.new("name=" + "a" * 1_048_576)
+    env = Rack::MockRequest.env_for("/api/greetings", method: "POST")
+    env["HTTP_HOST"] = "localhost"
+    env["CONTENT_TYPE"] = "application/x-www-form-urlencoded"
+    env.delete("CONTENT_LENGTH")
+    env["rack.input"] = input
+    status, _, body = app.call(env)
+    assert_equal 413, status
+    assert_equal "body_too_large", JSON.parse(body.to_a.join).fetch("error")
+    assert_operator input.pos, :<=, 16_385
+    body.close if body.respond_to?(:close)
+  end
+
+  def test_multiple_trusted_frontend_origins
+    previous = app.allowed_origins
+    app.set :allowed_origins, ["http://localhost:5173", "http://localhost:8080"]
+    app.allowed_origins.each do |origin|
+      header "Origin", origin
+      get "/health"
+      assert_equal 200, last_response.status
+      assert_equal origin, last_response.headers["access-control-allow-origin"]
+    end
+    header "Origin", "http://localhost:9999"
+    get "/health"
+    assert_equal 403, last_response.status
+  ensure
+    app.set :allowed_origins, previous
+  end
+
+  def test_cors_origin_is_pinned
+    header "Origin", app.allowed_origins.first
+    options "/api/greetings"
+    assert_equal 204, last_response.status
+    assert_equal app.allowed_origins.first, last_response.headers["access-control-allow-origin"]
+    header "Origin", "https://untrusted.example"
+    post_json("name" => "Ruby")
+    assert_equal 403, last_response.status
+  end
+
+  def test_unrecognized_host_is_rejected
+    header "Host", "untrusted.example"
+    get "/health"
+    assert_equal 403, last_response.status
+  end
+end
