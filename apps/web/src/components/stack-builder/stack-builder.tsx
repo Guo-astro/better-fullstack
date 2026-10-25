@@ -147,7 +147,9 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -747,6 +749,36 @@ const BUILDER_ECOSYSTEMS = ECOSYSTEMS.flatMap((ecosystem) =>
       ]
     : [ecosystem],
 );
+
+type BuilderEcosystemId = (typeof BUILDER_ECOSYSTEMS)[number]["id"];
+
+const BUILDER_LANGUAGE_SECTIONS = [
+  { id: "web", label: () => m.builderLanguageSectionWeb() },
+  { id: "mobile", label: () => m.builderLanguageSectionMobile() },
+  { id: "backend", label: () => m.builderLanguageSectionBackend() },
+] as const;
+
+const BUILDER_LANGUAGE_SECTION_BY_ECOSYSTEM = {
+  typescript: "web",
+  "react-native": "mobile",
+  rust: "backend",
+  python: "backend",
+  go: "backend",
+  crystal: "backend",
+  java: "backend",
+  kotlin: "backend",
+  ruby: "backend",
+  php: "backend",
+  elixir: "backend",
+  dotnet: "backend",
+} satisfies Record<BuilderEcosystemId, (typeof BUILDER_LANGUAGE_SECTIONS)[number]["id"]>;
+
+const BUILDER_LANGUAGE_GROUPS = BUILDER_LANGUAGE_SECTIONS.map((section) => ({
+  ...section,
+  ecosystems: BUILDER_ECOSYSTEMS.filter(
+    (ecosystem) => BUILDER_LANGUAGE_SECTION_BY_ECOSYSTEM[ecosystem.id] === section.id,
+  ),
+}));
 
 const GRAPH_FRONTEND_CONFIG_BY_ECOSYSTEM = Object.fromEntries(
   GRAPH_FRONTEND_CONFIGS.map((config) => [config.ecosystem, config]),
@@ -3894,7 +3926,6 @@ const StackBuilderInner = ({ initialStack }: { initialStack?: StackState }) => {
     () => new Set(),
   );
   const packageManagerLabel = getLocalizedCategoryDisplayName("packageManager", "Package manager");
-  const reducedMotion = useReducedMotion();
   // Saved stacks live inside Presets: both are places to load a stack from.
   const isLibraryView = viewMode === "presets" || viewMode === "saved";
   const isFinalMultiStep = multiActiveStepIndex >= multiSteps.length - 1;
@@ -4292,10 +4323,9 @@ const StackBuilderInner = ({ initialStack }: { initialStack?: StackState }) => {
   };
 
   const activeEcosystem = BUILDER_ECOSYSTEMS.find((eco) => isEcosystemActive(eco.id));
+  const languageSelectionsRef = useRef(new Map<BuilderEcosystemId, StackState>());
+  const reducedMotion = useReducedMotion();
 
-  // Swapping a whole language's options under the cursor reads as a blink. A view
-  // transition keeps the old screen up until the new one has rendered, then
-  // dissolves between the two. Without support, or with reduced motion, it just swaps.
   const withContentDissolve = (update: () => void) => {
     if (reducedMotion || typeof document.startViewTransition !== "function") {
       startTransition(update);
@@ -4304,22 +4334,25 @@ const StackBuilderInner = ({ initialStack }: { initialStack?: StackState }) => {
     document.startViewTransition(() => flushSync(update));
   };
 
-  const selectEcosystem = (ecosystemId: string) => {
+  const selectEcosystem = (ecosystemId: BuilderEcosystemId) => {
     if (isEcosystemActive(ecosystemId)) return;
     const isKotlin = ecosystemId === "kotlin";
+    if (activeEcosystem) languageSelectionsRef.current.set(activeEcosystem.id, stack);
+    const rememberedSelection = languageSelectionsRef.current.get(ecosystemId);
     withContentDissolve(() => {
-      // Fresh defaults per ecosystem: carrying the previous selection through
+      // Each ecosystem restores its own last picks or defaults: carrying the previous selection through
       // the compat engine persists zeroed fields (e.g. react-native nulls
       // webFrontend, hiding the Run tab back on TS) and stale
       // foreign-ecosystem params in the URL.
       setStack({
-        ...getEcosystemDefaultStackSelection((isKotlin ? "java" : ecosystemId) as Ecosystem),
+        ...(rememberedSelection ??
+          getEcosystemDefaultStackSelection(isKotlin ? "java" : ecosystemId)),
         projectName: stack.projectName,
         packageManager: stack.packageManager,
         git: stack.git,
         install: stack.install,
         yolo: stack.yolo,
-        ecosystem: (isKotlin ? "java" : ecosystemId) as Ecosystem,
+        ecosystem: isKotlin ? "java" : ecosystemId,
         ...(isKotlin ? { javaLanguage: "kotlin" as const } : {}),
         stackMode: "solo",
         stackPartSpecs: [],
@@ -4860,8 +4893,7 @@ const StackBuilderInner = ({ initialStack }: { initialStack?: StackState }) => {
               )}
             >
               {/* One bar for brand, languages, the stack views and its actions. It is a single row
-                  from xl up and wraps into two rows below that; phones get a language menu in
-                  place of the icon strip. */}
+                  from xl up and wraps into two rows below that. */}
               <div className="relative flex shrink-0 flex-wrap items-center gap-x-2 gap-y-2 border-b border-border/60 bg-fd-background px-3 py-2 [view-transition-name:builder-bar] sm:px-4 xl:flex-nowrap xl:gap-x-3">
                 <RouterLink to="/" aria-label={m.navHome()} className="flex shrink-0 items-center">
                   <img
@@ -4885,11 +4917,16 @@ const StackBuilderInner = ({ initialStack }: { initialStack?: StackState }) => {
                     render={
                       <button
                         type="button"
-                        aria-label={m.navLanguage()}
-                        className="flex h-8 min-w-0 cursor-pointer items-center gap-1.5 rounded-full border border-border/50 bg-muted/25 px-2.5 md:hidden"
+                        data-testid="ecosystem-menu"
+                        aria-label={`${m.builderLanguagePickerLabel()}: ${activeEcosystem?.name ?? m.navMultiEcosystem()}`}
+                        className="group flex h-8 min-w-0 shrink-0 cursor-pointer items-center gap-2 rounded-full border border-border bg-card pr-2.5 pl-3 shadow-xs transition-colors hover:border-foreground/30 data-[popup-open]:border-foreground/40"
                       />
                     }
                   >
+                    <span className="font-mono text-[11px] tracking-wide text-muted-foreground uppercase">
+                      {m.builderLanguagePickerLabel()}
+                    </span>
+                    <span className="h-4 w-px shrink-0 bg-border" aria-hidden />
                     {activeEcosystem ? (
                       <TechIcon
                         techId={activeEcosystem.id}
@@ -4900,75 +4937,97 @@ const StackBuilderInner = ({ initialStack }: { initialStack?: StackState }) => {
                     ) : (
                       <Layers3 className="size-4 shrink-0" aria-hidden />
                     )}
-                    <span className="truncate font-mono text-[11px] font-semibold uppercase tracking-wide">
+                    <span className="truncate font-mono text-[11px] font-semibold tracking-wide uppercase">
                       {activeEcosystem?.name ?? m.navMultiEcosystem()}
                     </span>
-                    <ChevronDown className="size-3 shrink-0 text-muted-foreground" aria-hidden />
+                    <ChevronDown
+                      className="size-3.5 shrink-0 text-muted-foreground transition-transform duration-200 ease-out group-data-[popup-open]:rotate-180"
+                      aria-hidden
+                    />
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-52 bg-fd-background">
-                    {BUILDER_ECOSYSTEMS.map((eco) => (
-                      <DropdownMenuItem key={eco.id} onClick={() => selectEcosystem(eco.id)}>
-                        <TechIcon
-                          techId={eco.id}
-                          icon={eco.icon}
-                          name={eco.name}
-                          className="size-4"
-                        />
-                        <span className="flex-1">{eco.name}</span>
-                        {isEcosystemActive(eco.id) && <Check className="size-3.5" />}
-                      </DropdownMenuItem>
-                    ))}
+                  <DropdownMenuContent
+                    align="start"
+                    className="w-[min(28rem,calc(100vw-1.5rem))] bg-fd-background p-1.5"
+                  >
+                    <div className="grid grid-cols-2 gap-x-1">
+                      {BUILDER_LANGUAGE_GROUPS.map((group) => (
+                        <DropdownMenuGroup
+                          key={group.id}
+                          className={cn(group.ecosystems.length > 1 && "col-span-2")}
+                        >
+                          <DropdownMenuLabel className="pt-2 pb-1">
+                            {group.label()}
+                          </DropdownMenuLabel>
+                          <div
+                            className={cn(
+                              "grid gap-1",
+                              group.ecosystems.length > 1 && "grid-cols-2",
+                            )}
+                          >
+                            {group.ecosystems.map((eco) => {
+                              const isActive = isEcosystemActive(eco.id);
+                              return (
+                                <DropdownMenuItem
+                                  key={eco.id}
+                                  data-testid={`ecosystem-${eco.id}`}
+                                  onClick={() => selectEcosystem(eco.id)}
+                                  className={cn(
+                                    "h-9 rounded-lg bg-muted/40 px-2.5 text-sm text-foreground focus:bg-muted",
+                                    isActive && "bg-brand/15 font-semibold focus:bg-brand/20",
+                                  )}
+                                >
+                                  <TechIcon
+                                    techId={eco.id}
+                                    icon={eco.icon}
+                                    name={eco.name}
+                                    className="size-4"
+                                  />
+                                  <span className="min-w-0 flex-1 truncate">{eco.name}</span>
+                                  <Check
+                                    className={cn(
+                                      "size-3.5 text-foreground dark:text-brand",
+                                      !isActive && "invisible",
+                                    )}
+                                    aria-hidden
+                                  />
+                                </DropdownMenuItem>
+                              );
+                            })}
+                          </div>
+                        </DropdownMenuGroup>
+                      ))}
+                    </div>
+                    <DropdownMenuItem
+                      data-testid="ecosystem-menu-multi"
+                      onClick={() => {
+                        if (!isMultiMode) withContentDissolve(enableMultiMode);
+                      }}
+                      className={cn(
+                        "mt-2 items-start gap-2.5 rounded-lg bg-muted/40 px-2.5 py-2 text-foreground focus:bg-muted",
+                        isMultiMode && "bg-brand/15 focus:bg-brand/20",
+                      )}
+                    >
+                      <Layers3 className="mt-0.5 size-4" aria-hidden />
+                      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                        <span
+                          className={cn("text-sm", isMultiMode ? "font-semibold" : "font-medium")}
+                        >
+                          {m.navMultiEcosystem()}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {m.builderLanguageMultiDescription()}
+                        </span>
+                      </span>
+                      <Check
+                        className={cn(
+                          "mt-0.5 size-3.5 text-foreground dark:text-brand",
+                          !isMultiMode && "invisible",
+                        )}
+                        aria-hidden
+                      />
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-
-                <div className="hidden items-center rounded-full border border-border/50 bg-muted/25 p-0.5 md:flex">
-                  {BUILDER_ECOSYSTEMS.map((eco) => {
-                    const isActive = isEcosystemActive(eco.id);
-                    return (
-                      <BarTip key={eco.id} label={eco.name}>
-                        <button
-                          type="button"
-                          data-testid={`ecosystem-${eco.id}`}
-                          aria-pressed={isActive}
-                          aria-label={eco.name}
-                          onClick={() => selectEcosystem(eco.id)}
-                          className={cn(
-                            "relative flex h-7 cursor-pointer items-center gap-1.5 rounded-full px-2 transition-opacity",
-                            !isActive && "opacity-55 hover:opacity-100",
-                          )}
-                        >
-                          {isActive && (
-                            <motion.span
-                              layoutId="builder-language-pill"
-                              className="absolute inset-0 rounded-full bg-background shadow-sm"
-                              transition={{ type: "spring", bounce: 0.18, duration: 0.45 }}
-                            />
-                          )}
-                          <TechIcon
-                            techId={eco.id}
-                            icon={eco.icon}
-                            name={eco.name}
-                            className="relative size-4"
-                          />
-                          <AnimatePresence initial={false}>
-                            {isActive && (
-                              <motion.span
-                                key="label"
-                                initial={{ width: 0, opacity: 0 }}
-                                animate={{ width: "auto", opacity: 1 }}
-                                exit={{ width: 0, opacity: 0 }}
-                                transition={{ duration: 0.25, ease: "easeOut" }}
-                                className="relative overflow-hidden whitespace-nowrap font-mono text-[11px] font-semibold uppercase tracking-wide"
-                              >
-                                {eco.name}
-                              </motion.span>
-                            )}
-                          </AnimatePresence>
-                        </button>
-                      </BarTip>
-                    );
-                  })}
-                </div>
 
                 {/* Several languages at once is a different way to build, not a tenth language. */}
                 <BarTip label={m.navMultiEcosystem()}>
@@ -5694,7 +5753,10 @@ const StackBuilderInner = ({ initialStack }: { initialStack?: StackState }) => {
                                                           ) ? (
                                                             <motion.div
                                                               key={tech.id}
-                                                              initial={{ opacity: 0, scale: 0.97 }}
+                                                              initial={{
+                                                                opacity: 0,
+                                                                scale: 0.97,
+                                                              }}
                                                               animate={{ opacity: 1, scale: 1 }}
                                                               exit={{ opacity: 0, scale: 0.97 }}
                                                               transition={{ duration: 0.2 }}
@@ -5824,7 +5886,10 @@ const StackBuilderInner = ({ initialStack }: { initialStack?: StackState }) => {
                                                         {!isSectionCollapsed("shadcnBase") && (
                                                           <motion.div
                                                             initial={{ height: 0, opacity: 0 }}
-                                                            animate={{ height: "auto", opacity: 1 }}
+                                                            animate={{
+                                                              height: "auto",
+                                                              opacity: 1,
+                                                            }}
                                                             exit={{ height: 0, opacity: 0 }}
                                                             transition={{
                                                               duration: 0.25,
