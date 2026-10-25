@@ -381,6 +381,7 @@ export function getGraphBackendConnections(config: ProjectConfig): GraphBackendC
         part.source !== "provided" &&
         ((part.ecosystem === "go" && part.toolId === "grpc-go") ||
           (part.ecosystem === "rust" && part.toolId === "tonic") ||
+          (part.ecosystem === "elixir" && part.toolId === "grpc") ||
           (part.ecosystem === "java" && part.toolId === "grpc")),
     );
     if (!usesGrpc) return connection;

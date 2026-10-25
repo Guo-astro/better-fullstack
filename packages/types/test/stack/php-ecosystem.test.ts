@@ -33,6 +33,18 @@ const native = {
 };
 
 describe("PHP graph and transport contract", () => {
+  it.each(["stable", "latest", "beta"])(
+    "preserves the %s PHP version channel in commands",
+    (versionChannel) => {
+      const command = generateStackSelectionCommand({
+        ...getEcosystemDefaultStackSelection("php"),
+        versionChannel,
+      });
+      if (versionChannel === "stable") expect(command).not.toContain("--version-channel");
+      else expect(command).toContain(`--version-channel ${versionChannel}`);
+    },
+  );
+
   it("offers databases only when another backend can own their integration", () => {
     const parts = parseStackPartSpecs(["backend:php:slim"]);
     const context = {

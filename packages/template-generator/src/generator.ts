@@ -161,7 +161,10 @@ function validateGraphRenderingSupport(config: ProjectConfig): string[] {
   return validateStackParts(config.stackParts ?? [])
     .issues.filter(
       (issue) =>
-        issue.code === "UNSUPPORTED_REPEATED_PRIMARY" || issue.code === "UNSUPPORTED_TARGET_PATH",
+        issue.code === "UNSUPPORTED_REPEATED_PRIMARY" ||
+        issue.code === "UNSUPPORTED_TARGET_PATH" ||
+        issue.code === "OVERLAPPING_TARGET_PATH" ||
+        issue.code === "INVALID_TARGET_PATH",
     )
     .map(formatStackGraphIssue);
 }

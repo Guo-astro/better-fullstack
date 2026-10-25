@@ -2706,6 +2706,8 @@ export function generateStackSelectionCommand(selection: StackSelectionInput): s
         `--php-web-framework ${selection.phpWebFramework}`,
         `--database ${selection.database}`,
       ];
+      if (selection.versionChannel !== "stable")
+        flags.push(`--version-channel ${selection.versionChannel}`);
       flags.push(formatArrayFlag("ai-docs", selection.aiDocs));
       if (selection.git === "false") flags.push("--no-git");
       if (selection.install === "false") flags.push("--no-install");
