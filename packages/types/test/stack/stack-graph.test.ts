@@ -181,6 +181,29 @@ function getTypeScriptApiOptionsForFrontend(frontend: string) {
 }
 
 describe("stack graph", () => {
+  it("rejects custom JavaScript application directories from specs and saved parts", () => {
+    for (const [spec, defaultPath] of [
+      ["frontend:typescript:react-vite", "apps/web"],
+      ["backend:typescript:hono", "apps/server"],
+      ["mobile:react-native:native-bare", "apps/native"],
+    ]) {
+      for (const parts of [
+        parseStackPartSpecs([`${spec}@services/custom`]),
+        parseStackPartSpecs([spec]).map((part) => ({ ...part, targetPath: "services/custom" })),
+      ]) {
+        expect(validateStackParts(parts).issues).toContainEqual(
+          expect.objectContaining({
+            code: "UNSUPPORTED_TARGET_PATH",
+            message: expect.stringContaining(defaultPath),
+          }),
+        );
+      }
+      expect(validateStackParts(parseStackPartSpecs([`${spec}@${defaultPath}`])).issues).toEqual(
+        [],
+      );
+    }
+  });
+
   it("keeps JavaScript app paths fixed and named native paths distinct", () => {
     const parts = parseStackPartSpecs([
       "frontend:dotnet:blazor-webassembly:web",
@@ -261,11 +284,7 @@ describe("stack graph", () => {
   });
 
   it("keeps collision suffixes compact when native service names overlap", () => {
-    const specs = [
-      "backend:go:gin",
-      "backend:rust:axum:go-gin",
-      "backend:python:fastapi:go-gin-2",
-    ];
+    const specs = ["backend:go:gin", "backend:rust:axum:go-gin", "backend:python:fastapi:go-gin-2"];
     const parts = parseStackPartSpecs(specs);
     const formatted = parts
       .filter((part) => part.source !== "provided")
@@ -339,7 +358,9 @@ describe("stack graph", () => {
     const parts = parseStackPartSpecs(specs);
     const formatted = parts.map((part) => formatStackPartSpec(part, parts));
 
-    expect(parts.find((part) => part.id === "api")?.targetPath).toBe("services/api v2@blue:50%/%2F");
+    expect(parts.find((part) => part.id === "api")?.targetPath).toBe(
+      "services/api v2@blue:50%/%2F",
+    );
     expect(parts.find((part) => part.toolId === "gorm")?.ownerPartId).toBe("api");
     expect(parts.find((part) => part.toolId === "sqlc")?.ownerPartId).toBe("admin");
     expect(formatted).toEqual(specs);

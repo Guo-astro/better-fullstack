@@ -159,7 +159,10 @@ function validateGraphContainerAddons(config: ProjectConfig): string[] {
 
 function validateGraphRenderingSupport(config: ProjectConfig): string[] {
   return validateStackParts(config.stackParts ?? [])
-    .issues.filter((issue) => issue.code === "UNSUPPORTED_REPEATED_PRIMARY")
+    .issues.filter(
+      (issue) =>
+        issue.code === "UNSUPPORTED_REPEATED_PRIMARY" || issue.code === "UNSUPPORTED_TARGET_PATH",
+    )
     .map(formatStackGraphIssue);
 }
 

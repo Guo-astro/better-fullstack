@@ -23,6 +23,22 @@ async function generate(part: string[]) {
 }
 
 describe("multi-ecosystem project output", () => {
+  it("rejects custom JavaScript paths before they can overwrite native applications", async () => {
+    for (const specs of [
+      ["frontend:typescript:react-vite@services/client", "backend:crystal:kemal@apps/web"],
+      ["backend:typescript:hono@services/api", "backend:crystal:kemal@apps/server"],
+      ["mobile:react-native:native-bare@apps/phone", "backend:crystal:kemal@apps/native"],
+    ]) {
+      const result = await generateVirtualProject({
+        config: configFor(specs),
+        templates: EMBEDDED_TEMPLATES,
+      });
+      expect(result.success).toBe(false);
+      expect(result.error).toContain("because its templates require that directory");
+      expect(result.tree).toBeUndefined();
+    }
+  });
+
   it("passes every generated frontend origin to Crystal's native launch command", async () => {
     const specs = [
       "frontend:dotnet:blazor-webassembly:admin",

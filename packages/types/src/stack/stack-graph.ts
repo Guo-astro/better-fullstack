@@ -3583,6 +3583,13 @@ type PrimaryPartPathInput = Pick<StackPart, "role" | "ecosystem" | "toolId" | "t
   customId?: string;
 };
 
+function usesFixedJavaScriptPath(part: PrimaryPartPathInput) {
+  return (
+    (part.ecosystem === "typescript" || part.ecosystem === "react-native") &&
+    ["frontend", "backend", "mobile"].includes(part.role)
+  );
+}
+
 function allocatePrimaryPartTargetPaths(parts: readonly PrimaryPartPathInput[]) {
   const primaryRoleCounts = new Map<StackPartRole, number>();
   for (const part of parts) {
@@ -3595,9 +3602,6 @@ function allocatePrimaryPartTargetPaths(parts: readonly PrimaryPartPathInput[]) 
     database: "data",
   };
 
-  const usesFixedJavaScriptPath = (part: PrimaryPartPathInput) =>
-    (part.ecosystem === "typescript" || part.ecosystem === "react-native") &&
-    ["frontend", "backend", "mobile"].includes(part.role);
   const usedTargetPaths = new Set(
     parts
       .filter(
@@ -4641,6 +4645,17 @@ export function validateStackParts(parts: readonly StackPart[]): StackGraphValid
       );
       continue;
     }
+    const fixedPath = getRoleTargetPath(part.role);
+    if (usesFixedJavaScriptPath(part) && targetPath !== fixedPath)
+      issues.push(
+        createStackGraphIssue({
+          code: "UNSUPPORTED_TARGET_PATH",
+          role: part.role,
+          toolId: part.toolId,
+          partId: part.id,
+          message: `JavaScript application '${part.id}' must use '${fixedPath}' because its templates require that directory.`,
+        }),
+      );
     const collision = targetPaths.find(
       (entry) =>
         entry.targetPath === targetPath ||
