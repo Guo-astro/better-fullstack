@@ -2480,6 +2480,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "none",
         "multiple": false
+      },
+      {
+        "flag": "--php-testing",
+        "summary": "PHP test runner.",
+        "values": [
+          "phpunit",
+          "pest",
+          "codeception",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "phpunit",
+        "multiple": false
       }
     ]
   },
@@ -2939,6 +2952,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "php:--php-web-framework": m.docsCliSummaryPhpPhpWebFramework,
   "php:--php-orm": m.docsCliSummaryPhpPhpOrm,
   "php:--php-auth": m.docsCliSummaryPhpPhpAuth,
+  "php:--php-testing": m.docsCliSummaryPhpPhpTesting,
   "elixir:--elixir-web-framework": m.docsCliSummaryElixirElixirWebFramework,
   "elixir:--elixir-orm": m.docsCliSummaryElixirElixirOrm,
   "elixir:--elixir-auth": m.docsCliSummaryElixirElixirAuth,

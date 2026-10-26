@@ -21,15 +21,21 @@ export async function processPhpBaseTemplate(
     ...config,
     phpOrm: config.phpOrm ?? "none",
     phpAuth: config.phpAuth ?? "none",
+    phpTesting: config.phpTesting ?? "phpunit",
     phpPackageName,
     phpSourceDirectory,
   };
   const sourcePath = targetPath ? `${targetPath}/${phpSourceDirectory}` : phpSourceDirectory;
-  renderTemplateTree(vfs, templates, { prefix: "php-base/common/", targetPath, context });
+  const skip =
+    context.phpTesting === "none"
+      ? (templatePath: string) => templatePath.includes("/tests/")
+      : undefined;
+  renderTemplateTree(vfs, templates, { prefix: "php-base/common/", targetPath, context, skip });
   renderTemplateTree(vfs, templates, {
     prefix: `php-base/${config.phpWebFramework}/`,
     targetPath,
     context,
+    skip,
   });
   renderTemplateTree(vfs, templates, { prefix: "php-base/app/", targetPath: sourcePath, context });
 }

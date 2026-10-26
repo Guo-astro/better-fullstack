@@ -100,6 +100,7 @@ import {
   PYTHON_QUALITY_VALUES,
   PHP_AUTH_VALUES,
   PHP_ORM_VALUES,
+  PHP_TESTING_VALUES,
   PHP_WEB_FRAMEWORK_VALUES,
   PYTHON_TESTING_VALUES,
   PYTHON_CACHING_VALUES,
@@ -652,6 +653,7 @@ function makePhpDraft(args: GeneratorArgs): CandidateDraft {
       phpWebFramework,
       phpOrm,
       phpAuth,
+      phpTesting: sampleScalar(PHP_TESTING_VALUES, 0.1, "phpTesting"),
       database: "none",
     },
   };
@@ -897,6 +899,7 @@ function createValidationBase(projectName: string, draft: CandidateDraft): Proje
     phpWebFramework: "none",
     phpOrm: "none",
     phpAuth: "none",
+    phpTesting: "none",
     elixirWebFramework: "none",
     elixirOrm: "none",
     elixirAuth: "none",

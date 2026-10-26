@@ -6,7 +6,7 @@ export const PHP_RECIPE_REASONS = {
   database:
     "The PHP recipe does not generate database or migration integration. Use --database none.",
   capability:
-    "The PHP recipe provides REST, Composer and PHPUnit; additional backend capabilities are not implemented.",
+    "The PHP recipe provides REST, Composer, ORM, auth and test runner choices; additional backend capabilities are not implemented.",
   owner: "PHP capabilities must belong to a PHP backend.",
 } as const;
 
@@ -51,6 +51,11 @@ const PHP_CAPABILITY_FRAMEWORKS: Record<string, Record<string, readonly string[]
     "firebase-jwt": ["slim", "laravel", "symfony"],
     "lcobucci-jwt": ["slim", "laravel", "symfony"],
     "symfony-security": ["symfony"],
+  },
+  testing: {
+    phpunit: ["slim", "laravel", "symfony"],
+    pest: ["slim", "laravel", "symfony"],
+    codeception: ["slim", "laravel", "symfony"],
   },
 };
 

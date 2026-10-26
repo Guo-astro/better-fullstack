@@ -1279,6 +1279,7 @@ export function generateReproducibleCommand(config: ProjectConfig) {
         `--php-web-framework ${config.phpWebFramework}`,
         `--php-orm ${config.phpOrm ?? "none"}`,
         `--php-auth ${config.phpAuth ?? "none"}`,
+        `--php-testing ${config.phpTesting ?? "phpunit"}`,
         "--database none",
       ];
       appendCommonFlags(flags, config);

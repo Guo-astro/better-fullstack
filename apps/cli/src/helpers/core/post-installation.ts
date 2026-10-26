@@ -117,7 +117,7 @@ export async function displayPostInstallInstructions(
 
   if (ecosystem === "php") {
     consola.box(
-      `Next steps\n\ncd ${relativePath}\n${depsInstalled ? "" : "composer install --no-interaction\n"}composer run build\ncomposer test\ncomposer run proof:http\n${config.phpOrm && config.phpOrm !== "none" ? "composer run db:setup\n" : ""}composer run dev\n\n${config.phpAuth && config.phpAuth !== "none" ? "Set JWT_SECRET (32+ bytes) before calling GET /api/me.\n" : ""}Experimental PHP recipe. See PHP.md for routes, environment and the verification boundary.`,
+      `Next steps\n\ncd ${relativePath}\n${depsInstalled ? "" : "composer install --no-interaction\n"}composer run build\n${config.phpTesting === "none" ? "" : "composer test\n"}composer run proof:http\n${config.phpOrm && config.phpOrm !== "none" ? "composer run db:setup\n" : ""}composer run dev\n\n${config.phpAuth && config.phpAuth !== "none" ? "Set JWT_SECRET (32+ bytes) before calling GET /api/me.\n" : ""}Experimental PHP recipe. See PHP.md for routes, environment and the verification boundary.`,
     );
     return;
   }

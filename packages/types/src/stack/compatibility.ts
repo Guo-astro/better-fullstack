@@ -577,6 +577,7 @@ export type CompatibilityInput = {
   phpWebFramework: string;
   phpOrm: string;
   phpAuth: string;
+  phpTesting: string;
   elixirWebFramework: string;
   elixirOrm: string;
   elixirAuth: string;

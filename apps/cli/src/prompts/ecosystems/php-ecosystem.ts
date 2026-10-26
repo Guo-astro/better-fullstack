@@ -1,6 +1,6 @@
 import { getPhpCapabilityIssue } from "@better-fullstack/types";
 
-import type { PhpAuth, PhpOrm, PhpWebFramework } from "@/types";
+import type { PhpAuth, PhpOrm, PhpTesting, PhpWebFramework } from "@/types";
 
 import { exitCancelled } from "@/presentation/errors";
 import { isCancel, navigableSelect } from "@/prompts/core/navigable";
@@ -36,6 +36,13 @@ const AUTH_OPTIONS: PromptOption<PhpAuth>[] = [
     hint: "Stateless access-token firewall for Symfony",
   },
   { value: "none", label: "None", hint: "No authentication" },
+];
+
+const TESTING_OPTIONS: PromptOption<PhpTesting>[] = [
+  { value: "phpunit", label: "PHPUnit", hint: "Request-level PHPUnit tests" },
+  { value: "pest", label: "Pest", hint: "Pest specs that also run the PHPUnit classes" },
+  { value: "codeception", label: "Codeception", hint: "Codeception Unit suite over the same tests" },
+  { value: "none", label: "None", hint: "No test runner; keep only the HTTP proof" },
 ];
 
 export function resolvePhpWebFrameworkPrompt(value?: PhpWebFramework) {
@@ -83,6 +90,21 @@ export async function getPhpAuthChoice(value?: PhpAuth, framework?: PhpWebFramew
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
   const response = await navigableSelect<PhpAuth>({
     message: "Select PHP authentication",
+    options: resolution.options,
+    initialValue: resolution.initialValue,
+  });
+  return isCancel(response) ? exitCancelled("Operation cancelled") : response;
+}
+
+export function resolvePhpTestingPrompt(value?: PhpTesting) {
+  return createStaticSinglePromptResolution(TESTING_OPTIONS, "phpunit", value);
+}
+
+export async function getPhpTestingChoice(value?: PhpTesting) {
+  const resolution = resolvePhpTestingPrompt(value);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "phpunit";
+  const response = await navigableSelect<PhpTesting>({
+    message: "Select PHP test runner",
     options: resolution.options,
     initialValue: resolution.initialValue,
   });

@@ -126,6 +126,7 @@ export function makeBaseConfig(name: string, ecosystem: Ecosystem): ProjectConfi
     phpWebFramework: ecosystem === "php" ? "slim" : "none",
     phpOrm: "none",
     phpAuth: "none",
+    phpTesting: ecosystem === "php" ? "phpunit" : "none",
     elixirWebFramework: "none",
     elixirOrm: "none",
     elixirAuth: "none",

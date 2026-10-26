@@ -594,6 +594,7 @@
   "docsCliSummaryPhpPhpWebFramework": "PHP HTTP 框架。",
   "docsCliSummaryPhpPhpOrm": "PHP ORM / 数据库层。",
   "docsCliSummaryPhpPhpAuth": "PHP 认证。",
+  "docsCliSummaryPhpPhpTesting": "PHP 测试运行器。",
   "docsCliSummaryElixirElixirWebFramework": "Elixir Web 框架。",
   "docsCliSummaryElixirElixirOrm": "Elixir ORM / 数据库。",
   "docsCliSummaryElixirElixirAuth": "Elixir 认证。",

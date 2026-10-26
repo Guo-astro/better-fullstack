@@ -86,5 +86,7 @@ describe("PHP builder recipe", () => {
     expect(stackStateToProjectConfig(withOrm).phpOrm).toBe("eloquent");
     expect(generateStackCommand(withOrm)).toContain("--php-orm eloquent --php-auth firebase-jwt");
     expect(stackStateToProjectConfig(withOrm).phpAuth).toBe("firebase-jwt");
+    expect(stackStateToProjectConfig(stack).phpTesting).toBe("phpunit");
+    expect(generateStackCommand({ ...stack, phpTesting: "pest" })).toContain("--php-testing pest");
   });
 });

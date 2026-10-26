@@ -96,16 +96,37 @@ describe("PHP graph and transport contract", () => {
     ).toEqual(
       expect.arrayContaining([
         ["api", "rest", backend?.id],
-        ["testing", "phpunit", backend?.id],
         ["packageManager", "composer", backend?.id],
       ]),
+    );
+    expect(parts).toContainEqual(
+      expect.objectContaining({
+        role: "testing",
+        toolId: "phpunit",
+        ownerPartId: backend?.id,
+      }),
     );
     expect(validateStackParts(parts).issues).toEqual([]);
     expect(stackPartsToLegacyProjectConfigPartial(parts)).toMatchObject({
       ecosystem: "php",
       phpWebFramework: "slim",
+      phpTesting: "phpunit",
       database: "none",
     });
+  });
+
+  it("projects the selected PHP test runner and omits it for none", () => {
+    for (const runner of ["pest", "codeception"] as const) {
+      const parts = legacyProjectConfigToStackParts({ ...native, phpTesting: runner });
+      expect(parts.filter((part) => part.role === "testing").map((part) => part.toolId)).toEqual([
+        runner,
+      ]);
+      expect(validateStackParts(parts).issues).toEqual([]);
+      expect(stackPartsToLegacyProjectConfigPartial(parts)).toMatchObject({ phpTesting: runner });
+    }
+    const parts = legacyProjectConfigToStackParts({ ...native, phpTesting: "none" });
+    expect(parts.some((part) => part.role === "testing")).toBe(false);
+    expect(stackPartsToLegacyProjectConfigPartial(parts).phpTesting ?? "none").toBe("none");
   });
 
   it("preserves named repeated services and unrelated frontend settings", () => {
@@ -170,7 +191,7 @@ describe("PHP graph and transport contract", () => {
     );
     const command = generateStackSelectionCommand(selection);
     expect(command).toContain(
-      "--ecosystem php --php-web-framework slim --php-orm none --php-auth none --database none",
+      "--ecosystem php --php-web-framework slim --php-orm none --php-auth none --php-testing phpunit --database none",
     );
     expect(command).toContain("--no-install");
     const withOrm = { ...selection, phpWebFramework: "symfony", phpOrm: "doctrine" };

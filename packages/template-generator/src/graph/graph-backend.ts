@@ -144,8 +144,10 @@ function getRawGraphBackendConnection(config: ProjectConfig): GraphBackendConnec
         testCommand: `cd ${directory} && bundle exec rake test`,
       };
     case "php": {
-      const hasOrm = (config.stackParts ?? []).some(
-        (part) => part.ownerPartId === backend.id && part.role === "orm" && part.toolId !== "none",
+      const ownedParts = (config.stackParts ?? []).filter((part) => part.ownerPartId === backend.id);
+      const hasOrm = ownedParts.some((part) => part.role === "orm" && part.toolId !== "none");
+      const hasTesting = ownedParts.some(
+        (part) => part.role === "testing" && part.toolId !== "none",
       );
       return {
         partId: backend.id,
@@ -162,7 +164,7 @@ function getRawGraphBackendConnection(config: ProjectConfig): GraphBackendConnec
           : `cd ${directory} && composer install --no-interaction`,
         devCommand: `cd ${directory} && composer run dev`,
         checkCommand: `cd ${directory} && composer run build`,
-        testCommand: `cd ${directory} && composer test`,
+        testCommand: hasTesting ? `cd ${directory} && composer test` : null,
       };
     }
     case "elixir": {

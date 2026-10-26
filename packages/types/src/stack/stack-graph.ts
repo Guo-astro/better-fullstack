@@ -70,6 +70,7 @@ import {
   PHP_WEB_FRAMEWORK_VALUES,
   PHP_ORM_VALUES,
   PHP_AUTH_VALUES,
+  PHP_TESTING_VALUES,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   EFFECT_VALUES,
   EMAIL_VALUES,
@@ -809,7 +810,7 @@ const LEGACY_EXTRA_CATEGORIES_BY_ECOSYSTEM = {
     validation: "dotnetValidation",
   },
   ruby: {},
-  php: {},
+  php: { testing: "phpTesting" },
   elixir: {
     realtime: "elixirRealtime",
     jobQueue: "elixirJobs",
@@ -1252,7 +1253,6 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
       ...definition,
       provides: [
         { role: "api", toolId: "rest", overrideable: false },
-        { role: "testing", toolId: "phpunit", overrideable: false },
         { role: "packageManager", toolId: "composer", overrideable: false },
       ] satisfies ProvidedCapabilityDefinition[],
     }),
@@ -1263,10 +1263,7 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
     ...definition,
     selectable: false,
   })),
-  ...defineTools(["phpunit"], "testing", "php").map((definition) => ({
-    ...definition,
-    selectable: false,
-  })),
+  ...defineTools(PHP_TESTING_VALUES, "testing", "php", "phpTesting"),
   ...defineTools(["composer"], "packageManager", "php").map((definition) => ({
     ...definition,
     selectable: false,

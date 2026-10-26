@@ -2347,6 +2347,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://symfony.com/doc/current/security/access_token.html",
     githubUrl: "https://github.com/symfony/security-bundle",
   },
+  "phpTesting:phpunit": {
+    docsUrl: "https://docs.phpunit.de/en/13.4/",
+    githubUrl: "https://github.com/sebastianbergmann/phpunit",
+  },
+  "phpTesting:pest": {
+    docsUrl: "https://pestphp.com/docs/installation",
+    githubUrl: "https://github.com/pestphp/pest",
+  },
+  "phpTesting:codeception": {
+    docsUrl: "https://codeception.com/docs/UnitTests",
+    githubUrl: "https://github.com/Codeception/Codeception",
+  },
   "phpOrm:cycle": {
     docsUrl: "https://cycle-orm.dev/docs/intro-about/current/en",
     githubUrl: "https://github.com/cycle/orm",

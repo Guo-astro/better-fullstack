@@ -6135,6 +6135,37 @@ export const TECH_OPTIONS: Record<
       default: true,
     },
   ],
+  phpTesting: [
+    {
+      id: "phpunit",
+      name: "PHPUnit",
+      description: "Request-level PHPUnit tests for routes, validation and CORS",
+      icon: "https://cdn.simpleicons.org/php/777BB4",
+      color: "from-indigo-500 to-indigo-700",
+      default: true,
+    },
+    {
+      id: "pest",
+      name: "Pest",
+      description: "Pest specs that also run the generated PHPUnit classes",
+      icon: "",
+      color: "from-fuchsia-500 to-pink-600",
+    },
+    {
+      id: "codeception",
+      name: "Codeception",
+      description: "Codeception Unit suite over the generated tests",
+      icon: "",
+      color: "from-teal-500 to-cyan-700",
+    },
+    {
+      id: "none",
+      name: "None",
+      description: "No test runner; the HTTP proof remains",
+      icon: "",
+      color: "from-gray-500 to-gray-700",
+    },
+  ],
   phpAuth: [
     {
       id: "firebase-jwt",

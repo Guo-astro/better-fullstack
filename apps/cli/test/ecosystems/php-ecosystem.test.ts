@@ -185,6 +185,68 @@ describe("PHP generation and lifecycle", () => {
     expect(previewBtsConfigUpdate(saved, {}).phpAuth).toBe(auth);
   });
 
+  it.each([
+    [
+      "pest",
+      "pestphp/pest",
+      "@php vendor/bin/pest tests",
+      ["tests/Pest.php", "tests/Feature/HealthTest.php"],
+    ],
+    [
+      "codeception",
+      "codeception/codeception",
+      "@php vendor/bin/codecept run Unit",
+      [
+        "codeception.yml",
+        "tests/Unit.suite.yml",
+        "tests/Support/UnitTester.php",
+        "tests/HealthCodeceptTest.php",
+      ],
+    ],
+  ] as const)(
+    "generates the %s runner over the existing tests",
+    async (runner, dependency, script, files) => {
+      const result = await createVirtual({
+        projectName: `php-${runner}`,
+        ecosystem: "php",
+        phpWebFramework: "symfony",
+        phpTesting: runner,
+      });
+      expect(result.success).toBe(true);
+      const tree = result.tree!;
+      const manifest = JSON.parse(getVirtualTreeFileContent(tree, "composer.json"));
+      expect(manifest["require-dev"]).toHaveProperty(dependency);
+      expect(manifest.scripts.test).toBe(script);
+      for (const file of [...files, "tests/ApplicationTest.php"]) {
+        expect(hasVirtualFile(tree.root, file)).toBe(true);
+      }
+      expect(generateReproducibleCommand(tree.config)).toContain(`--php-testing ${runner}`);
+      const saved = buildBtsConfigForPersistence(tree.config, {
+        version: "0.0.0",
+        createdAt: "2026-10-27T00:00:00.000Z",
+      });
+      expect(previewBtsConfigUpdate(saved, {}).phpTesting).toBe(runner);
+    },
+  );
+
+  it("omits the test runner and tests when testing is none", async () => {
+    const result = await createVirtual({
+      ecosystem: "php",
+      phpWebFramework: "laravel",
+      phpOrm: "eloquent",
+      phpTesting: "none",
+    });
+    expect(result.success).toBe(true);
+    const tree = result.tree!;
+    const manifest = JSON.parse(getVirtualTreeFileContent(tree, "composer.json"));
+    expect(manifest).not.toHaveProperty("require-dev");
+    expect(manifest.scripts).not.toHaveProperty("test");
+    expect(hasVirtualFile(tree.root, "tests/ApplicationTest.php")).toBe(false);
+    expect(hasVirtualFile(tree.root, "tests/NotesTest.php")).toBe(false);
+    expect(getVirtualTreeFileContent(tree, "bin/check.php")).not.toContain("'tests'");
+    expect(getVirtualTreeFileContent(tree, "README.md")).not.toContain("composer test");
+  });
+
   it("rejects Symfony Security outside Symfony before emitting files", async () => {
     const result = await createVirtual({
       ecosystem: "php",

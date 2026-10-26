@@ -1,27 +1,39 @@
 # {{projectName}}
 
 {{#if (eq phpWebFramework "laravel")}}
-Experimental PHP/Laravel HTTP application. Composer owns PHP dependencies and scripts. The recipe uses PHP 8.5.12, Laravel 13.38.0 and PHPUnit 13.4.3 as its minimum patch versions. PHP 8.6 is outside this recipe's declared version range.
+Experimental PHP/Laravel HTTP application. Composer owns PHP dependencies and scripts. The recipe uses PHP 8.5.12, Laravel 13.38.0{{#if (ne phpTesting "none")}} and PHPUnit 13.4.3{{/if}} as its minimum patch versions. PHP 8.6 is outside this recipe's declared version range.
 {{else if (eq phpWebFramework "symfony")}}
-Experimental PHP/Symfony HTTP application. Composer owns PHP dependencies and scripts. The recipe uses PHP 8.5.12, Symfony FrameworkBundle 8.1.9 and PHPUnit 13.4.3 as its minimum patch versions. PHP 8.6 is outside this recipe's declared version range.
+Experimental PHP/Symfony HTTP application. Composer owns PHP dependencies and scripts. The recipe uses PHP 8.5.12, Symfony FrameworkBundle 8.1.9{{#if (ne phpTesting "none")}} and PHPUnit 13.4.3{{/if}} as its minimum patch versions. PHP 8.6 is outside this recipe's declared version range.
 {{else}}
-Experimental PHP/Slim HTTP application. Composer owns PHP dependencies and scripts. The recipe uses PHP 8.5.12, Slim 4.15.3, Slim PSR-7 1.8.0 and PHPUnit 13.4.3 as its minimum patch versions. PHP 8.6 is outside this recipe's declared version range.
+Experimental PHP/Slim HTTP application. Composer owns PHP dependencies and scripts. The recipe uses PHP 8.5.12, Slim 4.15.3, Slim PSR-7 1.8.0{{#if (ne phpTesting "none")}} and PHPUnit 13.4.3{{/if}} as its minimum patch versions. PHP 8.6 is outside this recipe's declared version range.
 {{/if}}
 
 ## Setup and checks
 
-Install PHP 8.5.12 or a later 8.5 patch and Composer 2. PHPUnit requires DOM, filter, JSON, libxml, mbstring and XMLWriter extensions. Run these commands in this service directory:
+Install PHP 8.5.12 or a later 8.5 patch and Composer 2.{{#if (ne phpTesting "none")}} PHPUnit requires DOM, filter, JSON, libxml, mbstring and XMLWriter extensions.{{/if}} Run these commands in this service directory:
 
 ```sh
 composer install --no-interaction
 composer run build
+{{#if (ne phpTesting "none")}}
 composer test
+{{/if}}
 composer run proof:http
 composer run dev
 ```
 
-Commit the generated `composer.lock`. `build` validates the manifest, checks PHP syntax and validates optimized PSR-4 autoloading. `test` exercises the real {{#if (eq phpWebFramework "laravel")}}Laravel HTTP kernel{{else if (eq phpWebFramework "symfony")}}Symfony HTTP kernel{{else}}Slim request pipeline{{/if}} in process. `proof:http` starts a PHP HTTP process on an available loopback port, checks parsed responses and rejection behavior, then verifies shutdown. A successful file generation is not build or runtime verification.
+Commit the generated `composer.lock`. `build` validates the manifest, checks PHP syntax and validates optimized PSR-4 autoloading. {{#if (ne phpTesting "none")}}`test` exercises the real {{#if (eq phpWebFramework "laravel")}}Laravel HTTP kernel{{else if (eq phpWebFramework "symfony")}}Symfony HTTP kernel{{else}}Slim request pipeline{{/if}} in process. {{/if}}`proof:http` starts a PHP HTTP process on an available loopback port, checks parsed responses and rejection behavior, then verifies shutdown. A successful file generation is not build or runtime verification.
 
+{{#if (eq phpTesting "pest")}}
+`composer test` runs Pest. Pest executes the PHPUnit test classes in `tests/` unchanged and the Pest-style specs in `tests/Feature/`; `tests/Pest.php` configures them.
+
+{{else if (eq phpTesting "codeception")}}
+`composer test` runs the Codeception `Unit` suite defined by `codeception.yml` and `tests/Unit.suite.yml`. The suite executes the PHPUnit test classes in `tests/` unchanged and `tests/HealthCodeceptTest.php`, which extends `Codeception\Test\Unit`. Codeception generates `tests/Support/_generated/` on the first run.
+
+{{else if (eq phpTesting "none")}}
+No test runner or test files are generated. `composer run proof:http` is the only generated check of HTTP behavior.
+
+{{/if}}
 `composer run dev` uses PHP's development server at http://127.0.0.1:8080. Stop it with Ctrl-C. This server is for local development only.
 
 ## HTTP contract
@@ -42,7 +54,7 @@ Doctrine ORM stores notes in SQLite. `src/Entity/Note.php` maps the entity with 
 Cycle ORM stores notes in SQLite. `src/Notes.php` declares the ORM schema, creates the table through Cycle Database and persists `src/Entity/Note.php`. Set DATABASE_PATH to choose the file; it defaults to `var/database.sqlite`.
 {{/if}}
 
-Run `composer run db:setup` once before `composer run dev`. `GET /api/notes` lists notes. `POST /api/notes` accepts `{"title":"..."}` with 1 to 120 bytes of trimmed text and returns 201 with `id` and `title`. Invalid notes return 422 and malformed JSON returns 400. `composer test` and `composer run proof:http` use temporary SQLite databases. Migrations beyond this starter schema are not generated.
+Run `composer run db:setup` once before `composer run dev`. `GET /api/notes` lists notes. `POST /api/notes` accepts `{"title":"..."}` with 1 to 120 bytes of trimmed text and returns 201 with `id` and `title`. Invalid notes return 422 and malformed JSON returns 400. {{#if (eq phpTesting "none")}}`composer run proof:http` uses{{else}}`composer test` and `composer run proof:http` use{{/if}} temporary SQLite databases. Migrations beyond this starter schema are not generated.
 
 {{/if}}
 {{#if (ne phpAuth "none")}}
@@ -63,7 +75,7 @@ This starter verifies tokens; it does not log users in. Issue tokens from your i
 ## Configuration and extension
 
 {{#if (eq phpWebFramework "laravel")}}
-Copy `.env.example` to `.env` if local configuration is needed. Laravel loads `.env` itself; `config/cors.php` reads CORS_ORIGIN and `bin/serve.php` reads HOST and PORT. Run `php artisan key:generate` before adding sessions, cookies or encryption. Exported environment variables take precedence. HOST defaults to 127.0.0.1 and PORT to 8080. Set CORS_ORIGIN to a comma-separated list of exact allowed origins. A composed web graph includes each frontend's development origin. Requests from other origins receive no CORS header.
+Composer copies `.env.example` to `.env` after install when `.env` is missing. Laravel loads `.env` itself; `config/cors.php` reads CORS_ORIGIN and `bin/serve.php` reads HOST and PORT. Run `php artisan key:generate` before adding sessions, cookies or encryption. Exported environment variables take precedence. HOST defaults to 127.0.0.1 and PORT to 8080. Set CORS_ORIGIN to a comma-separated list of exact allowed origins. A composed web graph includes each frontend's development origin. Requests from other origins receive no CORS header.
 {{else if (eq phpWebFramework "symfony")}}
 Copy `.env.example` to `.env` if local configuration is needed. `Environment::load` reads only APP_ENV, APP_DEBUG, HOST, PORT and CORS_ORIGIN as INI strings. APP_ENV defaults to `prod`; the compiled container is cached in `var/cache/`. Exported environment variables take precedence. HOST defaults to 127.0.0.1 and PORT to 8080. Set CORS_ORIGIN to a comma-separated list of exact allowed origins. A composed web graph includes each frontend's development origin. Requests from other origins receive no CORS header.
 {{else}}
@@ -71,11 +83,11 @@ Copy `.env.example` to `.env` if local configuration is needed. `Environment::lo
 {{/if}}
 
 {{#if (eq phpWebFramework "laravel")}}
-`bootstrap/app.php` owns middleware and JSON error rendering, `routes/api.php` owns routes, and `app/Greeting.php` owns typed input validation. Add behavior here with request-level PHPUnit tests; keep `bin/proof-http.php` aligned with the public HTTP contract. Composer remains the dependency authority. TypeScript package processors must not modify this service.
+`bootstrap/app.php` owns middleware and JSON error rendering, `routes/api.php` owns routes, and `app/Greeting.php` owns typed input validation. Add behavior here {{#if (eq phpTesting "none")}}and{{else}}with request-level {{#if (eq phpTesting "pest")}}Pest{{else if (eq phpTesting "codeception")}}Codeception{{else}}PHPUnit{{/if}} tests;{{/if}} keep `bin/proof-http.php` aligned with the public HTTP contract. Composer remains the dependency authority. TypeScript package processors must not modify this service.
 {{else if (eq phpWebFramework "symfony")}}
-`src/Kernel.php` owns bundles and services, `src/Controller/ApiController.php` owns routes, `src/EventSubscriber/HttpContractSubscriber.php` owns CORS and JSON errors, and `src/Greeting.php` owns typed input validation. Add behavior here with request-level PHPUnit tests; keep `bin/proof-http.php` aligned with the public HTTP contract. Composer remains the dependency authority. TypeScript package processors must not modify this service.
+`src/Kernel.php` owns bundles and services, `src/Controller/ApiController.php` owns routes, `src/EventSubscriber/HttpContractSubscriber.php` owns CORS and JSON errors, and `src/Greeting.php` owns typed input validation. Add behavior here {{#if (eq phpTesting "none")}}and{{else}}with request-level {{#if (eq phpTesting "pest")}}Pest{{else if (eq phpTesting "codeception")}}Codeception{{else}}PHPUnit{{/if}} tests;{{/if}} keep `bin/proof-http.php` aligned with the public HTTP contract. Composer remains the dependency authority. TypeScript package processors must not modify this service.
 {{else}}
-`src/Application.php` owns routes and middleware. `src/Greeting.php` owns typed input validation. Add behavior here with request-level PHPUnit tests; keep `bin/proof-http.php` aligned with the public HTTP contract. Composer remains the dependency authority. TypeScript package processors must not modify this service.
+`src/Application.php` owns routes and middleware. `src/Greeting.php` owns typed input validation. Add behavior here {{#if (eq phpTesting "none")}}and{{else}}with request-level {{#if (eq phpTesting "pest")}}Pest{{else if (eq phpTesting "codeception")}}Codeception{{else}}PHPUnit{{/if}} tests;{{/if}} keep `bin/proof-http.php` aligned with the public HTTP contract. Composer remains the dependency authority. TypeScript package processors must not modify this service.
 {{/if}}
 
 {{#if (eq phpOrm "none")}}No database, migrations, {{#if (eq phpAuth "none")}}authentication, {{/if}}deployment adapter or production hosting recipe is generated.{{else}}No {{#if (eq phpAuth "none")}}authentication, {{/if}}deployment adapter or production hosting recipe is generated.{{/if}} Add these through explicit Stack Part roles and compatibility rules before advertising support. For a production rollout, configure a PHP-capable web server with `public/` as its document root and route application requests to `public/index.php`; obtain separate deployment verification.
@@ -91,5 +103,12 @@ Copy `.env.example` to `.env` if local configuration is needed. `Environment::lo
 - [Slim 4.15.3 source](https://github.com/slimphp/Slim/tree/4.15.3)
 - [Slim PSR-7 1.8.0 source](https://github.com/slimphp/Slim-Psr7/tree/1.8.0)
 {{/if}}
+{{#if (ne phpTesting "none")}}
 - [PHPUnit 13.4](https://docs.phpunit.de/en/13.4/)
+{{/if}}
+{{#if (eq phpTesting "pest")}}
+- [Pest](https://pestphp.com/docs/installation)
+{{else if (eq phpTesting "codeception")}}
+- [Codeception unit tests](https://codeception.com/docs/UnitTests)
+{{/if}}
 - [Composer scripts](https://getcomposer.org/doc/articles/scripts.md)

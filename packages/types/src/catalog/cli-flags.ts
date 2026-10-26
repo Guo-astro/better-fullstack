@@ -1167,6 +1167,12 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         source: { kind: "category", category: "phpAuth" },
         configKey: "phpAuth",
       },
+      {
+        flag: "php-testing",
+        summary: "PHP test runner.",
+        source: { kind: "category", category: "phpTesting" },
+        configKey: "phpTesting",
+      },
     ],
   },
   {

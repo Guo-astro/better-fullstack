@@ -328,7 +328,7 @@ export const CONFIG_SCOPE_REGISTRY = {
     ],
   },
   ruby: { core: ["rubyWebFramework", "rubyOrm", "rubyAuth"], sections: [] },
-  php: { core: ["phpWebFramework", "phpOrm", "phpAuth"], sections: [] },
+  php: { core: ["phpWebFramework", "phpOrm", "phpAuth", "phpTesting"], sections: [] },
   elixir: {
     core: ["elixirWebFramework", "database", "dbSetup", "elixirOrm", "elixirAuth", "elixirApi"],
     sections: [

@@ -144,7 +144,7 @@ const GETTING_STARTED_MD = `# Getting Started with Better-Fullstack MCP
 2. Tell the user to run: cd my-java-app && ./mvnw test && ./mvnw spring-boot:run
 
 ## Quick Start - PHP Project
-1. Call bfs_create_project with projectName, ecosystem: "php", phpWebFramework: "slim", "laravel" or "symfony", and database: "none". Optional phpOrm: "eloquent" (Slim or Laravel), "doctrine" (Slim or Symfony) or "cycle" (Slim) persists notes in SQLite. Optional phpAuth: "firebase-jwt" or "lcobucci-jwt" (any framework) or "symfony-security" (Symfony) protects GET /api/me with HS256 bearer tokens.
+1. Call bfs_create_project with projectName, ecosystem: "php", phpWebFramework: "slim", "laravel" or "symfony", and database: "none". Optional phpOrm: "eloquent" (Slim or Laravel), "doctrine" (Slim or Symfony) or "cycle" (Slim) persists notes in SQLite. Optional phpAuth: "firebase-jwt" or "lcobucci-jwt" (any framework) or "symfony-security" (Symfony) protects GET /api/me with HS256 bearer tokens. phpTesting picks "phpunit" (default), "pest", "codeception" or "none".
 2. Run composer install --no-interaction, composer run build, composer test and composer run proof:http from the generated service directory.
 3. Start local development with composer run dev. PHP.md describes the validated JSON route and extension boundaries.
 4. Treat this recipe as experimental until those native checks pass. With phpOrm, run composer run db:setup before composer run dev. With phpAuth, set JWT_SECRET; tokens come from your identity provider. Deployment adapters are not generated. For composition use backend:php:slim, backend:php:laravel or backend:php:symfony with a frontend Stack Part.

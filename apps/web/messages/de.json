@@ -594,6 +594,7 @@
   "docsCliSummaryPhpPhpWebFramework": "PHP-HTTP-Framework.",
   "docsCliSummaryPhpPhpOrm": "PHP-ORM / Datenbankschicht.",
   "docsCliSummaryPhpPhpAuth": "PHP-Authentifizierung.",
+  "docsCliSummaryPhpPhpTesting": "PHP-Testrunner.",
   "docsCliSummaryElixirElixirWebFramework": "Web-Framework für Elixir.",
   "docsCliSummaryElixirElixirOrm": "ORM / Datenbank für Elixir.",
   "docsCliSummaryElixirElixirAuth": "Authentifizierung für Elixir.",

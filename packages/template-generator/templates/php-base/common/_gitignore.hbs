@@ -7,3 +7,7 @@ var/
 {{#if (and (eq phpWebFramework "laravel") (ne phpOrm "none"))}}
 database/*.sqlite
 {{/if}}
+{{#if (eq phpTesting "codeception")}}
+tests/_output/
+tests/Support/_generated/
+{{/if}}

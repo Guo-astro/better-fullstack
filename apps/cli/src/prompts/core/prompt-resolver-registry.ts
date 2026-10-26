@@ -85,6 +85,7 @@ import {
 import {
   resolvePhpAuthPrompt,
   resolvePhpOrmPrompt,
+  resolvePhpTestingPrompt,
   resolvePhpWebFrameworkPrompt,
 } from "@/prompts/ecosystems/php-ecosystem";
 import {
@@ -222,6 +223,7 @@ import {
   PAYMENTS_VALUES,
   PhpAuthSchema,
   PhpOrmSchema,
+  PhpTestingSchema,
   PhpWebFrameworkSchema,
   PYTHON_AI_VALUES,
   PYTHON_API_VALUES,
@@ -819,6 +821,12 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
         value === undefined ? undefined : PhpOrmSchema.parse(value),
         phpWebFramework === undefined ? undefined : PhpWebFrameworkSchema.parse(phpWebFramework),
       ),
+  },
+  phpTesting: {
+    schemaValues: PhpTestingSchema.options,
+    coverageContexts: [{}],
+    resolve: ({ value }: { value?: string } = {}) =>
+      resolvePhpTestingPrompt(value === undefined ? undefined : PhpTestingSchema.parse(value)),
   },
   phpAuth: {
     schemaValues: PhpAuthSchema.options,

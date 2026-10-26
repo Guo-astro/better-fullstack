@@ -52,20 +52,35 @@
     "symfony/cache": "~8.1.9"{{/if}}
 {{/if}}
   },
+{{#if (ne phpTesting "none")}}
   "require-dev": {
+{{#if (eq phpTesting "codeception")}}
+    "codeception/codeception": "~5.3.7",
+{{/if}}
+{{#if (eq phpTesting "pest")}}
+    "pestphp/pest": "~5.3.3",
+{{/if}}
     "phpunit/phpunit": "~13.4.3"
   },
+{{/if}}
   "autoload": {
     "psr-4": {
       "App\\": "{{phpSourceDirectory}}/"
     }
   },
+{{#if (ne phpTesting "none")}}
   "autoload-dev": {
     "psr-4": {
       "App\\Tests\\": "tests/"
     }
   },
+{{/if}}
   "scripts": {
+{{#if (eq phpWebFramework "laravel")}}
+    "post-autoload-dump": [
+      "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+    ],
+{{/if}}
     "dev": [
       "Composer\\Config::disableProcessTimeout",
       "@php bin/serve.php"
@@ -75,7 +90,13 @@
       "@php bin/check.php",
       "@composer dump-autoload --optimize --strict-psr"
     ],
+{{#if (eq phpTesting "pest")}}
+    "test": "@php vendor/bin/pest tests",
+{{else if (eq phpTesting "codeception")}}
+    "test": "@php vendor/bin/codecept run Unit",
+{{else if (eq phpTesting "phpunit")}}
     "test": "@php vendor/bin/phpunit --bootstrap vendor/autoload.php tests",
+{{/if}}
 {{#if (ne phpAuth "none")}}
     "token:issue": "@php bin/issue-token.php",
 {{/if}}

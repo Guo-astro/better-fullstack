@@ -153,6 +153,7 @@ import type {
   PhpWebFrameworkSchema,
   PhpOrmSchema,
   PhpAuthSchema,
+  PhpTestingSchema,
   ElixirWebFrameworkSchema,
   ElixirOrmSchema,
   ElixirAuthSchema,
@@ -331,6 +332,7 @@ export type DotnetLibraries = z.infer<typeof DotnetLibrariesSchema>;
 export type PhpWebFramework = z.infer<typeof PhpWebFrameworkSchema>;
 export type PhpOrm = z.infer<typeof PhpOrmSchema>;
 export type PhpAuth = z.infer<typeof PhpAuthSchema>;
+export type PhpTesting = z.infer<typeof PhpTestingSchema>;
 export type ElixirWebFramework = z.infer<typeof ElixirWebFrameworkSchema>;
 export type ElixirOrm = z.infer<typeof ElixirOrmSchema>;
 export type ElixirAuth = z.infer<typeof ElixirAuthSchema>;

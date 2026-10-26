@@ -610,6 +610,7 @@
   "docsCliSummaryPhpPhpWebFramework": "PHP HTTP framework.",
   "docsCliSummaryPhpPhpOrm": "PHP ORM / database layer.",
   "docsCliSummaryPhpPhpAuth": "PHP authentication.",
+  "docsCliSummaryPhpPhpTesting": "PHP test runner.",
   "docsCliSummaryElixirElixirWebFramework": "Elixir web framework.",
   "docsCliSummaryElixirElixirOrm": "Elixir ORM / database.",
   "docsCliSummaryElixirElixirAuth": "Elixir auth.",

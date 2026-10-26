@@ -673,6 +673,16 @@ const CATEGORY_NAMES: Record<string, LocalizedMap> = {
     "fr": "PHP ORM / Base de données",
     "uk": "PHP ORM / База даних",
   },
+  phpTesting: {
+    "es": "Pruebas PHP",
+    "zh": "PHP 测试",
+    "ja": "PHP テスト",
+    "ko": "PHP 테스트",
+    "zh-Hant": "PHP 測試",
+    "de": "PHP-Tests",
+    "fr": "Tests PHP",
+    "uk": "Тестування PHP",
+  },
   phpAuth: {
     "es": "Auth PHP",
     "zh": "PHP 认证",
