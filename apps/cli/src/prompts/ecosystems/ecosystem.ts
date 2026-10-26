@@ -44,7 +44,7 @@ export const ECOSYSTEM_PROMPT_OPTIONS = [
   {
     value: "php" as const,
     label: "PHP",
-    hint: "Experimental Slim HTTP application with Composer and PHPUnit",
+    hint: "Experimental Slim, Laravel or Symfony HTTP application with Composer",
   },
   {
     value: "elixir" as const,

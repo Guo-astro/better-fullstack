@@ -98,6 +98,8 @@ export const ICON_REGISTRY: Record<string, IconConfig> = {
   sinatra: { type: "si", slug: "ruby", hex: "CC342D" },
   php: { type: "si", slug: "php", hex: "777BB4" },
   slim: { type: "si", slug: "php", hex: "777BB4" },
+  laravel: { type: "si", slug: "laravel", hex: "FF2D20" },
+  symfony: { type: "si", slug: "symfony", hex: "000000", needsInvert: "dark" },
   elixir: { type: "si", slug: "elixir", hex: "4B275F" },
   dotnet: { type: "si", slug: "dotnet", hex: "512BD4" },
   "aspnet-minimal": { type: "si", slug: "dotnet", hex: "512BD4" },

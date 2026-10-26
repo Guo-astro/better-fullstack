@@ -68,5 +68,11 @@ describe("PHP builder recipe", () => {
     });
     expect(generateStackCommand(stack)).toContain("--php-web-framework slim");
     expect(getDisabledReason(stack, "database", "sqlite")).toContain("does not generate database");
+    for (const framework of ["laravel", "symfony"] as const) {
+      const selected = { ...stack, phpWebFramework: framework };
+      expect(TECH_OPTIONS.phpWebFramework.some((option) => option.id === framework)).toBe(true);
+      expect(stackStateToProjectConfig(selected).phpWebFramework).toBe(framework);
+      expect(generateStackCommand(selected)).toContain(`--php-web-framework ${framework}`);
+    }
   });
 });

@@ -5991,6 +5991,20 @@ export const TECH_OPTIONS: Record<
       default: true,
     },
     {
+      id: "laravel",
+      name: "Laravel",
+      description: "Experimental Laravel 13 JSON API with the same HTTP contract",
+      icon: "https://cdn.simpleicons.org/laravel/FF2D20",
+      color: "from-red-500 to-red-700",
+    },
+    {
+      id: "symfony",
+      name: "Symfony",
+      description: "Experimental Symfony 8 micro-kernel JSON API with the same HTTP contract",
+      icon: "https://cdn.simpleicons.org/symfony/000000",
+      color: "from-gray-700 to-gray-900",
+    },
+    {
       id: "none",
       name: "None",
       description: "No PHP service",
@@ -7804,7 +7818,7 @@ export const ECOSYSTEMS: {
   {
     id: "php",
     name: "PHP",
-    description: "Experimental Slim HTTP application",
+    description: "Experimental Slim, Laravel or Symfony HTTP application",
     icon: "https://cdn.simpleicons.org/php/777BB4",
     color: "from-indigo-500 to-indigo-700",
   },

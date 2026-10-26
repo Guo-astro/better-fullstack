@@ -17,7 +17,7 @@ One CLI covers solo ecosystems and additional languages for composed projects. E
 | [Java and Kotlin](#java-and-kotlin) | Spring Boot, Ktor, Quarkus, Micronaut, or plain JVM projects with Maven/Gradle.                 | Maven/Gradle        |
 | [Elixir](#elixir)                   | Phoenix and LiveView apps with Ecto, Absinthe, realtime, jobs, and deploy files.                | Mix                 |
 | [.NET](#net)                        | ASP.NET Core services with EF Core or Dapper, Identity, Minimal APIs, SignalR, jobs, and tests. | .NET SDK 10         |
-| [PHP](#php)                         | Experimental Slim JSON services with validated requests, PHPUnit, and a live HTTP proof.        | PHP 8.5, Composer 2 |
+| [PHP](#php)                         | Experimental Slim, Laravel or Symfony JSON services with PHPUnit and a live HTTP proof.         | PHP 8.5, Composer 2 |
 | [Ruby](#ruby)                       | Experimental Sinatra JSON HTTP service with Minitest/Rack integration tests.                    | Bundler             |
 | [Crystal](#crystal)                 | Experimental native Kemal HTTP services and framework-free programs.                            | Crystal, Shards     |
 
@@ -261,7 +261,7 @@ The recipe remains experimental and listed until current, revision-matched evide
 
 ## PHP
 
-The experimental PHP recipe generates a Slim application with Composer dependencies, PSR-4 classes, PHPUnit request tests, and a bounded HTTP proof. It requires PHP 8.5.12 or a later 8.5 patch and Composer 2. It provides REST and testing; database, authentication, migrations, and deployment integrations are outside this recipe.
+The experimental PHP recipe generates a Slim, Laravel 13 or Symfony 8 application with Composer dependencies, PSR-4 classes, PHPUnit request tests, and a bounded HTTP proof. Choose the framework with `--php-web-framework slim`, `laravel` or `symfony`; all three serve the same HTTP contract. It requires PHP 8.5.12 or a later 8.5 patch and Composer 2. It provides REST and testing; database, authentication, migrations, and deployment integrations are outside this recipe.
 
 ```sh
 bunx create-better-fullstack@latest php-service \

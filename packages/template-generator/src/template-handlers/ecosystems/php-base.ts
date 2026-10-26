@@ -10,12 +10,20 @@ export async function processPhpBaseTemplate(
   config: ProjectConfig,
   targetPath = "",
 ): Promise<void> {
-  if (config.ecosystem !== "php" || config.phpWebFramework !== "slim") return;
+  if (config.ecosystem !== "php" || config.phpWebFramework === "none") return;
   const phpPackageName =
     config.projectName
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, "") || "app";
-  const context = { ...config, phpPackageName };
-  renderTemplateTree(vfs, templates, { prefix: "php-base/", targetPath, context });
+  const phpSourceDirectory = config.phpWebFramework === "laravel" ? "app" : "src";
+  const context = { ...config, phpPackageName, phpSourceDirectory };
+  const sourcePath = targetPath ? `${targetPath}/${phpSourceDirectory}` : phpSourceDirectory;
+  renderTemplateTree(vfs, templates, { prefix: "php-base/common/", targetPath, context });
+  renderTemplateTree(vfs, templates, {
+    prefix: `php-base/${config.phpWebFramework}/`,
+    targetPath,
+    context,
+  });
+  renderTemplateTree(vfs, templates, { prefix: "php-base/app/", targetPath: sourcePath, context });
 }

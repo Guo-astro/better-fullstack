@@ -10,6 +10,7 @@ import { z } from "zod";
 
 import { buildBtsConfigForPersistence, previewBtsConfigUpdate } from "@/config/bts-config";
 import { createVirtual } from "@/index";
+import { generateReproducibleCommand } from "@/lifecycle/generate-reproducible-command";
 import { planProjectOperation } from "@/operations/project-create";
 import { MCP_PLAN_CREATE_SCHEMA, MCP_STACK_UPDATE_SCHEMA } from "@/operations/stack-input";
 import { resolvePhpWebFrameworkPrompt } from "@/prompts/ecosystems/php-ecosystem";
@@ -67,6 +68,45 @@ describe("PHP generation and lifecycle", () => {
     expect(updated.phpWebFramework).toBe("slim");
     expect(updated.stackParts).toEqual(saved.stackParts);
   });
+
+  it.each([
+    [
+      "laravel",
+      "laravel/framework",
+      ["artisan", "bootstrap/app.php", "routes/api.php", "app/Greeting.php"],
+    ],
+    ["symfony", "symfony/framework-bundle", ["src/Kernel.php", "src/Controller/ApiController.php"]],
+  ] as const)(
+    "generates the %s framework and keeps it through saved config",
+    async (framework, dependency, files) => {
+      const result = await createVirtual({
+        projectName: `php-${framework}`,
+        ecosystem: "php",
+        phpWebFramework: framework,
+      });
+      expect(result.success).toBe(true);
+      const tree = result.tree!;
+      const manifest = JSON.parse(getVirtualTreeFileContent(tree, "composer.json"));
+      expect(Object.keys(manifest.require)).toContain(dependency);
+      expect(manifest.require).not.toHaveProperty("slim/slim");
+      for (const file of files) expect(hasVirtualFile(tree.root, file)).toBe(true);
+      expect(hasVirtualFile(tree.root, "src/Application.php")).toBe(false);
+      expect(getVirtualTreeFileContent(tree, "bin/proof-http.php")).toContain(
+        `'framework' => '${framework}'`,
+      );
+      expect(generateReproducibleCommand(tree.config)).toContain(
+        `--php-web-framework ${framework}`,
+      );
+      const saved = buildBtsConfigForPersistence(tree.config, {
+        version: "0.0.0",
+        createdAt: "2026-10-27T00:00:00.000Z",
+      });
+      expect(previewBtsConfigUpdate(saved, {}).phpWebFramework).toBe(framework);
+      expect(saved.stackParts).toContainEqual(
+        expect.objectContaining({ role: "backend", ecosystem: "php", toolId: framework }),
+      );
+    },
+  );
 
   it("creates separately owned PHP services beside React", async () => {
     const graph = cliInputToProjectConfigPartial({

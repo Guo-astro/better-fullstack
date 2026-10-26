@@ -1026,7 +1026,9 @@ export const DotnetLibrariesSchema = z
   .describe(".NET application libraries");
 
 // Elixir ecosystem schemas
-export const PhpWebFrameworkSchema = z.enum(["slim", "none"]).describe("PHP HTTP framework");
+export const PhpWebFrameworkSchema = z
+  .enum(["slim", "laravel", "symfony", "none"])
+  .describe("PHP HTTP framework");
 
 export const ElixirWebFrameworkSchema = z
   .enum(["phoenix", "phoenix-live-view", "none"])

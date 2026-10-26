@@ -2,12 +2,12 @@ import type { ProjectConfig } from "@/config/types";
 
 export const PHP_RECIPE_REASONS = {
   framework:
-    "The PHP recipe requires Slim. Use --php-web-framework slim or select another ecosystem.",
+    "The PHP recipe requires a web framework. Use --php-web-framework slim, laravel or symfony, or select another ecosystem.",
   database:
-    "The Slim recipe does not generate database or migration integration. Use --database none.",
+    "The PHP recipe does not generate database or migration integration. Use --database none.",
   capability:
-    "The Slim recipe provides REST, Composer and PHPUnit; additional backend capabilities are not implemented.",
-  owner: "PHP capabilities must belong to a PHP Slim backend.",
+    "The PHP recipe provides REST, Composer and PHPUnit; additional backend capabilities are not implemented.",
+  owner: "PHP capabilities must belong to a PHP backend.",
 } as const;
 
 export const PHP_UNSUPPORTED_BACKEND_FIELDS = [

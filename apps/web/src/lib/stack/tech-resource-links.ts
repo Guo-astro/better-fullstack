@@ -19,6 +19,14 @@ const BASE_LINKS: LinkMap = {
     docsUrl: "https://www.slimframework.com/docs/v4/",
     githubUrl: "https://github.com/slimphp/Slim",
   },
+  laravel: {
+    docsUrl: "https://laravel.com/docs/13.x",
+    githubUrl: "https://github.com/laravel/framework",
+  },
+  symfony: {
+    docsUrl: "https://symfony.com/doc/current/index.html",
+    githubUrl: "https://github.com/symfony/symfony",
+  },
   enabled: {
     docsUrl: "https://developer.chrome.com/docs/ai/webmcp",
     githubUrl: "https://github.com/webmachinelearning/webmcp",

@@ -97,6 +97,7 @@ import {
   PYTHON_ORM_VALUES,
   PYTHON_GRAPHQL_VALUES,
   PYTHON_QUALITY_VALUES,
+  PHP_WEB_FRAMEWORK_VALUES,
   PYTHON_TESTING_VALUES,
   PYTHON_CACHING_VALUES,
   PYTHON_REALTIME_VALUES,
@@ -623,6 +624,18 @@ function makeRubyDraft(args: GeneratorArgs): CandidateDraft {
   };
 }
 
+function makePhpDraft(args: GeneratorArgs): CandidateDraft {
+  const phpWebFramework = sampleScalar(
+    PHP_WEB_FRAMEWORK_VALUES.filter((value) => value !== "none"),
+    0,
+    "phpWebFramework",
+  );
+  return {
+    ecosystem: "php",
+    options: { ...createCommonOptions("php", args), phpWebFramework, database: "none" },
+  };
+}
+
 function makeElixirDraft(args: GeneratorArgs): CandidateDraft {
   const elixirWebFramework = sampleScalar(ELIXIR_WEB_FRAMEWORK_VALUES, 0.08, "elixirWebFramework");
   const usesPhoenix = elixirWebFramework !== "none";
@@ -994,10 +1007,7 @@ function createDraft(ecosystem: Ecosystem, args: GeneratorArgs): CandidateDraft 
     case "ruby":
       return makeRubyDraft(args);
     case "php":
-      return {
-        ecosystem: "php",
-        options: { ...createCommonOptions("php", args), phpWebFramework: "slim", database: "none" },
-      };
+      return makePhpDraft(args);
     case "elixir":
       return makeElixirDraft(args);
     case "dotnet":

@@ -13,7 +13,7 @@ final class Environment
         if (!is_file($file)) return;
         $values = parse_ini_file($file, false, INI_SCANNER_RAW);
         if ($values === false) throw new RuntimeException('Cannot parse .env.');
-        foreach (['HOST', 'PORT', 'CORS_ORIGIN'] as $key) {
+        foreach ([{{#if (eq phpWebFramework "symfony")}}'APP_ENV', 'APP_DEBUG', {{/if}}'HOST', 'PORT', 'CORS_ORIGIN'] as $key) {
             if (getenv($key) === false && isset($values[$key]) && is_string($values[$key])) {
                 putenv($key . '=' . $values[$key]);
             }

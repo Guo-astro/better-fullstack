@@ -13,6 +13,8 @@ const OPTIONS: PromptOption<PhpWebFramework>[] = [
     label: "Slim",
     hint: "Experimental JSON HTTP application, Composer and PHPUnit",
   },
+  { value: "laravel", label: "Laravel", hint: "Experimental Laravel 13 JSON API" },
+  { value: "symfony", label: "Symfony", hint: "Experimental Symfony 8 micro-kernel JSON API" },
   { value: "none", label: "None", hint: "No PHP service" },
 ];
 

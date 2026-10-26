@@ -45,7 +45,7 @@ try {
         requireProof(proc_get_status($process)['running'], 'Server exited before readiness.');
         try {
             [$status, $health] = requestProof('http://' . $address . '/health');
-            $ready = $status === 200 && $health === ['status' => 'ok', 'framework' => 'slim'];
+            $ready = $status === 200 && $health === ['status' => 'ok', 'framework' => '{{phpWebFramework}}'];
         } catch (Throwable) {
             usleep(50000);
         }

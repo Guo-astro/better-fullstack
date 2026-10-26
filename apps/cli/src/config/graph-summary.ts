@@ -40,6 +40,8 @@ const BACKEND_LABELS: Record<string, string> = {
   "java:spring-boot": "Java Spring Boot API",
   "java:quarkus": "Java Quarkus API",
   "php:slim": "PHP Slim HTTP API",
+  "php:laravel": "PHP Laravel HTTP API",
+  "php:symfony": "PHP Symfony HTTP API",
   "elixir:phoenix": "Elixir Phoenix API",
   "elixir:phoenix-live-view": "Elixir Phoenix LiveView API",
 };

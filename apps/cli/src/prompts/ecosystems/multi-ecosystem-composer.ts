@@ -249,7 +249,7 @@ export async function selectBackendEcosystem(
       { value: "java", label: "Java / Kotlin", hint: "Spring Boot, Ktor, Quarkus" },
       { value: "dotnet", label: ".NET", hint: "ASP.NET Core, EF Core, SignalR" },
       { value: "ruby", label: "Ruby", hint: "Experimental Sinatra JSON service" },
-      { value: "php", label: "PHP", hint: "Slim HTTP with Composer" },
+      { value: "php", label: "PHP", hint: "Slim, Laravel or Symfony with Composer" },
       { value: "elixir", label: "Elixir", hint: "Phoenix, LiveView" },
     ],
     initialValue,

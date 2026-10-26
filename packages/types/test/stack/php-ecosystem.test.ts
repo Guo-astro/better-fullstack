@@ -73,13 +73,15 @@ describe("PHP graph and transport contract", () => {
     expect(parseStackSelectionFromUrlRecord(Object.fromEntries(explicit)).database).toBe("sqlite");
   });
 
-  it("accepts PHP and Slim in the shared create schema", () => {
+  it("accepts each generated PHP framework in the shared create schema", () => {
     expect(EcosystemSchema.parse("php")).toBe("php");
+    for (const framework of ["slim", "laravel", "symfony"]) {
+      expect(
+        CreateInputSchema.parse({ ecosystem: "php", phpWebFramework: framework }).phpWebFramework,
+      ).toBe(framework);
+    }
     expect(
-      CreateInputSchema.parse({ ecosystem: "php", phpWebFramework: "slim" }).phpWebFramework,
-    ).toBe("slim");
-    expect(
-      CreateInputSchema.safeParse({ ecosystem: "php", phpWebFramework: "laravel" }).success,
+      CreateInputSchema.safeParse({ ecosystem: "php", phpWebFramework: "mezzio" }).success,
     ).toBe(false);
   });
 
