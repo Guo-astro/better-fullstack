@@ -211,6 +211,7 @@ export const STACK_SELECTION_OPTION_CATEGORY_BY_KEY: Record<
   dotnetLibraries: "dotnetLibraries",
   rubyWebFramework: "rubyWebFramework",
   rubyOrm: "rubyOrm",
+  rubyAuth: "rubyAuth",
   phpWebFramework: "phpWebFramework",
   phpOrm: "phpOrm",
   phpAuth: "phpAuth",
@@ -413,6 +414,7 @@ export const STACK_SELECTION_URL_KEYS = {
   dotnetLibraries: "dnlib",
   rubyWebFramework: "rbwf",
   rubyOrm: "rborm",
+  rubyAuth: "rbauth",
   phpWebFramework: "phwf",
   phpOrm: "phorm",
   phpAuth: "phauth",
@@ -890,6 +892,7 @@ const CLI_SCALAR_CONFIG_FIELDS = [
   ["dotnetDeploy", "dotnetDeploy"],
   ["rubyWebFramework", "rubyWebFramework"],
   ["rubyOrm", "rubyOrm"],
+  ["rubyAuth", "rubyAuth"],
   ["phpWebFramework", "phpWebFramework"],
   ["phpOrm", "phpOrm"],
   ["phpAuth", "phpAuth"],
@@ -1974,6 +1977,7 @@ function getCliGraphStackParts(input: CLIInput): StackPart[] {
   addScopedBackendPart("php", "orm", input.phpOrm);
   addScopedBackendPart("php", "auth", input.phpAuth);
   addScopedBackendPart("ruby", "orm", input.rubyOrm);
+  addScopedBackendPart("ruby", "auth", input.rubyAuth);
   addScopedBackendPart("elixir", "orm", input.elixirOrm);
   addScopedBackendPart("elixir", "api", input.elixirApi);
   addScopedBackendPart("elixir", "auth", input.elixirAuth);
@@ -2171,6 +2175,7 @@ function buildProjectConfigBase(
     ) as ProjectConfig["dotnetLibraries"],
     rubyWebFramework: stack.rubyWebFramework as ProjectConfig["rubyWebFramework"],
     rubyOrm: stack.rubyOrm as ProjectConfig["rubyOrm"],
+    rubyAuth: stack.rubyAuth as ProjectConfig["rubyAuth"],
     phpWebFramework: stack.phpWebFramework as ProjectConfig["phpWebFramework"],
     phpOrm: stack.phpOrm as ProjectConfig["phpOrm"],
     phpAuth: stack.phpAuth as ProjectConfig["phpAuth"],
@@ -2274,6 +2279,7 @@ export function isCliDefaultStackSelection(
           ...DOTNET_CONFIG_KEYS,
           "rubyWebFramework",
           "rubyOrm",
+          "rubyAuth",
           "phpWebFramework",
           "phpOrm",
           "phpAuth",
@@ -2649,6 +2655,7 @@ function generateRubyCommand(selection: StackSelectionInput, projectName: string
     "--ecosystem ruby",
     `--ruby-web-framework ${selection.rubyWebFramework}`,
     `--ruby-orm ${selection.rubyOrm}`,
+    `--ruby-auth ${selection.rubyAuth}`,
     "--database none",
     "--addons none",
     "--examples none",

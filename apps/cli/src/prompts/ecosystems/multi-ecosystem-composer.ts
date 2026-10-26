@@ -143,7 +143,11 @@ import {
   getPythonValidationChoice,
   getPythonWebFrameworkChoice,
 } from "@/prompts/ecosystems/python-ecosystem";
-import { getRubyOrmChoice, getRubyWebFrameworkChoice } from "@/prompts/ecosystems/ruby-ecosystem";
+import {
+  getRubyAuthChoice,
+  getRubyOrmChoice,
+  getRubyWebFrameworkChoice,
+} from "@/prompts/ecosystems/ruby-ecosystem";
 import {
   getRustApiChoice,
   getRustAuthChoice,
@@ -1450,9 +1454,12 @@ export async function gatherMultiEcosystemConfig(
     const rubyWebFramework = promptValue(await getRubyWebFrameworkChoice(flags.rubyWebFramework));
     const rubyOrm =
       rubyWebFramework === "none" ? "none" : promptValue(await getRubyOrmChoice(flags.rubyOrm));
-    Object.assign(backendChoices, { rubyWebFramework, rubyOrm });
+    const rubyAuth =
+      rubyWebFramework === "none" ? "none" : promptValue(await getRubyAuthChoice(flags.rubyAuth));
+    Object.assign(backendChoices, { rubyWebFramework, rubyOrm, rubyAuth });
     if (rubyWebFramework !== "none") stackPartSpecs.push(`backend:ruby:${rubyWebFramework}`);
     if (rubyOrm !== "none") stackPartSpecs.push(`backend.orm:ruby:${rubyOrm}`);
+    if (rubyAuth !== "none") stackPartSpecs.push(`backend.auth:ruby:${rubyAuth}`);
   }
 
   if (backendEcosystem === "php") {

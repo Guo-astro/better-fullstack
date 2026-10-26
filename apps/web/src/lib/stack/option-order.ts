@@ -109,6 +109,7 @@ export const OPTION_DISPLAY_ORDER: Readonly<Record<string, readonly string[]>> =
   elixirObservability: ["telemetry", "opentelemetry", "sentry", "prom_ex", "none"],
   elixirOrm: ["ecto", "ecto-sql", "myxql", "ecto_sqlite3", "none"],
   rubyOrm: ["active-record", "sequel", "rom", "none"],
+  rubyAuth: ["jwt", "omniauth", "rodauth", "none"],
   elixirQuality: ["credo", "dialyxir", "excoveralls", "sobelow", "mix_audit", "none"],
   elixirTesting: ["ex_unit", "ex_machina", "wallaby", "mox", "bypass", "stream_data", "none"],
   elixirValidation: ["nimble-options", "ecto-changesets", "peri", "tarams", "none"],

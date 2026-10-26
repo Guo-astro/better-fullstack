@@ -1135,6 +1135,12 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         source: { kind: "category", category: "rubyOrm" },
         configKey: "rubyOrm",
       },
+      {
+        flag: "ruby-auth",
+        summary: "Ruby authentication.",
+        source: { kind: "category", category: "rubyAuth" },
+        configKey: "rubyAuth",
+      },
     ],
   },
   {

@@ -277,6 +277,55 @@ describe("Ruby language integration", () => {
     ).toBe(orm);
   });
 
+  it.each([
+    { auth: "jwt", gems: ['gem "jwt", "3.3.0"'], env: "JWT_SECRET=" },
+    {
+      auth: "omniauth",
+      gems: ['gem "omniauth", "2.3.1"', 'gem "omniauth_openid_connect", "0.8.0"'],
+      env: "OIDC_ISSUER=",
+    },
+    { auth: "rodauth", gems: ['gem "rodauth", "2.49.0"', 'gem "sqlite3", "2.10.2"'], env: "SESSION_SECRET=" },
+  ] as const)("protects /api/me with $auth on every framework", async ({ auth, gems, env }) => {
+    for (const framework of ["sinatra", "rails", "roda", "grape"] as const) {
+      const result = await createVirtual({
+        ecosystem: "ruby",
+        projectName: "ruby-service",
+        rubyWebFramework: framework,
+        rubyAuth: auth,
+        aiDocs: ["agents-md"],
+      });
+      if (!result.success || !result.tree) throw new Error(result.error ?? "No Ruby project");
+      const paths = listVirtualTreeFilePaths(result.tree);
+      expect(paths).toContain("auth.rb");
+      expect(paths.some((path) => path.startsWith("auth/"))).toBe(false);
+      for (const gem of gems) expect(content(result.tree, "Gemfile")).toContain(gem);
+      expect(content(result.tree, "app.rb")).toContain("Auth");
+      expect(content(result.tree, "app.rb")).toContain("api/me");
+      expect(content(result.tree, ".env.example")).toContain(env);
+      expect(content(result.tree, "bin/proof")).toContain('authentication: "passed"');
+    }
+    const project = { ...config(), rubyAuth: auth };
+    expect(generateReproducibleCommand(project)).toContain(`--ruby-auth ${auth}`);
+    expect(
+      buildBtsConfigForPersistence(project, { version: "test", createdAt: "2026-10-27T00:00:00.000Z" })
+        .stackParts?.find((part) => part.role === "auth" && part.ecosystem === "ruby")?.toolId,
+    ).toBe(auth);
+  });
+
+  it("migrates Rodauth accounts alongside the selected ORM", async () => {
+    const result = await createVirtual({
+      ecosystem: "ruby",
+      rubyWebFramework: "sinatra",
+      rubyOrm: "active-record",
+      rubyAuth: "rodauth",
+    });
+    if (!result.success || !result.tree) throw new Error(result.error ?? "No Ruby project");
+    expect(listVirtualTreeFilePaths(result.tree)).toContain("db/auth_migrations/001_create_accounts.rb");
+    const rakefile = content(result.tree, "Rakefile");
+    expect(rakefile).toContain("BetterFullstack::Database.migrate!");
+    expect(rakefile).toContain("BetterFullstack::Auth.migrate!");
+  });
+
   it("omits the database layer when no Ruby ORM is selected", async () => {
     const result = await createVirtual({ ecosystem: "ruby", rubyWebFramework: "sinatra" });
     if (!result.success || !result.tree) throw new Error(result.error ?? "No Ruby project");

@@ -105,6 +105,8 @@ export const ICON_REGISTRY: Record<string, IconConfig> = {
   "active-record": { type: "si", slug: "rubyonrails", hex: "D30001" },
   sequel: { type: "si", slug: "sqlite", hex: "003B57" },
   rom: { type: "si", slug: "ruby", hex: "CC342D" },
+  omniauth: { type: "si", slug: "openid", hex: "F78C40" },
+  rodauth: { type: "si", slug: "ruby", hex: "CC342D" },
   php: { type: "si", slug: "php", hex: "777BB4" },
   slim: { type: "si", slug: "php", hex: "777BB4" },
   laravel: { type: "si", slug: "laravel", hex: "FF2D20" },

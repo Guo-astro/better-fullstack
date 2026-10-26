@@ -13,9 +13,18 @@ listener.close
 log = Tempfile.new("{{rubyWebFramework}}-proof")
 root = File.expand_path("..", __dir__)
 environment = { "HOST" => "127.0.0.1", "PORT" => port.to_s, "RACK_ENV" => "production", "ALLOWED_ORIGIN" => "http://localhost:5173,http://localhost:8080", "SECRET_KEY_BASE" => SecureRandom.hex(64) }
-{{#if (ne rubyOrm "none")}}
+{{#if (or (ne rubyOrm "none") (eq rubyAuth "rodauth"))}}
 database = Tempfile.new(["proof", ".sqlite3"])
 environment["DATABASE_PATH"] = database.path
+{{/if}}
+{{#if (eq rubyAuth "jwt")}}
+environment["JWT_SECRET"] = SecureRandom.hex(32)
+{{/if}}
+{{#if (or (eq rubyAuth "rodauth") (eq rubyAuth "omniauth"))}}
+environment["SESSION_SECRET"] = SecureRandom.hex(64)
+{{/if}}
+{{#if (eq rubyAuth "omniauth")}}
+environment.merge!("OIDC_ISSUER" => "https://issuer.example.com", "OIDC_CLIENT_ID" => "proof-client", "OIDC_CLIENT_SECRET" => "proof-secret", "OIDC_REDIRECT_URI" => "http://127.0.0.1:#{port}/auth/oidc/callback")
 {{/if}}
 pid = nil
 
@@ -23,6 +32,10 @@ begin
 {{#if (ne rubyOrm "none")}}
   migrated = system(environment, RbConfig.ruby, "-r", "./db", "-e", "BetterFullstack::Database.migrate!", chdir: root, out: log, err: log)
   raise "Database migration failed" unless migrated
+{{/if}}
+{{#if (eq rubyAuth "rodauth")}}
+  migrated = system(environment, RbConfig.ruby, "-r", "./auth", "-e", "BetterFullstack::Auth.migrate!", chdir: root, out: log, err: log)
+  raise "Account migration failed" unless migrated
 {{/if}}
   pid = Process.spawn(
     environment,
@@ -68,7 +81,34 @@ begin
   response = http.get("/api/items")
   raise "Persisted item was not listed" unless response.code == "200" && JSON.parse(response.body).fetch("items").include?(created)
 {{/if}}
-  puts JSON.generate(health: "passed", parsed_response: "passed", invalid_request: "passed", frontend_origins: "passed", empty_json: "passed"{{#if (ne rubyOrm "none")}}, persistence: "passed"{{/if}})
+{{#if (ne rubyAuth "none")}}
+  response = http.get("/api/me")
+  raise "Anonymous request was authenticated" unless response.code == "401"
+{{/if}}
+{{#if (eq rubyAuth "jwt")}}
+  ENV["JWT_SECRET"] = environment["JWT_SECRET"]
+  require_relative "../auth"
+  response = http.get("/api/me", "Authorization" => "Bearer #{BetterFullstack::Auth.issue("proof-user")}")
+  raise "Signed token was rejected" unless response.code == "200" && JSON.parse(response.body).dig("user", "id") == "proof-user"
+  response = http.get("/api/me", "Authorization" => "Bearer #{BetterFullstack::Auth.issue("proof-user")}x")
+  raise "Tampered token was accepted" unless response.code == "401"
+{{/if}}
+{{#if (eq rubyAuth "rodauth")}}
+  response = http.post("/create-account", JSON.generate(login: "proof@example.com", password: "correct horse battery staple"), "Content-Type" => "application/json", "Accept" => "application/json")
+  raise "Account creation failed" unless response.code == "200"
+  cookie = response.get_fields("set-cookie").map { |value| value.split(";").first }.join("; ")
+  response = http.get("/api/me", "Cookie" => cookie)
+  raise "Session was not authenticated" unless response.code == "200" && JSON.parse(response.body).dig("user", "id")
+  response = http.post("/login", JSON.generate(login: "proof@example.com", password: "wrong password"), "Content-Type" => "application/json", "Accept" => "application/json")
+  raise "Wrong password was accepted" unless response.code == "401"
+{{/if}}
+{{#if (eq rubyAuth "omniauth")}}
+  response = http.get("/auth/csrf")
+  raise "CSRF token was not issued" unless response.code == "200" && !JSON.parse(response.body).fetch("csrf_token").empty?
+  response = http.post("/auth/oidc", "")
+  raise "Sign-in without a CSRF token was not rejected" unless response.code == "302" && response["location"].include?("/auth/failure")
+{{/if}}
+  puts JSON.generate(health: "passed", parsed_response: "passed", invalid_request: "passed", frontend_origins: "passed", empty_json: "passed"{{#if (ne rubyOrm "none")}}, persistence: "passed"{{/if}}{{#if (ne rubyAuth "none")}}, authentication: "passed"{{/if}})
 rescue StandardError => error
   log.rewind
   warn log.read
@@ -88,7 +128,7 @@ ensure
     end
   end
   log.close!
-{{#if (ne rubyOrm "none")}}
+{{#if (or (ne rubyOrm "none") (eq rubyAuth "rodauth"))}}
   database.close!
 {{/if}}
 end

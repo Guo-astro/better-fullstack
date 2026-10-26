@@ -590,6 +590,7 @@
   "docsCliSummaryDotnetDotnetLibraries": "オプションの .NET ライブラリ。",
   "docsCliSummaryRubyRubyWebFramework": "Ruby の HTTP フレームワーク。",
   "docsCliSummaryRubyRubyOrm": "Ruby の ORM / データベース層。",
+  "docsCliSummaryRubyRubyAuth": "Ruby の認証。",
   "docsCliSummaryPhpPhpWebFramework": "PHP の HTTP フレームワーク。",
   "docsCliSummaryPhpPhpOrm": "PHP の ORM / データベース層。",
   "docsCliSummaryPhpPhpAuth": "PHP の認証。",

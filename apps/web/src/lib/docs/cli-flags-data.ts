@@ -2421,6 +2421,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "none",
         "multiple": false
+      },
+      {
+        "flag": "--ruby-auth",
+        "summary": "Ruby authentication.",
+        "values": [
+          "jwt",
+          "omniauth",
+          "rodauth",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
       }
     ]
   },
@@ -2922,6 +2935,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "dotnet:--dotnet-libraries": m.docsCliSummaryDotnetDotnetLibraries,
   "ruby:--ruby-web-framework": m.docsCliSummaryRubyRubyWebFramework,
   "ruby:--ruby-orm": m.docsCliSummaryRubyRubyOrm,
+  "ruby:--ruby-auth": m.docsCliSummaryRubyRubyAuth,
   "php:--php-web-framework": m.docsCliSummaryPhpPhpWebFramework,
   "php:--php-orm": m.docsCliSummaryPhpPhpOrm,
   "php:--php-auth": m.docsCliSummaryPhpPhpAuth,

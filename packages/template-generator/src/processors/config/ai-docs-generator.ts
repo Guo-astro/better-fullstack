@@ -314,6 +314,7 @@ function generateTechStackSection(config: ProjectConfig): string {
     lines.push(`- Experimental Ruby ${rubyFrameworkLabel(config)} HTTP recipe; Bundler owns Gemfile and Gemfile.lock; Puma serves JSON routes; Minitest/Rack tests cover request validation.`);
     const orm = rubyOrmLabel(config);
     if (orm) lines.push(`- Database: ${orm} on SQLite with versioned migrations (\`bundle exec rake db:migrate\`)`);
+    if (config.rubyAuth && config.rubyAuth !== "none") lines.push(`- Auth: ${getOptionMetadata("rubyAuth", config.rubyAuth)?.label ?? config.rubyAuth}`);
   }
 
   if (config.ecosystem === "rust") {
@@ -509,6 +510,16 @@ function rubyFrameworkLabel(config: ProjectConfig) {
   return getOptionMetadata("rubyWebFramework", config.rubyWebFramework ?? "sinatra")?.label ?? "Sinatra";
 }
 
+const RUBY_AUTH_GUIDANCE = {
+  jwt: "JWT bearer tokens: auth.rb verifies HS256 tokens (issuer, audience, expiry) from JWT_SECRET and exposes the subject at GET /api/me. Never add an endpoint that signs caller-supplied claims; `bundle exec rake auth:token[subject]` prints a development token.",
+  omniauth: "OmniAuth OpenID Connect: auth.rb mounts the oidc strategy with discovery and PKCE, a cookie session, GET /auth/csrf for the request-phase token, the callback, and POST /auth/logout. Configure OIDC_ISSUER, OIDC_CLIENT_ID, OIDC_CLIENT_SECRET, OIDC_REDIRECT_URI, and SESSION_SECRET; a real provider is required for an end-to-end sign-in.",
+  rodauth: "Rodauth JSON accounts: auth.rb mounts create-account, login, and logout with accounts in SQLite (db/auth_migrations, run by `bundle exec rake db:migrate`). SESSION_SECRET signs the session cookie.",
+} as const;
+
+function rubyAuthGuidance(config: ProjectConfig) {
+  return config.rubyAuth && config.rubyAuth !== "none" ? RUBY_AUTH_GUIDANCE[config.rubyAuth] : undefined;
+}
+
 function rubyOrmLabel(config: ProjectConfig) {
   return config.rubyOrm && config.rubyOrm !== "none"
     ? getOptionMetadata("rubyOrm", config.rubyOrm)?.label
@@ -597,7 +608,7 @@ function generateCommandsSection(config: ProjectConfig): string {
   } else if (config.ecosystem === "ruby") {
     lines.push(
       "- `bundle install` - Install native dependencies",
-      ...(rubyOrmLabel(config) ? ["- `bundle exec rake db:migrate` - Apply database migrations"] : []),
+      ...(rubyOrmLabel(config) || config.rubyAuth === "rodauth" ? ["- `bundle exec rake db:migrate` - Apply database migrations"] : []),
       "- `bundle exec rake build` - Check Ruby syntax",
       "- `bundle exec rake test` - Run Minitest/Rack integration tests",
       "- `bundle exec ruby bin/proof` - Exercise real HTTP and shutdown",
@@ -705,9 +716,10 @@ function generateCursorRules(config: ProjectConfig): string {
       rules.push(`Logging: ${config.pythonLogging}, configured in src/app/logging_config.py`);
     }
   } else if (config.ecosystem === "ruby") {
-    rules.push("Keep Ruby routes in app.rb, shared Rack host, origin, and body policies in http_policy.rb and request_body_limit.rb, and Minitest/Rack coverage in test/app_test.rb. Bundler owns native dependencies. No auth adapter is generated. Environment variables are read from the process; .env.example is documentation. Run bundle exec rake and bundle exec ruby bin/proof before claiming runtime verification.");
+    rules.push("Keep Ruby routes in app.rb, shared Rack host, origin, and body policies in http_policy.rb and request_body_limit.rb, and Minitest/Rack coverage in test/app_test.rb. Bundler owns native dependencies. Environment variables are read from the process; .env.example is documentation. Run bundle exec rake and bundle exec ruby bin/proof before claiming runtime verification.");
     const orm = rubyOrmLabel(config);
     rules.push(orm ? `Persistence uses ${orm} on SQLite: connection and migrator in db.rb, the Items repository in items.rb, migrations under db/. DATABASE_PATH overrides the SQLite file. Change the schema with a new migration, never by editing an applied one.` : "No database adapter is generated.");
+    rules.push(rubyAuthGuidance(config) ?? "No auth adapter is generated.");
   } else if (config.ecosystem === "go") {
     rules.push(`You are working on a Go project.`);
     if (config.goWebFramework !== "none") rules.push(`Web framework: ${config.goWebFramework}`);

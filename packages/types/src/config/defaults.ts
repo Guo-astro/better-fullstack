@@ -145,6 +145,7 @@ export const CLI_DEFAULT_PROJECT_CONFIG = {
   dotnetLibraries: [],
   rubyWebFramework: "sinatra",
   rubyOrm: "none",
+  rubyAuth: "none",
   phpWebFramework: "slim",
   phpOrm: "none",
   phpAuth: "none",

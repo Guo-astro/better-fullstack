@@ -2351,6 +2351,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://cycle-orm.dev/docs/intro-about/current/en",
     githubUrl: "https://github.com/cycle/orm",
   },
+  "rubyAuth:jwt": {
+    docsUrl: "https://github.com/jwt/ruby-jwt#readme",
+    githubUrl: "https://github.com/jwt/ruby-jwt",
+  },
+  "rubyAuth:omniauth": {
+    docsUrl: "https://github.com/omniauth/omniauth/wiki",
+    githubUrl: "https://github.com/omniauth/omniauth_openid_connect",
+  },
+  "rubyAuth:rodauth": {
+    docsUrl: "https://rodauth.jeremyevans.net/documentation.html",
+    githubUrl: "https://github.com/jeremyevans/rodauth",
+  },
   "rubyOrm:active-record": {
     docsUrl: "https://guides.rubyonrails.org/active_record_basics.html",
     githubUrl: "https://github.com/rails/rails/tree/main/activerecord",

@@ -66,6 +66,7 @@ import {
   ELIXIR_VALIDATION_VALUES,
   RUBY_WEB_FRAMEWORK_VALUES,
   RUBY_ORM_VALUES,
+  RUBY_AUTH_VALUES,
   PHP_WEB_FRAMEWORK_VALUES,
   PHP_ORM_VALUES,
   PHP_AUTH_VALUES,
@@ -395,7 +396,7 @@ const LEGACY_CAPABILITY_CATEGORIES_BY_ECOSYSTEM = {
     observability: "observability",
   },
   dotnet: { orm: "dotnetOrm", api: "dotnetApi", auth: "dotnetAuth" },
-  ruby: { orm: "rubyOrm" },
+  ruby: { orm: "rubyOrm", auth: "rubyAuth" },
   php: { orm: "phpOrm", auth: "phpAuth" },
   elixir: { orm: "elixirOrm", api: "elixirApi", auth: "elixirAuth" },
 } as const satisfies Record<
@@ -1245,6 +1246,7 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   }),
   ...defineTools(RUBY_WEB_FRAMEWORK_VALUES, "backend", "ruby", "rubyWebFramework"),
   ...defineTools(RUBY_ORM_VALUES, "orm", "ruby", "rubyOrm"),
+  ...defineTools(RUBY_AUTH_VALUES, "auth", "ruby", "rubyAuth"),
   ...defineTools(PHP_WEB_FRAMEWORK_VALUES, "backend", "php", "phpWebFramework").map(
     (definition) => ({
       ...definition,

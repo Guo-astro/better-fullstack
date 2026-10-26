@@ -590,6 +590,7 @@
   "docsCliSummaryDotnetDotnetLibraries": "Optionale .NET-Bibliotheken.",
   "docsCliSummaryRubyRubyWebFramework": "Ruby-HTTP-Framework.",
   "docsCliSummaryRubyRubyOrm": "Ruby-ORM / Datenbankschicht.",
+  "docsCliSummaryRubyRubyAuth": "Ruby-Authentifizierung.",
   "docsCliSummaryPhpPhpWebFramework": "PHP-HTTP-Framework.",
   "docsCliSummaryPhpPhpOrm": "PHP-ORM / Datenbankschicht.",
   "docsCliSummaryPhpPhpAuth": "PHP-Authentifizierung.",

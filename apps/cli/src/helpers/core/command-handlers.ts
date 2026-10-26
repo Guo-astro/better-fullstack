@@ -724,6 +724,7 @@ export async function createProjectHandler(
               dotnetLibraries: [],
               rubyWebFramework: "none",
               rubyOrm: "none",
+              rubyAuth: "none",
               phpWebFramework: "none",
               phpOrm: "none",
               phpAuth: "none",

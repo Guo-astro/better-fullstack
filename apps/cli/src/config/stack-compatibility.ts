@@ -550,6 +550,7 @@ export function buildCompatibilityInputFromConfig(
     dotnetLibraries: asStringArray(config.dotnetLibraries),
     rubyWebFramework: asString(config.rubyWebFramework),
     rubyOrm: asString(config.rubyOrm),
+    rubyAuth: asString(config.rubyAuth),
     phpWebFramework: asString(config.phpWebFramework),
     phpOrm: asString(config.phpOrm),
     phpAuth: asString(config.phpAuth),

@@ -25,7 +25,19 @@ gem "sequel", "5.109.0"
 gem "rom", "5.4.3"
 gem "rom-sql", "3.7.0"
 {{/if}}
-{{#if (ne rubyOrm "none")}}
+{{#if (eq rubyAuth "jwt")}}
+gem "jwt", "3.3.0"
+{{/if}}
+{{#if (eq rubyAuth "rodauth")}}
+gem "rodauth", "2.49.0"
+gem "bcrypt", "3.1.22"
+{{/if}}
+{{#if (eq rubyAuth "omniauth")}}
+gem "omniauth", "2.3.1"
+gem "omniauth_openid_connect", "0.8.0"
+gem "rack-session", "2.1.2"
+{{/if}}
+{{#if (or (ne rubyOrm "none") (eq rubyAuth "rodauth"))}}
 gem "sqlite3", "2.10.2"
 {{/if}}
 gem "puma", "7.1.0"

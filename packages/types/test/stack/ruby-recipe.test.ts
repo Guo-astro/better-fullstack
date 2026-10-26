@@ -237,6 +237,23 @@ describe("Ruby recipe contracts", () => {
     ).toBe(RUBY_RECIPE_EXTENSION_REASON);
   });
 
+  it("accepts Ruby auth only inside the Ruby service", () => {
+    const parts = parseStackPartSpecs(["backend:ruby:roda", "backend.auth:ruby:rodauth"]);
+    expect(getRubyRecipeIssue({ stackParts: parts })).toBeNull();
+    expect(validateStackParts(parts).issues).toEqual([]);
+    expect(stackPartsToLegacyProjectConfigPartial(parts).rubyAuth).toBe("rodauth");
+    expect(
+      getDisabledReason(getEcosystemDefaultStackSelection("typescript"), "rubyAuth", "jwt"),
+    ).toBe("Ruby options only apply when the Ruby ecosystem is selected");
+    expect(getDisabledReason(rubySelection(), "auth", "better-auth")).toBe(
+      RUBY_RECIPE_EXTENSION_REASON,
+    );
+    const restored = parseStackSelectionFromUrlRecord(
+      Object.fromEntries(createStackSelectionSearchParams({ ...rubySelection(), rubyAuth: "jwt" })),
+    );
+    expect(generateStackSelectionCommand(restored)).toContain("--ruby-auth jwt");
+  });
+
   it("rejects selected databases when Ruby is the only backend, in either picker order", () => {
     const ruby = parseStackPartSpecs(["backend:ruby:sinatra:api"]);
     const database = parseStackPartSpecs(["database:universal:sqlite"]);

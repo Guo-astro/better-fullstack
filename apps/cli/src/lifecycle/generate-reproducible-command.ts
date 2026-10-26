@@ -1265,6 +1265,7 @@ export function generateReproducibleCommand(config: ProjectConfig) {
         "--ecosystem ruby",
         `--ruby-web-framework ${config.rubyWebFramework}`,
         `--ruby-orm ${config.rubyOrm ?? "none"}`,
+        `--ruby-auth ${config.rubyAuth ?? "none"}`,
         "--database none",
         "--addons none",
         "--examples none",

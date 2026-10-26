@@ -1,6 +1,9 @@
 require "action_controller/railtie"
 require "json"
 require "securerandom"
+{{#if (ne rubyAuth "none")}}
+require_relative "auth"
+{{/if}}
 require_relative "http_policy"
 {{#if (ne rubyOrm "none")}}
 require_relative "items"
@@ -17,6 +20,9 @@ module BetterFullstack
     config.hosts.clear
     config.logger = ActiveSupport::Logger.new(Rails.env.test? ? File::NULL : $stdout)
     config.secret_key_base = ENV.fetch("SECRET_KEY_BASE") { Rails.env.production? ? nil : SecureRandom.hex(64) }
+{{#if (ne rubyAuth "none")}}
+    config.middleware.insert_before 0, Auth
+{{/if}}
     config.middleware.insert_before 0, HttpPolicy
     config.middleware.insert_before 0, RequestBodyLimit, -> { HttpPolicy.allowed_origins }
   end
@@ -50,6 +56,15 @@ module BetterFullstack
     end
 {{/if}}
 
+{{#if (ne rubyAuth "none")}}
+    def me
+      user = request.env[Auth::CURRENT_USER]
+      return render json: { error: "unauthorized" }, status: 401 unless user
+
+      render json: { user: user }
+    end
+
+{{/if}}
     def not_found
       render json: { error: "not_found" }, status: 404
     end
@@ -62,6 +77,9 @@ module BetterFullstack
 {{#if (ne rubyOrm "none")}}
     get "api/items", to: "better_fullstack/api#items"
     post "api/items", to: "better_fullstack/api#create_item"
+{{/if}}
+{{#if (ne rubyAuth "none")}}
+    get "api/me", to: "better_fullstack/api#me"
 {{/if}}
     match "/", to: "better_fullstack/api#not_found", via: :all
     match "*path", to: "better_fullstack/api#not_found", via: :all

@@ -1,5 +1,8 @@
 require "json"
 require "sinatra/base"
+{{#if (ne rubyAuth "none")}}
+require_relative "auth"
+{{/if}}
 require_relative "http_policy"
 {{#if (ne rubyOrm "none")}}
 require_relative "items"
@@ -11,6 +14,9 @@ module BetterFullstack
   class App < Sinatra::Base
     use RequestBodyLimit, -> { HttpPolicy.allowed_origins }
     use HttpPolicy
+{{#if (ne rubyAuth "none")}}
+    use Auth
+{{/if}}
     set :show_exceptions, false
     set :raise_errors, false
     set :dump_errors, false
@@ -51,6 +57,14 @@ module BetterFullstack
     end
 {{/if}}
 
+{{#if (ne rubyAuth "none")}}
+    get "/api/me" do
+      user = request.env[Auth::CURRENT_USER]
+      halt json_response(401, error: "unauthorized") unless user
+      json_response(200, user: user)
+    end
+
+{{/if}}
     not_found do
       json_response(404, error: "not_found")
     end

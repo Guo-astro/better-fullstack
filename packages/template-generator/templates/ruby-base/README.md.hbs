@@ -1,6 +1,6 @@
 # {{projectName}}
 
-Experimental Ruby {{#if (eq rubyWebFramework "sinatra")}}Sinatra{{/if}}{{#if (eq rubyWebFramework "rails")}}Rails (API-only){{/if}}{{#if (eq rubyWebFramework "roda")}}Roda{{/if}}{{#if (eq rubyWebFramework "grape")}}Grape{{/if}} HTTP service{{#if (eq rubyOrm "active-record")}} with Active Record{{/if}}{{#if (eq rubyOrm "sequel")}} with Sequel{{/if}}{{#if (eq rubyOrm "rom")}} with ROM{{/if}}{{#if (ne rubyOrm "none")}} on SQLite{{/if}}. This recipe has no {{#if (eq rubyOrm "none")}}database, {{/if}}authentication, jobs, or deployment adapter. It does not require a TypeScript runtime.
+Experimental Ruby {{#if (eq rubyWebFramework "sinatra")}}Sinatra{{/if}}{{#if (eq rubyWebFramework "rails")}}Rails (API-only){{/if}}{{#if (eq rubyWebFramework "roda")}}Roda{{/if}}{{#if (eq rubyWebFramework "grape")}}Grape{{/if}} HTTP service{{#if (eq rubyOrm "active-record")}} with Active Record{{/if}}{{#if (eq rubyOrm "sequel")}} with Sequel{{/if}}{{#if (eq rubyOrm "rom")}} with ROM{{/if}}{{#if (ne rubyOrm "none")}} on SQLite{{/if}}. {{#if (eq rubyAuth "jwt")}}It verifies JWT bearer tokens. {{/if}}{{#if (eq rubyAuth "omniauth")}}It signs users in with OmniAuth OpenID Connect. {{/if}}{{#if (eq rubyAuth "rodauth")}}It manages accounts with Rodauth. {{/if}}This recipe has no {{#if (eq rubyOrm "none")}}database, {{/if}}{{#if (eq rubyAuth "none")}}authentication, {{/if}}jobs, or deployment adapter. It does not require a TypeScript runtime.
 
 ## Setup
 
@@ -8,7 +8,7 @@ Use Ruby 3.4.11 and Bundler 4.0.21. The Gemfile accepts Ruby 3.3 through 4.x. Pu
 
 ```sh
 bundle install
-{{#if (ne rubyOrm "none")}}
+{{#if (or (ne rubyOrm "none") (eq rubyAuth "rodauth"))}}
 bundle exec rake db:migrate
 {{/if}}
 bundle exec rake build
@@ -27,6 +27,9 @@ bundle exec ruby bin/server
 - GET `/api/items` returns `{"items":[{"id":1,"name":"Ruby"}]}` from the database.
 - POST `/api/items` accepts the same `{"name":"Ruby"}` body, stores it, and returns 201 with the created item.
 {{/if}}
+{{#if (ne rubyAuth "none")}}
+- GET `/api/me` returns `{"user":{"id":"..."}}` for an authenticated request and 401 otherwise.
+{{/if}}
 - Blank, non-string, unknown-field, and over-80-character names return 422. Malformed JSON returns 400, non-JSON content returns 415, and bodies over 16 KiB return 413.
 
 The server binds to `127.0.0.1:{{rubyPort}}`. `HOST`, `PORT`, `RACK_ENV`, and `ALLOWED_ORIGIN` are process environment variables. `.env.example` documents values and is not loaded automatically. CORS permits the generated frontend origins `{{rubyWebOrigin}}` by default. Set ALLOWED_ORIGIN to a comma-separated list of trusted frontend origins to override them. Host authorization accepts localhost and loopback addresses. Configure explicit trusted hosts before public hosting.
@@ -37,6 +40,24 @@ The server binds to `127.0.0.1:{{rubyPort}}`. `HOST`, `PORT`, `RACK_ENV`, and `A
 ## Database
 
 `db.rb` opens the SQLite database and runs migrations; `items.rb` holds the {{#if (eq rubyOrm "active-record")}}Active Record model{{/if}}{{#if (eq rubyOrm "sequel")}}Sequel model{{/if}}{{#if (eq rubyOrm "rom")}}ROM relation and repository{{/if}} behind the `Items` repository the routes call. Migrations live in `{{#if (eq rubyOrm "sequel")}}db/migrations{{else}}db/migrate{{/if}}`. Run `bundle exec rake db:migrate` before starting the server. The database file defaults to `db/<RACK_ENV>.sqlite3`; set `DATABASE_PATH` to use another file. Tests migrate and clean `db/test.sqlite3`, and `bin/proof` migrates a temporary database. Add a new migration for every schema change.
+
+{{/if}}
+{{#if (eq rubyAuth "jwt")}}
+## Authentication
+
+`auth.rb` is Rack middleware that verifies `Authorization: Bearer <token>` with ruby-jwt. It accepts only HS256 tokens signed with `JWT_SECRET` whose `iss`, `aud`, `exp`, and `iat` claims are valid (`JWT_ISSUER` and `JWT_AUDIENCE` override the expected issuer and audience). The app never signs tokens over HTTP; issue them from your identity provider or, locally, with `bundle exec rake "auth:token[user-1]"`. `JWT_SECRET` is required when `RACK_ENV=production`.
+
+{{/if}}
+{{#if (eq rubyAuth "omniauth")}}
+## Authentication
+
+`auth.rb` mounts OmniAuth with the `openid_connect` strategy (discovery, authorization code flow, and PKCE) behind a signed cookie session. A browser client fetches `GET /auth/csrf`, then submits a form `POST /auth/oidc` with `authenticity_token`; the provider redirects back to `GET /auth/oidc/callback`, which stores the user in the session. `POST /auth/logout` clears it. Set `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_REDIRECT_URI`, and `SESSION_SECRET` (64+ characters); all are required when `RACK_ENV=production`. Tests use OmniAuth test mode, so a full sign-in still needs a real OpenID Connect provider.
+
+{{/if}}
+{{#if (eq rubyAuth "rodauth")}}
+## Authentication
+
+`auth.rb` mounts Rodauth in JSON-only mode with `POST /create-account`, `POST /login`, and `POST /logout` (JSON bodies with `login` and `password`). Accounts and bcrypt password hashes live in the `accounts` table of the SQLite database; `db/auth_migrations` is applied by `bundle exec rake db:migrate`. A signed cookie session keyed by `SESSION_SECRET` (64+ characters, required when `RACK_ENV=production`) carries the login.
 
 {{/if}}
 Use Ctrl-C to stop the foreground server. Add future routes in `app.rb` and behavior tests in `test/app_test.rb`. Keep Gemfile ownership inside this service when composed with other languages.

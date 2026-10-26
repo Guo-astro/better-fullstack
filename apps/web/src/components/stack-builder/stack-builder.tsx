@@ -661,6 +661,7 @@ const GRAPH_BACKEND_CONFIGS: GraphBackendConfig[] = [
     label: "Ruby",
     frameworkCategory: "rubyWebFramework",
     ormCategory: "rubyOrm",
+    authCategory: "rubyAuth",
   },
   {
     ecosystem: "typescript",

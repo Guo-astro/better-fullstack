@@ -6005,6 +6005,40 @@ export const TECH_OPTIONS: Record<
       color: "from-gray-400 to-gray-600",
     },
   ],
+  rubyAuth: [
+    {
+      id: "jwt",
+      name: "JWT (ruby-jwt)",
+      description: "HS256 bearer-token verification with issuer, audience, and expiry checks",
+      icon: "https://cdn.simpleicons.org/jsonwebtokens/000000",
+      color: "from-pink-500 to-fuchsia-600",
+      isNew: true,
+    },
+    {
+      id: "omniauth",
+      name: "OmniAuth OIDC",
+      description: "OpenID Connect sign-in with CSRF-protected requests and a cookie session",
+      icon: "https://cdn.simpleicons.org/openid/F78C40",
+      color: "from-orange-400 to-amber-600",
+      isNew: true,
+    },
+    {
+      id: "rodauth",
+      name: "Rodauth",
+      description: "JSON account creation, login, and logout with accounts in SQLite",
+      icon: "https://cdn.simpleicons.org/ruby/CC342D",
+      color: "from-red-500 to-rose-700",
+      isNew: true,
+    },
+    {
+      id: "none",
+      name: "No Auth",
+      description: "Skip Ruby authentication",
+      icon: "",
+      color: "from-gray-400 to-gray-600",
+      default: true,
+    },
+  ],
   rubyOrm: [
     {
       id: "active-record",

@@ -590,6 +590,7 @@
   "docsCliSummaryDotnetDotnetLibraries": "Bibliotecas opcionales de .NET.",
   "docsCliSummaryRubyRubyWebFramework": "Framework HTTP de Ruby.",
   "docsCliSummaryRubyRubyOrm": "ORM / capa de base de datos de Ruby.",
+  "docsCliSummaryRubyRubyAuth": "Autenticación de Ruby.",
   "docsCliSummaryPhpPhpWebFramework": "Framework HTTP de PHP.",
   "docsCliSummaryPhpPhpOrm": "ORM / capa de base de datos de PHP.",
   "docsCliSummaryPhpPhpAuth": "Autenticación de PHP.",

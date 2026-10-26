@@ -52,6 +52,7 @@ import type {
   ElixirValidation,
   RubyWebFramework,
   RubyOrm,
+  RubyAuth,
   PhpWebFramework,
   PhpOrm,
   PhpAuth,
@@ -315,7 +316,11 @@ import {
   getPythonValidationChoice,
   getPythonWebFrameworkChoice,
 } from "@/prompts/ecosystems/python-ecosystem";
-import { getRubyOrmChoice, getRubyWebFrameworkChoice } from "@/prompts/ecosystems/ruby-ecosystem";
+import {
+  getRubyAuthChoice,
+  getRubyOrmChoice,
+  getRubyWebFrameworkChoice,
+} from "@/prompts/ecosystems/ruby-ecosystem";
 import {
   getRustApiChoice,
   getRustCliChoice,
@@ -501,6 +506,7 @@ type PromptGroupResults = {
   // Elixir ecosystem
   rubyWebFramework: RubyWebFramework;
   rubyOrm: RubyOrm;
+  rubyAuth: RubyAuth;
   phpWebFramework: PhpWebFramework;
   phpOrm: PhpOrm;
   phpAuth: PhpAuth;
@@ -688,6 +694,7 @@ const CONFIG_PROMPT_ENTRY_KEY_MAP = {
   dotnetLibraries: true,
   rubyWebFramework: true,
   rubyOrm: true,
+  rubyAuth: true,
   phpWebFramework: true,
   phpOrm: true,
   phpAuth: true,
@@ -922,7 +929,10 @@ function scopedPrompt<K extends PromptGroupKey>(
   }) => Promise<PromptGroupResults[K] | symbol | undefined> | undefined,
 ) {
   return (opts: { results: Partial<PromptGroupResults> }) => {
-    if ((key === "rubyWebFramework" || key === "rubyOrm") && opts.results.ecosystem !== "ruby")
+    if (
+      (key === "rubyWebFramework" || key === "rubyOrm" || key === "rubyAuth") &&
+      opts.results.ecosystem !== "ruby"
+    )
       return Promise.resolve("none" as PromptGroupResults[K]);
     if (
       opts.results.ecosystem === "ruby" &&
@@ -930,6 +940,7 @@ function scopedPrompt<K extends PromptGroupKey>(
       ![
         "rubyWebFramework",
         "rubyOrm",
+        "rubyAuth",
         "aiDocs",
         "git",
         "install",
@@ -1874,6 +1885,10 @@ export async function gatherConfig(
       results.ecosystem === "ruby"
         ? getRubyOrmChoice(flags.rubyOrm)
         : Promise.resolve("none" as const),
+    rubyAuth: ({ results }) =>
+      results.ecosystem === "ruby"
+        ? getRubyAuthChoice(flags.rubyAuth)
+        : Promise.resolve("none" as const),
     phpWebFramework: ({ results }) =>
       results.ecosystem === "php"
         ? getPhpWebFrameworkChoice(flags.phpWebFramework)
@@ -2154,6 +2169,7 @@ export async function gatherConfig(
     // Elixir ecosystem options
     rubyWebFramework: result.rubyWebFramework,
     rubyOrm: result.rubyOrm,
+    rubyAuth: result.rubyAuth,
     phpWebFramework: result.phpWebFramework,
     phpOrm: result.phpOrm,
     phpAuth: result.phpAuth,

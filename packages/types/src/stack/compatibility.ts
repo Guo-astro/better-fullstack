@@ -573,6 +573,7 @@ export type CompatibilityInput = {
   dotnetLibraries: string[];
   rubyWebFramework: string;
   rubyOrm: string;
+  rubyAuth: string;
   phpWebFramework: string;
   phpOrm: string;
   phpAuth: string;
@@ -2985,7 +2986,11 @@ export const getDisabledReason = (
     currentStack.ecosystem !== "crystal"
   )
     return "Crystal HTTP frameworks require the Crystal ecosystem or a Crystal backend part.";
-  if (category === "rubyOrm" && optionId !== "none" && currentStack.ecosystem !== "ruby")
+  if (
+    (category === "rubyOrm" || category === "rubyAuth") &&
+    optionId !== "none" &&
+    currentStack.ecosystem !== "ruby"
+  )
     return "Ruby options only apply when the Ruby ecosystem is selected";
   if (currentStack.ecosystem === "ruby") {
     if (category === "rubyWebFramework" && optionId === "none") return RUBY_RECIPE_FRAMEWORK_REASON;

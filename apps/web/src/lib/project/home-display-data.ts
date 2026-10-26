@@ -59,6 +59,7 @@ export const HOME_FEATURE_OPTIONS = {
     "goAuth",
     "javaAuth",
     "elixirAuth",
+    "rubyAuth",
     "dotnetAuth",
   ]),
   ai: getOptions(["ai", "pythonAi"]),

@@ -110,7 +110,7 @@ export async function displayPostInstallInstructions(
 
   if (ecosystem === "ruby") {
     consola.box(
-      `Next steps\n\ncd ${relativePath}\n${depsInstalled ? "" : "bundle install\n"}${config.rubyOrm && config.rubyOrm !== "none" ? "bundle exec rake db:migrate\n" : ""}bundle exec rake build\nbundle exec rake test\nbundle exec ruby bin/server\n\nHTTP: http://127.0.0.1:4567/health\nRuntime proof: bundle exec ruby bin/proof\n${config.rubyOrm && config.rubyOrm !== "none" ? `Database: ${config.rubyOrm} on SQLite (DATABASE_PATH).\n` : ""}Experimental recipe.`,
+      `Next steps\n\ncd ${relativePath}\n${depsInstalled ? "" : "bundle install\n"}${(config.rubyOrm && config.rubyOrm !== "none") || config.rubyAuth === "rodauth" ? "bundle exec rake db:migrate\n" : ""}bundle exec rake build\nbundle exec rake test\nbundle exec ruby bin/server\n\nHTTP: http://127.0.0.1:4567/health\nRuntime proof: bundle exec ruby bin/proof\n${config.rubyOrm && config.rubyOrm !== "none" ? `Database: ${config.rubyOrm} on SQLite (DATABASE_PATH).\n` : ""}${config.rubyAuth && config.rubyAuth !== "none" ? `Auth: ${config.rubyAuth}. Set its secrets from .env.example before production.\n` : ""}Experimental recipe.`,
     );
     return;
   }

@@ -4,6 +4,11 @@ ENV["RACK_ENV"] = "test"
 require_relative "../db"
 BetterFullstack::Database.migrate!
 {{/if}}
+{{#if (eq rubyAuth "rodauth")}}
+
+require_relative "../auth"
+BetterFullstack::Auth.migrate!
+{{/if}}
 
 require "minitest/autorun"
 require "rack/test"
@@ -20,6 +25,9 @@ class AppTest < Minitest::Test
     header "Host", "localhost"
 {{#if (ne rubyOrm "none")}}
     BetterFullstack::Items.delete_all
+{{/if}}
+{{#if (eq rubyAuth "rodauth")}}
+    BetterFullstack::Auth::DB[:accounts].delete
 {{/if}}
   end
 
@@ -64,6 +72,89 @@ class AppTest < Minitest::Test
     assert_equal 422, last_response.status
     get "/api/items"
     assert_equal [], JSON.parse(last_response.body).fetch("items")
+  end
+
+{{/if}}
+{{#if (eq rubyAuth "jwt")}}
+  def test_current_user_requires_a_valid_token
+    get "/api/me"
+    assert_equal 401, last_response.status
+    header "Authorization", "Bearer #{BetterFullstack::Auth.issue("user-1")}"
+    get "/api/me"
+    assert_equal 200, last_response.status
+    assert_equal({ "user" => { "id" => "user-1" } }, JSON.parse(last_response.body))
+  end
+
+  def test_rejected_tokens
+    now = Time.now.to_i
+    claims = { sub: "user-1", iss: BetterFullstack::Auth::ISSUER, aud: BetterFullstack::Auth::AUDIENCE, iat: now, exp: now + 60 }
+    [
+      JWT.encode(claims, "wrong-secret", "HS256"),
+      JWT.encode(claims.merge(exp: now - 1), BetterFullstack::Auth.secret, "HS256"),
+      JWT.encode(claims.merge(aud: "another-api"), BetterFullstack::Auth.secret, "HS256"),
+      JWT.encode(claims, nil, "none"),
+      "not-a-token"
+    ].each do |token|
+      header "Authorization", "Bearer #{token}"
+      get "/api/me"
+      assert_equal 401, last_response.status
+    end
+  end
+
+{{/if}}
+{{#if (eq rubyAuth "rodauth")}}
+  def auth_json(path, value)
+    post path, JSON.generate(value), "CONTENT_TYPE" => "application/json", "HTTP_ACCEPT" => "application/json"
+  end
+
+  def test_account_lifecycle
+    credentials = { "login" => "ruby@example.com", "password" => "correct horse battery staple" }
+    get "/api/me"
+    assert_equal 401, last_response.status
+    auth_json "/create-account", credentials
+    assert_equal 200, last_response.status
+    get "/api/me"
+    assert_equal 200, last_response.status
+    assert JSON.parse(last_response.body).dig("user", "id")
+    auth_json "/logout", {}
+    assert_equal 200, last_response.status
+    get "/api/me"
+    assert_equal 401, last_response.status
+    auth_json "/login", credentials.merge("password" => "wrong password")
+    assert_equal 401, last_response.status
+    auth_json "/login", credentials
+    assert_equal 200, last_response.status
+    get "/api/me"
+    assert_equal 200, last_response.status
+  end
+
+{{/if}}
+{{#if (eq rubyAuth "omniauth")}}
+  def test_oidc_sign_in_requires_the_session_csrf_token
+    get "/api/me"
+    assert_equal 401, last_response.status
+    post "/auth/oidc"
+    assert_equal 302, last_response.status
+    assert_match "/auth/failure", last_response.headers["location"]
+  end
+
+  def test_oidc_callback_establishes_and_clears_a_session
+    OmniAuth.config.test_mode = true
+    OmniAuth.config.mock_auth[:oidc] = OmniAuth::AuthHash.new(provider: "oidc", uid: "user-1", info: { email: "ruby@example.com" })
+    get "/auth/csrf"
+    token = JSON.parse(last_response.body).fetch("csrf_token")
+    post "/auth/oidc", authenticity_token: token
+    assert_equal 302, last_response.status
+    assert_match "/auth/oidc/callback", last_response.headers["location"]
+    get "/auth/oidc/callback"
+    assert_equal 200, last_response.status
+    get "/api/me"
+    assert_equal({ "user" => { "id" => "user-1", "email" => "ruby@example.com" } }, JSON.parse(last_response.body))
+    post "/auth/logout"
+    get "/api/me"
+    assert_equal 401, last_response.status
+  ensure
+    OmniAuth.config.test_mode = false
   end
 
 {{/if}}

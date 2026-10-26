@@ -3,6 +3,6 @@ vendor/bundle/
 .env
 *.log
 tmp/
-{{#if (ne rubyOrm "none")}}
+{{#if (or (ne rubyOrm "none") (eq rubyAuth "rodauth"))}}
 db/*.sqlite3*
 {{/if}}

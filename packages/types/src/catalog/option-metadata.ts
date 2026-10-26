@@ -45,6 +45,7 @@ import {
   ELIXIR_VALIDATION_VALUES,
   RUBY_WEB_FRAMEWORK_VALUES,
   RUBY_ORM_VALUES,
+  RUBY_AUTH_VALUES,
   PHP_WEB_FRAMEWORK_VALUES,
   PHP_ORM_VALUES,
   PHP_AUTH_VALUES,
@@ -463,6 +464,7 @@ export const ELIXIR_CATEGORY_ORDER = [
 export const RUBY_CATEGORY_ORDER = [
   "rubyWebFramework",
   "rubyOrm",
+  "rubyAuth",
   "aiDocs",
   "git",
   "install",
@@ -907,6 +909,7 @@ const CATEGORY_DEFINITIONS = {
   },
   rubyWebFramework: { values: RUBY_WEB_FRAMEWORK_VALUES, displayName: "Ruby web framework" },
   rubyOrm: { values: RUBY_ORM_VALUES, displayName: "Ruby ORM / Database" },
+  rubyAuth: { values: RUBY_AUTH_VALUES, displayName: "Ruby Auth" },
   phpWebFramework: { values: PHP_WEB_FRAMEWORK_VALUES, displayName: "PHP web framework" },
   phpOrm: { values: PHP_ORM_VALUES, displayName: "PHP ORM / Database" },
   phpAuth: { values: PHP_AUTH_VALUES, displayName: "PHP Auth" },
@@ -1823,6 +1826,7 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
   },
   rubyWebFramework: { sinatra: "Sinatra", rails: "Rails", roda: "Roda", grape: "Grape" },
   rubyOrm: { "active-record": "Active Record", sequel: "Sequel", rom: "ROM" },
+  rubyAuth: { jwt: "JWT (ruby-jwt)", omniauth: "OmniAuth OIDC", rodauth: "Rodauth" },
   phpWebFramework: { slim: "Slim", laravel: "Laravel", symfony: "Symfony" },
   phpOrm: { eloquent: "Eloquent", doctrine: "Doctrine ORM", cycle: "Cycle ORM" },
   phpAuth: {

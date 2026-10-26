@@ -1,5 +1,8 @@
 require "grape"
 require "json"
+{{#if (ne rubyAuth "none")}}
+require_relative "auth"
+{{/if}}
 require_relative "http_policy"
 {{#if (ne rubyOrm "none")}}
 require_relative "items"
@@ -42,6 +45,14 @@ module BetterFullstack
     end
 {{/if}}
 
+{{#if (ne rubyAuth "none")}}
+    get "/api/me" do
+      user = env[Auth::CURRENT_USER]
+      error!({ error: "unauthorized" }, 401) unless user
+      { user: user }
+    end
+
+{{/if}}
     route :any, "*path" do
       error!({ error: "not_found" }, 404)
     end
@@ -50,6 +61,9 @@ module BetterFullstack
   App = Rack::Builder.app do
     use RequestBodyLimit, -> { HttpPolicy.allowed_origins }
     use HttpPolicy
+{{#if (ne rubyAuth "none")}}
+    use Auth
+{{/if}}
     run Api
   end
 end

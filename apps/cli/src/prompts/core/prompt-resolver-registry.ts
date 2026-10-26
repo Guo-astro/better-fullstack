@@ -106,6 +106,7 @@ import {
   resolvePythonWebFrameworkPrompt,
 } from "@/prompts/ecosystems/python-ecosystem";
 import {
+  resolveRubyAuthPrompt,
   resolveRubyOrmPrompt,
   resolveRubyWebFrameworkPrompt,
 } from "@/prompts/ecosystems/ruby-ecosystem";
@@ -178,6 +179,8 @@ import {
   ELIXIR_VALIDATION_VALUES,
   RUBY_WEB_FRAMEWORK_VALUES,
   RUBY_ORM_VALUES,
+  RUBY_AUTH_VALUES,
+  RubyAuthSchema,
   RubyOrmSchema,
   RubyWebFrameworkSchema,
   ELIXIR_WEB_FRAMEWORK_VALUES,
@@ -792,6 +795,12 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
     schemaValues: RUBY_ORM_VALUES,
     resolve: ({ value }: { value?: string } = {}) =>
       resolveRubyOrmPrompt(value === undefined ? undefined : RubyOrmSchema.parse(value)),
+    coverageContexts: [{}],
+  },
+  rubyAuth: {
+    schemaValues: RUBY_AUTH_VALUES,
+    resolve: ({ value }: { value?: string } = {}) =>
+      resolveRubyAuthPrompt(value === undefined ? undefined : RubyAuthSchema.parse(value)),
     coverageContexts: [{}],
   },
   phpWebFramework: {

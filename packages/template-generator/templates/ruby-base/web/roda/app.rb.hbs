@@ -1,5 +1,8 @@
 require "json"
 require "roda"
+{{#if (ne rubyAuth "none")}}
+require_relative "auth"
+{{/if}}
 require_relative "http_policy"
 {{#if (ne rubyOrm "none")}}
 require_relative "items"
@@ -11,6 +14,9 @@ module BetterFullstack
   class App < Roda
     use RequestBodyLimit, -> { HttpPolicy.allowed_origins }
     use HttpPolicy
+{{#if (ne rubyAuth "none")}}
+    use Auth
+{{/if}}
 
     plugin :json
     plugin :all_verbs
@@ -37,6 +43,16 @@ module BetterFullstack
         end
         { greeting: "Hello, #{name}!" }
       end
+{{#if (ne rubyAuth "none")}}
+
+      r.get "api/me" do
+        user = env[Auth::CURRENT_USER]
+        next { user: user } if user
+
+        response.status = 401
+        { error: "unauthorized" }
+      end
+{{/if}}
 {{#if (ne rubyOrm "none")}}
 
       r.is "api/items" do

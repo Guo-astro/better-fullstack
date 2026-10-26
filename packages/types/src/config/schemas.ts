@@ -10,6 +10,10 @@ export const RubyOrmSchema = z
   .enum(["active-record", "sequel", "rom", "none"])
   .describe("Ruby ORM / database layer (SQLite-backed)");
 
+export const RubyAuthSchema = z
+  .enum(["jwt", "omniauth", "rodauth", "none"])
+  .describe("Ruby authentication");
+
 export const EcosystemSchema = z
   .enum([
     "typescript",
@@ -1422,6 +1426,7 @@ const STACK_CONFIG_FIELDS = {
   // Elixir ecosystem options
   rubyWebFramework: RubyWebFrameworkSchema.optional(),
   rubyOrm: RubyOrmSchema.optional(),
+  rubyAuth: RubyAuthSchema.optional(),
   phpWebFramework: PhpWebFrameworkSchema.default("none"),
   phpOrm: PhpOrmSchema.default("none"),
   phpAuth: PhpAuthSchema.default("none"),
@@ -1747,3 +1752,4 @@ export const SHADCN_RADIUS_VALUES = ShadcnRadiusSchema.options;
 
 export const RUBY_WEB_FRAMEWORK_VALUES = RubyWebFrameworkSchema.options;
 export const RUBY_ORM_VALUES = RubyOrmSchema.options;
+export const RUBY_AUTH_VALUES = RubyAuthSchema.options;
