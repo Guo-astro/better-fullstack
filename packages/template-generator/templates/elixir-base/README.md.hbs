@@ -72,7 +72,7 @@ git push gigalixir main
 ```
 {{/if}}
 
-{{#if (or (ne elixirDeploy "none") (eq elixirClustering "libcluster"))}}
+{{#if (or (ne elixirDeploy "none") (ne elixirClustering "none"))}}
 ## Releases
 
 Use Elixir 1.17 or newer.
@@ -94,7 +94,7 @@ The generated Dockerfile can be built with `docker build -t {{elixirAppName}} .`
 {{#if (ne elixirWebFramework "none")}}
 Set `SECRET_KEY_BASE` and `PHX_HOST` in the deployment environment before starting the release.
 {{/if}}
-{{#if (eq elixirClustering "libcluster")}}
+{{#if (ne elixirClustering "none")}}
 
 ### Clustering
 
@@ -102,10 +102,22 @@ Set `RELEASE_COOKIE` to the same private value on every node. Set a unique, reac
 `RELEASE_NODE` such as `{{elixirAppName}}_a@10.0.0.10` on each node. The release enables long node
 names; it refuses to start without a cookie. Keep Erlang distribution on a private network.
 
+{{#if (eq elixirClustering "libcluster")}}
 For Docker, Gigalixir, and standalone Mix releases, set `CLUSTER_HOSTS` to comma-separated full
 node names. The EPMD strategy reconnects every second. Alternatively, set `DNS_CLUSTER_QUERY`
 to a DNS name whose addresses correspond to `{{elixirAppName}}@<address>` nodes. Explicit hosts
 take precedence over DNS. Empty discovery settings leave the node unclustered.
+{{/if}}
+{{#if (eq elixirClustering "dns-cluster")}}
+DNSCluster polls `DNS_CLUSTER_QUERY` every five seconds and connects to `{{elixirAppName}}@<address>`
+for each A or AAAA record it returns. Node basenames must match. An empty query leaves the node
+unclustered.
+{{/if}}
+{{#if (eq elixirClustering "distributed-erlang")}}
+`{{elixirModuleName}}.Cluster` calls `Node.connect/1` for every node in `CLUSTER_HOSTS`
+(comma-separated full node names) at startup and every five seconds. There is no automatic
+discovery; list each peer explicitly. An empty list leaves the node unclustered.
+{{/if}}
 {{#if (eq elixirDeploy "fly")}}
 
 Fly uses the application's internal DNS and `FLY_PRIVATE_IP` automatically. Set the same
@@ -118,6 +130,14 @@ do not provision machines or certify a hosted deployment.
 {{/if}}
 
 {{/if}}
+{{#if (eq elixirJobs "exq")}}
+## Exq jobs
+
+Exq stores jobs in Redis. Start Redis and set `REDIS_URL` (default `redis://localhost:6379`)
+before `mix phx.server` or `iex -S mix`. Enqueue the sample job with
+`{{elixirModuleName}}.Workers.SampleWorker.enqueue("Ada")`. Tests use `Exq.Mock` and need no Redis.
+{{/if}}
+
 {{#if (eq elixirObservability "prom_ex")}}
 ## Metrics
 

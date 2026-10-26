@@ -2680,7 +2680,11 @@ export const analyzeStackCompatibility = (
       for (const key of dependentKeys) {
         const value = nextStack[key];
         const shouldClear =
-          key !== "elixirObservability" ? value !== "none" : value === "phoenix-telemetry";
+          key === "elixirObservability"
+            ? value === "phoenix-telemetry"
+            : key === "elixirI18n"
+              ? value === "gettext"
+              : value !== "none";
 
         if (shouldClear) {
           nextStack[key] = "none" as never;

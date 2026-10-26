@@ -337,6 +337,7 @@ const ELIXIR_PHOENIX_REQUIRED_ROLE_MESSAGES: Partial<Record<StackPartRole, strin
   i18n: "Elixir Internationalization requires Phoenix",
   runtime: "HTTP server adapters require Phoenix",
 };
+const ELIXIR_STANDALONE_I18N_TOOLS = new Set(["linguist", "ex-cldr-messages"]);
 const ELIXIR_UNSUPPORTED_GRAPH_TOOL_MESSAGES: Record<string, string> = {};
 export const ELIXIR_UNSUPPORTED_GRAPH_TOOLS = new Set(
   Object.keys(ELIXIR_UNSUPPORTED_GRAPH_TOOL_MESSAGES),
@@ -3373,7 +3374,8 @@ function getStackPartCompatibilityIssue(
 
   if (part.ecosystem === "elixir" && !context.ownerRole) {
     const phoenixRequiredMessage = ELIXIR_PHOENIX_REQUIRED_ROLE_MESSAGES[part.role];
-    if (phoenixRequiredMessage && part.toolId !== "none") {
+    const isStandaloneI18n = part.role === "i18n" && ELIXIR_STANDALONE_I18N_TOOLS.has(part.toolId);
+    if (phoenixRequiredMessage && part.toolId !== "none" && !isStandaloneI18n) {
       return createStackGraphIssue({
         code: "MISSING_OWNER_PART",
         partId: part.id,

@@ -120,12 +120,15 @@ const REALTIME_OPTIONS: PromptOption<ElixirRealtime>[] = [
 const JOB_OPTIONS: PromptOption<ElixirJobs>[] = [
   { value: "oban", label: "Oban", hint: "PostgreSQL-backed jobs and workers" },
   { value: "quantum", label: "Quantum", hint: "Cron-like scheduler" },
+  { value: "exq", label: "Exq", hint: "Redis-backed Sidekiq-compatible jobs" },
   { value: "none", label: "None", hint: "No jobs layer" },
 ];
 
 const VALIDATION_OPTIONS: PromptOption<ElixirValidation>[] = [
   { value: "ecto-changesets", label: "Ecto Changesets", hint: "Data validation with Ecto" },
   { value: "nimble-options", label: "NimbleOptions", hint: "Declarative option validation" },
+  { value: "peri", label: "Peri", hint: "Schema-as-data map validation" },
+  { value: "tarams", label: "Tarams", hint: "Request params casting and validation" },
   { value: "none", label: "None", hint: "No extra validation helper" },
 ];
 
@@ -138,6 +141,8 @@ const HTTP_OPTIONS: PromptOption<ElixirHttp>[] = [
 
 const JSON_OPTIONS: PromptOption<ElixirJson>[] = [
   { value: "jason", label: "Jason", hint: "Phoenix default JSON library" },
+  { value: "elixir-json", label: "Elixir JSON", hint: "Built-in JSON module (Elixir 1.18+)" },
+  { value: "jiffy", label: "Jiffy", hint: "NIF-based JSON encoder and decoder" },
   { value: "none", label: "None", hint: "No JSON library" },
 ];
 
@@ -183,6 +188,12 @@ const QUALITY_OPTIONS: PromptOption<ElixirQuality>[] = [
 
 const I18N_OPTIONS: PromptOption<ElixirI18n>[] = [
   { value: "gettext", label: "Gettext", hint: "Canonical Phoenix localization" },
+  { value: "linguist", label: "Linguist", hint: "Compile-time keyword vocabularies" },
+  {
+    value: "ex-cldr-messages",
+    label: "CLDR Messages",
+    hint: "ICU and MessageFormat 2 with CLDR plurals",
+  },
   { value: "none", label: "None", hint: "No localization layer" },
 ];
 
@@ -204,6 +215,12 @@ const DOCUMENTATION_OPTIONS: PromptOption<ElixirDocumentation>[] = [
 
 const CLUSTERING_OPTIONS: PromptOption<ElixirClustering>[] = [
   { value: "libcluster", label: "libcluster", hint: "Automatic BEAM cluster formation" },
+  { value: "dns-cluster", label: "DNSCluster", hint: "DNS-based node discovery" },
+  {
+    value: "distributed-erlang",
+    label: "Distributed Erlang",
+    hint: "Built-in Node.connect to listed peers",
+  },
   { value: "none", label: "None", hint: "No cluster topology" },
 ];
 

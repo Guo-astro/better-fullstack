@@ -2407,6 +2407,10 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://hexdocs.pm/quantum/",
     githubUrl: "https://github.com/quantum-elixir/quantum-core",
   },
+  "elixirJobs:exq": {
+    docsUrl: "https://hexdocs.pm/exq/",
+    githubUrl: "https://github.com/akira/exq",
+  },
   "elixirValidation:ecto-changesets": {
     docsUrl: "https://hexdocs.pm/ecto/Ecto.Changeset.html",
     githubUrl: "https://github.com/elixir-ecto/ecto",
@@ -2414,6 +2418,14 @@ const CATEGORY_LINKS: LinkMap = {
   "elixirValidation:nimble-options": {
     docsUrl: "https://hexdocs.pm/nimble_options/",
     githubUrl: "https://github.com/dashbitco/nimble_options",
+  },
+  "elixirValidation:peri": {
+    docsUrl: "https://hexdocs.pm/peri/",
+    githubUrl: "https://github.com/zoedsoupe/peri",
+  },
+  "elixirValidation:tarams": {
+    docsUrl: "https://hexdocs.pm/tarams/",
+    githubUrl: "https://github.com/bluzky/tarams",
   },
   "elixirHttp:req": {
     docsUrl: "https://hexdocs.pm/req/",
@@ -2430,6 +2442,14 @@ const CATEGORY_LINKS: LinkMap = {
   "elixirJson:jason": {
     docsUrl: "https://hexdocs.pm/jason/",
     githubUrl: "https://github.com/michalmuskala/jason",
+  },
+  "elixirJson:elixir-json": {
+    docsUrl: "https://hexdocs.pm/elixir/JSON.html",
+    githubUrl: "https://github.com/elixir-lang/elixir",
+  },
+  "elixirJson:jiffy": {
+    docsUrl: "https://hexdocs.pm/jiffy/",
+    githubUrl: "https://github.com/davisp/jiffy",
   },
   "elixirEmail:swoosh": {
     docsUrl: "https://hexdocs.pm/swoosh/",
@@ -2508,6 +2528,14 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://hexdocs.pm/gettext/",
     githubUrl: "https://github.com/elixir-gettext/gettext",
   },
+  "elixirI18n:linguist": {
+    docsUrl: "https://hexdocs.pm/linguist/",
+    githubUrl: "https://github.com/change/linguist",
+  },
+  "elixirI18n:ex-cldr-messages": {
+    docsUrl: "https://hexdocs.pm/ex_cldr_messages/",
+    githubUrl: "https://github.com/elixir-cldr/cldr_messages",
+  },
   "elixirHttpServer:bandit": {
     docsUrl: "https://hexdocs.pm/bandit/",
     githubUrl: "https://github.com/mtrudel/bandit",
@@ -2527,6 +2555,14 @@ const CATEGORY_LINKS: LinkMap = {
   "elixirClustering:libcluster": {
     docsUrl: "https://hexdocs.pm/libcluster/",
     githubUrl: "https://github.com/bitwalker/libcluster",
+  },
+  "elixirClustering:dns-cluster": {
+    docsUrl: "https://hexdocs.pm/dns_cluster/",
+    githubUrl: "https://github.com/phoenixframework/dns_cluster",
+  },
+  "elixirClustering:distributed-erlang": {
+    docsUrl: "https://hexdocs.pm/elixir/Node.html",
+    githubUrl: "https://github.com/elixir-lang/elixir",
   },
   "elixirLibraries:ex_aws": {
     docsUrl: "https://hexdocs.pm/ex_aws/",

@@ -1822,6 +1822,9 @@ function displayElixirInstructions(config: ProjectConfig & { depsInstalled: bool
   output += `${pc.cyan("•")} Jobs: ${elixirJobs}\n`;
   output += `${pc.cyan("•")} Auth: ${elixirAuth}\n`;
   output += `${pc.cyan("•")} Deploy: ${elixirDeploy}\n`;
+  if (elixirJobs === "exq") {
+    output += `${pc.yellow("NOTE:")} Exq needs Redis at REDIS_URL (default redis://localhost:6379)\n`;
+  }
 
   output += `\n${pc.bold("Common Mix commands:")}\n`;
   output += `${pc.cyan("•")} Run: mix phx.server\n`;

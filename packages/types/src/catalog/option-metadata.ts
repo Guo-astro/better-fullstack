@@ -1864,10 +1864,13 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
   elixirJobs: {
     oban: "Oban",
     quantum: "Quantum",
+    exq: "Exq",
   },
   elixirValidation: {
     "ecto-changesets": "Ecto Changesets",
     "nimble-options": "NimbleOptions",
+    peri: "Peri",
+    tarams: "Tarams",
   },
   elixirHttp: {
     req: "Req",
@@ -1876,6 +1879,8 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
   },
   elixirJson: {
     jason: "Jason",
+    "elixir-json": "Elixir JSON",
+    jiffy: "Jiffy",
   },
   elixirEmail: {
     swoosh: "Swoosh",
@@ -1909,6 +1914,8 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
   },
   elixirI18n: {
     gettext: "Gettext",
+    linguist: "Linguist",
+    "ex-cldr-messages": "CLDR Messages",
   },
   elixirHttpServer: {
     bandit: "Bandit",
@@ -1922,6 +1929,8 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
   },
   elixirClustering: {
     libcluster: "libcluster",
+    "dns-cluster": "DNSCluster",
+    "distributed-erlang": "Distributed Erlang",
   },
   elixirDeploy: {
     docker: "Docker",

@@ -5,7 +5,7 @@ defmodule {{elixirModuleName}}.MixProject do
     [
       app: :{{elixirAppName}},
       version: "0.1.0",
-      elixir: "~> 1.17",
+      elixir: "{{#if (eq elixirJson "elixir-json")}}~> 1.18{{else}}~> 1.17{{/if}}",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -95,6 +95,9 @@ defmodule {{elixirModuleName}}.MixProject do
 {{#if (eq elixirJobs "quantum")}}
       {:quantum, "~> 3.5"},
 {{/if}}
+{{#if (eq elixirJobs "exq")}}
+      {:exq, "~> 0.25"},
+{{/if}}
 {{#if (eq elixirApi "absinthe")}}
       {:absinthe, "~> 1.7"},
       {:absinthe_plug, "~> 1.5"},
@@ -104,6 +107,12 @@ defmodule {{elixirModuleName}}.MixProject do
 {{/if}}
 {{#if (eq elixirValidation "nimble-options")}}
       {:nimble_options, "~> 1.1"},
+{{/if}}
+{{#if (eq elixirValidation "peri")}}
+      {:peri, "~> 0.11"},
+{{/if}}
+{{#if (eq elixirValidation "tarams")}}
+      {:tarams, "~> 1.9"},
 {{/if}}
 {{#if (or (eq elixirHttp "req") (eq elixirTesting "bypass"))}}
       {:req, "~> 0.5"},
@@ -116,6 +125,9 @@ defmodule {{elixirModuleName}}.MixProject do
 {{/if}}
 {{#if (or (ne elixirWebFramework "none") (eq elixirJson "jason"))}}
       {:jason, "~> 1.4"},
+{{/if}}
+{{#if (eq elixirJson "jiffy")}}
+      {:jiffy, "~> 2.0"},
 {{/if}}
 {{#if (eq elixirEmail "swoosh")}}
       {:swoosh, "~> 1.17"},
@@ -186,6 +198,12 @@ defmodule {{elixirModuleName}}.MixProject do
 {{#if (eq elixirI18n "gettext")}}
       {:gettext, "~> 1.0"},
 {{/if}}
+{{#if (eq elixirI18n "linguist")}}
+      {:linguist, "~> 0.6"},
+{{/if}}
+{{#if (eq elixirI18n "ex-cldr-messages")}}
+      {:ex_cldr_messages, "~> 2.0"},
+{{/if}}
 {{#if (and (ne elixirWebFramework "none") (eq elixirHttpServer "bandit"))}}
       {:bandit, "~> 1.12"},
 {{/if}}
@@ -200,6 +218,9 @@ defmodule {{elixirModuleName}}.MixProject do
 {{/if}}
 {{#if (eq elixirClustering "libcluster")}}
       {:libcluster, "~> 3.5"},
+{{/if}}
+{{#if (eq elixirClustering "dns-cluster")}}
+      {:dns_cluster, "~> 0.3"},
 {{/if}}
 {{#if (includes elixirLibraries "ex_aws")}}
       {:ex_aws, "~> 2.7"},

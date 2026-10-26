@@ -48,7 +48,7 @@ config :{{elixirAppName}}, {{elixirModuleName}}.GRPCEndpoint,
 {{/if}}
 {{#if (ne elixirWebFramework "none")}}
 
-config :phoenix, :json_library, Jason
+config :phoenix, :json_library, {{#if (eq elixirJson "elixir-json")}}JSON{{else if (eq elixirJson "jiffy")}}{{elixirModuleName}}.JSON{{else}}Jason{{/if}}
 {{/if}}
 {{#if (eq elixirJobs "oban")}}
 
@@ -68,6 +68,15 @@ config :{{elixirAppName}},
            task: fn -> :ok end
          ]
        ]
+{{/if}}
+{{#if (eq elixirJobs "exq")}}
+
+config :exq,
+  name: Exq,
+  namespace: "exq",
+  queues: ["default"],
+  concurrency: :infinite,
+  start_on_application: false
 {{/if}}
 {{#if (eq elixirEmail "swoosh")}}
 
@@ -113,6 +122,10 @@ config :sentry,
   environment_name: config_env(),
   enable_source_code_context: true,
   root_source_code_paths: [File.cwd!()]
+{{/if}}
+{{#if (eq elixirI18n "linguist")}}
+
+config :linguist, pluralization_key: :count
 {{/if}}
 {{#if (eq elixirClustering "libcluster")}}
 config :{{elixirAppName}}, :cluster_topologies, []

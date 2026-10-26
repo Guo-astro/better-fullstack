@@ -12,7 +12,7 @@ primary_region = "iad"
   PHX_HOST = "{{elixirDeployAppName}}.fly.dev"
   PORT = "4000"
 {{/if}}
-{{#if (eq elixirClustering "libcluster")}}
+{{#if (or (eq elixirClustering "libcluster") (eq elixirClustering "dns-cluster"))}}
   DNS_CLUSTER_QUERY = "{{elixirDeployAppName}}.internal"
 {{/if}}
 {{#if (eq elixirOrm "ecto_sqlite3")}}
@@ -29,8 +29,8 @@ primary_region = "iad"
   force_https = true
   auto_stop_machines = true
   auto_start_machines = true
-{{#if (eq elixirJobs "oban")}}
-  # Oban runs inside the app, so a stopped machine also stops queued and scheduled jobs.
+{{#if (or (eq elixirJobs "oban") (eq elixirJobs "exq"))}}
+  # Jobs run inside the app, so a stopped machine also stops queued and scheduled jobs.
   min_machines_running = 1
 {{else}}
   min_machines_running = 0
@@ -45,7 +45,7 @@ primary_region = "iad"
   processes = ["app"]
   auto_stop_machines = true
   auto_start_machines = true
-{{#if (eq elixirJobs "oban")}}
+{{#if (or (eq elixirJobs "oban") (eq elixirJobs "exq"))}}
   min_machines_running = 1
 {{else}}
   min_machines_running = 0

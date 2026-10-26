@@ -2536,6 +2536,7 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "values": [
           "oban",
           "quantum",
+          "exq",
           "none"
         ],
         "valueHint": null,
@@ -2548,6 +2549,8 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "values": [
           "ecto-changesets",
           "nimble-options",
+          "peri",
+          "tarams",
           "none"
         ],
         "valueHint": null,
@@ -2572,6 +2575,8 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "summary": "Elixir JSON library.",
         "values": [
           "jason",
+          "elixir-json",
+          "jiffy",
           "none"
         ],
         "valueHint": null,
@@ -2653,6 +2658,8 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "summary": "Elixir internationalization.",
         "values": [
           "gettext",
+          "linguist",
+          "ex-cldr-messages",
           "none"
         ],
         "valueHint": null,
@@ -2698,6 +2705,8 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "summary": "Elixir clustering.",
         "values": [
           "libcluster",
+          "dns-cluster",
+          "distributed-erlang",
           "none"
         ],
         "valueHint": null,

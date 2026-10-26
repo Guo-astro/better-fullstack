@@ -1065,18 +1065,20 @@ export const ElixirRealtimeSchema = z
   .describe("Elixir realtime feature");
 
 export const ElixirJobsSchema = z
-  .enum(["oban", "quantum", "none"])
+  .enum(["oban", "quantum", "exq", "none"])
   .describe("Elixir jobs and scheduling");
 
 export const ElixirValidationSchema = z
-  .enum(["ecto-changesets", "nimble-options", "none"])
+  .enum(["ecto-changesets", "nimble-options", "peri", "tarams", "none"])
   .describe("Elixir validation and data contracts");
 
 export const ElixirHttpSchema = z
   .enum(["req", "finch", "tesla", "none"])
   .describe("Elixir HTTP client");
 
-export const ElixirJsonSchema = z.enum(["jason", "none"]).describe("Elixir JSON library");
+export const ElixirJsonSchema = z
+  .enum(["jason", "elixir-json", "jiffy", "none"])
+  .describe("Elixir JSON library");
 
 export const ElixirEmailSchema = z
   .enum(["swoosh", "bamboo", "none"])
@@ -1098,7 +1100,9 @@ export const ElixirQualitySchema = z
   .enum(["credo", "dialyxir", "sobelow", "excoveralls", "mix_audit", "none"])
   .describe("Elixir code quality tool");
 
-export const ElixirI18nSchema = z.enum(["gettext", "none"]).describe("Elixir localization");
+export const ElixirI18nSchema = z
+  .enum(["gettext", "linguist", "ex-cldr-messages", "none"])
+  .describe("Elixir localization");
 
 export const ElixirHttpServerSchema = z
   .enum(["bandit", "cowboy", "none"])
@@ -1113,7 +1117,7 @@ export const ElixirDocumentationSchema = z
   .describe("Elixir documentation tooling");
 
 export const ElixirClusteringSchema = z
-  .enum(["libcluster", "none"])
+  .enum(["libcluster", "dns-cluster", "distributed-erlang", "none"])
   .describe("Elixir clustering library");
 
 export const ElixirDeploySchema = z
