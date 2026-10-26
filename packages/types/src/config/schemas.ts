@@ -868,7 +868,7 @@ export const GoDISchema = z.enum(["fx", "none"]).describe("Go dependency injecti
 
 // Java ecosystem schemas
 export const CrystalWebFrameworkSchema = z
-  .enum(["kemal", "none"])
+  .enum(["kemal", "lucky", "athena", "marten", "none"])
   .describe("Experimental Crystal HTTP framework");
 
 export const JavaLanguageSchema = z

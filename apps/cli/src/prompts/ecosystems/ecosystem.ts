@@ -51,7 +51,7 @@ export const ECOSYSTEM_PROMPT_OPTIONS = [
     label: "Elixir",
     hint: "Elixir ecosystem with Phoenix, LiveView, Ecto, and more",
   },
-  { value: "crystal" as const, label: "Crystal", hint: "Experimental Kemal HTTP service" },
+  { value: "crystal" as const, label: "Crystal", hint: "Experimental native HTTP service" },
 ];
 
 export async function getEcosystemChoice(ecosystem?: Ecosystem, auth?: Auth) {

@@ -744,6 +744,9 @@ const BASE_LINKS: LinkMap = {
   uppy: { docsUrl: "https://uppy.io/docs/", githubUrl: "https://github.com/transloadit/uppy" },
   crystal: { docsUrl: "https://crystal-lang.org/reference/1.22/", githubUrl: "https://github.com/crystal-lang/crystal" },
   kemal: { docsUrl: "https://kemalcr.com/guide/", githubUrl: "https://github.com/kemalcr/kemal" },
+  lucky: { docsUrl: "https://luckyframework.org/guides/getting-started/why-lucky", githubUrl: "https://github.com/luckyframework/lucky" },
+  athena: { docsUrl: "https://athenaframework.org/", githubUrl: "https://github.com/athena-framework/framework" },
+  marten: { docsUrl: "https://martenframework.com/docs", githubUrl: "https://github.com/martenframework/marten" },
   java: {
     docsUrl: "https://dev.java/learn/",
     githubUrl: "https://github.com/openjdk/jdk",

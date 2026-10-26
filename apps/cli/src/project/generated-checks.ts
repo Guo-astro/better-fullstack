@@ -5,7 +5,7 @@ import path from "node:path";
 import type { ProjectConfig, StackPart, StackPartEcosystem } from "@/types";
 
 import { commandExists } from "@/platform/command-exists";
-import { stackGraphToLegacyProjectConfigForEcosystem } from "@/types";
+import { getCrystalCompilerFlags, stackGraphToLegacyProjectConfigForEcosystem } from "@/types";
 
 export type GeneratedCheckCommand = {
   command: string;
@@ -455,16 +455,18 @@ async function commandsForTarget(
       };
     case "python":
       return pythonCommands(config, target);
-    case "crystal":
+    case "crystal": {
+      const crystalFlags = getCrystalCompilerFlags(target.toolId);
       return {
         toolchain: "Crystal + Shards",
         required: ["crystal", "shards"],
         commands: [
           display("shards", ["install"]),
-          display("shards", ["build", "--release"]),
-          display("crystal", ["spec"]),
+          display("shards", ["build", "--release", ...crystalFlags]),
+          display("crystal", ["spec", ...crystalFlags]),
         ],
       };
+    }
     case "ruby":
       return {
         toolchain: "Ruby + Bundler",

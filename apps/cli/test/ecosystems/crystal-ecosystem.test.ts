@@ -12,7 +12,7 @@ import { SUPPORTED_STACK_UPDATE_KEYS } from "@/helpers/core/stack-update";
 import { create, createVirtual } from "@/index";
 import { generateReproducibleCommand } from "@/lifecycle/generate-reproducible-command";
 import { createProjectOperation, planProjectOperation } from "@/operations/project-create";
-import { buildProjectConfig } from "@/operations/stack-helpers";
+import { buildProjectConfig, getInstallCommand } from "@/operations/stack-helpers";
 import * as configPrompts from "@/prompts/core/config-prompts";
 import { createStackPart } from "@/types";
 
@@ -161,6 +161,34 @@ describe("Crystal create contract", () => {
     );
     expect(hasFile(result.tree.root, "package.json")).toBe(false);
   });
+
+  it.each([
+    ["lucky", "luckyframework/lucky", "class AppServer < Lucky::BaseAppServer", "413"],
+    ["athena", "athena-framework/framework", "ATH.run(", "413"],
+    ["marten", "martenframework/marten", "Marten.start", "400"],
+  ] as const)(
+    "renders the %s HTTP contract with its own server and shared proof",
+    async (framework, shard, server, oversizedStatus) => {
+      const result = await createVirtual({ ecosystem: "crystal", crystalWebFramework: framework });
+      expect(result.success).toBe(true);
+      if (!result.tree) throw new Error(result.error);
+      const root = result.tree.root;
+      expect(content(root, "shard.yml")).toContain(`github: ${shard}`);
+      expect(content(root, "shard.yml")).not.toContain("kemal");
+      expect(content(root, "src/server.cr")).toContain(server);
+      expect(hasFile(root, "src/greeting_request.cr")).toBe(true);
+      expect(hasFile(root, "spec/greeting_request_spec.cr")).toBe(true);
+      expect(hasFile(root, "src/http_guard.cr")).toBe(framework !== "marten");
+      expect(content(root, "scripts/http_proof.cr")).toContain(
+        `oversized.status_code == ${oversizedStatus}`,
+      );
+      const config = buildProjectConfig({ ecosystem: "crystal", crystalWebFramework: framework });
+      expect(generateReproducibleCommand(config)).toContain(`--crystal-web-framework ${framework}`);
+      expect(getInstallCommand("crystal", "svc", undefined, undefined, undefined, undefined, framework)).toContain(
+        framework === "athena" ? "crystal spec -Dwithout_libmagic" : "crystal spec &&",
+      );
+    },
+  );
 
   it("rejects unsupported selections before rendering", async () => {
     const result = await createVirtual({ ecosystem: "crystal", database: "postgres" });

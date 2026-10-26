@@ -6,6 +6,7 @@ import type {
 } from "@testing/lib/generate-combos/types";
 
 import {
+  CRYSTAL_WEB_FRAMEWORK_VALUES,
   ADDONS_VALUES,
   AI_VALUES,
   ANALYTICS_VALUES,
@@ -1001,7 +1002,13 @@ function createDraft(ecosystem: Ecosystem, args: GeneratorArgs): CandidateDraft 
     case "go":
       return makeGoDraft(args);
     case "crystal":
-      return { ecosystem: "crystal", options: { ...createCommonOptions("crystal", args), crystalWebFramework: "kemal" } };
+      return {
+        ecosystem: "crystal",
+        options: {
+          ...createCommonOptions("crystal", args),
+          crystalWebFramework: sampleScalar(CRYSTAL_WEB_FRAMEWORK_VALUES, 0, "crystalWebFramework"),
+        },
+      };
     case "java":
       return makeJavaDraft(args);
     case "ruby":

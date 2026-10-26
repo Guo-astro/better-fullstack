@@ -1,4 +1,5 @@
 import {
+  getCrystalCommands,
   getLocalWebDevPort,
   getRoleTargetPath,
   getStandaloneBackendEcosystem,
@@ -58,6 +59,9 @@ const BACKEND_LABELS: Record<string, string> = {
   "aspnet-mvc": ".NET ASP.NET Core MVC",
   "aspnet-blazor": ".NET ASP.NET Core Blazor",
   kemal: "Crystal Kemal",
+  lucky: "Crystal Lucky",
+  athena: "Crystal Athena",
+  marten: "Crystal Marten",
   sinatra: "Ruby Sinatra",
   slim: "PHP Slim",
   phoenix: "Elixir Phoenix",
@@ -99,6 +103,7 @@ function getRawGraphBackendConnection(config: ProjectConfig): GraphBackendConnec
 
   switch (backend.ecosystem) {
     case "crystal": {
+      const commands = getCrystalCommands(backend.toolId);
       const origins =
         [...new Set(getGraphFrontendPorts(config).values())]
           .map((port) => `http://localhost:${port}`)
@@ -114,9 +119,9 @@ function getRawGraphBackendConnection(config: ProjectConfig): GraphBackendConnec
         healthPath: "/health",
         healthUrl: "http://localhost:3000/health",
         setupCommand: `cd ${directory} && shards install`,
-        devCommand: `cd ${directory} && ${origins ? `export CORS_ORIGIN=${origins} && ` : ""}crystal run src/server.cr`,
-        checkCommand: `cd ${directory} && shards build --release`,
-        testCommand: `cd ${directory} && crystal spec`,
+        devCommand: `cd ${directory} && ${origins ? `export CORS_ORIGIN=${origins} && ` : ""}${commands.run}`,
+        checkCommand: `cd ${directory} && ${commands.build}`,
+        testCommand: `cd ${directory} && ${commands.test}`,
       };
     }
     case "ruby":

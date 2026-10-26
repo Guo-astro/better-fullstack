@@ -221,7 +221,7 @@ export const OPTION_DISPLAY_ORDER: Readonly<Record<string, readonly string[]>> =
     "jqwik",
     "none",
   ],
-  crystalWebFramework: ["kemal", "none"],
+  crystalWebFramework: ["kemal", "lucky", "athena", "marten", "none"],
   javaWebFramework: ["spring-boot", "quarkus", "ktor", "micronaut", "none"],
   jobQueue: [
     "bullmq",

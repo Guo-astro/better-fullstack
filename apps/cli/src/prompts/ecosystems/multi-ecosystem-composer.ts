@@ -245,7 +245,7 @@ export async function selectBackendEcosystem(
       { value: "go", label: "Go", hint: "Gin, Echo, Fiber, Chi" },
       { value: "rust", label: "Rust", hint: "Axum, Actix Web, Rocket" },
       { value: "python", label: "Python", hint: "FastAPI, Django, Flask" },
-      { value: "crystal", label: "Crystal", hint: "Experimental Kemal HTTP service" },
+      { value: "crystal", label: "Crystal", hint: "Experimental native HTTP service" },
       { value: "java", label: "Java / Kotlin", hint: "Spring Boot, Ktor, Quarkus" },
       { value: "dotnet", label: ".NET", hint: "ASP.NET Core, EF Core, SignalR" },
       { value: "ruby", label: "Ruby", hint: "Experimental Sinatra JSON service" },

@@ -7,13 +7,18 @@ import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 
 const repoRoot = resolve(import.meta.dir, "..");
+const frameworkIndex = process.argv.indexOf("--framework");
+const framework = frameworkIndex < 0 ? "kemal" : process.argv[frameworkIndex + 1];
+if (!framework || !["kemal", "lucky", "athena", "marten"].includes(framework)) {
+  throw new Error("--framework must be kemal, lucky, athena, or marten");
+}
 const outputIndex = process.argv.indexOf("--output");
 const requestedOutput = outputIndex < 0 ? undefined : process.argv[outputIndex + 1];
 if (outputIndex >= 0 && (!requestedOutput || requestedOutput.startsWith("--"))) {
   throw new Error("--output requires a directory");
 }
 const outputDir = resolve(
-  requestedOutput ?? join(repoRoot, "testing/.smoke-output/crystal-runtime-proof"),
+  requestedOutput ?? join(repoRoot, `testing/.smoke-output/crystal-runtime-proof-${framework}`),
 );
 const git = (args: string[]) => {
   const result = Bun.spawnSync(["git", ...args], { cwd: repoRoot });
@@ -42,7 +47,7 @@ const flags = [
   "--ecosystem",
   "crystal",
   "--crystal-web-framework",
-  "kemal",
+  framework,
   "--database",
   "none",
   "--addons",
@@ -80,7 +85,7 @@ const cliSha256 = createHash("sha256")
   .digest("hex");
 const receipt = {
   schemaVersion: 1,
-  recipe: "crystal-kemal",
+  recipe: `crystal-${framework}`,
   maturity: "experimental",
   evidence: "unqualified-observation",
   revision,

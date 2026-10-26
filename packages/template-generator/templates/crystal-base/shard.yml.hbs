@@ -5,9 +5,26 @@ license: MIT
 targets:
   server:
     main: src/server.cr
-{{#if hasKemal}}
+{{#if (ne crystalWebFramework "none")}}
 dependencies:
+{{/if}}
+{{#if (eq crystalWebFramework "kemal")}}
   kemal:
     github: kemalcr/kemal
     version: 1.15.0
+{{/if}}
+{{#if (eq crystalWebFramework "lucky")}}
+  lucky:
+    github: luckyframework/lucky
+    version: 1.5.0
+{{/if}}
+{{#if (eq crystalWebFramework "athena")}}
+  athena:
+    github: athena-framework/framework
+    version: 0.23.0
+{{/if}}
+{{#if (eq crystalWebFramework "marten")}}
+  marten:
+    github: martenframework/marten
+    version: 0.7.1
 {{/if}}

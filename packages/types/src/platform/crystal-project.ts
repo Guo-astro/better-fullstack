@@ -72,6 +72,20 @@ export const CRYSTAL_UNSUPPORTED_FIELDS = [
   "examples",
 ] as const satisfies readonly (keyof ProjectConfig)[];
 
+export function getCrystalCompilerFlags(framework: string | undefined): string[] {
+  return framework === "athena" ? ["-Dwithout_libmagic"] : [];
+}
+
+export function getCrystalCommands(framework: string | undefined) {
+  const flags = getCrystalCompilerFlags(framework).map((flag) => ` ${flag}`).join("");
+  return {
+    build: `shards build --release${flags}`,
+    test: `crystal spec${flags}`,
+    run: `crystal run src/server.cr${flags}`,
+    proof: framework && framework !== "none" ? "crystal run scripts/http_proof.cr" : undefined,
+  };
+}
+
 function selected(value: unknown): boolean {
   return Array.isArray(value)
     ? value.some(selected)
@@ -120,14 +134,17 @@ export function getCrystalSelectionIssue(config: Partial<ProjectConfig>): string
     if (collision)
       return `Crystal service target path is shared by another application: ${collision.targetPath}.`;
     const backendIds = new Set(backends.map((part) => part.id));
+    const partsById = new Map(backends.map((part) => [part.id, part]));
     const unsupported = parts.find(
       (part) =>
         part.source !== "provided" &&
         part.toolId !== "none" &&
         backendIds.has(part.ownerPartId ?? ""),
     );
-    if (unsupported)
-      return `Crystal Kemal does not support the owned '${unsupported.toolId}' selection.`;
+    if (unsupported) {
+      const owner = partsById.get(unsupported.ownerPartId ?? "")?.toolId ?? "service";
+      return `Crystal ${owner.charAt(0).toUpperCase()}${owner.slice(1)} does not support the owned '${unsupported.toolId}' selection.`;
+    }
     const databaseIssue = getCrystalDatabaseSelectionIssue(parts);
     if (databaseIssue) return databaseIssue;
     const hasOtherApplication = parts.some(

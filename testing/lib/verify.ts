@@ -1,4 +1,5 @@
 import type { Ecosystem, ProjectConfig } from "@better-fullstack/types";
+import { getCrystalCompilerFlags } from "@better-fullstack/types";
 
 import {
   runDevCheck,
@@ -867,10 +868,15 @@ export async function verifyCrystal(comboName: string, projectDir: string): Prom
       templateFailure("structure", "Expected Crystal shard.yml"),
     ]);
   }
+  const flags = getCrystalCompilerFlags(
+    readFileSync(join(projectDir, "shard.yml"), "utf8").includes("github: athena-framework/framework")
+      ? "athena"
+      : undefined,
+  );
   for (const [step, command, args] of [
     ["install", "shards", ["install"]],
-    ["build", "shards", ["build", "--release"]],
-    ["test", "crystal", ["spec"]],
+    ["build", "shards", ["build", "--release", ...flags]],
+    ["test", "crystal", ["spec", ...flags]],
   ] as const) {
     steps.push(await runStep(step, command, [...args], projectDir));
     if (!steps.at(-1)!.success) return wrapResult("crystal", comboName, projectDir, steps);

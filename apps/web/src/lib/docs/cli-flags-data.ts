@@ -2021,13 +2021,16 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
   {
     "id": "crystal",
     "title": "Crystal flags",
-    "description": "Experimental Kemal HTTP service with Crystal and Shards.",
+    "description": "Experimental Kemal, Lucky, Athena, or Marten HTTP service with Crystal and Shards.",
     "flags": [
       {
         "flag": "--crystal-web-framework",
         "summary": "Crystal HTTP framework.",
         "values": [
           "kemal",
+          "lucky",
+          "athena",
+          "marten",
           "none"
         ],
         "valueHint": null,

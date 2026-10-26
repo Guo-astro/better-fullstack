@@ -6,7 +6,17 @@ import { createStaticSinglePromptResolution } from "@/prompts/core/prompt-contra
 
 export function resolveCrystalWebFrameworkPrompt(value?: string) {
   const selected = value === undefined ? undefined : CrystalWebFrameworkSchema.parse(value);
-  return createStaticSinglePromptResolution([{ value: "kemal" as const, label: "Kemal", hint: "Experimental native HTTP service" }, { value: "none" as const, label: "None" }], "kemal", selected);
+  return createStaticSinglePromptResolution(
+    [
+      { value: "kemal" as const, label: "Kemal", hint: "Experimental native HTTP service" },
+      { value: "lucky" as const, label: "Lucky", hint: "Type-safe actions without a database" },
+      { value: "athena" as const, label: "Athena", hint: "Annotation-based controllers" },
+      { value: "marten" as const, label: "Marten", hint: "Handlers and middleware without a database" },
+      { value: "none" as const, label: "None" },
+    ],
+    "kemal",
+    selected,
+  );
 }
 
 export async function getCrystalWebFrameworkChoice(value?: CrystalWebFramework) {

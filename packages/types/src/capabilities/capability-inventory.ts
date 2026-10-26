@@ -632,7 +632,7 @@ export function getCapabilityInventory(
           limitation: quarantineEntry
             ? quarantineEntry.reason
             : ecosystem === "crystal"
-              ? "Experimental Crystal 1.22.1 / Kemal 1.15.0 HTTP recipe. No qualified current runtime receipt covers this recipe. No database, auth, deployment, or native overlays."
+              ? "Experimental Crystal 1.22.1 native recipe with pinned shards. No qualified current runtime receipt covers this recipe. No deployment or native overlays."
               : recipeIds.length === 0
                 ? CONTROL_CATEGORIES.has(category)
                   ? "Schema-listed project control. No runtime recipe is declared for this control."

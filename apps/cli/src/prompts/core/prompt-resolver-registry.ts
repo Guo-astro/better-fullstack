@@ -188,6 +188,7 @@ import {
   GO_AUTH_VALUES,
   GO_CLI_VALUES,
   GO_DI_VALUES,
+  CRYSTAL_WEB_FRAMEWORK_VALUES,
   GO_LOGGING_VALUES,
   GO_MIGRATIONS_VALUES,
   GO_ORM_VALUES,
@@ -676,7 +677,7 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
     coverageContexts: [{}],
   },
   crystalWebFramework: {
-    schemaValues: ["kemal", "none"],
+    schemaValues: CRYSTAL_WEB_FRAMEWORK_VALUES,
     resolve: ({ value }: { value?: string } = {}) => resolveCrystalWebFrameworkPrompt(value),
     coverageContexts: [{}],
   },

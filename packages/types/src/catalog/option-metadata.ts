@@ -1658,7 +1658,7 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
     java: "Java",
     kotlin: "Kotlin",
   },
-  crystalWebFramework: { kemal: "Kemal", none: "None" },
+  crystalWebFramework: { kemal: "Kemal", lucky: "Lucky", athena: "Athena", marten: "Marten", none: "None" },
   javaWebFramework: {
     "spring-boot": "Spring Boot",
     ktor: "Ktor",

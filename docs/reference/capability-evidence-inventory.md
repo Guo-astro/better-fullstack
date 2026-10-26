@@ -46,7 +46,7 @@ Ruby's Sinatra recipe uses a separate `testing/ruby-runtime-proof.ts` gate with 
 
 ## Experimental Crystal observation
 
-Crystal's Kemal recipe uses the separate `testing/crystal-runtime-proof.ts` gate with Crystal 1.22.1 and Shards 0.20.0. It scaffolds through the built CLI, installs dependencies, compiles, runs native specs, and checks live JSON HTTP, rejected input, and shutdown. Its revision, toolchain, lockfile, and result remain an unqualified observation. Crystal stays listed and experimental; the eight golden recipes and historical upgrade receipt schema are unchanged.
+Crystal's Kemal, Lucky, Athena, and Marten recipes use the separate `testing/crystal-runtime-proof.ts` gate with Crystal 1.22.1 and Shards 0.20.0. It scaffolds through the built CLI, installs dependencies, compiles, runs native specs, and checks live JSON HTTP, rejected input, and shutdown. Its revision, toolchain, lockfile, and result remain an unqualified observation. Crystal stays listed and experimental; the eight golden recipes and historical upgrade receipt schema are unchanged.
 
 ## Freshness and producer changes
 

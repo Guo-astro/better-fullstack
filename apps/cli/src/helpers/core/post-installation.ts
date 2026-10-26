@@ -1,5 +1,6 @@
 import {
   getCategoryDisplayName,
+  getCrystalCommands,
   getLocalWebDevPort,
   getOptionMetadata,
   getStandaloneBackendEcosystem,
@@ -77,7 +78,9 @@ export async function displayPostInstallInstructions(
   }
 
   if (ecosystem === "crystal") {
-    consola.box(`Next steps\n\ncd ${relativePath}\n${depsInstalled ? "" : "shards install\n"}shards build --release\ncrystal spec\n${config.crystalWebFramework === "kemal" ? "crystal run scripts/http_proof.cr\nHOST=127.0.0.1 PORT=3000 ./bin/server" : "./bin/server"}\n\nExperimental recipe. Runtime proof has not been recorded.`);
+    const commands = getCrystalCommands(config.crystalWebFramework);
+    const steps = [`cd ${relativePath}`, depsInstalled ? undefined : "shards install", commands.build, commands.test, commands.proof, commands.proof ? "HOST=127.0.0.1 PORT=3000 ./bin/server" : "./bin/server"];
+    consola.box(`Next steps\n\n${steps.filter(Boolean).join("\n")}\n\nExperimental recipe. Runtime proof has not been recorded.`);
     return;
   }
 

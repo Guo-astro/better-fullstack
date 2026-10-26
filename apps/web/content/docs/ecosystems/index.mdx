@@ -19,7 +19,7 @@ One CLI covers solo ecosystems and additional languages for composed projects. E
 | [.NET](#net)                        | ASP.NET Core services with EF Core or Dapper, Identity, Minimal APIs, SignalR, jobs, and tests. | .NET SDK 10         |
 | [PHP](#php)                         | Experimental Slim, Laravel or Symfony JSON services with PHPUnit and a live HTTP proof.         | PHP 8.5, Composer 2 |
 | [Ruby](#ruby)                       | Experimental Sinatra JSON HTTP service with Minitest/Rack integration tests.                    | Bundler             |
-| [Crystal](#crystal)                 | Experimental native Kemal HTTP services and framework-free programs.                            | Crystal, Shards     |
+| [Crystal](#crystal)                 | Experimental Kemal, Lucky, Athena, or Marten HTTP services and framework-free programs.         | Crystal, Shards     |
 
 For product stacks that span languages, use [Multi-Ecosystem mode](/docs/ecosystems/multi-ecosystem/), which models the project as stack parts such as `frontend:typescript:next` and `backend:go:gin`. That mode also unlocks Kotlin/Compose, SwiftUI, Flutter, Blazor, and standalone Rust web frontends; see [Native and Additional Apps](/docs/ecosystems/native-apps/).
 
@@ -51,7 +51,7 @@ Some flags are global because they live in one project config, but not every fla
 
 ## Crystal
 
-The experimental Crystal recipe generates a native Kemal JSON HTTP service. It requires Crystal 1.22.1 and Shards 0.20.0, and pins Kemal 1.15.0. Public capability evidence stays listed until a current receipt qualifies the recipe.
+The experimental Crystal recipe generates a native JSON HTTP service with `--crystal-web-framework kemal`, `lucky`, `athena`, or `marten`. It requires Crystal 1.22.1 and Shards 0.20.0, and pins Kemal 1.15.0, Lucky 1.5.0, Athena 0.23.0, or Marten 0.7.1. Lucky and Marten run without a database. Athena builds and specs need `-Dwithout_libmagic`, which the generated README and next steps include. Public capability evidence stays listed until a current receipt qualifies the recipe.
 
 ```sh
 bunx create-better-fullstack@latest crystal-api --ecosystem crystal --crystal-web-framework kemal --database none --addons none --examples none --ai-docs agents-md --no-install --no-git
@@ -62,7 +62,7 @@ crystal spec
 crystal run scripts/http_proof.cr
 ```
 
-The service exposes `/health`, a validated greeting at `/api/hello?name=Crystal`, and a JSON POST endpoint at `/api/echo`. The HTTP proof checks parsed responses, rejected input, the body limit, SIGTERM shutdown, and port release. `crystalWebFramework=none` instead creates a native greeting program without Kemal.
+The service exposes `/health`, a validated greeting at `/api/hello?name=Crystal`, and a JSON POST endpoint at `/api/echo`. Every framework serves the same contract. The HTTP proof checks parsed responses, rejected input, the body limit, SIGTERM shutdown, and port release. Marten rejects oversized bodies with its native 400 response; the other frameworks return 413. `crystalWebFramework=none` instead creates a native greeting program without an HTTP framework.
 
 Append a relative directory to a binding, such as `backend:crystal:kemal:audit@services/audit%20api`. Directory segments accept ASCII letters, digits, spaces, dots, underscores, hyphens, `@`, `:`, and `%`. Encode special characters in the binding. Applications cannot share a destination or nest one destination inside another.
 

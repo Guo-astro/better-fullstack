@@ -2942,14 +2942,14 @@ export const getDisabledReason = (
       "versionChannel",
     ].includes(category)
   ) {
-    return "Crystal's bounded recipe supports Kemal HTTP only. Use a mixed graph for independently owned tools.";
+    return "Crystal's bounded recipe supports its HTTP framework only. Use a mixed graph for independently owned tools.";
   }
   if (
     category === "crystalWebFramework" &&
     optionId !== "none" &&
     currentStack.ecosystem !== "crystal"
   )
-    return "Kemal requires the Crystal ecosystem or a Crystal backend part.";
+    return "Crystal HTTP frameworks require the Crystal ecosystem or a Crystal backend part.";
   if (currentStack.ecosystem === "ruby") {
     if (category === "rubyWebFramework" && optionId === "none") return RUBY_RECIPE_FRAMEWORK_REASON;
     const key =

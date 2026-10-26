@@ -1,5 +1,6 @@
 import {
   CRYSTAL_PROJECT_DEFAULTS,
+  getCrystalCommands,
   getCrystalSelectionIssue,
   getCrystalRequestedIssue,
   CreateInputSchema,
@@ -189,8 +190,12 @@ export function getInstallCommand(
       return `cd ${projectName} && uv sync --extra dev`;
     case "go":
       return `cd ${projectName} && go mod tidy`;
-    case "crystal":
-      return `cd ${projectName} && shards install && shards build --release && crystal spec${crystalWebFramework === "none" ? "" : " && crystal run scripts/http_proof.cr"}`;
+    case "crystal": {
+      const commands = getCrystalCommands(crystalWebFramework);
+      return [`cd ${projectName}`, "shards install", commands.build, commands.test, commands.proof]
+        .filter(Boolean)
+        .join(" && ");
+    }
     case "ruby":
       return `cd ${projectName} && bundle install`;
     case "php":

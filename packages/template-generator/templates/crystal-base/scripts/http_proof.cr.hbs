@@ -1,4 +1,4 @@
-{{#if hasKemal}}
+{{#if (ne crystalWebFramework "none")}}
 require "http/client"
 require "json"
 require "socket"
@@ -67,7 +67,7 @@ begin
   wrong_type = client.post("/api/echo", headers, %({"name":12}))
   raise "non-string name accepted" unless wrong_type.status_code == 422
   oversized = client.post("/api/echo", headers, %({"name":"#{"x" * 5000}"}))
-  raise "oversized body accepted" unless oversized.status_code == 413
+  raise "oversized body accepted" unless oversized.status_code == {{#if (eq crystalWebFramework "marten")}}400{{else}}413{{/if}}
   client.close
 
   process.signal(Signal::TERM)
@@ -84,7 +84,7 @@ begin
   rescue ex : Socket::Error
     raise "listener remained open: #{ex.message}"
   end
-  puts ({proof: "crystal-kemal-http-v1", success: true, assertions: ["invalid-port", "health-json", "hello-json", "cors", "cors-allowlist", "content-type", "blank-name-422", "post-json", "malformed-json-400", "wrong-type-422", "body-limit-413", "sigterm-exit", "port-released"]}).to_json
+  puts ({proof: "crystal-{{crystalWebFramework}}-http-v1", success: true, assertions: ["invalid-port", "health-json", "hello-json", "cors", "cors-allowlist", "content-type", "blank-name-422", "post-json", "malformed-json-400", "wrong-type-422", "body-limit-{{#if (eq crystalWebFramework "marten")}}400{{else}}413{{/if}}", "sigterm-exit", "port-released"]}).to_json
 ensure
   unless finished
     if process.exists?

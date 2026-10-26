@@ -6625,6 +6625,9 @@ export const TECH_OPTIONS: Record<
   // Java ecosystem options
   crystalWebFramework: [
     { id: "kemal", name: "Kemal", description: "Experimental native Crystal HTTP service", icon: "https://cdn.simpleicons.org/crystal", color: "from-slate-500 to-zinc-600", default: true },
+    { id: "lucky", name: "Lucky", description: "Type-safe Crystal web framework with JSON actions", icon: "https://cdn.simpleicons.org/crystal", color: "from-slate-500 to-zinc-600", default: false },
+    { id: "athena", name: "Athena", description: "Annotation-based Crystal framework with controllers", icon: "https://cdn.simpleicons.org/crystal", color: "from-slate-500 to-zinc-600", default: false },
+    { id: "marten", name: "Marten", description: "Batteries-included Crystal framework with handlers", icon: "https://cdn.simpleicons.org/crystal", color: "from-slate-500 to-zinc-600", default: false },
     { id: "none", name: "None", description: "Crystal source project", icon: "", color: "from-gray-400 to-gray-600", default: false },
   ],
   javaWebFramework: [
@@ -7797,7 +7800,7 @@ export const ECOSYSTEMS: {
   {
     id: "crystal",
     name: "Crystal",
-    description: "Experimental Kemal HTTP service",
+    description: "Experimental Kemal, Lucky, Athena, or Marten HTTP service",
     icon: "https://cdn.simpleicons.org/crystal",
     color: "from-slate-500 to-zinc-600",
   },
