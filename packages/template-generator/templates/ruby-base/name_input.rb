@@ -1,0 +1,25 @@
+require "json"
+require_relative "request_body_limit"
+
+module BetterFullstack
+  module NameInput
+    Invalid = Struct.new(:status, :error)
+
+    def self.parse(media_type, input)
+      return Invalid.new(415, "content_type_must_be_json") unless media_type == "application/json"
+
+      raw = input.read(RequestBodyLimit::MAX_BYTES + 1) || ""
+      return Invalid.new(413, "body_too_large") if raw.bytesize > RequestBodyLimit::MAX_BYTES
+
+      payload = JSON.parse(raw)
+      unless payload.is_a?(Hash) && payload.keys == ["name"] && payload["name"].is_a?(String)
+        return Invalid.new(422, "name_must_be_a_string")
+      end
+
+      name = payload["name"].strip
+      (1..80).cover?(name.length) ? name : Invalid.new(422, "name_length_must_be_1_to_80")
+    rescue JSON::ParserError
+      Invalid.new(400, "invalid_json")
+    end
+  end
+end

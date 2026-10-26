@@ -12,6 +12,9 @@ export function resolveRubyWebFrameworkPrompt(value?: RubyWebFramework, allowNon
         label: "Sinatra",
         hint: "Experimental JSON HTTP service with Puma and Minitest",
       },
+      { value: "rails" as const, label: "Rails", hint: "API-only Rails application on Puma" },
+      { value: "roda" as const, label: "Roda", hint: "Routing-tree Rack framework" },
+      { value: "grape" as const, label: "Grape", hint: "REST API framework on Rack" },
       ...(allowNone
         ? [{ value: "none" as const, label: "None", hint: "Disable the Ruby backend" }]
         : []),

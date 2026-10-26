@@ -14,6 +14,18 @@ const BASE_LINKS: LinkMap = {
     docsUrl: "https://sinatrarb.com/intro.html",
     githubUrl: "https://github.com/sinatra/sinatra",
   },
+  rails: {
+    docsUrl: "https://guides.rubyonrails.org/api_app.html",
+    githubUrl: "https://github.com/rails/rails",
+  },
+  roda: {
+    docsUrl: "https://roda.jeremyevans.net/documentation.html",
+    githubUrl: "https://github.com/jeremyevans/roda",
+  },
+  grape: {
+    docsUrl: "https://www.ruby-grape.org/",
+    githubUrl: "https://github.com/ruby-grape/grape",
+  },
   php: { docsUrl: "https://www.php.net/manual/en/", githubUrl: "https://github.com/php/php-src" },
   slim: {
     docsUrl: "https://www.slimframework.com/docs/v4/",

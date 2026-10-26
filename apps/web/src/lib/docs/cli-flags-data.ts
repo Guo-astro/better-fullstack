@@ -2400,6 +2400,9 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "summary": "Ruby HTTP framework.",
         "values": [
           "sinatra",
+          "rails",
+          "roda",
+          "grape",
           "none"
         ],
         "valueHint": null,

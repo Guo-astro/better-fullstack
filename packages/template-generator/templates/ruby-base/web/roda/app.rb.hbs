@@ -1,0 +1,39 @@
+require "json"
+require "roda"
+require_relative "http_policy"
+require_relative "name_input"
+require_relative "request_body_limit"
+
+module BetterFullstack
+  class App < Roda
+    use RequestBodyLimit, -> { HttpPolicy.allowed_origins }
+    use HttpPolicy
+
+    plugin :json
+    plugin :all_verbs
+    plugin :not_found do
+      response["content-type"] = "application/json"
+      JSON.generate(error: "not_found")
+    end
+    plugin :error_handler do |_error|
+      response.status = 500
+      response["content-type"] = "application/json"
+      JSON.generate(error: "internal_server_error")
+    end
+
+    route do |r|
+      r.get "health" do
+        { status: "ok", service: "roda" }
+      end
+
+      r.post "api/greetings" do
+        name = NameInput.parse(r.media_type, r.body)
+        if name.is_a?(NameInput::Invalid)
+          response.status = name.status
+          next { error: name.error }
+        end
+        { greeting: "Hello, #{name}!" }
+      end
+    end
+  end
+end

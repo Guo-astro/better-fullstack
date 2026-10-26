@@ -117,6 +117,7 @@ import {
   PYTHON_WEB_FRAMEWORK_VALUES,
   RATE_LIMIT_VALUES,
   REALTIME_VALUES,
+  RUBY_WEB_FRAMEWORK_VALUES,
   RUNTIME_VALUES,
   RUST_API_VALUES,
   RUST_CLI_VALUES,
@@ -617,7 +618,7 @@ function makeRubyDraft(args: GeneratorArgs): CandidateDraft {
     ecosystem: "ruby",
     options: {
       ...createCommonOptions("ruby", args),
-      rubyWebFramework: "sinatra",
+      rubyWebFramework: sampleScalar(RUBY_WEB_FRAMEWORK_VALUES, 0, "rubyWebFramework"),
       database: "none",
       addons: ["none"],
       examples: ["none"],

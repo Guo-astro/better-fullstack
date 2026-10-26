@@ -1,0 +1,51 @@
+require "action_controller/railtie"
+require "json"
+require "securerandom"
+require_relative "http_policy"
+require_relative "name_input"
+require_relative "request_body_limit"
+
+module BetterFullstack
+  class Application < Rails::Application
+    config.load_defaults 8.1
+    config.api_only = true
+    config.eager_load = false
+    config.root = __dir__
+    config.hosts.clear
+    config.logger = ActiveSupport::Logger.new(Rails.env.test? ? File::NULL : $stdout)
+    config.secret_key_base = ENV.fetch("SECRET_KEY_BASE") { Rails.env.production? ? nil : SecureRandom.hex(64) }
+    config.middleware.insert_before 0, HttpPolicy
+    config.middleware.insert_before 0, RequestBodyLimit, -> { HttpPolicy.allowed_origins }
+  end
+
+  class ApiController < ActionController::API
+    rescue_from StandardError do
+      render json: { error: "internal_server_error" }, status: 500
+    end
+
+    def health
+      render json: { status: "ok", service: "rails" }
+    end
+
+    def greeting
+      name = NameInput.parse(request.media_type, request.body)
+      return render json: { error: name.error }, status: name.status if name.is_a?(NameInput::Invalid)
+
+      render json: { greeting: "Hello, #{name}!" }
+    end
+
+    def not_found
+      render json: { error: "not_found" }, status: 404
+    end
+  end
+
+  Application.initialize!
+  Application.routes.draw do
+    get "health", to: "better_fullstack/api#health"
+    post "api/greetings", to: "better_fullstack/api#greeting"
+    match "/", to: "better_fullstack/api#not_found", via: :all
+    match "*path", to: "better_fullstack/api#not_found", via: :all
+  end
+
+  App = Application.instance
+end

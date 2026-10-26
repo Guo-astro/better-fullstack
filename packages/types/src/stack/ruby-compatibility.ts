@@ -3,9 +3,9 @@ import type { ProjectConfig, StackPart } from "@/config/types";
 import { getToolingCapability, isToolingOverlayOnly } from "@/capabilities/tooling-capabilities";
 
 export const RUBY_RECIPE_EXTENSION_REASON =
-  "The experimental Ruby recipe provides Sinatra JSON HTTP and Minitest/Rack tests only. Database, authentication, deployment, and other service adapters are not generated.";
+  "The experimental Ruby recipe provides Sinatra, Rails, Roda, or Grape JSON HTTP and Minitest/Rack tests only. Database, authentication, deployment, and other service adapters are not generated.";
 export const RUBY_RECIPE_FRAMEWORK_REASON =
-  "The Ruby HTTP recipe requires Sinatra. Use rubyWebFramework=sinatra or remove the Ruby backend.";
+  "The Ruby HTTP recipe requires a web framework. Use rubyWebFramework=sinatra, rails, roda, or grape, or remove the Ruby backend.";
 
 export const RUBY_UNSUPPORTED_CONFIG_KEYS = [
   "database",
@@ -86,7 +86,7 @@ export function getRubyRecipeIssue(config: Partial<ProjectConfig>): string | nul
       (part) => part.role === "backend" && part.ecosystem === "ruby" && part.source !== "provided",
     );
     const rubyIds = new Set(rubyBackends.map((part) => part.id));
-    if (rubyBackends.some((part) => part.toolId !== "sinatra")) return RUBY_RECIPE_FRAMEWORK_REASON;
+    if (rubyBackends.some((part) => part.toolId === "none")) return RUBY_RECIPE_FRAMEWORK_REASON;
     if (
       config.stackParts.some(
         (part) =>

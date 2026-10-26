@@ -1812,7 +1812,7 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
     refit: "Refit",
     "fluent-email": "FluentEmail",
   },
-  rubyWebFramework: { sinatra: "Sinatra" },
+  rubyWebFramework: { sinatra: "Sinatra", rails: "Rails", roda: "Roda", grape: "Grape" },
   phpWebFramework: { slim: "Slim", laravel: "Laravel", symfony: "Symfony" },
   elixirWebFramework: {
     phoenix: "Phoenix",

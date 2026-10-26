@@ -6,6 +6,8 @@ import { getGraphBackendConnections } from "@/graph/graph-backend";
 import { getGraphFrontendPorts } from "@/graph/graph-frontend";
 import { renderTemplateTree, type TemplateData } from "@/template-handlers/core/utils";
 
+const RUBY_VARIANT_DIRECTORIES = ["web"] as const;
+
 export async function processRubyBaseTemplate(
   vfs: VirtualFileSystem,
   templates: TemplateData,
@@ -30,5 +32,22 @@ export async function processRubyBaseTemplate(
     rubyPort: connection ? new URL(connection.serverUrl).port : "4567",
     rubyWebOrigin,
   };
-  renderTemplateTree(vfs, templates, { prefix: "ruby-base/", targetPath, context });
+  renderTemplateTree(vfs, templates, {
+    prefix: "ruby-base/",
+    targetPath,
+    context,
+    skip: (templatePath) =>
+      RUBY_VARIANT_DIRECTORIES.some((directory) =>
+        templatePath.startsWith(`ruby-base/${directory}/`),
+      ),
+  });
+  const variants = { web: config.rubyWebFramework };
+  for (const [directory, option] of Object.entries(variants)) {
+    if (option === "none") continue;
+    renderTemplateTree(vfs, templates, {
+      prefix: `ruby-base/${directory}/${option}/`,
+      targetPath,
+      context,
+    });
+  }
 }

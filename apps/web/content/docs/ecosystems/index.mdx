@@ -18,7 +18,7 @@ One CLI covers solo ecosystems and additional languages for composed projects. E
 | [Elixir](#elixir)                   | Phoenix and LiveView apps with Ecto, Absinthe, realtime, jobs, and deploy files.                | Mix                 |
 | [.NET](#net)                        | ASP.NET Core services with EF Core or Dapper, Identity, Minimal APIs, SignalR, jobs, and tests. | .NET SDK 10         |
 | [PHP](#php)                         | Experimental Slim, Laravel or Symfony JSON services with PHPUnit and a live HTTP proof.         | PHP 8.5, Composer 2 |
-| [Ruby](#ruby)                       | Experimental Sinatra JSON HTTP service with Minitest/Rack integration tests.                    | Bundler             |
+| [Ruby](#ruby)                       | Experimental Sinatra, Rails, Roda, or Grape JSON HTTP service with Minitest/Rack tests.         | Bundler             |
 | [Crystal](#crystal)                 | Experimental Kemal, Lucky, Athena, or Marten HTTP services and framework-free programs.         | Crystal, Shards     |
 
 For product stacks that span languages, use [Multi-Ecosystem mode](/docs/ecosystems/multi-ecosystem/), which models the project as stack parts such as `frontend:typescript:next` and `backend:go:gin`. That mode also unlocks Kotlin/Compose, SwiftUI, Flutter, Blazor, and standalone Rust web frontends; see [Native and Additional Apps](/docs/ecosystems/native-apps/).
@@ -239,7 +239,7 @@ That primary frontend part is distinct from `--dotnet-web-framework aspnet-blazo
 
 ## Ruby
 
-Ruby starts with one experimental Sinatra HTTP recipe. Bundler owns `Gemfile` and the lockfile generated during installation. The service uses Sinatra 4.2.1 and Puma 7.1.0; `.ruby-version` selects Ruby 3.4.11. No database, authentication, background jobs, or deployment adapter is generated.
+Ruby offers an experimental HTTP recipe for four frameworks: Sinatra 4.2.1 (default), API-only Rails 8.1.4, Roda 3.109.0, and Grape 4.0.1. Select one with `--ruby-web-framework sinatra|rails|roda|grape`. Bundler owns `Gemfile` and the lockfile generated during installation. Every framework runs on Puma 7.1.0 behind the same Rack host, origin, and body-size policy, so the HTTP contract and tests below are identical. `.ruby-version` selects Ruby 3.4.11 and the Gemfile accepts Ruby 3.3 through 4.x. No database, authentication, background jobs, or deployment adapter is generated.
 
 ```sh
 bun create better-fullstack@latest ruby-api --ecosystem ruby --ruby-web-framework sinatra --database none --addons none --examples none --ai-docs agents-md --no-install --no-git
@@ -255,9 +255,9 @@ bundle exec ruby bin/server
 
 GET `/health` returns JSON. POST `/api/greetings` accepts exactly `{"name":"Ruby"}` and returns a greeting. The app rejects malformed JSON, unsupported content types, extra fields, invalid names, and bodies over 16 KiB. `HOST`, `PORT`, `RACK_ENV`, and `ALLOWED_ORIGIN` come from the process environment; `.env.example` is documentation and is not loaded automatically.
 
-For a composed project, select `backend:ruby:sinatra` alongside an existing frontend. Each named Ruby service keeps its own Gemfile, source, commands, and assigned port. The shared graph rejects unsupported capabilities attached to Ruby while retaining capabilities owned by other services. The browser preview and ZIP export generate native Ruby source; the browser Run tab cannot execute Ruby.
+For a composed project, select `backend:ruby:sinatra` (or `rails`, `roda`, `grape`) alongside an existing frontend. Each named Ruby service keeps its own Gemfile, source, commands, and assigned port. The shared graph rejects unsupported capabilities attached to Ruby while retaining capabilities owned by other services. The browser preview and ZIP export generate native Ruby source; the browser Run tab cannot execute Ruby.
 
-The recipe remains experimental and listed until current, revision-matched evidence proves the declared boundaries. See [Sinatra 4.2.1 source](https://github.com/sinatra/sinatra/tree/v4.2.1) for the pinned framework API.
+The recipe remains experimental and listed until current, revision-matched evidence proves the declared boundaries. See the [Sinatra](https://github.com/sinatra/sinatra/tree/v4.2.1), [Rails API](https://guides.rubyonrails.org/api_app.html), [Roda](https://roda.jeremyevans.net/documentation.html), and [Grape](https://github.com/ruby-grape/grape) documentation for the pinned framework APIs.
 
 ## PHP
 

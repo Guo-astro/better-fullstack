@@ -2,6 +2,7 @@ import {
   formatStackPartSpec,
   getCapabilityInventory,
   getCrystalCommands,
+  getOptionMetadata,
   legacyProjectConfigToStackParts,
   type AiDocs,
   type ProjectConfig,
@@ -309,7 +310,7 @@ function generateTechStackSection(config: ProjectConfig): string {
     }
   }
 
-  if (config.ecosystem === "ruby") lines.push("- Experimental Ruby Sinatra HTTP recipe; Bundler owns Gemfile and Gemfile.lock; Puma serves JSON routes; Minitest/Rack tests cover request validation.");
+  if (config.ecosystem === "ruby") lines.push(`- Experimental Ruby ${rubyFrameworkLabel(config)} HTTP recipe; Bundler owns Gemfile and Gemfile.lock; Puma serves JSON routes; Minitest/Rack tests cover request validation.`);
 
   if (config.ecosystem === "rust") {
     if (config.rustWebFramework !== "none")
@@ -500,6 +501,10 @@ function generateStructureSection(config: ProjectConfig): string {
   return lines.join("\n");
 }
 
+function rubyFrameworkLabel(config: ProjectConfig) {
+  return getOptionMetadata("rubyWebFramework", config.rubyWebFramework ?? "sinatra")?.label ?? "Sinatra";
+}
+
 function generateCommandsSection(config: ProjectConfig): string {
   const lines: string[] = ["\n## Common Commands\n"];
 
@@ -513,7 +518,7 @@ function generateCommandsSection(config: ProjectConfig): string {
     for (const service of rubyConnections) {
       lines.push(`- Check Ruby syntax: \`${service.checkCommand}\``, `- Run Minitest/Rack tests: \`${service.testCommand}\``, `- Prove live HTTP and shutdown: \`cd ${service.targetPath} && bundle exec ruby bin/proof\``);
     }
-    lines.push("Ruby services use Bundler, Sinatra, and Puma. Do not add TypeScript dependencies or authentication/database adapters to them. Ruby remains experimental until a current revision-matched runtime receipt proves the recipe.");
+    lines.push(`Ruby services use Bundler, ${[...new Set(rubyConnections.map((service) => getOptionMetadata("rubyWebFramework", service.toolId)?.label ?? service.toolId))].join(", ")}, and Puma. Do not add TypeScript dependencies to them. Ruby remains experimental until a current revision-matched runtime receipt proves the recipe.`);
     return lines.join("\n");
   }
 
@@ -675,7 +680,7 @@ function generateCursorRules(config: ProjectConfig): string {
       rules.push(`Logging: ${config.pythonLogging}, configured in src/app/logging_config.py`);
     }
   } else if (config.ecosystem === "ruby") {
-    rules.push("Keep Ruby routes in app.rb and Minitest/Rack coverage in test/app_test.rb. Bundler owns native dependencies. No database or auth adapters are generated. Environment variables are read from the process; .env.example is documentation. Run bundle exec rake and bundle exec ruby bin/proof before claiming runtime verification.");
+    rules.push("Keep Ruby routes in app.rb, shared Rack host, origin, and body policies in http_policy.rb and request_body_limit.rb, and Minitest/Rack coverage in test/app_test.rb. Bundler owns native dependencies. No database or auth adapters are generated. Environment variables are read from the process; .env.example is documentation. Run bundle exec rake and bundle exec ruby bin/proof before claiming runtime verification.");
   } else if (config.ecosystem === "go") {
     rules.push(`You are working on a Go project.`);
     if (config.goWebFramework !== "none") rules.push(`Web framework: ${config.goWebFramework}`);

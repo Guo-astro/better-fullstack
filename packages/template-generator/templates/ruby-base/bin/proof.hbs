@@ -2,6 +2,7 @@ require "bundler/setup"
 require "json"
 require "net/http"
 require "rbconfig"
+require "securerandom"
 require "socket"
 require "tempfile"
 require "timeout"
@@ -9,14 +10,16 @@ require "timeout"
 listener = TCPServer.new("127.0.0.1", 0)
 port = listener.addr[1]
 listener.close
-log = Tempfile.new("sinatra-proof")
+log = Tempfile.new("{{rubyWebFramework}}-proof")
+root = File.expand_path("..", __dir__)
+environment = { "HOST" => "127.0.0.1", "PORT" => port.to_s, "RACK_ENV" => "production", "ALLOWED_ORIGIN" => "http://localhost:5173,http://localhost:8080", "SECRET_KEY_BASE" => SecureRandom.hex(64) }
 pid = nil
 
 begin
   pid = Process.spawn(
-    { "HOST" => "127.0.0.1", "PORT" => port.to_s, "RACK_ENV" => "production", "ALLOWED_ORIGIN" => "http://localhost:5173,http://localhost:8080" },
+    environment,
     RbConfig.ruby, File.expand_path("server", __dir__),
-    chdir: File.expand_path("..", __dir__), out: log, err: log, pgroup: true
+    chdir: root, out: log, err: log, pgroup: true
   )
   http = Net::HTTP.new("127.0.0.1", port, nil)
   http.open_timeout = 1
@@ -33,7 +36,7 @@ begin
     raise "Server readiness timed out" if Process.clock_gettime(Process::CLOCK_MONOTONIC) >= deadline
     sleep 0.1
   end
-  raise "Unexpected health response" unless JSON.parse(health.body) == { "status" => "ok", "service" => "sinatra" }
+  raise "Unexpected health response" unless JSON.parse(health.body) == { "status" => "ok", "service" => "{{rubyWebFramework}}" }
   ["http://localhost:5173", "http://localhost:8080"].each do |origin|
     response = http.get("/health", "Origin" => origin)
     raise "Frontend origin rejected" unless response.code == "200" && response["access-control-allow-origin"] == origin

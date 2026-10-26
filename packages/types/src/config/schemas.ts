@@ -2,7 +2,9 @@ import { z } from "zod";
 
 import { PRESET_ALIAS_IDS, PRESET_IDS } from "@/catalog/preset-ids";
 
-export const RubyWebFrameworkSchema = z.enum(["sinatra", "none"]).describe("Ruby HTTP framework");
+export const RubyWebFrameworkSchema = z
+  .enum(["sinatra", "rails", "roda", "grape", "none"])
+  .describe("Ruby HTTP framework");
 
 export const EcosystemSchema = z
   .enum([

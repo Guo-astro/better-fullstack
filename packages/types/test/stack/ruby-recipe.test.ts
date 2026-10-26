@@ -116,6 +116,9 @@ describe("Ruby recipe contracts", () => {
     const flags = getCliFlagReference().flatMap((group) => group.flags);
     expect(flags.find((flag) => flag.flag === "--ruby-web-framework")?.values).toEqual([
       "sinatra",
+      "rails",
+      "roda",
+      "grape",
       "none",
     ]);
   });

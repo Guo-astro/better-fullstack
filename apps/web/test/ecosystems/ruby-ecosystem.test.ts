@@ -54,7 +54,13 @@ describe("Ruby builder projections", () => {
   it("offers the bounded native recipe and retains it through URL and preview config", () => {
     expect(ECOSYSTEMS.find((entry) => entry.id === "ruby")?.name).toBe("Ruby");
     expect(ECOSYSTEM_CATEGORIES.ruby).toContain("rubyWebFramework");
-    expect(TECH_OPTIONS.rubyWebFramework.map((entry) => entry.id)).toEqual(["sinatra", "none"]);
+    expect(TECH_OPTIONS.rubyWebFramework.map((entry) => entry.id)).toEqual([
+      "sinatra",
+      "rails",
+      "roda",
+      "grape",
+      "none",
+    ]);
     const selection = getEcosystemDefaultStackSelection("ruby");
     const restored = parseStackSelectionFromUrlRecord(
       Object.fromEntries(createStackSelectionSearchParams(selection)),

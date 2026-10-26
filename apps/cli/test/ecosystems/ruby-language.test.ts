@@ -80,7 +80,7 @@ describe("Ruby language integration", () => {
       aiDocs: ["none"],
     });
     if (!result.success || !result.tree) throw new Error(result.error ?? "No Ruby graph");
-    expect(content(result.tree, "apps/server/app.rb")).toContain(
+    expect(content(result.tree, "apps/server/http_policy.rb")).toContain(
       "http://localhost:5173,http://localhost:5174",
     );
   });
@@ -109,10 +109,13 @@ describe("Ruby language integration", () => {
   it("offers only a runnable standalone framework while composer can disable the backend", () => {
     expect(resolveRubyWebFrameworkPrompt().options.map((option) => option.value)).toEqual([
       "sinatra",
+      "rails",
+      "roda",
+      "grape",
     ]);
     expect(
       resolveRubyWebFrameworkPrompt(undefined, true).options.map((option) => option.value),
-    ).toEqual(["sinatra", "none"]);
+    ).toEqual(["sinatra", "rails", "roda", "grape", "none"]);
   });
 
   it("plans a Bundler-owned native service through the actual MCP operation", async () => {
@@ -211,6 +214,33 @@ describe("Ruby language integration", () => {
     expect(content(result.tree, "AGENTS.md")).toContain("bundle exec rake test");
   });
 
+  it.each([
+    { framework: "rails", gem: 'gem "railties", "8.1.4"', app: "class Application < Rails::Application" },
+    { framework: "roda", gem: 'gem "roda", "3.109.0"', app: "class App < Roda" },
+    { framework: "grape", gem: 'gem "grape", "4.0.1"', app: "class Api < Grape::API" },
+  ] as const)("emits the $framework app behind the shared Rack policy", async ({ framework, gem, app }) => {
+    const result = await createVirtual({
+      ecosystem: "ruby",
+      projectName: "ruby-service",
+      rubyWebFramework: framework,
+      aiDocs: ["none"],
+    });
+    if (!result.success || !result.tree) throw new Error(result.error ?? "No Ruby project");
+    const gemfile = content(result.tree, "Gemfile");
+    expect(gemfile).toContain(gem);
+    expect(gemfile).not.toContain('gem "sinatra"');
+    expect(content(result.tree, "app.rb")).toContain(app);
+    expect(content(result.tree, "app.rb")).toContain("HttpPolicy");
+    expect(content(result.tree, "test/app_test.rb")).toContain(`"service" => "${framework}"`);
+    expect(content(result.tree, "bin/proof")).toContain(`"service" => "${framework}"`);
+    expect(listVirtualTreeFilePaths(result.tree).some((path) => path.startsWith("web/"))).toBe(
+      false,
+    );
+    expect(generateReproducibleCommand({ ...config(), rubyWebFramework: framework })).toContain(
+      `--ruby-web-framework ${framework}`,
+    );
+  });
+
   it("round-trips persistence and updates without retaining inactive Ruby defaults", () => {
     const project = config();
     const metadata = { version: "test", createdAt: "2026-10-22T00:00:00.000Z" };
@@ -235,7 +265,7 @@ describe("Ruby language integration", () => {
   it("shares the schema and native install command with MCP and prompts", () => {
     expect(getSchemaOptions("rubyWebFramework", "ruby")).toEqual({
       category: "rubyWebFramework",
-      options: ["sinatra", "none"],
+      options: ["sinatra", "rails", "roda", "grape", "none"],
     });
     expect(
       z.object(MCP_PLAN_CREATE_SCHEMA).parse({ ecosystem: "ruby", rubyWebFramework: "sinatra" })
@@ -326,7 +356,7 @@ describe("Ruby language integration", () => {
       "frontend:typescript:react-vite",
       "frontend.css:typescript:tailwind",
       "backend:ruby:sinatra:api",
-      "backend:ruby:sinatra:admin",
+      "backend:ruby:rails:admin",
     ]);
     const api = parts.find((part) => part.id === "api");
     const admin = parts.find((part) => part.id === "admin");
@@ -342,9 +372,12 @@ describe("Ruby language integration", () => {
     expect(paths).not.toContain("services/admin/package.json");
     expect(content(result.tree, "services/api/.env.example")).toContain("PORT=4567");
     expect(content(result.tree, "services/admin/.env.example")).toContain("PORT=4568");
-    expect(content(result.tree, "services/api/app.rb")).toContain("http://localhost:5173");
+    expect(content(result.tree, "services/api/http_policy.rb")).toContain("http://localhost:5173");
     expect(content(result.tree, "services/admin/README.md")).toContain(
       "bundle exec ruby bin/server",
     );
+    expect(content(result.tree, "services/api/Gemfile")).toContain('gem "sinatra", "4.2.1"');
+    expect(content(result.tree, "services/admin/Gemfile")).toContain('gem "railties", "8.1.4"');
+    expect(content(result.tree, "services/admin/app.rb")).toContain("Rails::Application");
   });
 });
