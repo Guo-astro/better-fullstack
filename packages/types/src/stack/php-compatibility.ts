@@ -47,12 +47,18 @@ const PHP_CAPABILITY_FRAMEWORKS: Record<string, Record<string, readonly string[]
     doctrine: ["slim", "symfony"],
     cycle: ["slim"],
   },
+  auth: {
+    "firebase-jwt": ["slim", "laravel", "symfony"],
+    "lcobucci-jwt": ["slim", "laravel", "symfony"],
+    "symfony-security": ["symfony"],
+  },
 };
 
 const PHP_CAPABILITY_LABELS: Record<string, string> = {
   eloquent: "Eloquent",
   doctrine: "Doctrine ORM",
   cycle: "Cycle ORM",
+  "symfony-security": "Symfony Security",
 };
 
 export function isPhpCapabilityRole(role: string): boolean {
@@ -86,6 +92,8 @@ export function getPhpRecipeIssue(config: Partial<ProjectConfig>): string | unde
   if (config.database && config.database !== "none") return PHP_RECIPE_REASONS.database;
   const ormIssue = getPhpCapabilityIssue(config.phpWebFramework, "orm", config.phpOrm);
   if (ormIssue) return ormIssue;
+  const authIssue = getPhpCapabilityIssue(config.phpWebFramework, "auth", config.phpAuth);
+  if (authIssue) return authIssue;
   for (const key of PHP_UNSUPPORTED_BACKEND_FIELDS) {
     if (config[key] && config[key] !== "none") return PHP_RECIPE_REASONS.capability;
   }

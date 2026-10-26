@@ -45,6 +45,21 @@ Cycle ORM stores notes in SQLite. `src/Notes.php` declares the ORM schema, creat
 Run `composer run db:setup` once before `composer run dev`. `GET /api/notes` lists notes. `POST /api/notes` accepts `{"title":"..."}` with 1 to 120 bytes of trimmed text and returns 201 with `id` and `title`. Invalid notes return 422 and malformed JSON returns 400. `composer test` and `composer run proof:http` use temporary SQLite databases. Migrations beyond this starter schema are not generated.
 
 {{/if}}
+{{#if (ne phpAuth "none")}}
+## Authentication
+
+`GET /api/me` requires `Authorization: Bearer <token>` and returns `{"subject":"..."}` from the token's `sub` claim. Missing, malformed, expired or foreign tokens return 401 JSON with `WWW-Authenticate: Bearer`. Tokens must be HS256 JWTs signed with JWT_SECRET (at least 32 bytes) and carry `exp`, the JWT_ISSUER issuer and the JWT_AUDIENCE audience. Every token is rejected until JWT_SECRET is set.
+
+{{#if (eq phpAuth "firebase-jwt")}}
+`{{phpSourceDirectory}}/TokenVerifier.php` verifies tokens with firebase/php-jwt.
+{{else if (eq phpAuth "lcobucci-jwt")}}
+`{{phpSourceDirectory}}/TokenVerifier.php` verifies tokens with lcobucci/jwt signature, issuer, audience and time constraints.
+{{else}}
+Symfony Security protects `/api/me` with a stateless `access_token` firewall configured in `src/Kernel.php`. `src/Security/BearerTokenHandler.php` turns a verified token into a user, using `src/TokenVerifier.php` with firebase/php-jwt.
+{{/if}}
+This starter verifies tokens; it does not log users in. Issue tokens from your identity provider with the same secret, issuer and audience. For local testing, `composer run token:issue -- <subject>` prints a 15-minute token signed with JWT_SECRET.
+
+{{/if}}
 ## Configuration and extension
 
 {{#if (eq phpWebFramework "laravel")}}
@@ -63,7 +78,7 @@ Copy `.env.example` to `.env` if local configuration is needed. `Environment::lo
 `src/Application.php` owns routes and middleware. `src/Greeting.php` owns typed input validation. Add behavior here with request-level PHPUnit tests; keep `bin/proof-http.php` aligned with the public HTTP contract. Composer remains the dependency authority. TypeScript package processors must not modify this service.
 {{/if}}
 
-{{#if (eq phpOrm "none")}}No database, migrations, authentication, deployment adapter or production hosting recipe is generated.{{else}}No authentication, deployment adapter or production hosting recipe is generated.{{/if}} Add these through explicit Stack Part roles and compatibility rules before advertising support. For a production rollout, configure a PHP-capable web server with `public/` as its document root and route application requests to `public/index.php`; obtain separate deployment verification.
+{{#if (eq phpOrm "none")}}No database, migrations, {{#if (eq phpAuth "none")}}authentication, {{/if}}deployment adapter or production hosting recipe is generated.{{else}}No {{#if (eq phpAuth "none")}}authentication, {{/if}}deployment adapter or production hosting recipe is generated.{{/if}} Add these through explicit Stack Part roles and compatibility rules before advertising support. For a production rollout, configure a PHP-capable web server with `public/` as its document root and route application requests to `public/index.php`; obtain separate deployment verification.
 
 ## Upstream references
 

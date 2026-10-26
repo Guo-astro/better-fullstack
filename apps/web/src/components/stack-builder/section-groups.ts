@@ -322,6 +322,7 @@ export const SECTIONS_BY_ECOSYSTEM: Record<Ecosystem, readonly BuilderSectionDef
   php: [
     section("backend", "PHP HTTP application", ["phpWebFramework"]),
     section("data", "Data & Storage", ["phpOrm"]),
+    section("auth", "Authentication", ["phpAuth"]),
     section("deployScaffold", "Scaffold", ["aiDocs", "git", "install"]),
   ],
   elixir: ELIXIR_SECTIONS,

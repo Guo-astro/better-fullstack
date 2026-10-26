@@ -591,6 +591,7 @@
   "docsCliSummaryRubyRubyWebFramework": "Framework HTTP Ruby.",
   "docsCliSummaryPhpPhpWebFramework": "Framework HTTP PHP.",
   "docsCliSummaryPhpPhpOrm": "ORM / couche de base de données PHP.",
+  "docsCliSummaryPhpPhpAuth": "Authentification PHP.",
   "docsCliSummaryElixirElixirWebFramework": "Framework web Elixir.",
   "docsCliSummaryElixirElixirOrm": "ORM / base de données Elixir.",
   "docsCliSummaryElixirElixirAuth": "Authentification Elixir.",

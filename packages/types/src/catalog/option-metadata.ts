@@ -46,6 +46,7 @@ import {
   RUBY_WEB_FRAMEWORK_VALUES,
   PHP_WEB_FRAMEWORK_VALUES,
   PHP_ORM_VALUES,
+  PHP_AUTH_VALUES,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   I18N_VALUES,
   CMS_VALUES,
@@ -425,6 +426,7 @@ export const DOTNET_CATEGORY_ORDER = [
 export const PHP_CATEGORY_ORDER = [
   "phpWebFramework",
   "phpOrm",
+  "phpAuth",
   "aiDocs",
   "git",
   "install",
@@ -904,6 +906,7 @@ const CATEGORY_DEFINITIONS = {
   rubyWebFramework: { values: RUBY_WEB_FRAMEWORK_VALUES, displayName: "Ruby web framework" },
   phpWebFramework: { values: PHP_WEB_FRAMEWORK_VALUES, displayName: "PHP web framework" },
   phpOrm: { values: PHP_ORM_VALUES, displayName: "PHP ORM / Database" },
+  phpAuth: { values: PHP_AUTH_VALUES, displayName: "PHP Auth" },
   elixirWebFramework: { values: ELIXIR_WEB_FRAMEWORK_VALUES, displayName: "Elixir Web Framework" },
   elixirOrm: { values: ELIXIR_ORM_VALUES, displayName: "Elixir ORM / Database" },
   elixirAuth: { values: ELIXIR_AUTH_VALUES, displayName: "Elixir Auth" },
@@ -1818,6 +1821,11 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
   rubyWebFramework: { sinatra: "Sinatra", rails: "Rails", roda: "Roda", grape: "Grape" },
   phpWebFramework: { slim: "Slim", laravel: "Laravel", symfony: "Symfony" },
   phpOrm: { eloquent: "Eloquent", doctrine: "Doctrine ORM", cycle: "Cycle ORM" },
+  phpAuth: {
+    "firebase-jwt": "Firebase JWT",
+    "lcobucci-jwt": "lcobucci/jwt",
+    "symfony-security": "Symfony Security",
+  },
   elixirWebFramework: {
     phoenix: "Phoenix",
     "phoenix-live-view": "Phoenix LiveView",

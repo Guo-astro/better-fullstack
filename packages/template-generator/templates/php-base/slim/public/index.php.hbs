@@ -7,11 +7,22 @@ use App\Environment;
 {{#if (ne phpOrm "none")}}
 use App\Notes;
 {{/if}}
+{{#if (ne phpAuth "none")}}
+use App\TokenVerifier;
+{{/if}}
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 Environment::load(dirname(__DIR__) . '/.env');
+{{#if (or (ne phpOrm "none") (ne phpAuth "none"))}}
+Application::create(
+    corsOrigin: getenv('CORS_ORIGIN') ?: '',
 {{#if (ne phpOrm "none")}}
-Application::create(getenv('CORS_ORIGIN') ?: '', Notes::open(getenv('DATABASE_PATH') ?: dirname(__DIR__) . '/var/database.sqlite'))->run();
+    notes: Notes::open(getenv('DATABASE_PATH') ?: dirname(__DIR__) . '/var/database.sqlite'),
+{{/if}}
+{{#if (ne phpAuth "none")}}
+    tokens: TokenVerifier::fromEnvironment(),
+{{/if}}
+)->run();
 {{else}}
 Application::create(getenv('CORS_ORIGIN') ?: '')->run();
 {{/if}}

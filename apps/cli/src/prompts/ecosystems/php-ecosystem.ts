@@ -1,6 +1,6 @@
 import { getPhpCapabilityIssue } from "@better-fullstack/types";
 
-import type { PhpOrm, PhpWebFramework } from "@/types";
+import type { PhpAuth, PhpOrm, PhpWebFramework } from "@/types";
 
 import { exitCancelled } from "@/presentation/errors";
 import { isCancel, navigableSelect } from "@/prompts/core/navigable";
@@ -25,6 +25,17 @@ const ORM_OPTIONS: PromptOption<PhpOrm>[] = [
   { value: "doctrine", label: "Doctrine ORM", hint: "Data-mapper ORM with attribute mapping" },
   { value: "cycle", label: "Cycle ORM", hint: "Data-mapper ORM with Cycle Database" },
   { value: "none", label: "None", hint: "No database layer" },
+];
+
+const AUTH_OPTIONS: PromptOption<PhpAuth>[] = [
+  { value: "firebase-jwt", label: "Firebase JWT", hint: "Bearer JWT verification with firebase/php-jwt" },
+  { value: "lcobucci-jwt", label: "lcobucci/jwt", hint: "Bearer JWT verification with validation constraints" },
+  {
+    value: "symfony-security",
+    label: "Symfony Security",
+    hint: "Stateless access-token firewall for Symfony",
+  },
+  { value: "none", label: "None", hint: "No authentication" },
 ];
 
 export function resolvePhpWebFrameworkPrompt(value?: PhpWebFramework) {
@@ -54,6 +65,24 @@ export async function getPhpOrmChoice(value?: PhpOrm, framework?: PhpWebFramewor
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
   const response = await navigableSelect<PhpOrm>({
     message: "Select PHP ORM / database layer",
+    options: resolution.options,
+    initialValue: resolution.initialValue,
+  });
+  return isCancel(response) ? exitCancelled("Operation cancelled") : response;
+}
+
+export function resolvePhpAuthPrompt(value?: PhpAuth, framework?: PhpWebFramework) {
+  const options = AUTH_OPTIONS.filter(
+    (option) => !getPhpCapabilityIssue(framework, "auth", option.value),
+  );
+  return createStaticSinglePromptResolution(options, "none", value);
+}
+
+export async function getPhpAuthChoice(value?: PhpAuth, framework?: PhpWebFramework) {
+  const resolution = resolvePhpAuthPrompt(value, framework);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
+  const response = await navigableSelect<PhpAuth>({
+    message: "Select PHP authentication",
     options: resolution.options,
     initialValue: resolution.initialValue,
   });

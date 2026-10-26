@@ -33,6 +33,7 @@ final class GreetingEndpoint
     public static function errorFor(int $status): string
     {
         return match ($status) {
+            401 => 'unauthorized',
             404 => 'not_found',
             405 => 'method_not_allowed',
             default => 'internal_error',

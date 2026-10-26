@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use App\GreetingEndpoint;
+{{#if (ne phpAuth "none")}}
+use App\Http\Middleware\RequireBearerToken;
+{{/if}}
 {{#if (eq phpOrm "eloquent")}}
 use App\Models\Note;
 use App\NoteInput;
@@ -33,4 +36,9 @@ Route::post('/api/notes', function (Request $request) {
     }
     return response()->json(Note::query()->create(['title' => $title]), 201);
 });
+{{/if}}
+{{#if (ne phpAuth "none")}}
+
+Route::get('/api/me', fn (Request $request) => response()->json(['subject' => $request->attributes->get('subject')]))
+    ->middleware(RequireBearerToken::class);
 {{/if}}

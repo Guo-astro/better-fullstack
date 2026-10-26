@@ -551,6 +551,7 @@ export function buildCompatibilityInputFromConfig(
     rubyWebFramework: asString(config.rubyWebFramework),
     phpWebFramework: asString(config.phpWebFramework),
     phpOrm: asString(config.phpOrm),
+    phpAuth: asString(config.phpAuth),
     elixirWebFramework: asString(config.elixirWebFramework),
     elixirOrm: asString(config.elixirOrm),
     elixirAuth: asString(config.elixirAuth),

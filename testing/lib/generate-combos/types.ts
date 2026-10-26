@@ -134,6 +134,7 @@ export const TEMPLATE_FINGERPRINT_KEYS = [
   "rubyWebFramework",
   "phpWebFramework",
   "phpOrm",
+  "phpAuth",
   "elixirWebFramework",
   "elixirOrm",
   "elixirAuth",

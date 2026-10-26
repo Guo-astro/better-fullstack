@@ -53,6 +53,7 @@ import type {
   RubyWebFramework,
   PhpWebFramework,
   PhpOrm,
+  PhpAuth,
   ElixirWebFramework,
   I18n,
   Database,
@@ -284,7 +285,11 @@ import {
   gatherMultiEcosystemConfig,
   getCompositionModeChoice,
 } from "@/prompts/ecosystems/multi-ecosystem-composer";
-import { getPhpOrmChoice, getPhpWebFrameworkChoice } from "@/prompts/ecosystems/php-ecosystem";
+import {
+  getPhpAuthChoice,
+  getPhpOrmChoice,
+  getPhpWebFrameworkChoice,
+} from "@/prompts/ecosystems/php-ecosystem";
 import {
   getPythonAiChoice,
   getPythonApiChoice,
@@ -496,6 +501,7 @@ type PromptGroupResults = {
   rubyWebFramework: RubyWebFramework;
   phpWebFramework: PhpWebFramework;
   phpOrm: PhpOrm;
+  phpAuth: PhpAuth;
   elixirWebFramework: ElixirWebFramework;
   elixirOrm: ElixirOrm;
   elixirAuth: ElixirAuth;
@@ -681,6 +687,7 @@ const CONFIG_PROMPT_ENTRY_KEY_MAP = {
   rubyWebFramework: true,
   phpWebFramework: true,
   phpOrm: true,
+  phpAuth: true,
   elixirWebFramework: true,
   elixirOrm: true,
   elixirAuth: true,
@@ -1867,6 +1874,10 @@ export async function gatherConfig(
       results.ecosystem === "php"
         ? getPhpOrmChoice(flags.phpOrm, results.phpWebFramework)
         : Promise.resolve("none" as const),
+    phpAuth: ({ results }) =>
+      results.ecosystem === "php"
+        ? getPhpAuthChoice(flags.phpAuth, results.phpWebFramework)
+        : Promise.resolve("none" as const),
     elixirWebFramework: ({ results }) => {
       if (results.ecosystem !== "elixir") return Promise.resolve("none" as ElixirWebFramework);
       return getElixirWebFrameworkChoice(flags.elixirWebFramework);
@@ -2136,6 +2147,7 @@ export async function gatherConfig(
     rubyWebFramework: result.rubyWebFramework,
     phpWebFramework: result.phpWebFramework,
     phpOrm: result.phpOrm,
+    phpAuth: result.phpAuth,
     elixirWebFramework: result.elixirWebFramework,
     elixirOrm: result.elixirOrm,
     elixirAuth: result.elixirAuth,

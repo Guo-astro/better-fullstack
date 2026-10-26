@@ -45,7 +45,8 @@ final readonly class HttpContractSubscriber implements EventSubscriberInterface
     {
         $error = $event->getThrowable();
         $status = $error instanceof HttpExceptionInterface ? $error->getStatusCode() : 500;
-        $event->setResponse(new JsonResponse(['error' => GreetingEndpoint::errorFor($status)], $status));
+        $headers = $error instanceof HttpExceptionInterface ? $error->getHeaders() : [];
+        $event->setResponse(new JsonResponse(['error' => GreetingEndpoint::errorFor($status)], $status, $headers));
     }
 
     public function applyCors(ResponseEvent $event): void

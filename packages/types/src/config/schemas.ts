@@ -1036,6 +1036,10 @@ export const PhpOrmSchema = z
   .enum(["eloquent", "doctrine", "cycle", "none"])
   .describe("PHP ORM / database layer");
 
+export const PhpAuthSchema = z
+  .enum(["firebase-jwt", "lcobucci-jwt", "symfony-security", "none"])
+  .describe("PHP authentication");
+
 export const ElixirWebFrameworkSchema = z
   .enum(["phoenix", "phoenix-live-view", "none"])
   .describe("Elixir web framework");
@@ -1411,6 +1415,7 @@ const STACK_CONFIG_FIELDS = {
   rubyWebFramework: RubyWebFrameworkSchema.optional(),
   phpWebFramework: PhpWebFrameworkSchema.default("none"),
   phpOrm: PhpOrmSchema.default("none"),
+  phpAuth: PhpAuthSchema.default("none"),
   elixirWebFramework: ElixirWebFrameworkSchema,
   elixirOrm: ElixirOrmSchema,
   elixirAuth: ElixirAuthSchema,
@@ -1700,6 +1705,7 @@ export const DOTNET_DEPLOY_VALUES = DotnetDeploySchema.options;
 export const DOTNET_LIBRARIES_VALUES = DotnetLibrariesSchema.options;
 export const PHP_WEB_FRAMEWORK_VALUES = PhpWebFrameworkSchema.options;
 export const PHP_ORM_VALUES = PhpOrmSchema.options;
+export const PHP_AUTH_VALUES = PhpAuthSchema.options;
 export const ELIXIR_WEB_FRAMEWORK_VALUES = ElixirWebFrameworkSchema.options;
 export const ELIXIR_ORM_VALUES = ElixirOrmSchema.options;
 export const ELIXIR_AUTH_VALUES = ElixirAuthSchema.options;

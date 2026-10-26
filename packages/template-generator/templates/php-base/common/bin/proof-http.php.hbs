@@ -7,11 +7,11 @@ function requireProof(bool $condition, string $message): void
     if (!$condition) throw new RuntimeException($message);
 }
 
-function requestProof(string $url, string $method = 'GET', ?string $body = null, string $origin = 'http://localhost:5173'): array
+function requestProof(string $url, string $method = 'GET', ?string $body = null, string $origin = 'http://localhost:5173'{{#if (ne phpAuth "none")}}, ?string $authorization = null{{/if}}): array
 {
     $context = stream_context_create(['http' => [
         'method' => $method,
-        'header' => "Content-Type: application/json\r\nOrigin: " . $origin . "\r\n",
+        'header' => "Content-Type: application/json\r\nOrigin: " . $origin . "\r\n"{{#if (ne phpAuth "none")}} . ($authorization === null ? '' : 'Authorization: ' . $authorization . "\r\n"){{/if}},
         'content' => $body ?? '',
         'ignore_errors' => true,
         'timeout' => 1,
@@ -50,6 +50,12 @@ requireProof(proc_close($setup) === 0, 'Database setup failed: ' . file_get_cont
 {{else}}
 $serverEnv = array_merge(getenv(), ['CORS_ORIGIN' => 'http://localhost:5173,http://localhost:8080']);
 {{/if}}
+{{#if (ne phpAuth "none")}}
+require $root . '/vendor/autoload.php';
+$proofSecret = bin2hex(random_bytes(32));
+$serverEnv = array_merge($serverEnv, ['JWT_SECRET' => $proofSecret, 'JWT_ISSUER' => 'better-fullstack', 'JWT_AUDIENCE' => 'api']);
+$proofTokens = new App\TokenVerifier($proofSecret, 'better-fullstack', 'api');
+{{/if}}
 $process = proc_open([PHP_BINARY, '-S', $address, '-t', 'public', 'public/index.php'], [0 => ['pipe', 'r'], 1 => ['file', $log, 'a'], 2 => ['file', $log, 'a']], $pipes, $root, $serverEnv);
 requireProof(is_resource($process), 'Cannot launch server.');
 fclose($pipes[0]);
@@ -85,6 +91,14 @@ try {
     requireProof($status === 413 && $body['error'] === 'payload_too_large', 'Oversized request accepted.');
     [$status, $body] = requestProof('http://' . $address . '/missing');
     requireProof($status === 404 && $body['error'] === 'not_found', 'Missing route mismatch.');
+{{#if (ne phpAuth "none")}}
+    [$status, $body] = requestProof('http://' . $address . '/api/me', 'GET', null, 'http://localhost:5173', 'Bearer ' . $proofTokens->issue('proof-user'));
+    requireProof($status === 200 && $body === ['subject' => 'proof-user'], 'Signed token was not accepted.');
+    [$status, $body] = requestProof('http://' . $address . '/api/me');
+    requireProof($status === 401 && $body['error'] === 'unauthorized', 'Missing token accepted.');
+    [$status, $body] = requestProof('http://' . $address . '/api/me', 'GET', null, 'http://localhost:5173', 'Bearer ' . (new App\TokenVerifier(bin2hex(random_bytes(32)), 'better-fullstack', 'api'))->issue('proof-user'));
+    requireProof($status === 401, 'Foreign token accepted.');
+{{/if}}
 {{#if (ne phpOrm "none")}}
     [$status, $body] = requestProof('http://' . $address . '/api/notes', 'POST', '{"title":"Proof note"}');
     requireProof($status === 201 && $body['title'] === 'Proof note' && is_int($body['id']), 'Note was not created.');
@@ -113,4 +127,4 @@ try {
 {{/if}}
 }
 if ($failure !== null) exit(1);
-echo json_encode(['php' => PHP_VERSION, 'assertions' => ['health', 'parsed-greeting', 'validation-rejection', 'malformed-json', 'oversized-body', 'missing-route', {{#if (ne phpOrm "none")}}'orm-persistence', {{/if}}'cors', 'cors-allowlist', 'shutdown'], 'success' => true], JSON_THROW_ON_ERROR) . "\n";
+echo json_encode(['php' => PHP_VERSION, 'assertions' => ['health', 'parsed-greeting', 'validation-rejection', 'malformed-json', 'oversized-body', 'missing-route', {{#if (ne phpOrm "none")}}'orm-persistence', {{/if}}{{#if (ne phpAuth "none")}}'bearer-auth', {{/if}}'cors', 'cors-allowlist', 'shutdown'], 'success' => true], JSON_THROW_ON_ERROR) . "\n";

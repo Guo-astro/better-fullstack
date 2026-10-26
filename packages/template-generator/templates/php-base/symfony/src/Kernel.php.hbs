@@ -7,8 +7,15 @@ namespace App;
 {{#if (eq phpOrm "doctrine")}}
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 {{/if}}
+{{#if (eq phpAuth "symfony-security")}}
+use App\Security\BearerChallenge;
+use App\Security\BearerTokenHandler;
+{{/if}}
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+{{#if (eq phpAuth "symfony-security")}}
+use Symfony\Bundle\SecurityBundle\SecurityBundle;
+{{/if}}
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
@@ -20,6 +27,9 @@ final class Kernel extends BaseKernel
     public function registerBundles(): iterable
     {
         yield new FrameworkBundle();
+{{#if (eq phpAuth "symfony-security")}}
+        yield new SecurityBundle();
+{{/if}}
 {{#if (eq phpOrm "doctrine")}}
         yield new DoctrineBundle();
 {{/if}}
@@ -47,7 +57,29 @@ final class Kernel extends BaseKernel
         $container->services()
             ->defaults()->autowire()->autoconfigure()
             ->load('App\\Controller\\', __DIR__ . '/Controller/')
-            ->load('App\\EventSubscriber\\', __DIR__ . '/EventSubscriber/');
+            ->load('App\\EventSubscriber\\', __DIR__ . '/EventSubscriber/'){{#if (eq phpAuth "symfony-security")}}
+            ->load('App\\Security\\', __DIR__ . '/Security/'){{/if}};
+{{#if (ne phpAuth "none")}}
+        $container->services()->set(TokenVerifier::class)->factory([TokenVerifier::class, 'fromEnvironment']);
+{{/if}}
+{{#if (eq phpAuth "symfony-security")}}
+        $container->extension('security', [
+            'providers' => ['token_subjects' => ['memory' => null]],
+            'firewalls' => [
+                'api' => [
+                    'pattern' => '^/api/me',
+                    'stateless' => true,
+                    'provider' => 'token_subjects',
+                    'entry_point' => BearerChallenge::class,
+                    'access_token' => [
+                        'token_handler' => BearerTokenHandler::class,
+                        'failure_handler' => BearerChallenge::class,
+                    ],
+                ],
+            ],
+            'access_control' => [['path' => '^/api/me', 'roles' => 'IS_AUTHENTICATED_FULLY']],
+        ]);
+{{/if}}
     }
 
     private function configureRoutes(RoutingConfigurator $routes): void

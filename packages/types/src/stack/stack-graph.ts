@@ -67,6 +67,7 @@ import {
   RUBY_WEB_FRAMEWORK_VALUES,
   PHP_WEB_FRAMEWORK_VALUES,
   PHP_ORM_VALUES,
+  PHP_AUTH_VALUES,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   EFFECT_VALUES,
   EMAIL_VALUES,
@@ -392,7 +393,7 @@ const LEGACY_CAPABILITY_CATEGORIES_BY_ECOSYSTEM = {
   },
   dotnet: { orm: "dotnetOrm", api: "dotnetApi", auth: "dotnetAuth" },
   ruby: {},
-  php: { orm: "phpOrm" },
+  php: { orm: "phpOrm", auth: "phpAuth" },
   elixir: { orm: "elixirOrm", api: "elixirApi", auth: "elixirAuth" },
 } as const satisfies Record<
   LegacyBackendEcosystem,
@@ -1251,6 +1252,7 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
     }),
   ),
   ...defineTools(PHP_ORM_VALUES, "orm", "php", "phpOrm"),
+  ...defineTools(PHP_AUTH_VALUES, "auth", "php", "phpAuth"),
   ...defineTools(["rest"], "api", "php").map((definition) => ({
     ...definition,
     selectable: false,

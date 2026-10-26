@@ -83,6 +83,7 @@ import {
   resolveJavaWebFrameworkPrompt,
 } from "@/prompts/ecosystems/java-ecosystem";
 import {
+  resolvePhpAuthPrompt,
   resolvePhpOrmPrompt,
   resolvePhpWebFrameworkPrompt,
 } from "@/prompts/ecosystems/php-ecosystem";
@@ -211,6 +212,7 @@ import {
   OBSERVABILITY_VALUES,
   ORM_VALUES,
   PAYMENTS_VALUES,
+  PhpAuthSchema,
   PhpOrmSchema,
   PhpWebFrameworkSchema,
   PYTHON_AI_VALUES,
@@ -795,6 +797,15 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
     resolve: ({ value, phpWebFramework }: { value?: string; phpWebFramework?: string } = {}) =>
       resolvePhpOrmPrompt(
         value === undefined ? undefined : PhpOrmSchema.parse(value),
+        phpWebFramework === undefined ? undefined : PhpWebFrameworkSchema.parse(phpWebFramework),
+      ),
+  },
+  phpAuth: {
+    schemaValues: PhpAuthSchema.options,
+    coverageContexts: [{}, { phpWebFramework: "slim" }, { phpWebFramework: "symfony" }],
+    resolve: ({ value, phpWebFramework }: { value?: string; phpWebFramework?: string } = {}) =>
+      resolvePhpAuthPrompt(
+        value === undefined ? undefined : PhpAuthSchema.parse(value),
         phpWebFramework === undefined ? undefined : PhpWebFrameworkSchema.parse(phpWebFramework),
       ),
   },

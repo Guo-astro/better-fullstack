@@ -574,6 +574,7 @@ export type CompatibilityInput = {
   rubyWebFramework: string;
   phpWebFramework: string;
   phpOrm: string;
+  phpAuth: string;
   elixirWebFramework: string;
   elixirOrm: string;
   elixirAuth: string;
@@ -2649,6 +2650,18 @@ export const analyzeStackCompatibility = (
     });
   }
 
+  if (
+    nextStack.ecosystem === "php" &&
+    getPhpCapabilityIssue(nextStack.phpWebFramework, "auth", nextStack.phpAuth)
+  ) {
+    nextStack.phpAuth = "none";
+    changed = true;
+    changes.push({
+      category: "phpAuth",
+      message: "PHP auth set to 'None' (not generated for the selected framework)",
+    });
+  }
+
   // ============================================
   // ELIXIR ECOSYSTEM CONSTRAINTS
   // ============================================
@@ -2985,8 +2998,9 @@ export const getDisabledReason = (
 
   if (currentStack.ecosystem === "php") {
     if (category === "phpWebFramework" && optionId === "none") return PHP_RECIPE_REASONS.framework;
-    if (category === "phpOrm") {
-      const issue = getPhpCapabilityIssue(currentStack.phpWebFramework, "orm", optionId);
+    if (category === "phpOrm" || category === "phpAuth") {
+      const role = category === "phpOrm" ? "orm" : "auth";
+      const issue = getPhpCapabilityIssue(currentStack.phpWebFramework, role, optionId);
       if (issue) return issue;
     }
     if (category === "database" && optionId !== "none") return PHP_RECIPE_REASONS.database;

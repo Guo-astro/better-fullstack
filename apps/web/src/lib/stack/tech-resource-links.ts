@@ -2335,6 +2335,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://www.doctrine-project.org/projects/doctrine-orm/en/current/index.html",
     githubUrl: "https://github.com/doctrine/orm",
   },
+  "phpAuth:firebase-jwt": {
+    docsUrl: "https://github.com/firebase/php-jwt#readme",
+    githubUrl: "https://github.com/firebase/php-jwt",
+  },
+  "phpAuth:lcobucci-jwt": {
+    docsUrl: "https://lcobucci-jwt.readthedocs.io/en/stable/",
+    githubUrl: "https://github.com/lcobucci/jwt",
+  },
+  "phpAuth:symfony-security": {
+    docsUrl: "https://symfony.com/doc/current/security/access_token.html",
+    githubUrl: "https://github.com/symfony/security-bundle",
+  },
   "phpOrm:cycle": {
     docsUrl: "https://cycle-orm.dev/docs/intro-about/current/en",
     githubUrl: "https://github.com/cycle/orm",

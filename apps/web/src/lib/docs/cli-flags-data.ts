@@ -2441,6 +2441,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "none",
         "multiple": false
+      },
+      {
+        "flag": "--php-auth",
+        "summary": "PHP authentication.",
+        "values": [
+          "firebase-jwt",
+          "lcobucci-jwt",
+          "symfony-security",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
       }
     ]
   },
@@ -2888,6 +2901,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "ruby:--ruby-web-framework": m.docsCliSummaryRubyRubyWebFramework,
   "php:--php-web-framework": m.docsCliSummaryPhpPhpWebFramework,
   "php:--php-orm": m.docsCliSummaryPhpPhpOrm,
+  "php:--php-auth": m.docsCliSummaryPhpPhpAuth,
   "elixir:--elixir-web-framework": m.docsCliSummaryElixirElixirWebFramework,
   "elixir:--elixir-orm": m.docsCliSummaryElixirElixirOrm,
   "elixir:--elixir-auth": m.docsCliSummaryElixirElixirAuth,

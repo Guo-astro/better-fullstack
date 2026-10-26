@@ -244,6 +244,7 @@ export async function createVirtual(
         options.rubyWebFramework ?? (options.ecosystem === "ruby" ? "sinatra" : "none"),
       phpWebFramework: options.phpWebFramework ?? (options.ecosystem === "php" ? "slim" : "none"),
       phpOrm: options.phpOrm ?? "none",
+      phpAuth: options.phpAuth ?? "none",
       elixirWebFramework:
         options.elixirWebFramework || (options.ecosystem === "elixir" ? "phoenix" : "none"),
       elixirOrm: options.elixirOrm || (options.ecosystem === "elixir" ? "ecto-sql" : "none"),

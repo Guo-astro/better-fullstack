@@ -170,7 +170,7 @@ describe("PHP graph and transport contract", () => {
     );
     const command = generateStackSelectionCommand(selection);
     expect(command).toContain(
-      "--ecosystem php --php-web-framework slim --php-orm none --database none",
+      "--ecosystem php --php-web-framework slim --php-orm none --php-auth none --database none",
     );
     expect(command).toContain("--no-install");
     const withOrm = { ...selection, phpWebFramework: "symfony", phpOrm: "doctrine" };
@@ -216,6 +216,41 @@ describe("PHP graph and transport contract", () => {
     }
     for (const orm of ["eloquent", "doctrine", "cycle"] as const) {
       expect(getPhpRecipeIssue({ ...native, phpOrm: orm })).toBeUndefined();
+    }
+  });
+
+  it("projects PHP auth as an owned part and keeps Symfony Security on Symfony", () => {
+    const parts = legacyProjectConfigToStackParts({
+      ...native,
+      phpWebFramework: "symfony",
+      phpAuth: "symfony-security",
+    });
+    expect(parts).toContainEqual(
+      expect.objectContaining({ role: "auth", ecosystem: "php", toolId: "symfony-security" }),
+    );
+    expect(validateStackParts(parts).issues).toEqual([]);
+    expect(stackPartsToLegacyProjectConfigPartial(parts)).toMatchObject({
+      phpAuth: "symfony-security",
+    });
+    for (const framework of ["slim", "laravel"] as const) {
+      const issue = getPhpRecipeIssue({
+        ...native,
+        phpWebFramework: framework,
+        phpAuth: "symfony-security",
+      });
+      expect(issue).toContain("Symfony Security is generated for Symfony");
+      const mismatched = parseStackPartSpecs([
+        `backend:php:${framework}`,
+        "backend.auth:php:symfony-security",
+      ]);
+      expect(validateStackParts(mismatched).issues.map((entry) => entry.message)).toContain(issue);
+    }
+    for (const framework of ["slim", "laravel", "symfony"] as const) {
+      for (const auth of ["firebase-jwt", "lcobucci-jwt"] as const) {
+        expect(
+          getPhpRecipeIssue({ ...native, phpWebFramework: framework, phpAuth: auth }),
+        ).toBeUndefined();
+      }
     }
   });
 });

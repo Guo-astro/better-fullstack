@@ -17,7 +17,13 @@ export async function processPhpBaseTemplate(
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, "") || "app";
   const phpSourceDirectory = config.phpWebFramework === "laravel" ? "app" : "src";
-  const context = { ...config, phpPackageName, phpSourceDirectory };
+  const context = {
+    ...config,
+    phpOrm: config.phpOrm ?? "none",
+    phpAuth: config.phpAuth ?? "none",
+    phpPackageName,
+    phpSourceDirectory,
+  };
   const sourcePath = targetPath ? `${targetPath}/${phpSourceDirectory}` : phpSourceDirectory;
   renderTemplateTree(vfs, templates, { prefix: "php-base/common/", targetPath, context });
   renderTemplateTree(vfs, templates, {

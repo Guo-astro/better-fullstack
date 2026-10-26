@@ -261,7 +261,7 @@ The recipe remains experimental and listed until current, revision-matched evide
 
 ## PHP
 
-The experimental PHP recipe generates a Slim, Laravel 13 or Symfony 8 application with Composer dependencies, PSR-4 classes, PHPUnit request tests, and a bounded HTTP proof. Choose the framework with `--php-web-framework slim`, `laravel` or `symfony`; all three serve the same HTTP contract. It requires PHP 8.5.12 or a later 8.5 patch and Composer 2. It provides REST and testing. `--php-orm eloquent` (Slim or Laravel), `doctrine` (Slim or Symfony) or `cycle` (Slim) adds a SQLite-backed notes resource with `composer run db:setup`; other combinations are rejected. Authentication, migrations beyond that starter schema, and deployment integrations are outside this recipe.
+The experimental PHP recipe generates a Slim, Laravel 13 or Symfony 8 application with Composer dependencies, PSR-4 classes, PHPUnit request tests, and a bounded HTTP proof. Choose the framework with `--php-web-framework slim`, `laravel` or `symfony`; all three serve the same HTTP contract. It requires PHP 8.5.12 or a later 8.5 patch and Composer 2. It provides REST and testing. `--php-orm eloquent` (Slim or Laravel), `doctrine` (Slim or Symfony) or `cycle` (Slim) adds a SQLite-backed notes resource with `composer run db:setup`; other combinations are rejected. `--php-auth firebase-jwt` or `lcobucci-jwt` (any framework) or `symfony-security` (Symfony) protects `GET /api/me` with HS256 bearer tokens signed with `JWT_SECRET`; the starter verifies tokens and does not issue credentials. Migrations beyond the starter schema and deployment integrations are outside this recipe.
 
 ```sh
 bunx create-better-fullstack@latest php-service \

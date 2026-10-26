@@ -706,6 +706,7 @@ const GRAPH_BACKEND_CONFIGS: GraphBackendConfig[] = [
     label: "PHP",
     frameworkCategory: "phpWebFramework",
     ormCategory: "phpOrm",
+    authCategory: "phpAuth",
   },
   {
     ecosystem: "elixir",

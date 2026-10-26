@@ -80,8 +80,11 @@ describe("PHP builder recipe", () => {
     expect(
       getDisabledReason({ ...stack, phpWebFramework: "symfony" }, "phpOrm", "cycle"),
     ).toContain("is generated for");
-    const withOrm = { ...laravel, phpOrm: "eloquent" };
+    expect(getDisabledReason(laravel, "phpAuth", "symfony-security")).toContain("is generated for");
+    expect(getDisabledReason(laravel, "phpAuth", "lcobucci-jwt")).toBeNull();
+    const withOrm = { ...laravel, phpOrm: "eloquent", phpAuth: "firebase-jwt" };
     expect(stackStateToProjectConfig(withOrm).phpOrm).toBe("eloquent");
-    expect(generateStackCommand(withOrm)).toContain("--php-orm eloquent");
+    expect(generateStackCommand(withOrm)).toContain("--php-orm eloquent --php-auth firebase-jwt");
+    expect(stackStateToProjectConfig(withOrm).phpAuth).toBe("firebase-jwt");
   });
 });

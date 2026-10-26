@@ -115,7 +115,11 @@ import {
   getJavaTestingLibrariesChoice,
   getJavaWebFrameworkChoice,
 } from "@/prompts/ecosystems/java-ecosystem";
-import { getPhpOrmChoice, getPhpWebFrameworkChoice } from "@/prompts/ecosystems/php-ecosystem";
+import {
+  getPhpAuthChoice,
+  getPhpOrmChoice,
+  getPhpWebFrameworkChoice,
+} from "@/prompts/ecosystems/php-ecosystem";
 import {
   getPythonAiChoice,
   getPythonAuthChoice,
@@ -1454,9 +1458,14 @@ export async function gatherMultiEcosystemConfig(
       phpWebFramework === "none"
         ? "none"
         : promptValue(await getPhpOrmChoice(flags.phpOrm, phpWebFramework));
-    Object.assign(backendChoices, { phpWebFramework, phpOrm });
+    const phpAuth =
+      phpWebFramework === "none"
+        ? "none"
+        : promptValue(await getPhpAuthChoice(flags.phpAuth, phpWebFramework));
+    Object.assign(backendChoices, { phpWebFramework, phpOrm, phpAuth });
     if (phpWebFramework !== "none") stackPartSpecs.push(`backend:php:${phpWebFramework}`);
     if (phpOrm !== "none") stackPartSpecs.push(`backend.orm:php:${phpOrm}`);
+    if (phpAuth !== "none") stackPartSpecs.push(`backend.auth:php:${phpAuth}`);
   }
 
   if (backendEcosystem === "elixir") {

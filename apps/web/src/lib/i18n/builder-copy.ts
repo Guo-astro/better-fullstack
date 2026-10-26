@@ -673,6 +673,16 @@ const CATEGORY_NAMES: Record<string, LocalizedMap> = {
     "fr": "PHP ORM / Base de données",
     "uk": "PHP ORM / База даних",
   },
+  phpAuth: {
+    "es": "Auth PHP",
+    "zh": "PHP 认证",
+    "ja": "PHP 認証",
+    "ko": "PHP 인증",
+    "zh-Hant": "PHP 認證",
+    "de": "PHP-Authentifizierung",
+    "fr": "Authentification PHP",
+    "uk": "Автентифікація PHP",
+  },
   elixirOrm: {
     "es": "ORM / base de datos Elixir",
     "zh": "Elixir ORM / 数据库",

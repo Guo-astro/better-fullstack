@@ -6067,6 +6067,37 @@ export const TECH_OPTIONS: Record<
       default: true,
     },
   ],
+  phpAuth: [
+    {
+      id: "firebase-jwt",
+      name: "Firebase JWT",
+      description: "Verify HS256 bearer tokens with firebase/php-jwt on any PHP framework",
+      icon: "https://cdn.simpleicons.org/jsonwebtokens/000000",
+      color: "from-amber-500 to-orange-600",
+    },
+    {
+      id: "lcobucci-jwt",
+      name: "lcobucci/jwt",
+      description: "Verify HS256 bearer tokens with lcobucci/jwt constraints on any PHP framework",
+      icon: "https://cdn.simpleicons.org/jsonwebtokens/000000",
+      color: "from-purple-500 to-fuchsia-600",
+    },
+    {
+      id: "symfony-security",
+      name: "Symfony Security",
+      description: "Stateless access-token firewall for Symfony",
+      icon: "https://cdn.simpleicons.org/symfony/000000",
+      color: "from-gray-700 to-gray-900",
+    },
+    {
+      id: "none",
+      name: "None",
+      description: "No authentication",
+      icon: "",
+      color: "from-gray-500 to-gray-700",
+      default: true,
+    },
+  ],
   elixirWebFramework: [
     {
       id: "phoenix",

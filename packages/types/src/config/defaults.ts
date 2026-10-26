@@ -146,6 +146,7 @@ export const CLI_DEFAULT_PROJECT_CONFIG = {
   rubyWebFramework: "sinatra",
   phpWebFramework: "slim",
   phpOrm: "none",
+  phpAuth: "none",
   elixirWebFramework: "phoenix",
   elixirOrm: "ecto-sql",
   elixirAuth: "none",

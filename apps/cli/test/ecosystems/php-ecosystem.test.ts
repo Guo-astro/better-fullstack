@@ -159,11 +159,49 @@ describe("PHP generation and lifecycle", () => {
     },
   );
 
+  it.each([
+    ["slim", "firebase-jwt", "firebase/php-jwt"],
+    ["laravel", "lcobucci-jwt", "lcobucci/jwt"],
+    ["symfony", "symfony-security", "symfony/security-bundle"],
+  ] as const)("generates %s with %s auth and replays it", async (framework, auth, dependency) => {
+    const result = await createVirtual({
+      projectName: `php-${framework}-${auth}`,
+      ecosystem: "php",
+      phpWebFramework: framework,
+      phpAuth: auth,
+    });
+    expect(result.success).toBe(true);
+    const tree = result.tree!;
+    const manifest = JSON.parse(getVirtualTreeFileContent(tree, "composer.json"));
+    expect(Object.keys(manifest.require)).toContain(dependency);
+    expect(manifest.scripts["token:issue"]).toBe("@php bin/issue-token.php");
+    expect(getVirtualTreeFileContent(tree, ".env.example")).toContain("JWT_SECRET=");
+    expect(getVirtualTreeFileContent(tree, "bin/proof-http.php")).toContain("/api/me");
+    expect(generateReproducibleCommand(tree.config)).toContain(`--php-auth ${auth}`);
+    const saved = buildBtsConfigForPersistence(tree.config, {
+      version: "0.0.0",
+      createdAt: "2026-10-27T00:00:00.000Z",
+    });
+    expect(previewBtsConfigUpdate(saved, {}).phpAuth).toBe(auth);
+  });
+
+  it("rejects Symfony Security outside Symfony before emitting files", async () => {
+    const result = await createVirtual({
+      ecosystem: "php",
+      phpWebFramework: "laravel",
+      phpAuth: "symfony-security",
+    });
+    expect(result.success).toBe(false);
+    expect(result.error).toContain("Symfony Security is generated for Symfony");
+    expect(result.tree).toBeUndefined();
+  });
+
   it("keeps the ORM out of a PHP project that does not select one", async () => {
     const result = await createVirtual({ ecosystem: "php", phpWebFramework: "slim" });
     expect(result.success).toBe(true);
     const tree = result.tree!;
     expect(hasVirtualFile(tree.root, "src/Notes.php")).toBe(false);
+    expect(hasVirtualFile(tree.root, "src/TokenVerifier.php")).toBe(false);
     expect(JSON.parse(getVirtualTreeFileContent(tree, "composer.json")).scripts).not.toHaveProperty(
       "db:setup",
     );

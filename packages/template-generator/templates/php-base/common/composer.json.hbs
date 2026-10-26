@@ -23,6 +23,9 @@
     "cycle/database": "~2.23.3",
     "cycle/orm": "~2.18.1",
 {{/if}}
+{{#if (or (eq phpAuth "firebase-jwt") (eq phpAuth "symfony-security"))}}
+    "firebase/php-jwt": "~7.2.1",
+{{/if}}
 {{#if (eq phpOrm "doctrine")}}
 {{#if (eq phpWebFramework "symfony")}}
     "doctrine/doctrine-bundle": "~3.3.3",
@@ -34,10 +37,15 @@
 {{#if (and (eq phpOrm "eloquent") (eq phpWebFramework "slim"))}}
     "illuminate/database": "~13.38.0",
 {{/if}}
+{{#if (eq phpAuth "lcobucci-jwt")}}
+    "lcobucci/clock": "~3.6.0",
+    "lcobucci/jwt": "~5.6.1",
+{{/if}}
 {{#if (eq phpWebFramework "laravel")}}
     "laravel/framework": "~13.38.0"
 {{else if (eq phpWebFramework "symfony")}}
-    "symfony/framework-bundle": "~8.1.9"
+    "symfony/framework-bundle": "~8.1.9"{{#if (eq phpAuth "symfony-security")}},
+    "symfony/security-bundle": "~8.1.9"{{/if}}
 {{else}}
     "slim/slim": "~4.15.3",
     "slim/psr7": "~1.8.0"{{#if (eq phpOrm "doctrine")}},
@@ -68,6 +76,9 @@
       "@composer dump-autoload --optimize --strict-psr"
     ],
     "test": "@php vendor/bin/phpunit --bootstrap vendor/autoload.php tests",
+{{#if (ne phpAuth "none")}}
+    "token:issue": "@php bin/issue-token.php",
+{{/if}}
 {{#if (ne phpOrm "none")}}
 {{#if (eq phpWebFramework "laravel")}}
     "db:setup": "@php artisan migrate --force --no-interaction",

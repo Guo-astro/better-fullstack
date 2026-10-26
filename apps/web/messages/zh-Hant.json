@@ -591,6 +591,7 @@
   "docsCliSummaryRubyRubyWebFramework": "Ruby HTTP 框架。",
   "docsCliSummaryPhpPhpWebFramework": "PHP HTTP 框架。",
   "docsCliSummaryPhpPhpOrm": "PHP ORM / 資料庫層。",
+  "docsCliSummaryPhpPhpAuth": "PHP 認證。",
   "docsCliSummaryElixirElixirWebFramework": "Elixir Web 框架。",
   "docsCliSummaryElixirElixirOrm": "Elixir ORM / 資料庫。",
   "docsCliSummaryElixirElixirAuth": "Elixir 驗證。",

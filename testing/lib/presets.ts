@@ -125,6 +125,7 @@ export function makeBaseConfig(name: string, ecosystem: Ecosystem): ProjectConfi
     rubyWebFramework: ecosystem === "ruby" ? "sinatra" : "none",
     phpWebFramework: ecosystem === "php" ? "slim" : "none",
     phpOrm: "none",
+    phpAuth: "none",
     elixirWebFramework: "none",
     elixirOrm: "none",
     elixirAuth: "none",

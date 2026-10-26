@@ -193,6 +193,7 @@ function normalizeGraphConfigForPersistence(
   if (!selectedEcosystems.has("php")) {
     normalized.phpWebFramework = "none";
     normalized.phpOrm = "none";
+    normalized.phpAuth = "none";
   }
   if (!selectedEcosystems.has("elixir")) {
     normalized.elixirWebFramework = "none";
@@ -513,6 +514,7 @@ export function buildBtsConfigForPersistence(
     rubyWebFramework: persistedConfig.rubyWebFramework,
     phpWebFramework: persistedConfig.phpWebFramework,
     phpOrm: persistedConfig.phpOrm,
+    phpAuth: persistedConfig.phpAuth,
     elixirWebFramework: persistedConfig.elixirWebFramework,
     elixirOrm: persistedConfig.elixirOrm,
     elixirAuth: persistedConfig.elixirAuth,
@@ -713,6 +715,7 @@ export function serializeBtsConfig(
     rubyWebFramework: btsConfig.rubyWebFramework,
     phpWebFramework: btsConfig.phpWebFramework,
     phpOrm: btsConfig.phpOrm,
+    phpAuth: btsConfig.phpAuth,
     elixirWebFramework: btsConfig.elixirWebFramework,
     elixirOrm: btsConfig.elixirOrm,
     elixirAuth: btsConfig.elixirAuth,

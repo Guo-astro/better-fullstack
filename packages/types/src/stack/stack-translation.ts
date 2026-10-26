@@ -212,6 +212,7 @@ export const STACK_SELECTION_OPTION_CATEGORY_BY_KEY: Record<
   rubyWebFramework: "rubyWebFramework",
   phpWebFramework: "phpWebFramework",
   phpOrm: "phpOrm",
+  phpAuth: "phpAuth",
   elixirWebFramework: "elixirWebFramework",
   elixirOrm: "elixirOrm",
   elixirAuth: "elixirAuth",
@@ -412,6 +413,7 @@ export const STACK_SELECTION_URL_KEYS = {
   rubyWebFramework: "rbwf",
   phpWebFramework: "phwf",
   phpOrm: "phorm",
+  phpAuth: "phauth",
   elixirWebFramework: "ewf",
   elixirOrm: "eorm",
   elixirAuth: "eauth",
@@ -887,6 +889,7 @@ const CLI_SCALAR_CONFIG_FIELDS = [
   ["rubyWebFramework", "rubyWebFramework"],
   ["phpWebFramework", "phpWebFramework"],
   ["phpOrm", "phpOrm"],
+  ["phpAuth", "phpAuth"],
   ["elixirWebFramework", "elixirWebFramework"],
   ["elixirOrm", "elixirOrm"],
   ["elixirAuth", "elixirAuth"],
@@ -1966,6 +1969,7 @@ function getCliGraphStackParts(input: CLIInput): StackPart[] {
   addScopedBackendPart("dotnet", "api", input.dotnetApi);
   addScopedBackendPart("dotnet", "auth", input.dotnetAuth);
   addScopedBackendPart("php", "orm", input.phpOrm);
+  addScopedBackendPart("php", "auth", input.phpAuth);
   addScopedBackendPart("elixir", "orm", input.elixirOrm);
   addScopedBackendPart("elixir", "api", input.elixirApi);
   addScopedBackendPart("elixir", "auth", input.elixirAuth);
@@ -2164,6 +2168,7 @@ function buildProjectConfigBase(
     rubyWebFramework: stack.rubyWebFramework as ProjectConfig["rubyWebFramework"],
     phpWebFramework: stack.phpWebFramework as ProjectConfig["phpWebFramework"],
     phpOrm: stack.phpOrm as ProjectConfig["phpOrm"],
+    phpAuth: stack.phpAuth as ProjectConfig["phpAuth"],
     elixirWebFramework: stack.elixirWebFramework as ProjectConfig["elixirWebFramework"],
     elixirOrm: stack.elixirOrm as ProjectConfig["elixirOrm"],
     elixirAuth: stack.elixirAuth as ProjectConfig["elixirAuth"],
@@ -2265,6 +2270,7 @@ export function isCliDefaultStackSelection(
           "rubyWebFramework",
           "phpWebFramework",
           "phpOrm",
+          "phpAuth",
           ...ELIXIR_CONFIG_KEYS,
           ...(selection.ecosystem === "typescript" ? REACT_NATIVE_CONFIG_KEYS : []),
         ])
@@ -2711,6 +2717,7 @@ export function generateStackSelectionCommand(selection: StackSelectionInput): s
         `--ecosystem php`,
         `--php-web-framework ${selection.phpWebFramework}`,
         `--php-orm ${selection.phpOrm}`,
+        `--php-auth ${selection.phpAuth}`,
         `--database ${selection.database}`,
       ];
       if (selection.versionChannel !== "stable")

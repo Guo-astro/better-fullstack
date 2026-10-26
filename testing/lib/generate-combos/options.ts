@@ -98,6 +98,7 @@ import {
   PYTHON_ORM_VALUES,
   PYTHON_GRAPHQL_VALUES,
   PYTHON_QUALITY_VALUES,
+  PHP_AUTH_VALUES,
   PHP_ORM_VALUES,
   PHP_WEB_FRAMEWORK_VALUES,
   PYTHON_TESTING_VALUES,
@@ -639,9 +640,20 @@ function makePhpDraft(args: GeneratorArgs): CandidateDraft {
     0.4,
     "phpOrm",
   );
+  const phpAuth = sampleScalar(
+    PHP_AUTH_VALUES.filter((value) => !getPhpCapabilityIssue(phpWebFramework, "auth", value)),
+    0.4,
+    "phpAuth",
+  );
   return {
     ecosystem: "php",
-    options: { ...createCommonOptions("php", args), phpWebFramework, phpOrm, database: "none" },
+    options: {
+      ...createCommonOptions("php", args),
+      phpWebFramework,
+      phpOrm,
+      phpAuth,
+      database: "none",
+    },
   };
 }
 
@@ -884,6 +896,7 @@ function createValidationBase(projectName: string, draft: CandidateDraft): Proje
     rubyWebFramework: "none",
     phpWebFramework: "none",
     phpOrm: "none",
+    phpAuth: "none",
     elixirWebFramework: "none",
     elixirOrm: "none",
     elixirAuth: "none",

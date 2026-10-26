@@ -1149,6 +1149,12 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         source: { kind: "category", category: "phpOrm" },
         configKey: "phpOrm",
       },
+      {
+        flag: "php-auth",
+        summary: "PHP authentication.",
+        source: { kind: "category", category: "phpAuth" },
+        configKey: "phpAuth",
+      },
     ],
   },
   {

@@ -62,6 +62,7 @@ import {
   RubyWebFrameworkSchema,
   PhpWebFrameworkSchema,
   PhpOrmSchema,
+  PhpAuthSchema,
   ElixirWebFrameworkSchema,
   JavaAuthSchema,
   JavaBuildToolSchema,
@@ -270,6 +271,10 @@ export function getPhpOrmJsonSchema() {
   return z.toJSONSchema(PhpOrmSchema);
 }
 
+export function getPhpAuthJsonSchema() {
+  return z.toJSONSchema(PhpAuthSchema);
+}
+
 export function getElixirWebFrameworkJsonSchema() {
   return z.toJSONSchema(ElixirWebFrameworkSchema);
 }
@@ -398,6 +403,7 @@ export function getAllJsonSchemas() {
     rubyWebFramework: z.toJSONSchema(RubyWebFrameworkSchema),
     phpWebFramework: getPhpWebFrameworkJsonSchema(),
     phpOrm: getPhpOrmJsonSchema(),
+    phpAuth: getPhpAuthJsonSchema(),
     elixirWebFramework: getElixirWebFrameworkJsonSchema(),
     elixirOrm: getElixirOrmJsonSchema(),
     elixirAuth: getElixirAuthJsonSchema(),
