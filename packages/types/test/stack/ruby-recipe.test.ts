@@ -254,6 +254,28 @@ describe("Ruby recipe contracts", () => {
     expect(generateStackSelectionCommand(restored)).toContain("--ruby-auth jwt");
   });
 
+  it("projects the Ruby test runner as a Ruby-owned testing part", () => {
+    expect(createRubyProjectConfigDefaults().rubyTesting).toBe("minitest");
+    const parts = parseStackPartSpecs(["backend:ruby:rails", "backend.testing:ruby:rspec"]);
+    expect(getRubyRecipeIssue({ stackParts: parts })).toBeNull();
+    expect(validateStackParts(parts).issues).toEqual([]);
+    expect(stackPartsToLegacyProjectConfigPartial(parts).rubyTesting).toBe("rspec");
+    expect(
+      getDisabledReason(getEcosystemDefaultStackSelection("typescript"), "rubyTesting", "rspec"),
+    ).toBe("Ruby options only apply when the Ruby ecosystem is selected");
+    expect(
+      getRubyRecipeIssue({
+        stackParts: parseStackPartSpecs(["backend:ruby:rails", "backend.testing:typescript:vitest"]),
+      }),
+    ).toBe(RUBY_RECIPE_EXTENSION_REASON);
+    const restored = parseStackSelectionFromUrlRecord(
+      Object.fromEntries(
+        createStackSelectionSearchParams({ ...rubySelection(), rubyTesting: "test-unit" }),
+      ),
+    );
+    expect(generateStackSelectionCommand(restored)).toContain("--ruby-testing test-unit");
+  });
+
   it("rejects selected databases when Ruby is the only backend, in either picker order", () => {
     const ruby = parseStackPartSpecs(["backend:ruby:sinatra:api"]);
     const database = parseStackPartSpecs(["database:universal:sqlite"]);

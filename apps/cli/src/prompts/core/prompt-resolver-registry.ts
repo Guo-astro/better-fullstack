@@ -109,6 +109,7 @@ import {
 import {
   resolveRubyAuthPrompt,
   resolveRubyOrmPrompt,
+  resolveRubyTestingPrompt,
   resolveRubyWebFrameworkPrompt,
 } from "@/prompts/ecosystems/ruby-ecosystem";
 import {
@@ -181,8 +182,10 @@ import {
   RUBY_WEB_FRAMEWORK_VALUES,
   RUBY_ORM_VALUES,
   RUBY_AUTH_VALUES,
+  RUBY_TESTING_VALUES,
   RubyAuthSchema,
   RubyOrmSchema,
+  RubyTestingSchema,
   RubyWebFrameworkSchema,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   EMAIL_VALUES,
@@ -810,6 +813,12 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
     schemaValues: RUBY_AUTH_VALUES,
     resolve: ({ value }: { value?: string } = {}) =>
       resolveRubyAuthPrompt(value === undefined ? undefined : RubyAuthSchema.parse(value)),
+    coverageContexts: [{}],
+  },
+  rubyTesting: {
+    schemaValues: RUBY_TESTING_VALUES,
+    resolve: ({ value }: { value?: string } = {}) =>
+      resolveRubyTestingPrompt(value === undefined ? undefined : RubyTestingSchema.parse(value)),
     coverageContexts: [{}],
   },
   phpWebFramework: {

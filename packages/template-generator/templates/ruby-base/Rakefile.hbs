@@ -1,12 +1,19 @@
-require "rake/testtask"
 require "rbconfig"
+{{#if (eq rubyTesting "rspec")}}
+require "rspec/core/rake_task"
+
+RSpec::Core::RakeTask.new(:test)
+{{/if}}
+{{#if (or (eq rubyTesting "minitest") (eq rubyTesting "test-unit"))}}
+require "rake/testtask"
 
 Rake::TestTask.new(:test) do |task|
   task.pattern = "test/**/*_test.rb"
 end
+{{/if}}
 
 task :build do
-  files = [*Dir["*.rb"], "config.ru", "Rakefile", *Dir["db/**/*.rb"], *Dir["test/**/*.rb"], *Dir["bin/*"]]
+  files = [*Dir["*.rb"], "config.ru", "Rakefile", *Dir["db/**/*.rb"], *Dir["test/**/*.rb"], *Dir["spec/**/*.rb"], *Dir["bin/*"]]
   files.each do |file|
     abort "Syntax check failed: #{file}" unless system(RbConfig.ruby, "-c", file)
   end
@@ -38,4 +45,4 @@ namespace :auth do
 end
 {{/if}}
 
-task default: [:build, :test]
+task default: [:build{{#if (ne rubyTesting "none")}}, :test{{/if}}]

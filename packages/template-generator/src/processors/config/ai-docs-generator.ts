@@ -311,7 +311,7 @@ function generateTechStackSection(config: ProjectConfig): string {
   }
 
   if (config.ecosystem === "ruby") {
-    lines.push(`- Experimental Ruby ${rubyFrameworkLabel(config)} HTTP recipe; Bundler owns Gemfile and Gemfile.lock; Puma serves JSON routes; Minitest/Rack tests cover request validation.`);
+    lines.push(`- Experimental Ruby ${rubyFrameworkLabel(config)} HTTP recipe; Bundler owns Gemfile and Gemfile.lock; Puma serves JSON routes; ${rubyTestingLabel(config) ? `${rubyTestingLabel(config)}/Rack tests cover request validation.` : "No test suite is generated."}`);
     const orm = rubyOrmLabel(config);
     if (orm) lines.push(`- Database: ${orm} on SQLite with versioned migrations (\`bundle exec rake db:migrate\`)`);
     if (config.rubyAuth && config.rubyAuth !== "none") lines.push(`- Auth: ${getOptionMetadata("rubyAuth", config.rubyAuth)?.label ?? config.rubyAuth}`);
@@ -520,6 +520,11 @@ function rubyAuthGuidance(config: ProjectConfig) {
   return config.rubyAuth && config.rubyAuth !== "none" ? RUBY_AUTH_GUIDANCE[config.rubyAuth] : undefined;
 }
 
+function rubyTestingLabel(config: ProjectConfig) {
+  const testing = config.rubyTesting ?? "minitest";
+  return testing === "none" ? undefined : getOptionMetadata("rubyTesting", testing)?.label;
+}
+
 function rubyOrmLabel(config: ProjectConfig) {
   return config.rubyOrm && config.rubyOrm !== "none"
     ? getOptionMetadata("rubyOrm", config.rubyOrm)?.label
@@ -543,7 +548,7 @@ function generateCommandsSection(config: ProjectConfig): string {
     for (const service of rubyConnections) {
       lines.push(
         `- Check Ruby syntax: \`${service.checkCommand}\``,
-        `- Run Minitest/Rack tests: \`${service.testCommand}\``,
+        ...(service.testCommand ? [`- Run Rack request tests: \`${service.testCommand}\``] : []),
         `- Prove live HTTP and shutdown: \`cd ${service.targetPath} && bundle exec ruby bin/proof\``,
       );
     }
@@ -610,7 +615,7 @@ function generateCommandsSection(config: ProjectConfig): string {
       "- `bundle install` - Install native dependencies",
       ...(rubyOrmLabel(config) || config.rubyAuth === "rodauth" ? ["- `bundle exec rake db:migrate` - Apply database migrations"] : []),
       "- `bundle exec rake build` - Check Ruby syntax",
-      "- `bundle exec rake test` - Run Minitest/Rack integration tests",
+      ...(rubyTestingLabel(config) ? [`- \`bundle exec rake test\` - Run ${rubyTestingLabel(config)}/Rack integration tests`] : []),
       "- `bundle exec ruby bin/proof` - Exercise real HTTP and shutdown",
       "- `bundle exec ruby bin/server` - Start Puma",
     );
@@ -716,7 +721,7 @@ function generateCursorRules(config: ProjectConfig): string {
       rules.push(`Logging: ${config.pythonLogging}, configured in src/app/logging_config.py`);
     }
   } else if (config.ecosystem === "ruby") {
-    rules.push("Keep Ruby routes in app.rb, shared Rack host, origin, and body policies in http_policy.rb and request_body_limit.rb, and Minitest/Rack coverage in test/app_test.rb. Bundler owns native dependencies. Environment variables are read from the process; .env.example is documentation. Run bundle exec rake and bundle exec ruby bin/proof before claiming runtime verification.");
+    rules.push(`Keep Ruby routes in app.rb, shared Rack host, origin, and body policies in http_policy.rb and request_body_limit.rb, and ${config.rubyTesting === "rspec" ? "RSpec coverage in spec/app_spec.rb" : config.rubyTesting === "none" ? "no generated test suite" : `${rubyTestingLabel(config)} coverage in test/app_test.rb`}. Bundler owns native dependencies. Environment variables are read from the process; .env.example is documentation. Run bundle exec rake and bundle exec ruby bin/proof before claiming runtime verification.`);
     const orm = rubyOrmLabel(config);
     rules.push(orm ? `Persistence uses ${orm} on SQLite: connection and migrator in db.rb, the Items repository in items.rb, migrations under db/. DATABASE_PATH overrides the SQLite file. Change the schema with a new migration, never by editing an applied one.` : "No database adapter is generated.");
     rules.push(rubyAuthGuidance(config) ?? "No auth adapter is generated.");

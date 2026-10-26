@@ -193,6 +193,7 @@ function normalizeGraphConfigForPersistence(
     normalized.rubyWebFramework = "none";
     normalized.rubyOrm = "none";
     normalized.rubyAuth = "none";
+    normalized.rubyTesting = "none";
   }
 
   if (!selectedEcosystems.has("php")) {
@@ -521,6 +522,7 @@ export function buildBtsConfigForPersistence(
     rubyWebFramework: persistedConfig.rubyWebFramework,
     rubyOrm: persistedConfig.rubyOrm,
     rubyAuth: persistedConfig.rubyAuth,
+    rubyTesting: persistedConfig.rubyTesting,
     phpWebFramework: persistedConfig.phpWebFramework,
     phpOrm: persistedConfig.phpOrm,
     phpAuth: persistedConfig.phpAuth,
@@ -726,6 +728,7 @@ export function serializeBtsConfig(
     rubyWebFramework: btsConfig.rubyWebFramework,
     rubyOrm: btsConfig.rubyOrm,
     rubyAuth: btsConfig.rubyAuth,
+    rubyTesting: btsConfig.rubyTesting,
     phpWebFramework: btsConfig.phpWebFramework,
     phpOrm: btsConfig.phpOrm,
     phpAuth: btsConfig.phpAuth,

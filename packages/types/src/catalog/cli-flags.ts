@@ -1141,6 +1141,12 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         source: { kind: "category", category: "rubyAuth" },
         configKey: "rubyAuth",
       },
+      {
+        flag: "ruby-testing",
+        summary: "Ruby test framework.",
+        source: { kind: "category", category: "rubyTesting" },
+        configKey: "rubyTesting",
+      },
     ],
   },
   {

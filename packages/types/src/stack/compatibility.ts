@@ -580,6 +580,7 @@ export type CompatibilityInput = {
   rubyWebFramework: string;
   rubyOrm: string;
   rubyAuth: string;
+  rubyTesting: string;
   phpWebFramework: string;
   phpOrm: string;
   phpAuth: string;
@@ -3009,7 +3010,7 @@ export const getDisabledReason = (
   )
     return "Crystal HTTP frameworks require the Crystal ecosystem or a Crystal backend part.";
   if (
-    (category === "rubyOrm" || category === "rubyAuth") &&
+    (category === "rubyOrm" || category === "rubyAuth" || category === "rubyTesting") &&
     optionId !== "none" &&
     currentStack.ecosystem !== "ruby"
   )

@@ -591,6 +591,7 @@
   "docsCliSummaryRubyRubyWebFramework": "Ruby の HTTP フレームワーク。",
   "docsCliSummaryRubyRubyOrm": "Ruby の ORM / データベース層。",
   "docsCliSummaryRubyRubyAuth": "Ruby の認証。",
+  "docsCliSummaryRubyRubyTesting": "Ruby のテストフレームワーク。",
   "docsCliSummaryPhpPhpWebFramework": "PHP の HTTP フレームワーク。",
   "docsCliSummaryPhpPhpOrm": "PHP の ORM / データベース層。",
   "docsCliSummaryPhpPhpAuth": "PHP の認証。",

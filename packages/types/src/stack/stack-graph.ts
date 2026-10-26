@@ -67,6 +67,7 @@ import {
   RUBY_WEB_FRAMEWORK_VALUES,
   RUBY_ORM_VALUES,
   RUBY_AUTH_VALUES,
+  RUBY_TESTING_VALUES,
   PHP_WEB_FRAMEWORK_VALUES,
   PHP_ORM_VALUES,
   PHP_AUTH_VALUES,
@@ -810,7 +811,7 @@ const LEGACY_EXTRA_CATEGORIES_BY_ECOSYSTEM = {
     deploy: "dotnetDeploy",
     validation: "dotnetValidation",
   },
-  ruby: {},
+  ruby: { testing: "rubyTesting" },
   php: { testing: "phpTesting" },
   elixir: {
     realtime: "elixirRealtime",
@@ -1250,6 +1251,7 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ...defineTools(RUBY_WEB_FRAMEWORK_VALUES, "backend", "ruby", "rubyWebFramework"),
   ...defineTools(RUBY_ORM_VALUES, "orm", "ruby", "rubyOrm"),
   ...defineTools(RUBY_AUTH_VALUES, "auth", "ruby", "rubyAuth"),
+  ...defineTools(RUBY_TESTING_VALUES, "testing", "ruby", "rubyTesting"),
   ...defineTools(PHP_WEB_FRAMEWORK_VALUES, "backend", "php", "phpWebFramework").map(
     (definition) => ({
       ...definition,

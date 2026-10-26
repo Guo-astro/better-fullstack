@@ -381,6 +381,9 @@ export function buildCommand(name: string, config: ProjectConfig): string {
       break;
     case "ruby":
       orderedFlags.push(["ruby-web-framework", config.rubyWebFramework]);
+      orderedFlags.push(["ruby-orm", config.rubyOrm ?? "none"]);
+      orderedFlags.push(["ruby-auth", config.rubyAuth ?? "none"]);
+      orderedFlags.push(["ruby-testing", config.rubyTesting ?? "minitest"]);
       break;
     case "php":
       orderedFlags.push(["php-web-framework", config.phpWebFramework]);

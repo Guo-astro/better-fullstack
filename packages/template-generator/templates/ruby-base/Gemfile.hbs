@@ -44,7 +44,18 @@ gem "puma", "7.1.0"
 gem "rackup", "2.3.1"
 gem "rake", "13.3.1"
 
+{{#if (ne rubyTesting "none")}}
+
 group :test do
+{{#if (eq rubyTesting "minitest")}}
   gem "minitest", "6.0.6"
+{{/if}}
+{{#if (eq rubyTesting "rspec")}}
+  gem "rspec", "3.13.2"
+{{/if}}
+{{#if (eq rubyTesting "test-unit")}}
+  gem "test-unit", "3.7.8"
+{{/if}}
   gem "rack-test", "2.2.0"
 end
+{{/if}}

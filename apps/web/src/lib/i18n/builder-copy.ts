@@ -693,6 +693,16 @@ const CATEGORY_NAMES: Record<string, LocalizedMap> = {
     "fr": "Authentification PHP",
     "uk": "Автентифікація PHP",
   },
+  rubyTesting: {
+    "es": "Pruebas Ruby",
+    "zh": "Ruby 测试",
+    "ja": "Ruby テスト",
+    "ko": "Ruby 테스트",
+    "zh-Hant": "Ruby 測試",
+    "de": "Ruby-Tests",
+    "fr": "Tests Ruby",
+    "uk": "Тестування Ruby",
+  },
   rubyAuth: {
     "es": "Auth Ruby",
     "zh": "Ruby 认证",

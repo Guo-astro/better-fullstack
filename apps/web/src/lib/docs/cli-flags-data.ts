@@ -2447,6 +2447,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "none",
         "multiple": false
+      },
+      {
+        "flag": "--ruby-testing",
+        "summary": "Ruby test framework.",
+        "values": [
+          "minitest",
+          "rspec",
+          "test-unit",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "minitest",
+        "multiple": false
       }
     ]
   },
@@ -2963,6 +2976,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "ruby:--ruby-web-framework": m.docsCliSummaryRubyRubyWebFramework,
   "ruby:--ruby-orm": m.docsCliSummaryRubyRubyOrm,
   "ruby:--ruby-auth": m.docsCliSummaryRubyRubyAuth,
+  "ruby:--ruby-testing": m.docsCliSummaryRubyRubyTesting,
   "php:--php-web-framework": m.docsCliSummaryPhpPhpWebFramework,
   "php:--php-orm": m.docsCliSummaryPhpPhpOrm,
   "php:--php-auth": m.docsCliSummaryPhpPhpAuth,

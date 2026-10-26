@@ -12,12 +12,14 @@ bundle install
 bundle exec rake db:migrate
 {{/if}}
 bundle exec rake build
+{{#if (ne rubyTesting "none")}}
 bundle exec rake test
+{{/if}}
 bundle exec ruby bin/proof
 bundle exec ruby bin/server
 ```
 
-`build` checks every Ruby entry point's syntax. `test` runs Minitest through Rack::Test. `bin/proof` starts a real Puma process on an available loopback port, parses its JSON response, rejects an invalid request, and stops the process. Commit the generated Gemfile.lock after installation to pin transitive dependencies. No lockfile is fabricated by the generator.
+`build` checks every Ruby entry point's syntax. {{#if (eq rubyTesting "minitest")}}`test` runs Minitest through Rack::Test. {{/if}}{{#if (eq rubyTesting "rspec")}}`test` runs the RSpec request specs in `spec/` through Rack::Test (`bundle exec rspec` also works). {{/if}}{{#if (eq rubyTesting "test-unit")}}`test` runs Test::Unit through Rack::Test. {{/if}}{{#if (eq rubyTesting "none")}}No test suite is generated. {{/if}} `bin/proof` starts a real Puma process on an available loopback port, parses its JSON response, rejects an invalid request, and stops the process. Commit the generated Gemfile.lock after installation to pin transitive dependencies. No lockfile is fabricated by the generator.
 
 ## HTTP contract
 
@@ -60,6 +62,6 @@ The server binds to `127.0.0.1:{{rubyPort}}`. `HOST`, `PORT`, `RACK_ENV`, and `A
 `auth.rb` mounts Rodauth in JSON-only mode with `POST /create-account`, `POST /login`, and `POST /logout` (JSON bodies with `login` and `password`). Accounts and bcrypt password hashes live in the `accounts` table of the SQLite database; `db/auth_migrations` is applied by `bundle exec rake db:migrate`. A signed cookie session keyed by `SESSION_SECRET` (64+ characters, required when `RACK_ENV=production`) carries the login.
 
 {{/if}}
-Use Ctrl-C to stop the foreground server. Add future routes in `app.rb` and behavior tests in `test/app_test.rb`. Keep Gemfile ownership inside this service when composed with other languages.
+Use Ctrl-C to stop the foreground server. Add future routes in `app.rb`{{#if (eq rubyTesting "rspec")}} and behavior specs in `spec/app_spec.rb`{{/if}}{{#if (or (eq rubyTesting "minitest") (eq rubyTesting "test-unit"))}} and behavior tests in `test/app_test.rb`{{/if}}. Keep Gemfile ownership inside this service when composed with other languages.
 
 This source recipe is experimental. Generation, build, and runtime claims require proof for the exact producer revision and toolchains.

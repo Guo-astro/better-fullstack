@@ -591,6 +591,7 @@
   "docsCliSummaryRubyRubyWebFramework": "Ruby-HTTP-Framework.",
   "docsCliSummaryRubyRubyOrm": "Ruby-ORM / Datenbankschicht.",
   "docsCliSummaryRubyRubyAuth": "Ruby-Authentifizierung.",
+  "docsCliSummaryRubyRubyTesting": "Ruby-Testframework.",
   "docsCliSummaryPhpPhpWebFramework": "PHP-HTTP-Framework.",
   "docsCliSummaryPhpPhpOrm": "PHP-ORM / Datenbankschicht.",
   "docsCliSummaryPhpPhpAuth": "PHP-Authentifizierung.",

@@ -591,6 +591,7 @@
   "docsCliSummaryRubyRubyWebFramework": "Ruby HTTP 框架。",
   "docsCliSummaryRubyRubyOrm": "Ruby ORM / 資料庫層。",
   "docsCliSummaryRubyRubyAuth": "Ruby 認證。",
+  "docsCliSummaryRubyRubyTesting": "Ruby 測試框架。",
   "docsCliSummaryPhpPhpWebFramework": "PHP HTTP 框架。",
   "docsCliSummaryPhpPhpOrm": "PHP ORM / 資料庫層。",
   "docsCliSummaryPhpPhpAuth": "PHP 認證。",

@@ -2363,6 +2363,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://cycle-orm.dev/docs/intro-about/current/en",
     githubUrl: "https://github.com/cycle/orm",
   },
+  "rubyTesting:minitest": {
+    docsUrl: "https://docs.seattlerb.org/minitest/",
+    githubUrl: "https://github.com/minitest/minitest",
+  },
+  "rubyTesting:rspec": {
+    docsUrl: "https://rspec.info/documentation/",
+    githubUrl: "https://github.com/rspec/rspec",
+  },
+  "rubyTesting:test-unit": {
+    docsUrl: "https://test-unit.github.io/",
+    githubUrl: "https://github.com/test-unit/test-unit",
+  },
   "rubyAuth:jwt": {
     docsUrl: "https://github.com/jwt/ruby-jwt#readme",
     githubUrl: "https://github.com/jwt/ruby-jwt",

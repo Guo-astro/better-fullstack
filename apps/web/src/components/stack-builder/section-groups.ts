@@ -319,6 +319,7 @@ export const SECTIONS_BY_ECOSYSTEM: Record<Ecosystem, readonly BuilderSectionDef
     section("frameworkBuild", "Framework & Build", ["rubyWebFramework"]),
     section("data", "Data & Storage", ["rubyOrm"]),
     section("auth", "Authentication", ["rubyAuth"]),
+    section("qualityTesting", "Quality & Testing", ["rubyTesting"]),
     section("deployScaffold", "Deploy & Scaffold", ["aiDocs", "git", "install"]),
   ],
   php: [

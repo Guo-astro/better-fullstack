@@ -53,6 +53,7 @@ import type {
   RubyWebFramework,
   RubyOrm,
   RubyAuth,
+  RubyTesting,
   PhpWebFramework,
   PhpOrm,
   PhpAuth,
@@ -321,6 +322,7 @@ import {
 import {
   getRubyAuthChoice,
   getRubyOrmChoice,
+  getRubyTestingChoice,
   getRubyWebFrameworkChoice,
 } from "@/prompts/ecosystems/ruby-ecosystem";
 import {
@@ -510,6 +512,7 @@ type PromptGroupResults = {
   rubyWebFramework: RubyWebFramework;
   rubyOrm: RubyOrm;
   rubyAuth: RubyAuth;
+  rubyTesting: RubyTesting;
   phpWebFramework: PhpWebFramework;
   phpOrm: PhpOrm;
   phpAuth: PhpAuth;
@@ -700,6 +703,7 @@ const CONFIG_PROMPT_ENTRY_KEY_MAP = {
   rubyWebFramework: true,
   rubyOrm: true,
   rubyAuth: true,
+  rubyTesting: true,
   phpWebFramework: true,
   phpOrm: true,
   phpAuth: true,
@@ -936,7 +940,10 @@ function scopedPrompt<K extends PromptGroupKey>(
 ) {
   return (opts: { results: Partial<PromptGroupResults> }) => {
     if (
-      (key === "rubyWebFramework" || key === "rubyOrm" || key === "rubyAuth") &&
+      (key === "rubyWebFramework" ||
+        key === "rubyOrm" ||
+        key === "rubyAuth" ||
+        key === "rubyTesting") &&
       opts.results.ecosystem !== "ruby"
     )
       return Promise.resolve("none" as PromptGroupResults[K]);
@@ -947,6 +954,7 @@ function scopedPrompt<K extends PromptGroupKey>(
         "rubyWebFramework",
         "rubyOrm",
         "rubyAuth",
+        "rubyTesting",
         "aiDocs",
         "git",
         "install",
@@ -1899,6 +1907,10 @@ export async function gatherConfig(
       results.ecosystem === "ruby"
         ? getRubyAuthChoice(flags.rubyAuth)
         : Promise.resolve("none" as const),
+    rubyTesting: ({ results }) =>
+      results.ecosystem === "ruby"
+        ? getRubyTestingChoice(flags.rubyTesting)
+        : Promise.resolve("none" as const),
     phpWebFramework: ({ results }) =>
       results.ecosystem === "php"
         ? getPhpWebFrameworkChoice(flags.phpWebFramework)
@@ -2185,6 +2197,7 @@ export async function gatherConfig(
     rubyWebFramework: result.rubyWebFramework,
     rubyOrm: result.rubyOrm,
     rubyAuth: result.rubyAuth,
+    rubyTesting: result.rubyTesting,
     phpWebFramework: result.phpWebFramework,
     phpOrm: result.phpOrm,
     phpAuth: result.phpAuth,

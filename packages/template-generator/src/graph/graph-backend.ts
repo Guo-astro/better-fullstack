@@ -130,7 +130,14 @@ function getRawGraphBackendConnection(config: ProjectConfig): GraphBackendConnec
         testCommand: `cd ${directory} && ${commands.test}`,
       };
     }
-    case "ruby":
+    case "ruby": {
+      const rubyTesting =
+        config.stackParts?.find(
+          (part) =>
+            part.role === "testing" && part.ecosystem === "ruby" && part.ownerPartId === backend.id,
+        )?.toolId ??
+        config.rubyTesting ??
+        "minitest";
       return {
         partId: backend.id,
         ecosystem: backend.ecosystem,
@@ -144,8 +151,10 @@ function getRawGraphBackendConnection(config: ProjectConfig): GraphBackendConnec
         setupCommand: `cd ${directory} && bundle install`,
         devCommand: `cd ${directory} && bundle exec ruby bin/server`,
         checkCommand: `cd ${directory} && bundle exec rake build`,
-        testCommand: `cd ${directory} && bundle exec rake test`,
+        testCommand:
+          rubyTesting === "none" ? null : `cd ${directory} && bundle exec rake test`,
       };
+    }
     case "php": {
       const ownedParts = (config.stackParts ?? []).filter((part) => part.ownerPartId === backend.id);
       const hasOrm = ownedParts.some((part) => part.role === "orm" && part.toolId !== "none");

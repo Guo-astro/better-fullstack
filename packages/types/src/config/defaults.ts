@@ -147,6 +147,7 @@ export const CLI_DEFAULT_PROJECT_CONFIG = {
   rubyWebFramework: "sinatra",
   rubyOrm: "none",
   rubyAuth: "none",
+  rubyTesting: "minitest",
   phpWebFramework: "slim",
   phpOrm: "none",
   phpAuth: "none",

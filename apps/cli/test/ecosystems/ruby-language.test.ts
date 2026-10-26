@@ -326,6 +326,57 @@ describe("Ruby language integration", () => {
     expect(rakefile).toContain("BetterFullstack::Auth.migrate!");
   });
 
+  it.each([
+    { testing: "minitest", file: "test/app_test.rb", runner: "class AppTest < Minitest::Test", gem: 'gem "minitest", "6.0.6"' },
+    { testing: "test-unit", file: "test/app_test.rb", runner: "class AppTest < Test::Unit::TestCase", gem: 'gem "test-unit", "3.7.8"' },
+    { testing: "rspec", file: "spec/app_spec.rb", runner: "RSpec.describe BetterFullstack::App", gem: 'gem "rspec", "3.13.2"' },
+  ] as const)("runs the $testing suite through rake test", async ({ testing, file, runner, gem }) => {
+    const result = await createVirtual({
+      ecosystem: "ruby",
+      rubyWebFramework: "grape",
+      rubyOrm: "sequel",
+      rubyAuth: "jwt",
+      rubyTesting: testing,
+      aiDocs: ["agents-md"],
+    });
+    if (!result.success || !result.tree) throw new Error(result.error ?? "No Ruby project");
+    const paths = listVirtualTreeFilePaths(result.tree);
+    expect(content(result.tree, file)).toContain(runner);
+    expect(content(result.tree, file)).toContain("/api/items");
+    expect(content(result.tree, file)).toContain("/api/me");
+    expect(paths.some((path) => path.startsWith("testing/"))).toBe(false);
+    expect(paths.filter((path) => path.startsWith("test/") || path.startsWith("spec/"))).toEqual(
+      testing === "rspec" ? ["spec/app_spec.rb", "spec/spec_helper.rb"] : ["test/app_test.rb"],
+    );
+    expect(content(result.tree, "Gemfile")).toContain(gem);
+    expect(content(result.tree, "Rakefile")).toContain("task default: [:build, :test]");
+    expect(content(result.tree, "AGENTS.md")).toContain("bundle exec rake test");
+    expect(generateReproducibleCommand({ ...config(), rubyTesting: testing })).toContain(
+      `--ruby-testing ${testing}`,
+    );
+  });
+
+  it("generates no test suite or test command when Ruby testing is disabled", async () => {
+    const result = await createVirtual({
+      stackParts: parseStackPartSpecs([
+        "frontend:typescript:react-vite",
+        "frontend.css:typescript:tailwind",
+        "backend:ruby:roda:api",
+      ]),
+      rubyTesting: "none",
+      aiDocs: ["agents-md"],
+    });
+    if (!result.success || !result.tree) throw new Error(result.error ?? "No composed project");
+    const paths = listVirtualTreeFilePaths(result.tree);
+    const rakefile = paths.find((path) => path.endsWith("/Rakefile"));
+    if (!rakefile) throw new Error("Missing Ruby Rakefile");
+    const root = rakefile.slice(0, -"Rakefile".length);
+    expect(paths.some((path) => path.startsWith(`${root}test/`) || path.startsWith(`${root}spec/`))).toBe(false);
+    expect(content(result.tree, rakefile)).toContain("task default: [:build]");
+    expect(content(result.tree, `${root}Gemfile`)).not.toContain("group :test");
+    expect(content(result.tree, "AGENTS.md")).not.toContain("bundle exec rake test");
+  });
+
   it("omits the database layer when no Ruby ORM is selected", async () => {
     const result = await createVirtual({ ecosystem: "ruby", rubyWebFramework: "sinatra" });
     if (!result.success || !result.tree) throw new Error(result.error ?? "No Ruby project");

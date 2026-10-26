@@ -1,0 +1,21 @@
+ENV["RACK_ENV"] = "test"
+{{#if (ne rubyOrm "none")}}
+
+require_relative "../db"
+BetterFullstack::Database.migrate!
+{{/if}}
+{{#if (eq rubyAuth "rodauth")}}
+
+require_relative "../auth"
+BetterFullstack::Auth.migrate!
+{{/if}}
+
+require "rack/test"
+require_relative "../app"
+
+RSpec.configure do |config|
+  config.include Rack::Test::Methods
+  config.disable_monkey_patching!
+  config.expect_with(:rspec) { |expectations| expectations.syntax = :expect }
+  config.order = :random
+end

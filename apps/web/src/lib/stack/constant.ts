@@ -6005,6 +6005,39 @@ export const TECH_OPTIONS: Record<
       color: "from-gray-400 to-gray-600",
     },
   ],
+  rubyTesting: [
+    {
+      id: "minitest",
+      name: "Minitest",
+      description: "Rack::Test request tests run by Minitest through rake test",
+      icon: "https://cdn.simpleicons.org/ruby/CC342D",
+      color: "from-red-500 to-red-700",
+      default: true,
+    },
+    {
+      id: "rspec",
+      name: "RSpec",
+      description: "Rack::Test request specs run by RSpec through rake test",
+      icon: "https://cdn.simpleicons.org/ruby/CC342D",
+      color: "from-rose-500 to-pink-700",
+      isNew: true,
+    },
+    {
+      id: "test-unit",
+      name: "Test::Unit",
+      description: "Rack::Test request tests run by test-unit through rake test",
+      icon: "https://cdn.simpleicons.org/ruby/CC342D",
+      color: "from-amber-500 to-red-600",
+      isNew: true,
+    },
+    {
+      id: "none",
+      name: "No tests",
+      description: "Skip the Ruby test suite",
+      icon: "",
+      color: "from-gray-400 to-gray-600",
+    },
+  ],
   rubyAuth: [
     {
       id: "jwt",

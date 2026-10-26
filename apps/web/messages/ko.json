@@ -591,6 +591,7 @@
   "docsCliSummaryRubyRubyWebFramework": "Ruby HTTP 프레임워크.",
   "docsCliSummaryRubyRubyOrm": "Ruby ORM / 데이터베이스 계층.",
   "docsCliSummaryRubyRubyAuth": "Ruby 인증.",
+  "docsCliSummaryRubyRubyTesting": "Ruby 테스트 프레임워크.",
   "docsCliSummaryPhpPhpWebFramework": "PHP HTTP 프레임워크.",
   "docsCliSummaryPhpPhpOrm": "PHP ORM / 데이터베이스 계층.",
   "docsCliSummaryPhpPhpAuth": "PHP 인증.",

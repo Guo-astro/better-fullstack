@@ -1,4 +1,4 @@
-import type { RubyAuth, RubyOrm, RubyWebFramework } from "@/types";
+import type { RubyAuth, RubyOrm, RubyTesting, RubyWebFramework } from "@/types";
 
 import { exitCancelled } from "@/presentation/errors";
 import { isCancel, navigableSelect } from "@/prompts/core/navigable";
@@ -76,6 +76,28 @@ export async function getRubyAuthChoice(value?: RubyAuth) {
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
   const response = await navigableSelect<RubyAuth>({
     message: "Select Ruby authentication",
+    options: resolution.options,
+    initialValue: resolution.initialValue,
+  });
+  if (isCancel(response)) return exitCancelled("Operation cancelled");
+  return response;
+}
+
+const TESTING_OPTIONS: PromptOption<RubyTesting>[] = [
+  { value: "minitest", label: "Minitest", hint: "Rack::Test request tests with Minitest" },
+  { value: "rspec", label: "RSpec", hint: "Rack::Test request specs with RSpec" },
+  { value: "test-unit", label: "Test::Unit", hint: "Rack::Test request tests with test-unit" },
+  { value: "none", label: "None", hint: "No test suite" },
+];
+
+export const resolveRubyTestingPrompt = (value?: RubyTesting) =>
+  createStaticSinglePromptResolution(TESTING_OPTIONS, "minitest", value);
+
+export async function getRubyTestingChoice(value?: RubyTesting) {
+  const resolution = resolveRubyTestingPrompt(value);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "minitest";
+  const response = await navigableSelect<RubyTesting>({
+    message: "Select Ruby test framework",
     options: resolution.options,
     initialValue: resolution.initialValue,
   });
