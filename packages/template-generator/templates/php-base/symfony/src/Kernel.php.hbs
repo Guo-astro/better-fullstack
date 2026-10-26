@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App;
 
+{{#if (eq phpOrm "doctrine")}}
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+{{/if}}
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -17,6 +20,9 @@ final class Kernel extends BaseKernel
     public function registerBundles(): iterable
     {
         yield new FrameworkBundle();
+{{#if (eq phpOrm "doctrine")}}
+        yield new DoctrineBundle();
+{{/if}}
     }
 
     private function configureContainer(ContainerConfigurator $container): void
@@ -27,6 +33,17 @@ final class Kernel extends BaseKernel
             'php_errors' => ['log' => true],
         ]);
         $container->parameters()->set('app.cors_origin', '%env(default::CORS_ORIGIN)%');
+{{#if (eq phpOrm "doctrine")}}
+        $container->parameters()->set('app.database_path', '%kernel.project_dir%/var/database.sqlite');
+        $container->extension('doctrine', [
+            'dbal' => ['driver' => 'pdo_sqlite', 'path' => '%env(default:app.database_path:DATABASE_PATH)%'],
+            'orm' => [
+                'mappings' => [
+                    'App' => ['type' => 'attribute', 'dir' => '%kernel.project_dir%/src/Entity', 'prefix' => 'App\\Entity'],
+                ],
+            ],
+        ]);
+{{/if}}
         $container->services()
             ->defaults()->autowire()->autoconfigure()
             ->load('App\\Controller\\', __DIR__ . '/Controller/')

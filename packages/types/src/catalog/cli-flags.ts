@@ -1143,6 +1143,12 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         source: { kind: "category", category: "phpWebFramework" },
         configKey: "phpWebFramework",
       },
+      {
+        flag: "php-orm",
+        summary: "PHP ORM / database layer.",
+        source: { kind: "category", category: "phpOrm" },
+        configKey: "phpOrm",
+      },
     ],
   },
   {

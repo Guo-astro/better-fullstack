@@ -1275,6 +1275,7 @@ export function generateReproducibleCommand(config: ProjectConfig) {
       flags = [
         "--ecosystem php",
         `--php-web-framework ${config.phpWebFramework}`,
+        `--php-orm ${config.phpOrm ?? "none"}`,
         "--database none",
       ];
       appendCommonFlags(flags, config);

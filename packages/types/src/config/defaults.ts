@@ -145,6 +145,7 @@ export const CLI_DEFAULT_PROJECT_CONFIG = {
   dotnetLibraries: [],
   rubyWebFramework: "sinatra",
   phpWebFramework: "slim",
+  phpOrm: "none",
   elixirWebFramework: "phoenix",
   elixirOrm: "ecto-sql",
   elixirAuth: "none",

@@ -36,7 +36,11 @@ import {
   type OptionCategory,
 } from "@/catalog/option-metadata";
 import { ANALYTICS_VALUES } from "@/config/schemas";
-import { PHP_RECIPE_REASONS, PHP_UNSUPPORTED_BACKEND_FIELDS } from "@/stack/php-compatibility";
+import {
+  getPhpCapabilityIssue,
+  PHP_RECIPE_REASONS,
+  PHP_UNSUPPORTED_BACKEND_FIELDS,
+} from "@/stack/php-compatibility";
 import {
   RUBY_RECIPE_EXTENSION_REASON,
   RUBY_RECIPE_FRAMEWORK_REASON,
@@ -569,6 +573,7 @@ export type CompatibilityInput = {
   dotnetLibraries: string[];
   rubyWebFramework: string;
   phpWebFramework: string;
+  phpOrm: string;
   elixirWebFramework: string;
   elixirOrm: string;
   elixirAuth: string;
@@ -2632,6 +2637,18 @@ export const analyzeStackCompatibility = (
     }
   }
 
+  if (
+    nextStack.ecosystem === "php" &&
+    getPhpCapabilityIssue(nextStack.phpWebFramework, "orm", nextStack.phpOrm)
+  ) {
+    nextStack.phpOrm = "none";
+    changed = true;
+    changes.push({
+      category: "phpOrm",
+      message: "PHP ORM set to 'None' (not generated for the selected framework)",
+    });
+  }
+
   // ============================================
   // ELIXIR ECOSYSTEM CONSTRAINTS
   // ============================================
@@ -2968,6 +2985,10 @@ export const getDisabledReason = (
 
   if (currentStack.ecosystem === "php") {
     if (category === "phpWebFramework" && optionId === "none") return PHP_RECIPE_REASONS.framework;
+    if (category === "phpOrm") {
+      const issue = getPhpCapabilityIssue(currentStack.phpWebFramework, "orm", optionId);
+      if (issue) return issue;
+    }
     if (category === "database" && optionId !== "none") return PHP_RECIPE_REASONS.database;
     if (PHP_UNSUPPORTED_BACKEND_FIELDS.some((field) => field === category) && optionId !== "none")
       return PHP_RECIPE_REASONS.capability;

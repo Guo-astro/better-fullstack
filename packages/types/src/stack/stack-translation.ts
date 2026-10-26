@@ -211,6 +211,7 @@ export const STACK_SELECTION_OPTION_CATEGORY_BY_KEY: Record<
   dotnetLibraries: "dotnetLibraries",
   rubyWebFramework: "rubyWebFramework",
   phpWebFramework: "phpWebFramework",
+  phpOrm: "phpOrm",
   elixirWebFramework: "elixirWebFramework",
   elixirOrm: "elixirOrm",
   elixirAuth: "elixirAuth",
@@ -410,6 +411,7 @@ export const STACK_SELECTION_URL_KEYS = {
   dotnetLibraries: "dnlib",
   rubyWebFramework: "rbwf",
   phpWebFramework: "phwf",
+  phpOrm: "phorm",
   elixirWebFramework: "ewf",
   elixirOrm: "eorm",
   elixirAuth: "eauth",
@@ -884,6 +886,7 @@ const CLI_SCALAR_CONFIG_FIELDS = [
   ["dotnetDeploy", "dotnetDeploy"],
   ["rubyWebFramework", "rubyWebFramework"],
   ["phpWebFramework", "phpWebFramework"],
+  ["phpOrm", "phpOrm"],
   ["elixirWebFramework", "elixirWebFramework"],
   ["elixirOrm", "elixirOrm"],
   ["elixirAuth", "elixirAuth"],
@@ -1962,6 +1965,7 @@ function getCliGraphStackParts(input: CLIInput): StackPart[] {
   addScopedBackendPart("dotnet", "orm", input.dotnetOrm);
   addScopedBackendPart("dotnet", "api", input.dotnetApi);
   addScopedBackendPart("dotnet", "auth", input.dotnetAuth);
+  addScopedBackendPart("php", "orm", input.phpOrm);
   addScopedBackendPart("elixir", "orm", input.elixirOrm);
   addScopedBackendPart("elixir", "api", input.elixirApi);
   addScopedBackendPart("elixir", "auth", input.elixirAuth);
@@ -2159,6 +2163,7 @@ function buildProjectConfigBase(
     ) as ProjectConfig["dotnetLibraries"],
     rubyWebFramework: stack.rubyWebFramework as ProjectConfig["rubyWebFramework"],
     phpWebFramework: stack.phpWebFramework as ProjectConfig["phpWebFramework"],
+    phpOrm: stack.phpOrm as ProjectConfig["phpOrm"],
     elixirWebFramework: stack.elixirWebFramework as ProjectConfig["elixirWebFramework"],
     elixirOrm: stack.elixirOrm as ProjectConfig["elixirOrm"],
     elixirAuth: stack.elixirAuth as ProjectConfig["elixirAuth"],
@@ -2259,6 +2264,7 @@ export function isCliDefaultStackSelection(
           ...DOTNET_CONFIG_KEYS,
           "rubyWebFramework",
           "phpWebFramework",
+          "phpOrm",
           ...ELIXIR_CONFIG_KEYS,
           ...(selection.ecosystem === "typescript" ? REACT_NATIVE_CONFIG_KEYS : []),
         ])
@@ -2704,6 +2710,7 @@ export function generateStackSelectionCommand(selection: StackSelectionInput): s
       const flags = [
         `--ecosystem php`,
         `--php-web-framework ${selection.phpWebFramework}`,
+        `--php-orm ${selection.phpOrm}`,
         `--database ${selection.database}`,
       ];
       if (selection.versionChannel !== "stable")

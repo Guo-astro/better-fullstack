@@ -66,6 +66,7 @@ import {
   ELIXIR_VALIDATION_VALUES,
   RUBY_WEB_FRAMEWORK_VALUES,
   PHP_WEB_FRAMEWORK_VALUES,
+  PHP_ORM_VALUES,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   EFFECT_VALUES,
   EMAIL_VALUES,
@@ -190,7 +191,11 @@ import {
   getCrystalSelectionIssue,
   getCrystalDatabaseSelectionIssue,
 } from "@/platform/crystal-project";
-import { PHP_RECIPE_REASONS } from "@/stack/php-compatibility";
+import {
+  getPhpCapabilityIssue,
+  isPhpCapabilityRole,
+  PHP_RECIPE_REASONS,
+} from "@/stack/php-compatibility";
 import {
   getRubyDatabaseSelectionIssue,
   RUBY_RECIPE_EXTENSION_REASON,
@@ -387,7 +392,7 @@ const LEGACY_CAPABILITY_CATEGORIES_BY_ECOSYSTEM = {
   },
   dotnet: { orm: "dotnetOrm", api: "dotnetApi", auth: "dotnetAuth" },
   ruby: {},
-  php: {},
+  php: { orm: "phpOrm" },
   elixir: { orm: "elixirOrm", api: "elixirApi", auth: "elixirAuth" },
 } as const satisfies Record<
   LegacyBackendEcosystem,
@@ -1245,6 +1250,7 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
       ] satisfies ProvidedCapabilityDefinition[],
     }),
   ),
+  ...defineTools(PHP_ORM_VALUES, "orm", "php", "phpOrm"),
   ...defineTools(["rest"], "api", "php").map((definition) => ({
     ...definition,
     selectable: false,
@@ -3146,7 +3152,11 @@ function getStackPartCompatibilityIssue(
     });
   }
 
-  if (context.ownerEcosystem === "php" && part.source !== "provided") {
+  if (
+    context.ownerEcosystem === "php" &&
+    part.source !== "provided" &&
+    !(part.ecosystem === "php" && isPhpCapabilityRole(part.role))
+  ) {
     return createStackGraphIssue({
       code: "INCOMPATIBLE_GRAPH_SELECTION",
       partId: part.id,
@@ -3156,6 +3166,19 @@ function getStackPartCompatibilityIssue(
         part.role === "database" || part.role === "orm"
           ? PHP_RECIPE_REASONS.database
           : PHP_RECIPE_REASONS.capability,
+    });
+  }
+  const phpCapabilityIssue =
+    part.ecosystem === "php" && context.ownerEcosystem === "php"
+      ? getPhpCapabilityIssue(context.ownerToolId, part.role, part.toolId)
+      : undefined;
+  if (phpCapabilityIssue) {
+    return createStackGraphIssue({
+      code: "INCOMPATIBLE_GRAPH_SELECTION",
+      partId: part.id,
+      role: part.role,
+      toolId: part.toolId,
+      message: phpCapabilityIssue,
     });
   }
   if (part.ecosystem === "php" && context.ownerRole && context.ownerRole !== "backend") {

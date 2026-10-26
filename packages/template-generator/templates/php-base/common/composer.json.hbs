@@ -11,18 +11,37 @@
   "license": "proprietary",
   "require": {
     "php": "~8.5.12",
-{{#if (eq phpWebFramework "laravel")}}
     "ext-json": "*",
+{{#if (eq phpWebFramework "laravel")}}
     "ext-mbstring": "*",
     "ext-openssl": "*",
+{{/if}}
+{{#if (ne phpOrm "none")}}
+    "ext-pdo_sqlite": "*",
+{{/if}}
+{{#if (eq phpOrm "cycle")}}
+    "cycle/database": "~2.23.3",
+    "cycle/orm": "~2.18.1",
+{{/if}}
+{{#if (eq phpOrm "doctrine")}}
+{{#if (eq phpWebFramework "symfony")}}
+    "doctrine/doctrine-bundle": "~3.3.3",
+{{else}}
+    "doctrine/dbal": "~4.5.0",
+{{/if}}
+    "doctrine/orm": "~3.7.5",
+{{/if}}
+{{#if (and (eq phpOrm "eloquent") (eq phpWebFramework "slim"))}}
+    "illuminate/database": "~13.38.0",
+{{/if}}
+{{#if (eq phpWebFramework "laravel")}}
     "laravel/framework": "~13.38.0"
 {{else if (eq phpWebFramework "symfony")}}
-    "ext-json": "*",
     "symfony/framework-bundle": "~8.1.9"
 {{else}}
-    "ext-json": "*",
     "slim/slim": "~4.15.3",
-    "slim/psr7": "~1.8.0"
+    "slim/psr7": "~1.8.0"{{#if (eq phpOrm "doctrine")}},
+    "symfony/cache": "~8.1.9"{{/if}}
 {{/if}}
   },
   "require-dev": {
@@ -49,6 +68,13 @@
       "@composer dump-autoload --optimize --strict-psr"
     ],
     "test": "@php vendor/bin/phpunit --bootstrap vendor/autoload.php tests",
+{{#if (ne phpOrm "none")}}
+{{#if (eq phpWebFramework "laravel")}}
+    "db:setup": "@php artisan migrate --force --no-interaction",
+{{else}}
+    "db:setup": "@php bin/db-setup.php",
+{{/if}}
+{{/if}}
     "proof:http": "@php bin/proof-http.php"
   },
   "config": {

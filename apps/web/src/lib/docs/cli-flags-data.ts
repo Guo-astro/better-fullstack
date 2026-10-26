@@ -2421,10 +2421,25 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "summary": "PHP HTTP framework.",
         "values": [
           "slim",
+          "laravel",
+          "symfony",
           "none"
         ],
         "valueHint": null,
         "defaultValue": "slim",
+        "multiple": false
+      },
+      {
+        "flag": "--php-orm",
+        "summary": "PHP ORM / database layer.",
+        "values": [
+          "eloquent",
+          "doctrine",
+          "cycle",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
         "multiple": false
       }
     ]
@@ -2872,6 +2887,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "dotnet:--dotnet-libraries": m.docsCliSummaryDotnetDotnetLibraries,
   "ruby:--ruby-web-framework": m.docsCliSummaryRubyRubyWebFramework,
   "php:--php-web-framework": m.docsCliSummaryPhpPhpWebFramework,
+  "php:--php-orm": m.docsCliSummaryPhpPhpOrm,
   "elixir:--elixir-web-framework": m.docsCliSummaryElixirElixirWebFramework,
   "elixir:--elixir-orm": m.docsCliSummaryElixirElixirOrm,
   "elixir:--elixir-auth": m.docsCliSummaryElixirElixirAuth,

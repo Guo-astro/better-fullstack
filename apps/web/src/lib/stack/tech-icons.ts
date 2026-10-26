@@ -106,6 +106,7 @@ export const ICON_REGISTRY: Record<string, IconConfig> = {
   slim: { type: "si", slug: "php", hex: "777BB4" },
   laravel: { type: "si", slug: "laravel", hex: "FF2D20" },
   symfony: { type: "si", slug: "symfony", hex: "000000", needsInvert: "dark" },
+  doctrine: { type: "si", slug: "doctrine", hex: "FC6A31" },
   elixir: { type: "si", slug: "elixir", hex: "4B275F" },
   dotnet: { type: "si", slug: "dotnet", hex: "512BD4" },
   "aspnet-minimal": { type: "si", slug: "dotnet", hex: "512BD4" },

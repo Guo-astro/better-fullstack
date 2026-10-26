@@ -74,5 +74,14 @@ describe("PHP builder recipe", () => {
       expect(stackStateToProjectConfig(selected).phpWebFramework).toBe(framework);
       expect(generateStackCommand(selected)).toContain(`--php-web-framework ${framework}`);
     }
+    const laravel = { ...stack, phpWebFramework: "laravel" };
+    expect(getDisabledReason(laravel, "phpOrm", "eloquent")).toBeNull();
+    expect(getDisabledReason(laravel, "phpOrm", "doctrine")).toContain("is generated for");
+    expect(
+      getDisabledReason({ ...stack, phpWebFramework: "symfony" }, "phpOrm", "cycle"),
+    ).toContain("is generated for");
+    const withOrm = { ...laravel, phpOrm: "eloquent" };
+    expect(stackStateToProjectConfig(withOrm).phpOrm).toBe("eloquent");
+    expect(generateStackCommand(withOrm)).toContain("--php-orm eloquent");
   });
 });

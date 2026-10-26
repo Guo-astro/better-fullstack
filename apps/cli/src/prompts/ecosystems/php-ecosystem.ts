@@ -1,4 +1,6 @@
-import type { PhpWebFramework } from "@/types";
+import { getPhpCapabilityIssue } from "@better-fullstack/types";
+
+import type { PhpOrm, PhpWebFramework } from "@/types";
 
 import { exitCancelled } from "@/presentation/errors";
 import { isCancel, navigableSelect } from "@/prompts/core/navigable";
@@ -18,6 +20,13 @@ const OPTIONS: PromptOption<PhpWebFramework>[] = [
   { value: "none", label: "None", hint: "No PHP service" },
 ];
 
+const ORM_OPTIONS: PromptOption<PhpOrm>[] = [
+  { value: "eloquent", label: "Eloquent", hint: "Laravel's ActiveRecord ORM with SQLite" },
+  { value: "doctrine", label: "Doctrine ORM", hint: "Data-mapper ORM with attribute mapping" },
+  { value: "cycle", label: "Cycle ORM", hint: "Data-mapper ORM with Cycle Database" },
+  { value: "none", label: "None", hint: "No database layer" },
+];
+
 export function resolvePhpWebFrameworkPrompt(value?: PhpWebFramework) {
   return createStaticSinglePromptResolution(OPTIONS, "slim", value);
 }
@@ -27,6 +36,24 @@ export async function getPhpWebFrameworkChoice(value?: PhpWebFramework) {
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "slim";
   const response = await navigableSelect<PhpWebFramework>({
     message: "Select PHP web framework",
+    options: resolution.options,
+    initialValue: resolution.initialValue,
+  });
+  return isCancel(response) ? exitCancelled("Operation cancelled") : response;
+}
+
+export function resolvePhpOrmPrompt(value?: PhpOrm, framework?: PhpWebFramework) {
+  const options = ORM_OPTIONS.filter(
+    (option) => !getPhpCapabilityIssue(framework, "orm", option.value),
+  );
+  return createStaticSinglePromptResolution(options, "none", value);
+}
+
+export async function getPhpOrmChoice(value?: PhpOrm, framework?: PhpWebFramework) {
+  const resolution = resolvePhpOrmPrompt(value, framework);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
+  const response = await navigableSelect<PhpOrm>({
+    message: "Select PHP ORM / database layer",
     options: resolution.options,
     initialValue: resolution.initialValue,
   });

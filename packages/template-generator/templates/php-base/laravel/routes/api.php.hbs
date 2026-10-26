@@ -3,6 +3,10 @@
 declare(strict_types=1);
 
 use App\GreetingEndpoint;
+{{#if (eq phpOrm "eloquent")}}
+use App\Models\Note;
+use App\NoteInput;
+{{/if}}
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -12,3 +16,21 @@ Route::post('/api/greetings', function (Request $request) {
     [$status, $body] = GreetingEndpoint::respond((string) $request->header('Content-Type', ''), $request->getContent());
     return response()->json($body, $status);
 });
+{{#if (eq phpOrm "eloquent")}}
+
+Route::get('/api/notes', fn () => response()->json(['notes' => Note::query()->orderBy('id')->get()]));
+
+Route::post('/api/notes', function (Request $request) {
+    if (strlen($request->getContent()) > GreetingEndpoint::MAX_BODY_BYTES) {
+        return response()->json(['error' => 'payload_too_large'], 413);
+    }
+    try {
+        $title = NoteInput::titleFromJson($request->getContent());
+    } catch (JsonException) {
+        return response()->json(['error' => 'invalid_json'], 400);
+    } catch (InvalidArgumentException $error) {
+        return response()->json(['error' => 'validation_failed', 'message' => $error->getMessage()], 422);
+    }
+    return response()->json(Note::query()->create(['title' => $title]), 201);
+});
+{{/if}}

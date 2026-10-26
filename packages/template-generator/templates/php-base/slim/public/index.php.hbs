@@ -4,7 +4,14 @@ declare(strict_types=1);
 
 use App\Application;
 use App\Environment;
+{{#if (ne phpOrm "none")}}
+use App\Notes;
+{{/if}}
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 Environment::load(dirname(__DIR__) . '/.env');
+{{#if (ne phpOrm "none")}}
+Application::create(getenv('CORS_ORIGIN') ?: '', Notes::open(getenv('DATABASE_PATH') ?: dirname(__DIR__) . '/var/database.sqlite'))->run();
+{{else}}
 Application::create(getenv('CORS_ORIGIN') ?: '')->run();
+{{/if}}

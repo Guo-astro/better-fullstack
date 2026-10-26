@@ -2327,6 +2327,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://hexdocs.pm/phoenix_live_view/",
     githubUrl: "https://github.com/phoenixframework/phoenix_live_view",
   },
+  "phpOrm:eloquent": {
+    docsUrl: "https://laravel.com/docs/13.x/eloquent",
+    githubUrl: "https://github.com/illuminate/database",
+  },
+  "phpOrm:doctrine": {
+    docsUrl: "https://www.doctrine-project.org/projects/doctrine-orm/en/current/index.html",
+    githubUrl: "https://github.com/doctrine/orm",
+  },
+  "phpOrm:cycle": {
+    docsUrl: "https://cycle-orm.dev/docs/intro-about/current/en",
+    githubUrl: "https://github.com/cycle/orm",
+  },
   "elixirOrm:ecto-sql": {
     docsUrl: "https://hexdocs.pm/ecto_sql/",
     githubUrl: "https://github.com/elixir-ecto/ecto_sql",

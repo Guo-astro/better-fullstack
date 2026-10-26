@@ -701,7 +701,12 @@ const GRAPH_BACKEND_CONFIGS: GraphBackendConfig[] = [
     ormCategory: "javaOrm",
     authCategory: "javaAuth",
   },
-  { ecosystem: "php", label: "PHP", frameworkCategory: "phpWebFramework" },
+  {
+    ecosystem: "php",
+    label: "PHP",
+    frameworkCategory: "phpWebFramework",
+    ormCategory: "phpOrm",
+  },
   {
     ecosystem: "elixir",
     label: "Elixir",

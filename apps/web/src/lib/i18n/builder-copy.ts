@@ -663,6 +663,16 @@ const CATEGORY_NAMES: Record<string, LocalizedMap> = {
     "fr": "Framework Web Elixir",
     "uk": "Elixir Веб-фреймворк",
   },
+  phpOrm: {
+    "es": "ORM / base de datos PHP",
+    "zh": "PHP ORM / 数据库",
+    "ja": "PHP ORM / データベース",
+    "ko": "PHP ORM / 데이터베이스",
+    "zh-Hant": "PHP ORM / 資料庫",
+    "de": "PHP ORM / Datenbank",
+    "fr": "PHP ORM / Base de données",
+    "uk": "PHP ORM / База даних",
+  },
   elixirOrm: {
     "es": "ORM / base de datos Elixir",
     "zh": "Elixir ORM / 数据库",

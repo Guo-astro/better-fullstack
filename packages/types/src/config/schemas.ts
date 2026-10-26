@@ -1032,6 +1032,10 @@ export const PhpWebFrameworkSchema = z
   .enum(["slim", "laravel", "symfony", "none"])
   .describe("PHP HTTP framework");
 
+export const PhpOrmSchema = z
+  .enum(["eloquent", "doctrine", "cycle", "none"])
+  .describe("PHP ORM / database layer");
+
 export const ElixirWebFrameworkSchema = z
   .enum(["phoenix", "phoenix-live-view", "none"])
   .describe("Elixir web framework");
@@ -1406,6 +1410,7 @@ const STACK_CONFIG_FIELDS = {
   // Elixir ecosystem options
   rubyWebFramework: RubyWebFrameworkSchema.optional(),
   phpWebFramework: PhpWebFrameworkSchema.default("none"),
+  phpOrm: PhpOrmSchema.default("none"),
   elixirWebFramework: ElixirWebFrameworkSchema,
   elixirOrm: ElixirOrmSchema,
   elixirAuth: ElixirAuthSchema,
@@ -1694,6 +1699,7 @@ export const DOTNET_CACHING_VALUES = DotnetCachingSchema.options;
 export const DOTNET_DEPLOY_VALUES = DotnetDeploySchema.options;
 export const DOTNET_LIBRARIES_VALUES = DotnetLibrariesSchema.options;
 export const PHP_WEB_FRAMEWORK_VALUES = PhpWebFrameworkSchema.options;
+export const PHP_ORM_VALUES = PhpOrmSchema.options;
 export const ELIXIR_WEB_FRAMEWORK_VALUES = ElixirWebFrameworkSchema.options;
 export const ELIXIR_ORM_VALUES = ElixirOrmSchema.options;
 export const ELIXIR_AUTH_VALUES = ElixirAuthSchema.options;

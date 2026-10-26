@@ -133,6 +133,7 @@ export const TEMPLATE_FINGERPRINT_KEYS = [
   "dotnetLibraries",
   "rubyWebFramework",
   "phpWebFramework",
+  "phpOrm",
   "elixirWebFramework",
   "elixirOrm",
   "elixirAuth",

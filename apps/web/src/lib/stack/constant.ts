@@ -6036,6 +6036,37 @@ export const TECH_OPTIONS: Record<
       color: "from-gray-500 to-gray-700",
     },
   ],
+  phpOrm: [
+    {
+      id: "eloquent",
+      name: "Eloquent",
+      description: "Laravel's ORM for Slim or Laravel, persisting notes in SQLite",
+      icon: "https://cdn.simpleicons.org/laravel/FF2D20",
+      color: "from-red-500 to-orange-600",
+    },
+    {
+      id: "doctrine",
+      name: "Doctrine ORM",
+      description: "Attribute-mapped data mapper for Slim or Symfony with SQLite",
+      icon: "https://cdn.simpleicons.org/doctrine/FC6A31",
+      color: "from-orange-500 to-amber-700",
+    },
+    {
+      id: "cycle",
+      name: "Cycle ORM",
+      description: "Data mapper with Cycle Database for Slim with SQLite",
+      icon: "",
+      color: "from-sky-500 to-indigo-600",
+    },
+    {
+      id: "none",
+      name: "None",
+      description: "No database layer",
+      icon: "",
+      color: "from-gray-500 to-gray-700",
+      default: true,
+    },
+  ],
   elixirWebFramework: [
     {
       id: "phoenix",

@@ -52,6 +52,7 @@ import type {
   ElixirValidation,
   RubyWebFramework,
   PhpWebFramework,
+  PhpOrm,
   ElixirWebFramework,
   I18n,
   Database,
@@ -283,7 +284,7 @@ import {
   gatherMultiEcosystemConfig,
   getCompositionModeChoice,
 } from "@/prompts/ecosystems/multi-ecosystem-composer";
-import { getPhpWebFrameworkChoice } from "@/prompts/ecosystems/php-ecosystem";
+import { getPhpOrmChoice, getPhpWebFrameworkChoice } from "@/prompts/ecosystems/php-ecosystem";
 import {
   getPythonAiChoice,
   getPythonApiChoice,
@@ -494,6 +495,7 @@ type PromptGroupResults = {
   // Elixir ecosystem
   rubyWebFramework: RubyWebFramework;
   phpWebFramework: PhpWebFramework;
+  phpOrm: PhpOrm;
   elixirWebFramework: ElixirWebFramework;
   elixirOrm: ElixirOrm;
   elixirAuth: ElixirAuth;
@@ -678,6 +680,7 @@ const CONFIG_PROMPT_ENTRY_KEY_MAP = {
   dotnetLibraries: true,
   rubyWebFramework: true,
   phpWebFramework: true,
+  phpOrm: true,
   elixirWebFramework: true,
   elixirOrm: true,
   elixirAuth: true,
@@ -1860,6 +1863,10 @@ export async function gatherConfig(
       results.ecosystem === "php"
         ? getPhpWebFrameworkChoice(flags.phpWebFramework)
         : Promise.resolve("none" as const),
+    phpOrm: ({ results }) =>
+      results.ecosystem === "php"
+        ? getPhpOrmChoice(flags.phpOrm, results.phpWebFramework)
+        : Promise.resolve("none" as const),
     elixirWebFramework: ({ results }) => {
       if (results.ecosystem !== "elixir") return Promise.resolve("none" as ElixirWebFramework);
       return getElixirWebFrameworkChoice(flags.elixirWebFramework);
@@ -2128,6 +2135,7 @@ export async function gatherConfig(
     // Elixir ecosystem options
     rubyWebFramework: result.rubyWebFramework,
     phpWebFramework: result.phpWebFramework,
+    phpOrm: result.phpOrm,
     elixirWebFramework: result.elixirWebFramework,
     elixirOrm: result.elixirOrm,
     elixirAuth: result.elixirAuth,

@@ -590,6 +590,7 @@
   "docsCliSummaryDotnetDotnetLibraries": "선택적 .NET 라이브러리.",
   "docsCliSummaryRubyRubyWebFramework": "Ruby HTTP 프레임워크.",
   "docsCliSummaryPhpPhpWebFramework": "PHP HTTP 프레임워크.",
+  "docsCliSummaryPhpPhpOrm": "PHP ORM / 데이터베이스 계층.",
   "docsCliSummaryElixirElixirWebFramework": "Elixir 웹 프레임워크.",
   "docsCliSummaryElixirElixirOrm": "Elixir ORM / 데이터베이스.",
   "docsCliSummaryElixirElixirAuth": "Elixir 인증.",

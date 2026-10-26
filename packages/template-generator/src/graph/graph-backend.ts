@@ -143,7 +143,10 @@ function getRawGraphBackendConnection(config: ProjectConfig): GraphBackendConnec
         checkCommand: `cd ${directory} && bundle exec rake build`,
         testCommand: `cd ${directory} && bundle exec rake test`,
       };
-    case "php":
+    case "php": {
+      const hasOrm = (config.stackParts ?? []).some(
+        (part) => part.ownerPartId === backend.id && part.role === "orm" && part.toolId !== "none",
+      );
       return {
         partId: backend.id,
         ecosystem: backend.ecosystem,
@@ -154,11 +157,14 @@ function getRawGraphBackendConnection(config: ProjectConfig): GraphBackendConnec
         serverUrl: "http://localhost:8080",
         healthPath: "/health",
         healthUrl: "http://localhost:8080/health",
-        setupCommand: `cd ${directory} && composer install --no-interaction`,
+        setupCommand: hasOrm
+          ? `cd ${directory} && composer install --no-interaction && composer run db:setup`
+          : `cd ${directory} && composer install --no-interaction`,
         devCommand: `cd ${directory} && composer run dev`,
         checkCommand: `cd ${directory} && composer run build`,
         testCommand: `cd ${directory} && composer test`,
       };
+    }
     case "elixir": {
       const hasPhoenix = backend.toolId === "phoenix" || backend.toolId === "phoenix-live-view";
       const hasEcto = (config.stackParts ?? []).some(

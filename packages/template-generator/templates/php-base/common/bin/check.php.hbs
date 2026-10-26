@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 $root = dirname(__DIR__);
-foreach ([{{#if (eq phpWebFramework "laravel")}}'app', 'bootstrap', 'config', 'routes', {{else}}'src', {{/if}}'public', 'bin', 'tests'] as $directory) {
+foreach ([{{#if (eq phpWebFramework "laravel")}}'app', 'bootstrap', 'config', {{#if (ne phpOrm "none")}}'database', {{/if}}'routes', {{else}}'src', {{/if}}'public', 'bin', 'tests'] as $directory) {
     $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . '/' . $directory, FilesystemIterator::SKIP_DOTS));
     foreach ($files as $file) {
         if (!$file->isFile() || $file->getExtension() !== 'php') continue;

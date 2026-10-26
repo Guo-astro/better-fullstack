@@ -82,7 +82,10 @@ import {
   resolveJavaTestingLibrariesPrompt,
   resolveJavaWebFrameworkPrompt,
 } from "@/prompts/ecosystems/java-ecosystem";
-import { resolvePhpWebFrameworkPrompt } from "@/prompts/ecosystems/php-ecosystem";
+import {
+  resolvePhpOrmPrompt,
+  resolvePhpWebFrameworkPrompt,
+} from "@/prompts/ecosystems/php-ecosystem";
 import {
   resolvePythonAiPrompt,
   resolvePythonApiPrompt,
@@ -208,6 +211,7 @@ import {
   OBSERVABILITY_VALUES,
   ORM_VALUES,
   PAYMENTS_VALUES,
+  PhpOrmSchema,
   PhpWebFrameworkSchema,
   PYTHON_AI_VALUES,
   PYTHON_API_VALUES,
@@ -783,6 +787,15 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
     resolve: ({ value }: { value?: string } = {}) =>
       resolvePhpWebFrameworkPrompt(
         value === undefined ? undefined : PhpWebFrameworkSchema.parse(value),
+      ),
+  },
+  phpOrm: {
+    schemaValues: PhpOrmSchema.options,
+    coverageContexts: [{}, { phpWebFramework: "laravel" }, { phpWebFramework: "symfony" }],
+    resolve: ({ value, phpWebFramework }: { value?: string; phpWebFramework?: string } = {}) =>
+      resolvePhpOrmPrompt(
+        value === undefined ? undefined : PhpOrmSchema.parse(value),
+        phpWebFramework === undefined ? undefined : PhpWebFrameworkSchema.parse(phpWebFramework),
       ),
   },
   elixirWebFramework: {

@@ -1,6 +1,9 @@
 vendor/
 .env
 .phpunit.cache/
-{{#if (eq phpWebFramework "symfony")}}
+{{#if (or (eq phpWebFramework "symfony") (and (eq phpWebFramework "slim") (ne phpOrm "none")))}}
 var/
+{{/if}}
+{{#if (and (eq phpWebFramework "laravel") (ne phpOrm "none"))}}
+database/*.sqlite
 {{/if}}

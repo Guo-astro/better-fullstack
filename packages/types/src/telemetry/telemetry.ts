@@ -387,6 +387,7 @@ export const TELEMETRY_PROJECT_CONFIG_KEYS = [
   "dotnetLibraries",
   "rubyWebFramework",
   "phpWebFramework",
+  "phpOrm",
   "elixirWebFramework",
   "elixirOrm",
   "elixirAuth",

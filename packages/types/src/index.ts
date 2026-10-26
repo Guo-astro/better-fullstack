@@ -25,4 +25,8 @@ export * from "@/stack/presets";
 export * from "@/telemetry/telemetry";
 
 export * from "@/stack/ruby-compatibility";
-export { getPhpRecipeIssue, PHP_RECIPE_REASONS } from "./stack/php-compatibility";
+export {
+  getPhpCapabilityIssue,
+  getPhpRecipeIssue,
+  PHP_RECIPE_REASONS,
+} from "./stack/php-compatibility";

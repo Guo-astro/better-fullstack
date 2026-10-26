@@ -169,7 +169,53 @@ describe("PHP graph and transport contract", () => {
       selection,
     );
     const command = generateStackSelectionCommand(selection);
-    expect(command).toContain("--ecosystem php --php-web-framework slim --database none");
+    expect(command).toContain(
+      "--ecosystem php --php-web-framework slim --php-orm none --database none",
+    );
     expect(command).toContain("--no-install");
+    const withOrm = { ...selection, phpWebFramework: "symfony", phpOrm: "doctrine" };
+    const ormParams = createStackSelectionSearchParams(withOrm, { includeDefaults: true });
+    expect(ormParams.get("phorm")).toBe("doctrine");
+    expect(parseStackSelectionFromUrlRecord(Object.fromEntries(ormParams.entries()))).toEqual(
+      withOrm,
+    );
+    expect(generateStackSelectionCommand(withOrm)).toContain("--php-orm doctrine");
+  });
+
+  it("projects a PHP ORM as an owned part and rejects framework mismatches", () => {
+    const config = cliInputToProjectConfigPartial({
+      ecosystem: "php",
+      phpWebFramework: "laravel",
+      phpOrm: "eloquent",
+    });
+    const parts = legacyProjectConfigToStackParts({ ...native, ...config });
+    const backend = parts.find((part) => part.role === "backend");
+    expect(parts).toContainEqual(
+      expect.objectContaining({
+        role: "orm",
+        ecosystem: "php",
+        toolId: "eloquent",
+        ownerPartId: backend?.id,
+      }),
+    );
+    expect(validateStackParts(parts).issues).toEqual([]);
+    expect(stackPartsToLegacyProjectConfigPartial(parts)).toMatchObject({ phpOrm: "eloquent" });
+    for (const [framework, orm] of [
+      ["laravel", "doctrine"],
+      ["laravel", "cycle"],
+      ["symfony", "eloquent"],
+      ["symfony", "cycle"],
+    ] as const) {
+      const issue = getPhpRecipeIssue({ ...native, phpWebFramework: framework, phpOrm: orm });
+      expect(issue).toContain("is generated for");
+      const mismatched = parseStackPartSpecs([
+        `backend:php:${framework}`,
+        `backend.orm:php:${orm}`,
+      ]);
+      expect(validateStackParts(mismatched).issues.map((entry) => entry.message)).toContain(issue);
+    }
+    for (const orm of ["eloquent", "doctrine", "cycle"] as const) {
+      expect(getPhpRecipeIssue({ ...native, phpOrm: orm })).toBeUndefined();
+    }
   });
 });

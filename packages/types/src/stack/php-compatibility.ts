@@ -35,6 +35,42 @@ export const PHP_UNSUPPORTED_BACKEND_FIELDS = [
   "ecommerce",
 ] as const;
 
+const PHP_FRAMEWORK_LABELS: Record<string, string> = {
+  slim: "Slim",
+  laravel: "Laravel",
+  symfony: "Symfony",
+};
+
+const PHP_CAPABILITY_FRAMEWORKS: Record<string, Record<string, readonly string[]>> = {
+  orm: {
+    eloquent: ["slim", "laravel"],
+    doctrine: ["slim", "symfony"],
+    cycle: ["slim"],
+  },
+};
+
+const PHP_CAPABILITY_LABELS: Record<string, string> = {
+  eloquent: "Eloquent",
+  doctrine: "Doctrine ORM",
+  cycle: "Cycle ORM",
+};
+
+export function isPhpCapabilityRole(role: string): boolean {
+  return role in PHP_CAPABILITY_FRAMEWORKS;
+}
+
+export function getPhpCapabilityIssue(
+  framework: string | undefined,
+  role: string,
+  toolId: string | undefined,
+): string | undefined {
+  if (!toolId || !framework) return undefined;
+  const frameworks = PHP_CAPABILITY_FRAMEWORKS[role]?.[toolId];
+  if (!frameworks || frameworks.includes(framework)) return undefined;
+  const supported = frameworks.map((id) => PHP_FRAMEWORK_LABELS[id] ?? id).join(" or ");
+  return `${PHP_CAPABILITY_LABELS[toolId] ?? toolId} is generated for ${supported}, not ${PHP_FRAMEWORK_LABELS[framework] ?? framework}.`;
+}
+
 export function getPhpRecipeIssue(config: Partial<ProjectConfig>): string | undefined {
   if (
     config.ecosystem !== "php" ||
@@ -48,6 +84,8 @@ export function getPhpRecipeIssue(config: Partial<ProjectConfig>): string | unde
   if (config.stackParts?.some((part) => part.source !== "provided"))
     return PHP_RECIPE_REASONS.capability;
   if (config.database && config.database !== "none") return PHP_RECIPE_REASONS.database;
+  const ormIssue = getPhpCapabilityIssue(config.phpWebFramework, "orm", config.phpOrm);
+  if (ormIssue) return ormIssue;
   for (const key of PHP_UNSUPPORTED_BACKEND_FIELDS) {
     if (config[key] && config[key] !== "none") return PHP_RECIPE_REASONS.capability;
   }

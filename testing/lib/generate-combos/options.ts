@@ -98,6 +98,7 @@ import {
   PYTHON_ORM_VALUES,
   PYTHON_GRAPHQL_VALUES,
   PYTHON_QUALITY_VALUES,
+  PHP_ORM_VALUES,
   PHP_WEB_FRAMEWORK_VALUES,
   PYTHON_TESTING_VALUES,
   PYTHON_CACHING_VALUES,
@@ -149,6 +150,7 @@ import {
   WEB_DEPLOY_VALUES,
   WEB_MCP_VALUES,
   getCategoryOptionIds,
+  getPhpCapabilityIssue,
   type CLIInput,
   type Ecosystem,
   type ProjectConfig,
@@ -632,9 +634,14 @@ function makePhpDraft(args: GeneratorArgs): CandidateDraft {
     0,
     "phpWebFramework",
   );
+  const phpOrm = sampleScalar(
+    PHP_ORM_VALUES.filter((value) => !getPhpCapabilityIssue(phpWebFramework, "orm", value)),
+    0.4,
+    "phpOrm",
+  );
   return {
     ecosystem: "php",
-    options: { ...createCommonOptions("php", args), phpWebFramework, database: "none" },
+    options: { ...createCommonOptions("php", args), phpWebFramework, phpOrm, database: "none" },
   };
 }
 
@@ -876,6 +883,7 @@ function createValidationBase(projectName: string, draft: CandidateDraft): Proje
     dotnetLibraries: [],
     rubyWebFramework: "none",
     phpWebFramework: "none",
+    phpOrm: "none",
     elixirWebFramework: "none",
     elixirOrm: "none",
     elixirAuth: "none",

@@ -16,7 +16,11 @@ use Throwable;
 
 final class Application
 {
+{{#if (ne phpOrm "none")}}
+    public static function create(string $corsOrigin = '', ?Notes $notes = null): App
+{{else}}
     public static function create(string $corsOrigin = ''): App
+{{/if}}
     {
         $app = AppFactory::create();
         $app->get('/health', function (ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
@@ -51,6 +55,27 @@ final class Application
             }
             return self::json($response, ['message' => $greeting->message(), 'repetitions' => $greeting->repetitions]);
         });
+{{#if (ne phpOrm "none")}}
+        if ($notes !== null) {
+            $app->get('/api/notes', function (ServerRequestInterface $request, ResponseInterface $response) use ($notes): ResponseInterface {
+                return self::json($response, ['notes' => $notes->all()]);
+            });
+            $app->post('/api/notes', function (ServerRequestInterface $request, ResponseInterface $response) use ($notes): ResponseInterface {
+                $body = (string) $request->getBody();
+                if (strlen($body) > 4096) {
+                    return self::json($response, ['error' => 'payload_too_large'], 413);
+                }
+                try {
+                    $title = NoteInput::titleFromJson($body);
+                } catch (JsonException) {
+                    return self::json($response, ['error' => 'invalid_json'], 400);
+                } catch (InvalidArgumentException $error) {
+                    return self::json($response, ['error' => 'validation_failed', 'message' => $error->getMessage()], 422);
+                }
+                return self::json($response, $notes->add($title), 201);
+            });
+        }
+{{/if}}
         $app->addRoutingMiddleware();
         $errors = $app->addErrorMiddleware(false, true, true);
         $errors->setDefaultErrorHandler(function (ServerRequestInterface $request, Throwable $error) use ($app): ResponseInterface {

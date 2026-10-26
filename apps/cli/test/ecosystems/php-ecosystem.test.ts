@@ -108,6 +108,94 @@ describe("PHP generation and lifecycle", () => {
     },
   );
 
+  it.each([
+    [
+      "slim",
+      "eloquent",
+      "illuminate/database",
+      ["src/Notes.php", "src/Entity/Note.php", "bin/db-setup.php"],
+    ],
+    [
+      "slim",
+      "doctrine",
+      "doctrine/orm",
+      ["src/Notes.php", "src/Entity/Note.php", "bin/db-setup.php"],
+    ],
+    ["slim", "cycle", "cycle/orm", ["src/Notes.php", "src/Entity/Note.php", "bin/db-setup.php"]],
+    [
+      "laravel",
+      "eloquent",
+      "laravel/framework",
+      ["app/Models/Note.php", "database/migrations/2026_10_27_000000_create_notes_table.php"],
+    ],
+    [
+      "symfony",
+      "doctrine",
+      "doctrine/doctrine-bundle",
+      ["src/Entity/Note.php", "src/Controller/NotesController.php", "bin/db-setup.php"],
+    ],
+  ] as const)(
+    "generates %s with the %s ORM and replays it",
+    async (framework, orm, dependency, files) => {
+      const result = await createVirtual({
+        projectName: `php-${framework}-${orm}`,
+        ecosystem: "php",
+        phpWebFramework: framework,
+        phpOrm: orm,
+      });
+      expect(result.success).toBe(true);
+      const tree = result.tree!;
+      const manifest = JSON.parse(getVirtualTreeFileContent(tree, "composer.json"));
+      expect(Object.keys(manifest.require)).toContain(dependency);
+      expect(manifest.scripts["db:setup"]).toBeString();
+      for (const file of files) expect(hasVirtualFile(tree.root, file)).toBe(true);
+      expect(getVirtualTreeFileContent(tree, "bin/proof-http.php")).toContain("/api/notes");
+      expect(generateReproducibleCommand(tree.config)).toContain(`--php-orm ${orm}`);
+      const saved = buildBtsConfigForPersistence(tree.config, {
+        version: "0.0.0",
+        createdAt: "2026-10-27T00:00:00.000Z",
+      });
+      expect(previewBtsConfigUpdate(saved, {}).phpOrm).toBe(orm);
+    },
+  );
+
+  it("keeps the ORM out of a PHP project that does not select one", async () => {
+    const result = await createVirtual({ ecosystem: "php", phpWebFramework: "slim" });
+    expect(result.success).toBe(true);
+    const tree = result.tree!;
+    expect(hasVirtualFile(tree.root, "src/Notes.php")).toBe(false);
+    expect(JSON.parse(getVirtualTreeFileContent(tree, "composer.json")).scripts).not.toHaveProperty(
+      "db:setup",
+    );
+  });
+
+  it.each([
+    ["laravel", "doctrine"],
+    ["symfony", "eloquent"],
+    ["symfony", "cycle"],
+  ] as const)("rejects %s with the %s ORM before emitting files", async (framework, orm) => {
+    const result = await createVirtual({
+      ecosystem: "php",
+      phpWebFramework: framework,
+      phpOrm: orm,
+    });
+    expect(result.success).toBe(false);
+    expect(result.error).toContain("is generated for");
+    expect(result.tree).toBeUndefined();
+  });
+
+  it("projects an owned ORM onto a composed PHP service", async () => {
+    const graph = cliInputToProjectConfigPartial({
+      part: ["frontend:typescript:react-vite", "backend:php:symfony", "backend.orm:php:doctrine"],
+    });
+    const result = await createVirtual({ ...graph, projectName: "php-orm-composed", addons: [] });
+    expect(result.success).toBe(true);
+    const tree = result.tree!;
+    expect(hasVirtualFile(tree.root, "apps/server/src/Controller/NotesController.php")).toBe(true);
+    const task = getGraphProjectTasks(tree.config).find((entry) => entry.path === "apps/server");
+    expect(task?.setup).toContain("composer run db:setup");
+  });
+
   it("creates separately owned PHP services beside React", async () => {
     const graph = cliInputToProjectConfigPartial({
       part: [

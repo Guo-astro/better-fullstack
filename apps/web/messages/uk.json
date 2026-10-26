@@ -591,6 +591,7 @@
   "docsCliSummaryDotnetDotnetLibraries": "Необов’язкові бібліотеки .NET.",
   "docsCliSummaryRubyRubyWebFramework": "HTTP-фреймворк Ruby.",
   "docsCliSummaryPhpPhpWebFramework": "HTTP-фреймворк PHP.",
+  "docsCliSummaryPhpPhpOrm": "ORM / шар бази даних PHP.",
   "docsCliSummaryElixirElixirWebFramework": "Вебфреймворк Elixir.",
   "docsCliSummaryElixirElixirOrm": "ORM / база даних Elixir.",
   "docsCliSummaryElixirElixirAuth": "Автентифікація в Elixir.",

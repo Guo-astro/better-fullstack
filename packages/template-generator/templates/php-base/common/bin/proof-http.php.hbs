@@ -34,7 +34,23 @@ fclose($socket);
 requireProof(is_string($address), 'Cannot read local address.');
 $log = tempnam(sys_get_temp_dir(), 'bfs-php-http-');
 requireProof(is_string($log), 'Cannot create server log.');
-$process = proc_open([PHP_BINARY, '-S', $address, '-t', 'public', 'public/index.php'], [0 => ['pipe', 'r'], 1 => ['file', $log, 'a'], 2 => ['file', $log, 'a']], $pipes, $root, array_merge(getenv(), ['CORS_ORIGIN' => 'http://localhost:5173,http://localhost:8080']));
+{{#if (ne phpOrm "none")}}
+$database = tempnam(sys_get_temp_dir(), 'bfs-php-db-');
+requireProof(is_string($database), 'Cannot create proof database.');
+{{#if (eq phpWebFramework "laravel")}}
+$serverEnv = array_merge(getenv(), ['CORS_ORIGIN' => 'http://localhost:5173,http://localhost:8080', 'DB_CONNECTION' => 'sqlite', 'DB_DATABASE' => $database]);
+$setup = proc_open([PHP_BINARY, 'artisan', 'migrate', '--force', '--no-interaction'], [0 => ['pipe', 'r'], 1 => ['file', $log, 'a'], 2 => ['file', $log, 'a']], $setupPipes, $root, $serverEnv);
+{{else}}
+$serverEnv = array_merge(getenv(), ['CORS_ORIGIN' => 'http://localhost:5173,http://localhost:8080', 'DATABASE_PATH' => $database]);
+$setup = proc_open([PHP_BINARY, 'bin/db-setup.php'], [0 => ['pipe', 'r'], 1 => ['file', $log, 'a'], 2 => ['file', $log, 'a']], $setupPipes, $root, $serverEnv);
+{{/if}}
+requireProof(is_resource($setup), 'Cannot start database setup.');
+fclose($setupPipes[0]);
+requireProof(proc_close($setup) === 0, 'Database setup failed: ' . file_get_contents($log));
+{{else}}
+$serverEnv = array_merge(getenv(), ['CORS_ORIGIN' => 'http://localhost:5173,http://localhost:8080']);
+{{/if}}
+$process = proc_open([PHP_BINARY, '-S', $address, '-t', 'public', 'public/index.php'], [0 => ['pipe', 'r'], 1 => ['file', $log, 'a'], 2 => ['file', $log, 'a']], $pipes, $root, $serverEnv);
 requireProof(is_resource($process), 'Cannot launch server.');
 fclose($pipes[0]);
 $failure = null;
@@ -69,6 +85,14 @@ try {
     requireProof($status === 413 && $body['error'] === 'payload_too_large', 'Oversized request accepted.');
     [$status, $body] = requestProof('http://' . $address . '/missing');
     requireProof($status === 404 && $body['error'] === 'not_found', 'Missing route mismatch.');
+{{#if (ne phpOrm "none")}}
+    [$status, $body] = requestProof('http://' . $address . '/api/notes', 'POST', '{"title":"Proof note"}');
+    requireProof($status === 201 && $body['title'] === 'Proof note' && is_int($body['id']), 'Note was not created.');
+    [$status, $body] = requestProof('http://' . $address . '/api/notes');
+    requireProof($status === 200 && $body === ['notes' => [['id' => $body['notes'][0]['id'] ?? null, 'title' => 'Proof note']]], 'Stored note mismatch.');
+    [$status, $body] = requestProof('http://' . $address . '/api/notes', 'POST', '{"title":""}');
+    requireProof($status === 422, 'Invalid note accepted.');
+{{/if}}
 } catch (Throwable $error) {
     $failure = $error->getMessage();
 } finally {
@@ -84,6 +108,9 @@ try {
     }
     if ($failure !== null) fwrite(STDERR, $failure . "\n" . file_get_contents($log));
     unlink($log);
+{{#if (ne phpOrm "none")}}
+    unlink($database);
+{{/if}}
 }
 if ($failure !== null) exit(1);
-echo json_encode(['php' => PHP_VERSION, 'assertions' => ['health', 'parsed-greeting', 'validation-rejection', 'malformed-json', 'oversized-body', 'missing-route', 'cors', 'cors-allowlist', 'shutdown'], 'success' => true], JSON_THROW_ON_ERROR) . "\n";
+echo json_encode(['php' => PHP_VERSION, 'assertions' => ['health', 'parsed-greeting', 'validation-rejection', 'malformed-json', 'oversized-body', 'missing-route', {{#if (ne phpOrm "none")}}'orm-persistence', {{/if}}'cors', 'cors-allowlist', 'shutdown'], 'success' => true], JSON_THROW_ON_ERROR) . "\n";
