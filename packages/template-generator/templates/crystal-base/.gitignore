@@ -2,3 +2,4 @@
 /lib/
 /.shards/
 /.env
+*.sqlite3

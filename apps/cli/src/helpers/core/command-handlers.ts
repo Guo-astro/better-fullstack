@@ -702,6 +702,7 @@ export async function createProjectHandler(
               goProtoTooling: "none",
               goDI: "none",
               crystalWebFramework: "none",
+              crystalOrm: "none",
               javaWebFramework: "none",
               javaBuildTool: "none",
               javaOrm: "none",

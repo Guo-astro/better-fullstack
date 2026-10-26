@@ -4,6 +4,7 @@ import { isToolingOverlayOnly } from "@/capabilities/tooling-capabilities";
 
 export const CRYSTAL_PROJECT_DEFAULTS = {
   crystalWebFramework: "kemal",
+  crystalOrm: "none",
   frontend: ["none"],
   backend: "none",
   runtime: "none",
@@ -72,13 +73,77 @@ export const CRYSTAL_UNSUPPORTED_FIELDS = [
   "examples",
 ] as const satisfies readonly (keyof ProjectConfig)[];
 
+const CRYSTAL_FRAMEWORK_LABELS: Record<string, string> = {
+  kemal: "Kemal",
+  lucky: "Lucky",
+  athena: "Athena",
+  marten: "Marten",
+};
+
+const CRYSTAL_HTTP_FRAMEWORKS = ["kemal", "lucky", "athena", "marten"];
+
+export const CRYSTAL_OPTION_RULES = {
+  crystalOrm: {
+    role: "orm",
+    options: {
+      "crystal-db": { label: "crystal-db", frameworks: CRYSTAL_HTTP_FRAMEWORKS },
+      avram: { label: "Avram", frameworks: ["lucky"] },
+      "marten-orm": { label: "Marten ORM", frameworks: ["marten"] },
+    },
+  },
+} as const satisfies Record<
+  string,
+  {
+    role: StackPart["role"];
+    options: Record<string, { label: string; frameworks: readonly string[] }>;
+  }
+>;
+
+export type CrystalOptionCategory = keyof typeof CRYSTAL_OPTION_RULES;
+
+export const CRYSTAL_OPTION_CATEGORIES = Object.keys(CRYSTAL_OPTION_RULES) as CrystalOptionCategory[];
+
+export function isCrystalOptionCategory(category: string): category is CrystalOptionCategory {
+  return category in CRYSTAL_OPTION_RULES;
+}
+
+export function getCrystalOptionIssue(
+  category: CrystalOptionCategory,
+  optionId: string | undefined,
+  framework: string | undefined,
+): string | null {
+  const options: Record<string, { label: string; frameworks: readonly string[] }> =
+    CRYSTAL_OPTION_RULES[category].options;
+  const rule = optionId ? options[optionId] : undefined;
+  if (!rule || rule.frameworks.includes(framework ?? "none")) return null;
+  const frameworks = rule.frameworks.map((id) => CRYSTAL_FRAMEWORK_LABELS[id] ?? id).join(" or ");
+  return `${rule.label} requires Crystal ${frameworks}.`;
+}
+
+function getCrystalOwnedPartIssue(part: StackPart, owner: StackPart): string | null {
+  const category = CRYSTAL_OPTION_CATEGORIES.find(
+    (candidate) => CRYSTAL_OPTION_RULES[candidate].role === part.role,
+  );
+  if (!category || part.ecosystem !== "crystal") {
+    const name = `${owner.toolId.charAt(0).toUpperCase()}${owner.toolId.slice(1)}`;
+    return `Crystal ${name} does not support the owned '${part.toolId}' selection.`;
+  }
+  return getCrystalOptionIssue(category, part.toolId, owner.toolId);
+}
+
 export function getCrystalCompilerFlags(framework: string | undefined): string[] {
   return framework === "athena" ? ["-Dwithout_libmagic"] : [];
 }
 
-export function getCrystalCommands(framework: string | undefined) {
+const CRYSTAL_MIGRATION_COMMANDS: Record<string, string> = {
+  avram: "crystal run scripts/db_migrate.cr",
+  "marten-orm": "crystal run manage.cr -- migrate",
+};
+
+export function getCrystalCommands(framework: string | undefined, orm?: string) {
   const flags = getCrystalCompilerFlags(framework).map((flag) => ` ${flag}`).join("");
   return {
+    migrate: orm ? CRYSTAL_MIGRATION_COMMANDS[orm] : undefined,
     build: `shards build --release${flags}`,
     test: `crystal spec${flags}`,
     run: `crystal run src/server.cr${flags}`,
@@ -133,18 +198,19 @@ export function getCrystalSelectionIssue(config: Partial<ProjectConfig>): string
     );
     if (collision)
       return `Crystal service target path is shared by another application: ${collision.targetPath}.`;
-    const backendIds = new Set(backends.map((part) => part.id));
-    const partsById = new Map(backends.map((part) => [part.id, part]));
-    const unsupported = parts.find(
+    const backendsById = new Map(backends.map((part) => [part.id, part]));
+    const ownedParts = parts.filter(
       (part) =>
         part.source !== "provided" &&
         part.toolId !== "none" &&
-        backendIds.has(part.ownerPartId ?? ""),
+        backendsById.has(part.ownerPartId ?? ""),
     );
-    if (unsupported) {
-      const owner = partsById.get(unsupported.ownerPartId ?? "")?.toolId ?? "service";
-      return `Crystal ${owner.charAt(0).toUpperCase()}${owner.slice(1)} does not support the owned '${unsupported.toolId}' selection.`;
+    for (const part of ownedParts) {
+      const owner = backendsById.get(part.ownerPartId ?? "");
+      const issue = owner ? getCrystalOwnedPartIssue(part, owner) : null;
+      if (issue) return issue;
     }
+    const crystalPartIds = new Set([...backendsById.keys(), ...ownedParts.map((part) => part.id)]);
     const databaseIssue = getCrystalDatabaseSelectionIssue(parts);
     if (databaseIssue) return databaseIssue;
     const hasOtherApplication = parts.some(
@@ -157,7 +223,8 @@ export function getCrystalSelectionIssue(config: Partial<ProjectConfig>): string
     );
     if (!hasOtherApplication) {
       const overlay = parts.find(
-        (part) => part.source !== "provided" && part.toolId !== "none" && !backendIds.has(part.id),
+        (part) =>
+          part.source !== "provided" && part.toolId !== "none" && !crystalPartIds.has(part.id),
       );
       if (overlay)
         return `Crystal-only projects do not support '${overlay.toolId}' overlays or databases.`;
@@ -172,6 +239,10 @@ export function getCrystalSelectionIssue(config: Partial<ProjectConfig>): string
     return `Crystal does not support '${field}'. Select none or use an explicit mixed graph with a separate owner.`;
   if ((config.frontend ?? []).some(selected))
     return "Use an explicit mixed graph to combine a frontend with Crystal.";
+  for (const category of CRYSTAL_OPTION_CATEGORIES) {
+    const issue = getCrystalOptionIssue(category, config[category], config.crystalWebFramework);
+    if (issue) return issue;
+  }
   if ((config.addons ?? []).some(selected) || parts.some((part) => part.source !== "provided"))
     return "Crystal-only projects do not support tooling overlays or addons.";
   return null;

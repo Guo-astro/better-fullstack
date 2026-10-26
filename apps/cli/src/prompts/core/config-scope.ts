@@ -280,7 +280,7 @@ export const CONFIG_SCOPE_REGISTRY = {
       },
     ],
   },
-  crystal: { core: ["crystalWebFramework"], sections: [] },
+  crystal: { core: ["crystalWebFramework", "crystalOrm"], sections: [] },
   java: {
     core: [
       "javaWebFramework",

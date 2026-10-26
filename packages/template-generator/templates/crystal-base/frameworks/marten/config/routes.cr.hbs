@@ -2,4 +2,7 @@ Marten.routes.draw do
   path "/health", HealthHandler, name: "health"
   path "/api/hello", HelloHandler, name: "hello"
   path "/api/echo", EchoHandler, name: "echo"
+{{#if (ne crystalOrm "none")}}
+  path "/api/greetings", GreetingsHandler, name: "greetings"
+{{/if}}
 end

@@ -6,7 +6,10 @@ import type {
 } from "@testing/lib/generate-combos/types";
 
 import {
+  CRYSTAL_ORM_VALUES,
   CRYSTAL_WEB_FRAMEWORK_VALUES,
+  type CrystalOptionCategory,
+  getCrystalOptionIssue,
   ADDONS_VALUES,
   AI_VALUES,
   ANALYTICS_VALUES,
@@ -885,6 +888,7 @@ function createValidationBase(projectName: string, draft: CandidateDraft): Proje
     goProtoTooling: "none",
     goDI: "none",
     crystalWebFramework: "none",
+    crystalOrm: "none",
     javaWebFramework: "none",
     javaBuildTool: "none",
     javaOrm: "none",
@@ -1026,14 +1030,23 @@ function createDraft(ecosystem: Ecosystem, args: GeneratorArgs): CandidateDraft 
       return makePythonDraft(args);
     case "go":
       return makeGoDraft(args);
-    case "crystal":
+    case "crystal": {
+      const crystalWebFramework = sampleScalar(
+        CRYSTAL_WEB_FRAMEWORK_VALUES,
+        0,
+        "crystalWebFramework",
+      );
+      const crystalOptions = <T extends string>(category: CrystalOptionCategory, values: readonly T[]) =>
+        values.filter((value) => !getCrystalOptionIssue(category, value, crystalWebFramework));
       return {
         ecosystem: "crystal",
         options: {
           ...createCommonOptions("crystal", args),
-          crystalWebFramework: sampleScalar(CRYSTAL_WEB_FRAMEWORK_VALUES, 0, "crystalWebFramework"),
+          crystalWebFramework,
+          crystalOrm: sampleScalar(crystalOptions("crystalOrm", CRYSTAL_ORM_VALUES), 0.5, "crystalOrm"),
         },
       };
+    }
     case "java":
       return makeJavaDraft(args);
     case "ruby":

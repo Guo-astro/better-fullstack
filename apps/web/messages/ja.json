@@ -775,5 +775,6 @@
   "builderComposerReviewTitle": "{name} を確認",
   "builderComposerJsWorkspace": "JavaScript ワークスペース",
   "builderComposerNativeToolchains": "ネイティブツールチェーン",
-  "docsCliSummaryCrystalCrystalWebFramework": "実験的な Crystal HTTP フレームワーク。"
+  "docsCliSummaryCrystalCrystalWebFramework": "実験的な Crystal HTTP フレームワーク。",
+  "docsCliSummaryCrystalCrystalOrm": "実験的な Crystal データベース層。"
 }

@@ -37,6 +37,11 @@ import {
 } from "@/catalog/option-metadata";
 import { ANALYTICS_VALUES } from "@/config/schemas";
 import {
+  CRYSTAL_OPTION_CATEGORIES,
+  getCrystalOptionIssue,
+  isCrystalOptionCategory,
+} from "@/platform/crystal-project";
+import {
   getPhpCapabilityIssue,
   PHP_RECIPE_REASONS,
   PHP_UNSUPPORTED_BACKEND_FIELDS,
@@ -551,6 +556,7 @@ export type CompatibilityInput = {
   goDI: string;
   javaLanguage: string;
   crystalWebFramework: string;
+  crystalOrm: string;
   javaWebFramework: string;
   javaBuildTool: string;
   javaOrm: string;
@@ -822,11 +828,23 @@ const SQL_ORM_REPLACEMENT = { orm: "drizzle", label: "Drizzle" };
 const getReplacementOrm = (database: string) =>
   DATABASE_ORM_REPLACEMENTS[database] ?? SQL_ORM_REPLACEMENT;
 
+function analyzeCrystalStackCompatibility(stack: CompatibilityInput): CompatibilityAnalysisResult {
+  const nextStack = { ...stack };
+  const changes: CompatibilityAnalysisResult["changes"] = [];
+  for (const category of CRYSTAL_OPTION_CATEGORIES) {
+    const issue = getCrystalOptionIssue(category, nextStack[category], nextStack.crystalWebFramework);
+    if (!issue) continue;
+    nextStack[category] = "none";
+    changes.push({ category, message: `${getCategoryDisplayName(category)} set to 'None' (${issue})` });
+  }
+  return { adjustedStack: changes.length > 0 ? nextStack : null, notes: {}, changes };
+}
+
 export const analyzeStackCompatibility = (
   stack: CompatibilityInput,
   options: { normalizeCodeQualityProfiles?: boolean } = {},
 ): CompatibilityAnalysisResult => {
-  if (stack.ecosystem === "crystal") return { adjustedStack: null, notes: {}, changes: [] };
+  if (stack.ecosystem === "crystal") return analyzeCrystalStackCompatibility(stack);
   // Skip all validation if YOLO mode is enabled
   if (stack.yolo === "true") {
     return {
@@ -2971,6 +2989,7 @@ export const getDisabledReason = (
     optionId !== "none" &&
     ![
       "crystalWebFramework",
+      "crystalOrm",
       "aiDocs",
       "git",
       "install",
@@ -2981,6 +3000,8 @@ export const getDisabledReason = (
   ) {
     return "Crystal's bounded recipe supports its HTTP framework only. Use a mixed graph for independently owned tools.";
   }
+  if (currentStack.ecosystem === "crystal" && isCrystalOptionCategory(category))
+    return getCrystalOptionIssue(category, optionId, currentStack.crystalWebFramework);
   if (
     category === "crystalWebFramework" &&
     optionId !== "none" &&

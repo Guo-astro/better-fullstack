@@ -104,6 +104,7 @@ import {
   JAVA_ORM_VALUES,
   JAVA_TESTING_LIBRARIES_VALUES,
   CRYSTAL_WEB_FRAMEWORK_VALUES,
+  CRYSTAL_ORM_VALUES,
   JAVA_WEB_FRAMEWORK_VALUES,
   JOB_QUEUE_VALUES,
   LOGGING_VALUES,
@@ -480,6 +481,7 @@ export const CATEGORY_ORDER = [
     ...PYTHON_CATEGORY_ORDER,
     ...GO_CATEGORY_ORDER,
     "crystalWebFramework",
+    "crystalOrm",
     ...JAVA_CATEGORY_ORDER,
     ...DOTNET_CATEGORY_ORDER,
     ...RUBY_CATEGORY_ORDER,
@@ -501,7 +503,7 @@ export function getCategoryOrderForEcosystem(
     case "go":
       return GO_CATEGORY_ORDER;
     case "crystal":
-      return ["crystalWebFramework", "aiDocs", "git", "install"];
+      return ["crystalWebFramework", "crystalOrm", "aiDocs", "git", "install"];
     case "java":
       return JAVA_CATEGORY_ORDER;
     case "dotnet":
@@ -868,6 +870,10 @@ const CATEGORY_DEFINITIONS = {
   crystalWebFramework: {
     values: CRYSTAL_WEB_FRAMEWORK_VALUES,
     displayName: "Crystal HTTP framework",
+  },
+  crystalOrm: {
+    values: CRYSTAL_ORM_VALUES,
+    displayName: "Crystal ORM / Database",
   },
   javaWebFramework: { values: JAVA_WEB_FRAMEWORK_VALUES, displayName: "Java Web Framework" },
   javaBuildTool: { values: JAVA_BUILD_TOOL_VALUES, displayName: "Java Build Tool" },
@@ -1674,6 +1680,7 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
     kotlin: "Kotlin",
   },
   crystalWebFramework: { kemal: "Kemal", lucky: "Lucky", athena: "Athena", marten: "Marten", none: "None" },
+  crystalOrm: { "crystal-db": "crystal-db (SQLite)", avram: "Avram (PostgreSQL)", "marten-orm": "Marten ORM (SQLite)", none: "None" },
   javaWebFramework: {
     "spring-boot": "Spring Boot",
     ktor: "Ktor",

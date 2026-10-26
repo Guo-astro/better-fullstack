@@ -27,6 +27,7 @@ import {
   stackSelectionToProjectConfig,
   generateStackSelectionCommand,
 } from "@/stack/stack-translation";
+import { analyzeStackCompatibility, getDisabledReason } from "@/stack/compatibility";
 
 const config = () => ({
   ...createCliDefaultProjectConfigBase(),
@@ -222,6 +223,33 @@ describe("bounded Crystal HTTP recipe", () => {
     expect(getCrystalSelectionIssue(project)).toBeNull();
     expect(generateStackSelectionCommand(parsed)).toContain("--crystal-web-framework kemal");
     expect(generateStackSelectionCommand(parsed)).not.toContain("--yes");
+  });
+
+  it("resets a framework-coupled database layer and round-trips a compatible one", () => {
+    const avram = createCrystalStackSelection({ crystalWebFramework: "lucky", crystalOrm: "avram" });
+    expect(getDisabledReason(avram, "crystalOrm", "marten-orm")).toBe(
+      "Marten ORM requires Crystal Marten.",
+    );
+    expect(getDisabledReason(avram, "crystalOrm", "crystal-db")).toBeNull();
+    const switched = analyzeStackCompatibility({ ...avram, crystalWebFramework: "kemal" });
+    expect(switched.adjustedStack?.crystalOrm).toBe("none");
+    expect(analyzeStackCompatibility(avram).adjustedStack).toBeNull();
+    const encoded = Object.fromEntries(createStackSelectionSearchParams(avram));
+    expect(parseStackSelectionFromSearch(encoded).crystalOrm).toBe("avram");
+    expect(generateStackSelectionCommand(avram)).toContain("--crystal-orm avram");
+    const parts = legacyProjectConfigToStackParts({
+      ...config(),
+      crystalWebFramework: "lucky",
+      crystalOrm: "avram",
+    });
+    const backend = parts.find((part) => part.role === "backend");
+    expect(parts.find((part) => part.role === "orm")).toMatchObject({
+      ecosystem: "crystal",
+      toolId: "avram",
+      ownerPartId: backend?.id,
+    });
+    expect(stackPartsToLegacyProjectConfigPartial(parts).crystalOrm).toBe("avram");
+    expect(validateStackParts(parts).issues).toEqual([]);
   });
 
   it("keeps Crystal experimental without changing the versioned golden recipes", () => {

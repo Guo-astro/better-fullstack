@@ -190,6 +190,56 @@ describe("Crystal create contract", () => {
     },
   );
 
+  it.each([
+    ["kemal", "crystal-db", "src/greeting_store.cr", "github: crystal-lang/crystal-sqlite3"],
+    ["lucky", "avram", "scripts/db_migrate.cr", "github: luckyframework/avram"],
+    ["marten", "marten-orm", "manage.cr", "github: crystal-lang/crystal-sqlite3"],
+  ] as const)(
+    "renders %s with the %s greeting store and replays it",
+    async (framework, orm, ownedFile, dependency) => {
+      const result = await createVirtual({
+        ecosystem: "crystal",
+        crystalWebFramework: framework,
+        crystalOrm: orm,
+      });
+      expect(result.success).toBe(true);
+      if (!result.tree) throw new Error(result.error);
+      const root = result.tree.root;
+      expect(content(root, "shard.yml")).toContain(dependency);
+      expect(hasFile(root, ownedFile)).toBe(true);
+      expect(hasFile(root, "spec/greeting_store_spec.cr")).toBe(true);
+      expect(content(root, "scripts/http_proof.cr")).toContain('client.post("/api/greetings"');
+      const config = buildProjectConfig({
+        ecosystem: "crystal",
+        crystalWebFramework: framework,
+        crystalOrm: orm,
+      });
+      expect(generateReproducibleCommand(config)).toContain(`--crystal-orm ${orm}`);
+    },
+  );
+
+  it("rejects database layers that the selected framework cannot run", async () => {
+    for (const [framework, orm, message] of [
+      ["kemal", "avram", "Avram requires Crystal Lucky."],
+      ["lucky", "marten-orm", "Marten ORM requires Crystal Marten."],
+      ["none", "crystal-db", "crystal-db requires Crystal"],
+    ] as const) {
+      const result = await createVirtual({
+        ecosystem: "crystal",
+        crystalWebFramework: framework,
+        crystalOrm: orm,
+      });
+      expect(result.success).toBe(false);
+      expect(result.error).toContain(message);
+    }
+    await expect(
+      planProjectOperation.invoke({
+        projectName: "crystal-orm",
+        part: ["backend:crystal:athena", "backend.orm:crystal:avram"],
+      }),
+    ).rejects.toThrow("Avram requires Crystal Lucky.");
+  });
+
   it("rejects unsupported selections before rendering", async () => {
     const result = await createVirtual({ ecosystem: "crystal", database: "postgres" });
     expect(result.success).toBe(false);

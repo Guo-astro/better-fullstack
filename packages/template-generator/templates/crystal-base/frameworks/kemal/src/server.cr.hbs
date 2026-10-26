@@ -1,4 +1,7 @@
 require "./greeting"
+{{#if (ne crystalOrm "none")}}
+require "./greeting_store"
+{{/if}}
 require "kemal"
 
 port_value = ENV.fetch("PORT", "3000")
@@ -55,4 +58,18 @@ post "/api/echo" do |env|
   end
 end
 
+{{#if (ne crystalOrm "none")}}
+get "/api/greetings" do |env|
+  result = GreetingStore.list
+  env.response.status_code = result.status
+  result.body
+end
+
+post "/api/greetings" do |env|
+  result = GreetingStore.create(env.params.raw_body)
+  env.response.status_code = result.status
+  result.body
+end
+
+{{/if}}
 Kemal.run(args: nil)

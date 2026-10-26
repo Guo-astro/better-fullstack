@@ -6882,6 +6882,12 @@ export const TECH_OPTIONS: Record<
     { id: "marten", name: "Marten", description: "Batteries-included Crystal framework with handlers", icon: "https://cdn.simpleicons.org/crystal", color: "from-slate-500 to-zinc-600", default: false },
     { id: "none", name: "None", description: "Crystal source project", icon: "", color: "from-gray-400 to-gray-600", default: false },
   ],
+  crystalOrm: [
+    { id: "crystal-db", name: "crystal-db (SQLite)", description: "Parameterized SQL over SQLite with crystal-db", icon: "https://cdn.simpleicons.org/sqlite", color: "from-slate-500 to-zinc-600", default: false },
+    { id: "avram", name: "Avram (PostgreSQL)", description: "Lucky's type-safe PostgreSQL ORM with migrations", icon: "https://cdn.simpleicons.org/postgresql", color: "from-slate-500 to-zinc-600", default: false },
+    { id: "marten-orm", name: "Marten ORM (SQLite)", description: "Marten models and migrations on SQLite", icon: "https://cdn.simpleicons.org/sqlite", color: "from-slate-500 to-zinc-600", default: false },
+    { id: "none", name: "None", description: "No database layer", icon: "", color: "from-gray-400 to-gray-600", default: true },
+  ],
   javaWebFramework: [
     {
       id: "ktor",

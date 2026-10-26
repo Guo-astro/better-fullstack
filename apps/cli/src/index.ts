@@ -213,6 +213,7 @@ export async function createVirtual(
       goDI: options.goDI || "none",
       crystalWebFramework:
         options.crystalWebFramework ?? (ecosystem === "crystal" ? "kemal" : "none"),
+      crystalOrm: options.crystalOrm ?? "none",
       javaWebFramework:
         options.javaWebFramework || (options.ecosystem === "java" ? "spring-boot" : "none"),
       javaLanguage: options.javaLanguage || "java",

@@ -775,5 +775,6 @@
   "builderComposerReviewTitle": "Vérifier {name}",
   "builderComposerJsWorkspace": "Workspace JavaScript",
   "builderComposerNativeToolchains": "Toolchains natives",
-  "docsCliSummaryCrystalCrystalWebFramework": "Framework HTTP expérimental Crystal."
+  "docsCliSummaryCrystalCrystalWebFramework": "Framework HTTP expérimental Crystal.",
+  "docsCliSummaryCrystalCrystalOrm": "Couche de base de données expérimentale Crystal."
 }

@@ -214,7 +214,7 @@ import { getShadcnOptions, type ShadcnOptions } from "@/prompts/developer/shadcn
 import { getTestingChoice } from "@/prompts/developer/testing";
 import { getUILibraryChoice } from "@/prompts/developer/ui-library";
 import { getValidationChoice } from "@/prompts/developer/validation";
-import { getCrystalWebFrameworkChoice } from "@/prompts/ecosystems/crystal-ecosystem";
+import { getCrystalOrmChoice, getCrystalWebFrameworkChoice } from "@/prompts/ecosystems/crystal-ecosystem";
 import {
   getDotnetApiChoice,
   getDotnetAuthChoice,
@@ -483,6 +483,7 @@ type PromptGroupResults = {
   goDI: GoDI;
   // Java ecosystem
   crystalWebFramework: ProjectConfig["crystalWebFramework"];
+  crystalOrm: ProjectConfig["crystalOrm"];
   javaWebFramework: JavaWebFramework;
   javaLanguage: JavaLanguage;
   javaBuildTool: JavaBuildTool;
@@ -674,6 +675,7 @@ const CONFIG_PROMPT_ENTRY_KEY_MAP = {
   goProtoTooling: true,
   goDI: true,
   crystalWebFramework: true,
+  crystalOrm: true,
   javaWebFramework: true,
   javaLanguage: true,
   javaBuildTool: true,
@@ -1016,7 +1018,7 @@ export async function gatherConfig(
           ecosystem,
         });
         if (issue) throw new Error(issue);
-        const { crystalWebFramework: _frameworkDefault, ...nativeDefaults } =
+        const { crystalWebFramework: _frameworkDefault, crystalOrm: _crystalOrmDefault, ...nativeDefaults } =
           CRYSTAL_PROJECT_DEFAULTS;
         Object.assign(flags, { ...nativeDefaults, ...flags });
       }
@@ -1730,6 +1732,10 @@ export async function gatherConfig(
       results.ecosystem === "crystal"
         ? getCrystalWebFrameworkChoice(flags.crystalWebFramework)
         : Promise.resolve("none" as const),
+    crystalOrm: ({ results }) =>
+      results.ecosystem === "crystal"
+        ? getCrystalOrmChoice(flags.crystalOrm, results.crystalWebFramework)
+        : Promise.resolve("none" as const),
     javaWebFramework: ({ results }) => {
       if (results.ecosystem !== "java") return Promise.resolve("none" as JavaWebFramework);
       return getJavaWebFrameworkChoice(flags.javaWebFramework);
@@ -2152,6 +2158,7 @@ export async function gatherConfig(
     goDI: result.goDI,
     // Java ecosystem options
     crystalWebFramework: result.crystalWebFramework,
+    crystalOrm: result.crystalOrm,
     javaWebFramework: result.javaWebFramework,
     javaLanguage: result.javaLanguage,
     javaBuildTool: result.javaBuildTool,

@@ -2,6 +2,9 @@ require "lucky"
 require "./app_config"
 require "./greeting_request"
 require "./http_guard"
+{{#if (ne crystalOrm "none")}}
+require "./greeting_store"
+{{/if}}
 
 Lucky::Server.configure do |settings|
   settings.secret_key_base = ENV.fetch("SECRET_KEY_BASE", Random::Secure.urlsafe_base64(32))
@@ -69,6 +72,20 @@ class Api::Echo::Create < ApiAction
   end
 end
 
+{{#if (ne crystalOrm "none")}}
+class Api::Greetings::Index < ApiAction
+  get "/api/greetings" do
+    respond GreetingStore.list
+  end
+end
+
+class Api::Greetings::Create < ApiAction
+  post "/api/greetings" do
+    respond GreetingStore.create(params.body)
+  end
+end
+
+{{/if}}
 class AppServer < Lucky::BaseAppServer
   def middleware : Array(HTTP::Handler)
     [

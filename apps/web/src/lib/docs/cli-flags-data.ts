@@ -2036,6 +2036,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "kemal",
         "multiple": false
+      },
+      {
+        "flag": "--crystal-orm",
+        "summary": "Crystal database layer.",
+        "values": [
+          "crystal-db",
+          "avram",
+          "marten-orm",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
       }
     ]
   },
@@ -2924,6 +2937,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "go:--go-proto-tooling": m.docsCliSummaryGoGoProtoTooling,
   "go:--go-di": m.docsCliSummaryGoGoDi,
   "crystal:--crystal-web-framework": m.docsCliSummaryCrystalCrystalWebFramework,
+  "crystal:--crystal-orm": m.docsCliSummaryCrystalCrystalOrm,
   "java:--java-web-framework": m.docsCliSummaryJavaJavaWebFramework,
   "java:--java-language": m.docsCliSummaryJavaJavaLanguage,
   "java:--java-build-tool": m.docsCliSummaryJavaJavaBuildTool,

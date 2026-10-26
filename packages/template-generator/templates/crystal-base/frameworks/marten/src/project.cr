@@ -1,7 +1,0 @@
-require "marten"
-require "./app_config"
-require "./greeting_request"
-require "./cors_middleware"
-require "./handlers/**"
-require "../config/settings/base"
-require "../config/routes"

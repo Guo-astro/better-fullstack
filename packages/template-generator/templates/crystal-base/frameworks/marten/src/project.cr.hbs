@@ -1,0 +1,17 @@
+require "marten"
+{{#if (eq crystalOrm "marten-orm")}}
+require "sqlite3"
+{{/if}}
+require "./app_config"
+require "./greeting_request"
+require "./cors_middleware"
+{{#if (eq crystalOrm "marten-orm")}}
+require "./apps/greetings/app"
+require "./apps/greetings/models/**"
+{{/if}}
+{{#if (ne crystalOrm "none")}}
+require "./greeting_store"
+{{/if}}
+require "./handlers/**"
+require "../config/settings/**"
+require "../config/routes"

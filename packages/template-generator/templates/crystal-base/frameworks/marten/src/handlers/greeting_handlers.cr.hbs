@@ -28,3 +28,18 @@ class EchoHandler < ApiHandler
     respond GreetingRequest.json(request.body)
   end
 end
+{{#if (ne crystalOrm "none")}}
+
+class GreetingsHandler < ApiHandler
+  http_method_names :get, :post
+  protect_from_forgery false
+
+  def get
+    respond GreetingStore.list
+  end
+
+  def post
+    respond GreetingStore.create(request.body)
+  end
+end
+{{/if}}

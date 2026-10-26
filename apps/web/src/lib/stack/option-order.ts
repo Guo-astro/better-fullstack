@@ -224,6 +224,7 @@ export const OPTION_DISPLAY_ORDER: Readonly<Record<string, readonly string[]>> =
     "none",
   ],
   crystalWebFramework: ["kemal", "lucky", "athena", "marten", "none"],
+  crystalOrm: ["crystal-db", "avram", "marten-orm", "none"],
   javaWebFramework: ["spring-boot", "quarkus", "ktor", "micronaut", "none"],
   jobQueue: [
     "bullmq",

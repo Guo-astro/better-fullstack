@@ -4,6 +4,14 @@ Marten.configure do |config|
   config.port = AppConfig.port
   config.allowed_hosts = ENV.fetch("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",").map(&.strip).reject(&.empty?)
   config.request_max_body_size = AppConfig::MAX_BODY_BYTES
+{{#if (eq crystalOrm "marten-orm")}}
+  config.installed_apps = [Greetings::App] of Marten::Apps::Config.class
+  config.database do |db|
+    db.backend = :sqlite
+    db.name = ENV.fetch("DATABASE_PATH", "development.sqlite3")
+  end
+{{else}}
   config.installed_apps = [] of Marten::Apps::Config.class
+{{/if}}
   config.middleware = [CorsMiddleware] of Marten::Middleware.class
 end

@@ -775,5 +775,6 @@
   "builderComposerReviewTitle": "檢查 {name}",
   "builderComposerJsWorkspace": "JavaScript 工作區",
   "builderComposerNativeToolchains": "原生工具鏈",
-  "docsCliSummaryCrystalCrystalWebFramework": "實驗性 Crystal HTTP 框架。"
+  "docsCliSummaryCrystalCrystalWebFramework": "實驗性 Crystal HTTP 框架。",
+  "docsCliSummaryCrystalCrystalOrm": "實驗性 Crystal 資料庫層。"
 }

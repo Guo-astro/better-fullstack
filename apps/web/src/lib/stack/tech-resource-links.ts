@@ -2387,6 +2387,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://rom-rb.org/learn/",
     githubUrl: "https://github.com/rom-rb/rom",
   },
+  "crystalOrm:crystal-db": {
+    docsUrl: "https://crystal-lang.org/reference/1.22/database/",
+    githubUrl: "https://github.com/crystal-lang/crystal-db",
+  },
+  "crystalOrm:avram": {
+    docsUrl: "https://luckyframework.org/guides/database/intro-to-avram-and-orms",
+    githubUrl: "https://github.com/luckyframework/avram",
+  },
+  "crystalOrm:marten-orm": {
+    docsUrl: "https://martenframework.com/docs/models-and-databases",
+    githubUrl: "https://github.com/martenframework/marten",
+  },
   "elixirOrm:ecto-sql": {
     docsUrl: "https://hexdocs.pm/ecto_sql/",
     githubUrl: "https://github.com/elixir-ecto/ecto_sql",

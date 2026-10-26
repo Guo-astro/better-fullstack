@@ -2,6 +2,9 @@ require "athena"
 require "./app_config"
 require "./greeting_request"
 require "./http_guard"
+{{#if (ne crystalOrm "none")}}
+require "./greeting_store"
+{{/if}}
 
 class GreetingController < ATH::Controller
   @[ARTA::Get("/health")]
@@ -19,6 +22,18 @@ class GreetingController < ATH::Controller
     json_response GreetingRequest.json(request.body.try(&.gets_to_end) || "")
   end
 
+{{#if (ne crystalOrm "none")}}
+  @[ARTA::Get("/api/greetings")]
+  def greetings : AHTTP::Response
+    json_response GreetingStore.list
+  end
+
+  @[ARTA::Post("/api/greetings")]
+  def create_greeting(request : AHTTP::Request) : AHTTP::Response
+    json_response GreetingStore.create(request.body.try(&.gets_to_end) || "")
+  end
+
+{{/if}}
   private def json_response(result : GreetingRequest::Result) : AHTTP::Response
     AHTTP::Response.new(result.body, result.status, HTTP::Headers{"Content-Type" => "application/json"})
   end

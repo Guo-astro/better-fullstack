@@ -124,6 +124,7 @@ export const TEMPLATE_FINGERPRINT_KEYS = [
   "goProtoTooling",
   "goDI",
   "crystalWebFramework",
+  "crystalOrm",
   "javaWebFramework",
   "javaBuildTool",
   "javaOrm",

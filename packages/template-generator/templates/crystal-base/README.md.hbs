@@ -6,6 +6,12 @@ Install the native toolchain using the [official installation guide](https://cry
 
 ```sh
 shards install
+{{#if (eq crystalOrm "avram")}}
+crystal run scripts/db_migrate.cr
+{{/if}}
+{{#if (eq crystalOrm "marten-orm")}}
+crystal run manage.cr -- migrate
+{{/if}}
 {{#if (eq crystalWebFramework "athena")}}
 shards build --release -Dwithout_libmagic
 crystal spec -Dwithout_libmagic
@@ -35,6 +41,22 @@ Athena's MIME component links `libmagic` by default. The `-Dwithout_libmagic` fl
 The proof chooses a free loopback port, starts the compiled server, parses real HTTP JSON, rejects invalid input, sends SIGTERM, waits at most five seconds, and checks the port can be rebound. Cleanup kills only its child process on failure. Port selection has a small close/bind race. The proof uses POSIX signals and targets macOS/Linux.{{#if (eq crystalWebFramework "kemal")}} Kemal drains active requests for at most two seconds; long-lived request draining has not been qualified.{{/if}}
 {{/if}}
 
-Database, ORM, auth, deployment, native addons, and service overlays are unsupported. Use an explicit mixed graph to add an independently owned frontend or another service; keep Crystal's manifest and native commands in its service directory.
+{{#if (ne crystalOrm "none")}}
+`GET /api/greetings` returns the newest 20 stored names as `{"greetings":[...]}`. `POST /api/greetings` with `{"name":"Crystal"}` stores the validated name and returns 201; invalid names return 422 and are not written.
+
+{{/if}}
+{{#if (eq crystalOrm "crystal-db")}}
+crystal-db 0.15.0 and crystal-sqlite3 0.24.0 run parameterized SQL against `DATABASE_URL`, which defaults to `sqlite3://./development.sqlite3`. The `greetings` table is created on first use. The SQLite shard links the system `libsqlite3`; macOS includes it, and Debian or Ubuntu need `libsqlite3-dev`. Specs use a temporary database file.
+
+{{/if}}
+{{#if (eq crystalOrm "avram")}}
+Avram 1.5.0 stores greetings in PostgreSQL at `DATABASE_URL`. `crystal run scripts/db_migrate.cr` creates the database and applies pending migrations; `crystal run scripts/db_migrate.cr -- rollback` reverts the latest one. Specs migrate and truncate the separate database in `TEST_DATABASE_URL`, so never point it at data you need.
+
+{{/if}}
+{{#if (eq crystalOrm "marten-orm")}}
+Marten's ORM stores greetings in SQLite at `DATABASE_PATH`, which defaults to `development.sqlite3`. Run `crystal run manage.cr -- migrate` before starting the server; `crystal run manage.cr -- genmigrations` writes new migrations after model changes. Specs run migrations against an in-memory database. The SQLite shard links the system `libsqlite3`.
+
+{{/if}}
+Auth, deployment, native addons, and service overlays are unsupported. Use an explicit mixed graph to add an independently owned frontend or another service; keep Crystal's manifest and native commands in its service directory.
 
 Named service replay uses `--part backend:crystal:{{#if (eq crystalWebFramework "none")}}kemal{{else}}{{crystalWebFramework}}{{/if}}:reports@services/reports`. The optional `@relative-path` suffix preserves the directory; percent-encode special path characters. Parent directories and absolute paths are rejected by the part parser. Existing part bindings without a suffix retain their defaults.

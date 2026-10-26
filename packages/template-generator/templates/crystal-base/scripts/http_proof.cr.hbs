@@ -3,6 +3,21 @@ require "http/client"
 require "json"
 require "socket"
 
+server_env = {"HOST" => "127.0.0.1", "KEMAL_ENV" => "production", "CORS_ORIGIN" => "http://localhost:5173,http://localhost:8080"}
+{{#if (ne crystalOrm "none")}}
+database_path = File.tempname("proof", ".sqlite3")
+{{/if}}
+{{#if (eq crystalOrm "crystal-db")}}
+server_env["DATABASE_URL"] = "sqlite3://#{database_path}"
+{{/if}}
+{{#if (eq crystalOrm "marten-orm")}}
+server_env["DATABASE_PATH"] = database_path
+raise "migration failed" unless Process.run("crystal", ["run", "manage.cr", "--", "migrate"], env: server_env, output: Process::Redirect::Inherit, error: Process::Redirect::Inherit).success?
+{{/if}}
+{{#if (eq crystalOrm "avram")}}
+raise "migration failed" unless Process.run("crystal", ["run", "scripts/db_migrate.cr"], output: Process::Redirect::Inherit, error: Process::Redirect::Inherit).success?
+{{/if}}
+
 probe = TCPServer.new("127.0.0.1", 0)
 port = probe.local_address.port
 probe.close
@@ -25,7 +40,7 @@ when timeout(5.seconds)
 end
 raise "invalid PORT diagnostic missing" unless invalid_output.to_s.includes?("PORT must be an integer")
 
-process = Process.new("./bin/server", env: {"HOST" => "127.0.0.1", "PORT" => port.to_s, "KEMAL_ENV" => "production", "CORS_ORIGIN" => "http://localhost:5173,http://localhost:8080"}, output: Process::Redirect::Inherit, error: Process::Redirect::Inherit)
+process = Process.new("./bin/server", env: server_env.merge({"PORT" => port.to_s}), output: Process::Redirect::Inherit, error: Process::Redirect::Inherit)
 exited = Channel(Process::Status).new(1)
 spawn { exited.send(process.wait) }
 finished = false
@@ -66,6 +81,14 @@ begin
   raise "malformed JSON accepted" unless malformed.status_code == 400 && JSON.parse(malformed.body)["error"].as_s == "invalid JSON"
   wrong_type = client.post("/api/echo", headers, %({"name":12}))
   raise "non-string name accepted" unless wrong_type.status_code == 422
+{{#if (ne crystalOrm "none")}}
+  stored = client.post("/api/greetings", headers, %({"name":"Proof"}))
+  raise "greeting was not stored" unless stored.status_code == 201 && JSON.parse(stored.body)["name"].as_s == "Proof"
+  listed = client.get("/api/greetings")
+  raise "stored greeting missing" unless listed.status_code == 200 && JSON.parse(listed.body)["greetings"].as_a.map(&.as_s).includes?("Proof")
+  rejected_greeting = client.post("/api/greetings", headers, %({"name":"  "}))
+  raise "invalid greeting stored" unless rejected_greeting.status_code == 422
+{{/if}}
   oversized = client.post("/api/echo", headers, %({"name":"#{"x" * 5000}"}))
   raise "oversized body accepted" unless oversized.status_code == {{#if (eq crystalWebFramework "marten")}}400{{else}}413{{/if}}
   client.close
@@ -84,7 +107,7 @@ begin
   rescue ex : Socket::Error
     raise "listener remained open: #{ex.message}"
   end
-  puts ({proof: "crystal-{{crystalWebFramework}}-http-v1", success: true, assertions: ["invalid-port", "health-json", "hello-json", "cors", "cors-allowlist", "content-type", "blank-name-422", "post-json", "malformed-json-400", "wrong-type-422", "body-limit-{{#if (eq crystalWebFramework "marten")}}400{{else}}413{{/if}}", "sigterm-exit", "port-released"]}).to_json
+  puts ({proof: "crystal-{{crystalWebFramework}}-http-v1", success: true, assertions: ["invalid-port", "health-json", "hello-json", "cors", "cors-allowlist", "content-type", "blank-name-422", "post-json", "malformed-json-400", "wrong-type-422", "body-limit-{{#if (eq crystalWebFramework "marten")}}400{{else}}413{{/if}}", "sigterm-exit", "port-released"{{#if (ne crystalOrm "none")}}, "{{crystalOrm}}-persisted-greeting"{{/if}}]}).to_json
 ensure
   unless finished
     if process.exists?
@@ -96,4 +119,7 @@ ensure
     end
   end
 end
+{{#if (ne crystalOrm "none")}}
+File.delete?(database_path)
+{{/if}}
 {{/if}}

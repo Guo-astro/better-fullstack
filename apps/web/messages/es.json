@@ -775,5 +775,6 @@
   "builderComposerReviewTitle": "Revisar {name}",
   "builderComposerJsWorkspace": "Workspace de JavaScript",
   "builderComposerNativeToolchains": "Toolchains nativas",
-  "docsCliSummaryCrystalCrystalWebFramework": "Framework HTTP experimental de Crystal."
+  "docsCliSummaryCrystalCrystalWebFramework": "Framework HTTP experimental de Crystal.",
+  "docsCliSummaryCrystalCrystalOrm": "Capa de base de datos experimental de Crystal."
 }

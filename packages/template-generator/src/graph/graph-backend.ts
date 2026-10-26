@@ -106,7 +106,10 @@ function getRawGraphBackendConnection(config: ProjectConfig): GraphBackendConnec
 
   switch (backend.ecosystem) {
     case "crystal": {
-      const commands = getCrystalCommands(backend.toolId);
+      const orm = (config.stackParts ?? []).find(
+        (part) => part.ownerPartId === backend.id && part.role === "orm",
+      )?.toolId;
+      const commands = getCrystalCommands(backend.toolId, orm);
       const origins =
         [...new Set(getGraphFrontendPorts(config).values())]
           .map((port) => `http://localhost:${port}`)
@@ -121,7 +124,7 @@ function getRawGraphBackendConnection(config: ProjectConfig): GraphBackendConnec
         serverUrl: "http://localhost:3000",
         healthPath: "/health",
         healthUrl: "http://localhost:3000/health",
-        setupCommand: `cd ${directory} && shards install`,
+        setupCommand: [`cd ${directory}`, "shards install", commands.migrate].filter(Boolean).join(" && "),
         devCommand: `cd ${directory} && ${origins ? `export CORS_ORIGIN=${origins} && ` : ""}${commands.run}`,
         checkCommand: `cd ${directory} && ${commands.build}`,
         testCommand: `cd ${directory} && ${commands.test}`,

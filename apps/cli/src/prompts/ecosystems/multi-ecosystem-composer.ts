@@ -46,7 +46,7 @@ import { getAstroIntegrationChoice } from "@/prompts/developer/astro-integration
 import { getCSSFrameworkChoice } from "@/prompts/developer/css-framework";
 import { getShadcnOptions, type ShadcnOptions } from "@/prompts/developer/shadcn-options";
 import { getUILibraryChoice } from "@/prompts/developer/ui-library";
-import { getCrystalWebFrameworkChoice } from "@/prompts/ecosystems/crystal-ecosystem";
+import { getCrystalOrmChoice, getCrystalWebFrameworkChoice } from "@/prompts/ecosystems/crystal-ecosystem";
 import {
   getDotnetApiChoice,
   getDotnetAuthChoice,
@@ -1260,6 +1260,8 @@ export async function gatherMultiEcosystemConfig(
   if (backendEcosystem === "crystal") {
     const framework = promptValue(await getCrystalWebFrameworkChoice(flags.crystalWebFramework));
     if (framework !== "none") stackPartSpecs.push(`backend:crystal:${framework}`);
+    const crystalOrm = promptValue(await getCrystalOrmChoice(flags.crystalOrm, framework));
+    if (crystalOrm !== "none") stackPartSpecs.push(`backend.orm:crystal:${crystalOrm}`);
   }
 
   if (backendEcosystem === "java") {

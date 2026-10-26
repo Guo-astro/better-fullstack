@@ -775,5 +775,6 @@
   "builderComposerReviewTitle": "{name} überprüfen",
   "builderComposerJsWorkspace": "JavaScript-Workspace",
   "builderComposerNativeToolchains": "Native Toolchains",
-  "docsCliSummaryCrystalCrystalWebFramework": "Experimentelles Crystal-HTTP-Framework."
+  "docsCliSummaryCrystalCrystalWebFramework": "Experimentelles Crystal-HTTP-Framework.",
+  "docsCliSummaryCrystalCrystalOrm": "Experimentelle Crystal-Datenbankschicht."
 }

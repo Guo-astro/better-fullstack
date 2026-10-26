@@ -24,7 +24,7 @@ import { resolveFormsPrompt } from "@/prompts/developer/forms";
 import { resolveTestingPrompt } from "@/prompts/developer/testing";
 import { resolveUILibraryPrompt } from "@/prompts/developer/ui-library";
 import { resolveValidationPrompt } from "@/prompts/developer/validation";
-import { resolveCrystalWebFrameworkPrompt } from "@/prompts/ecosystems/crystal-ecosystem";
+import { resolveCrystalOrmPrompt, resolveCrystalWebFrameworkPrompt } from "@/prompts/ecosystems/crystal-ecosystem";
 import {
   resolveDotnetApiPrompt,
   resolveDotnetAuthPrompt,
@@ -202,6 +202,7 @@ import {
   GO_CLI_VALUES,
   GO_DI_VALUES,
   CRYSTAL_WEB_FRAMEWORK_VALUES,
+  CRYSTAL_ORM_VALUES,
   GO_LOGGING_VALUES,
   GO_MIGRATIONS_VALUES,
   GO_ORM_VALUES,
@@ -696,6 +697,12 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
     schemaValues: CRYSTAL_WEB_FRAMEWORK_VALUES,
     resolve: ({ value }: { value?: string } = {}) => resolveCrystalWebFrameworkPrompt(value),
     coverageContexts: [{}],
+  },
+  crystalOrm: {
+    schemaValues: CRYSTAL_ORM_VALUES,
+    resolve: ({ value, crystalWebFramework }: { value?: string; crystalWebFramework?: string } = {}) =>
+      resolveCrystalOrmPrompt(value, crystalWebFramework),
+    coverageContexts: [{ crystalWebFramework: "kemal" }, { crystalWebFramework: "lucky" }, { crystalWebFramework: "marten" }],
   },
   javaWebFramework: {
     schemaValues: JAVA_WEB_FRAMEWORK_VALUES,

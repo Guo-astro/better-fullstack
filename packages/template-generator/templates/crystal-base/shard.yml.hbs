@@ -28,3 +28,18 @@ dependencies:
     github: martenframework/marten
     version: 0.7.1
 {{/if}}
+{{#if (eq crystalOrm "crystal-db")}}
+  db:
+    github: crystal-lang/crystal-db
+    version: 0.15.0
+{{/if}}
+{{#if (or (eq crystalOrm "crystal-db") (eq crystalOrm "marten-orm"))}}
+  sqlite3:
+    github: crystal-lang/crystal-sqlite3
+    version: 0.24.0
+{{/if}}
+{{#if (eq crystalOrm "avram")}}
+  avram:
+    github: luckyframework/avram
+    version: 1.5.0
+{{/if}}
