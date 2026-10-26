@@ -656,7 +656,12 @@ const APP_PLATFORM_OPTION_GROUPS = [
 ] as const;
 
 const GRAPH_BACKEND_CONFIGS: GraphBackendConfig[] = [
-  { ecosystem: "ruby", label: "Ruby", frameworkCategory: "rubyWebFramework" },
+  {
+    ecosystem: "ruby",
+    label: "Ruby",
+    frameworkCategory: "rubyWebFramework",
+    ormCategory: "rubyOrm",
+  },
   {
     ecosystem: "typescript",
     label: "TypeScript",

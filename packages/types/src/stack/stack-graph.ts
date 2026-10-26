@@ -65,6 +65,7 @@ import {
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
   RUBY_WEB_FRAMEWORK_VALUES,
+  RUBY_ORM_VALUES,
   PHP_WEB_FRAMEWORK_VALUES,
   PHP_ORM_VALUES,
   PHP_AUTH_VALUES,
@@ -199,6 +200,7 @@ import {
 } from "@/stack/php-compatibility";
 import {
   getRubyDatabaseSelectionIssue,
+  isRubyOwnedRole,
   RUBY_RECIPE_EXTENSION_REASON,
 } from "@/stack/ruby-compatibility";
 import {
@@ -393,7 +395,7 @@ const LEGACY_CAPABILITY_CATEGORIES_BY_ECOSYSTEM = {
     observability: "observability",
   },
   dotnet: { orm: "dotnetOrm", api: "dotnetApi", auth: "dotnetAuth" },
-  ruby: {},
+  ruby: { orm: "rubyOrm" },
   php: { orm: "phpOrm", auth: "phpAuth" },
   elixir: { orm: "elixirOrm", api: "elixirApi", auth: "elixirAuth" },
 } as const satisfies Record<
@@ -1242,6 +1244,7 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
     allowMultiple: true,
   }),
   ...defineTools(RUBY_WEB_FRAMEWORK_VALUES, "backend", "ruby", "rubyWebFramework"),
+  ...defineTools(RUBY_ORM_VALUES, "orm", "ruby", "rubyOrm"),
   ...defineTools(PHP_WEB_FRAMEWORK_VALUES, "backend", "php", "phpWebFramework").map(
     (definition) => ({
       ...definition,
@@ -3113,7 +3116,12 @@ function getStackPartCompatibilityIssue(
       message: RUBY_RECIPE_EXTENSION_REASON,
     });
   }
-  if (context.ownerEcosystem === "ruby" && part.source !== "provided" && part.toolId !== "none") {
+  if (
+    context.ownerEcosystem === "ruby" &&
+    part.source !== "provided" &&
+    part.toolId !== "none" &&
+    !(part.ecosystem === "ruby" && isRubyOwnedRole(part.role))
+  ) {
     return createStackGraphIssue({
       code: "UNSUPPORTED_ROLE_BINDING",
       partId: part.id,

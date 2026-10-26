@@ -1,6 +1,9 @@
 require "json"
 require "roda"
 require_relative "http_policy"
+{{#if (ne rubyOrm "none")}}
+require_relative "items"
+{{/if}}
 require_relative "name_input"
 require_relative "request_body_limit"
 
@@ -34,6 +37,24 @@ module BetterFullstack
         end
         { greeting: "Hello, #{name}!" }
       end
+{{#if (ne rubyOrm "none")}}
+
+      r.is "api/items" do
+        r.get do
+          { items: Items.all }
+        end
+
+        r.post do
+          name = NameInput.parse(r.media_type, r.body)
+          if name.is_a?(NameInput::Invalid)
+            response.status = name.status
+            next { error: name.error }
+          end
+          response.status = 201
+          Items.create(name)
+        end
+      end
+{{/if}}
     end
   end
 end

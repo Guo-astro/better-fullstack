@@ -13,9 +13,17 @@ listener.close
 log = Tempfile.new("{{rubyWebFramework}}-proof")
 root = File.expand_path("..", __dir__)
 environment = { "HOST" => "127.0.0.1", "PORT" => port.to_s, "RACK_ENV" => "production", "ALLOWED_ORIGIN" => "http://localhost:5173,http://localhost:8080", "SECRET_KEY_BASE" => SecureRandom.hex(64) }
+{{#if (ne rubyOrm "none")}}
+database = Tempfile.new(["proof", ".sqlite3"])
+environment["DATABASE_PATH"] = database.path
+{{/if}}
 pid = nil
 
 begin
+{{#if (ne rubyOrm "none")}}
+  migrated = system(environment, RbConfig.ruby, "-r", "./db", "-e", "BetterFullstack::Database.migrate!", chdir: root, out: log, err: log)
+  raise "Database migration failed" unless migrated
+{{/if}}
   pid = Process.spawn(
     environment,
     RbConfig.ruby, File.expand_path("server", __dir__),
@@ -53,7 +61,14 @@ begin
   raise "Invalid request was accepted" unless response.code == "422" && JSON.parse(response.body).fetch("error") == "name_length_must_be_1_to_80"
   response = http.post("/api/greetings", "", "Content-Type" => "application/json")
   raise "Empty JSON request was not rejected" unless response.code == "400" && JSON.parse(response.body).fetch("error") == "invalid_json"
-  puts JSON.generate(health: "passed", parsed_response: "passed", invalid_request: "passed", frontend_origins: "passed", empty_json: "passed")
+{{#if (ne rubyOrm "none")}}
+  response = http.post("/api/items", JSON.generate(name: "Ruby"), "Content-Type" => "application/json")
+  raise "Item was not persisted" unless response.code == "201" && JSON.parse(response.body).fetch("name") == "Ruby"
+  created = JSON.parse(response.body)
+  response = http.get("/api/items")
+  raise "Persisted item was not listed" unless response.code == "200" && JSON.parse(response.body).fetch("items").include?(created)
+{{/if}}
+  puts JSON.generate(health: "passed", parsed_response: "passed", invalid_request: "passed", frontend_origins: "passed", empty_json: "passed"{{#if (ne rubyOrm "none")}}, persistence: "passed"{{/if}})
 rescue StandardError => error
   log.rewind
   warn log.read
@@ -73,4 +88,7 @@ ensure
     end
   end
   log.close!
+{{#if (ne rubyOrm "none")}}
+  database.close!
+{{/if}}
 end

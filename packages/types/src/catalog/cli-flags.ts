@@ -1129,6 +1129,12 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         source: { kind: "category", category: "rubyWebFramework" },
         configKey: "rubyWebFramework",
       },
+      {
+        flag: "ruby-orm",
+        summary: "Ruby ORM / database layer.",
+        source: { kind: "category", category: "rubyOrm" },
+        configKey: "rubyOrm",
+      },
     ],
   },
   {

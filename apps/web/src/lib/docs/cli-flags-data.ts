@@ -2408,6 +2408,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "sinatra",
         "multiple": false
+      },
+      {
+        "flag": "--ruby-orm",
+        "summary": "Ruby ORM / database layer.",
+        "values": [
+          "active-record",
+          "sequel",
+          "rom",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
       }
     ]
   },
@@ -2908,6 +2921,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "dotnet:--dotnet-deploy": m.docsCliSummaryDotnetDotnetDeploy,
   "dotnet:--dotnet-libraries": m.docsCliSummaryDotnetDotnetLibraries,
   "ruby:--ruby-web-framework": m.docsCliSummaryRubyRubyWebFramework,
+  "ruby:--ruby-orm": m.docsCliSummaryRubyRubyOrm,
   "php:--php-web-framework": m.docsCliSummaryPhpPhpWebFramework,
   "php:--php-orm": m.docsCliSummaryPhpPhpOrm,
   "php:--php-auth": m.docsCliSummaryPhpPhpAuth,

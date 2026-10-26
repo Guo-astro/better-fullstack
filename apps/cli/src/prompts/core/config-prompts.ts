@@ -51,6 +51,7 @@ import type {
   ElixirTesting,
   ElixirValidation,
   RubyWebFramework,
+  RubyOrm,
   PhpWebFramework,
   PhpOrm,
   PhpAuth,
@@ -314,7 +315,7 @@ import {
   getPythonValidationChoice,
   getPythonWebFrameworkChoice,
 } from "@/prompts/ecosystems/python-ecosystem";
-import { getRubyWebFrameworkChoice } from "@/prompts/ecosystems/ruby-ecosystem";
+import { getRubyOrmChoice, getRubyWebFrameworkChoice } from "@/prompts/ecosystems/ruby-ecosystem";
 import {
   getRustApiChoice,
   getRustCliChoice,
@@ -499,6 +500,7 @@ type PromptGroupResults = {
   dotnetLibraries: DotnetLibraries[];
   // Elixir ecosystem
   rubyWebFramework: RubyWebFramework;
+  rubyOrm: RubyOrm;
   phpWebFramework: PhpWebFramework;
   phpOrm: PhpOrm;
   phpAuth: PhpAuth;
@@ -685,6 +687,7 @@ const CONFIG_PROMPT_ENTRY_KEY_MAP = {
   dotnetDeploy: true,
   dotnetLibraries: true,
   rubyWebFramework: true,
+  rubyOrm: true,
   phpWebFramework: true,
   phpOrm: true,
   phpAuth: true,
@@ -919,13 +922,14 @@ function scopedPrompt<K extends PromptGroupKey>(
   }) => Promise<PromptGroupResults[K] | symbol | undefined> | undefined,
 ) {
   return (opts: { results: Partial<PromptGroupResults> }) => {
-    if (key === "rubyWebFramework" && opts.results.ecosystem !== "ruby")
+    if ((key === "rubyWebFramework" || key === "rubyOrm") && opts.results.ecosystem !== "ruby")
       return Promise.resolve("none" as PromptGroupResults[K]);
     if (
       opts.results.ecosystem === "ruby" &&
       !CONFIG_SCOPE_META_KEYS.has(key) &&
       ![
         "rubyWebFramework",
+        "rubyOrm",
         "aiDocs",
         "git",
         "install",
@@ -1866,6 +1870,10 @@ export async function gatherConfig(
       results.ecosystem === "ruby"
         ? getRubyWebFrameworkChoice(flags.rubyWebFramework)
         : Promise.resolve("none" as const),
+    rubyOrm: ({ results }) =>
+      results.ecosystem === "ruby"
+        ? getRubyOrmChoice(flags.rubyOrm)
+        : Promise.resolve("none" as const),
     phpWebFramework: ({ results }) =>
       results.ecosystem === "php"
         ? getPhpWebFrameworkChoice(flags.phpWebFramework)
@@ -2145,6 +2153,7 @@ export async function gatherConfig(
     dotnetLibraries: result.dotnetLibraries,
     // Elixir ecosystem options
     rubyWebFramework: result.rubyWebFramework,
+    rubyOrm: result.rubyOrm,
     phpWebFramework: result.phpWebFramework,
     phpOrm: result.phpOrm,
     phpAuth: result.phpAuth,

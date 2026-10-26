@@ -3,9 +3,15 @@ import type { ProjectConfig, StackPart } from "@/config/types";
 import { getToolingCapability, isToolingOverlayOnly } from "@/capabilities/tooling-capabilities";
 
 export const RUBY_RECIPE_EXTENSION_REASON =
-  "The experimental Ruby recipe provides Sinatra, Rails, Roda, or Grape JSON HTTP and Minitest/Rack tests only. Database, authentication, deployment, and other service adapters are not generated.";
+  "The experimental Ruby recipe provides Sinatra, Rails, Roda, or Grape JSON HTTP, an optional SQLite ORM selected with rubyOrm, and Minitest/Rack tests. Shared database, authentication, deployment, and other service adapters are not generated.";
 export const RUBY_RECIPE_FRAMEWORK_REASON =
   "The Ruby HTTP recipe requires a web framework. Use rubyWebFramework=sinatra, rails, roda, or grape, or remove the Ruby backend.";
+
+export const RUBY_OWNED_ROLES = ["orm"] as const satisfies readonly StackPart["role"][];
+
+export function isRubyOwnedRole(role: StackPart["role"]): boolean {
+  return RUBY_OWNED_ROLES.some((entry) => entry === role);
+}
 
 export const RUBY_UNSUPPORTED_CONFIG_KEYS = [
   "database",
@@ -91,6 +97,11 @@ export function getRubyRecipeIssue(config: Partial<ProjectConfig>): string | nul
       config.stackParts.some(
         (part) =>
           part.source !== "provided" &&
+          !(
+            part.ecosystem === "ruby" &&
+            isRubyOwnedRole(part.role) &&
+            (!part.ownerPartId || rubyIds.has(part.ownerPartId))
+          ) &&
           ((part.ownerPartId && rubyIds.has(part.ownerPartId)) ||
             (part.ecosystem === "ruby" && part.role !== "backend")),
       )
@@ -135,6 +146,9 @@ export function createRubyProjectConfigDefaults(): Partial<ProjectConfig> {
     RUBY_UNSUPPORTED_CONFIG_KEYS.map((key) => [
       key,
       ["frontend", "addons", "examples", "mobileLibraries"].includes(key) ? [] : "none",
-    ]).concat([["rubyWebFramework", "sinatra"]]),
+    ]).concat([
+      ["rubyWebFramework", "sinatra"],
+      ["rubyOrm", "none"],
+    ]),
   );
 }

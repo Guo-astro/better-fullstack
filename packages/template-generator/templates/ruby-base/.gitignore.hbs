@@ -1,0 +1,8 @@
+.bundle/
+vendor/bundle/
+.env
+*.log
+tmp/
+{{#if (ne rubyOrm "none")}}
+db/*.sqlite3*
+{{/if}}

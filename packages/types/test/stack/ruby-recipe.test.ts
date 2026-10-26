@@ -209,6 +209,34 @@ describe("Ruby recipe contracts", () => {
     ).toBe(true);
   });
 
+  it("accepts Ruby ORMs only inside the Ruby service and round-trips them through URLs", () => {
+    const parts = parseStackPartSpecs(["backend:ruby:rails", "backend.orm:ruby:active-record"]);
+    expect(getRubyRecipeIssue({ stackParts: parts })).toBeNull();
+    expect(validateStackParts(parts).issues).toEqual([]);
+    expect(stackPartsToLegacyProjectConfigPartial(parts).rubyOrm).toBe("active-record");
+    expect(getDisabledReason(rubySelection(), "rubyOrm", "sequel")).toBeNull();
+    expect(
+      getDisabledReason(getEcosystemDefaultStackSelection("typescript"), "rubyOrm", "sequel"),
+    ).toBe("Ruby options only apply when the Ruby ecosystem is selected");
+    const selection = { ...rubySelection(), rubyOrm: "rom" };
+    const restored = parseStackSelectionFromUrlRecord(
+      Object.fromEntries(createStackSelectionSearchParams(selection)),
+    );
+    expect(restored.rubyOrm).toBe("rom");
+    expect(generateStackSelectionCommand(restored)).toContain("--ruby-orm rom");
+    expect(
+      stackSelectionToProjectConfig(restored, {
+        projectDir: "/virtual",
+        relativePath: "ruby-service",
+      }).rubyOrm,
+    ).toBe("rom");
+    expect(
+      getRubyRecipeIssue({
+        stackParts: parseStackPartSpecs(["backend:go:gin", "backend.orm:ruby:sequel"]),
+      }),
+    ).toBe(RUBY_RECIPE_EXTENSION_REASON);
+  });
+
   it("rejects selected databases when Ruby is the only backend, in either picker order", () => {
     const ruby = parseStackPartSpecs(["backend:ruby:sinatra:api"]);
     const database = parseStackPartSpecs(["database:universal:sqlite"]);

@@ -1,5 +1,0 @@
-.bundle/
-vendor/bundle/
-.env
-*.log
-tmp/

@@ -55,7 +55,7 @@ const HIGHLIGHT_KEYS_BY_ECOSYSTEM: Record<string, readonly (keyof StackState)[]>
     "javaTestingLibraries",
   ],
   dotnet: ["dotnetWebFramework", "dotnetOrm", "dotnetAuth", "dotnetApi", "dotnetLibraries"],
-  ruby: ["rubyWebFramework"],
+  ruby: ["rubyWebFramework", "rubyOrm"],
   elixir: [
     "elixirWebFramework",
     "elixirOrm",

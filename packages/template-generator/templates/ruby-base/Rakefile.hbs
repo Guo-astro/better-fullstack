@@ -1,0 +1,25 @@
+require "rake/testtask"
+require "rbconfig"
+
+Rake::TestTask.new(:test) do |task|
+  task.pattern = "test/**/*_test.rb"
+end
+
+task :build do
+  files = [*Dir["*.rb"], "config.ru", "Rakefile", *Dir["db/**/*.rb"], *Dir["test/**/*.rb"], *Dir["bin/*"]]
+  files.each do |file|
+    abort "Syntax check failed: #{file}" unless system(RbConfig.ruby, "-c", file)
+  end
+end
+{{#if (ne rubyOrm "none")}}
+
+namespace :db do
+  desc "Apply pending database migrations"
+  task :migrate do
+    require_relative "db"
+    BetterFullstack::Database.migrate!
+  end
+end
+{{/if}}
+
+task default: [:build, :test]

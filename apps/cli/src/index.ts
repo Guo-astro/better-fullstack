@@ -242,6 +242,7 @@ export async function createVirtual(
       dotnetLibraries: options.dotnetLibraries || [],
       rubyWebFramework:
         options.rubyWebFramework ?? (options.ecosystem === "ruby" ? "sinatra" : "none"),
+      rubyOrm: options.rubyOrm ?? "none",
       phpWebFramework: options.phpWebFramework ?? (options.ecosystem === "php" ? "slim" : "none"),
       phpOrm: options.phpOrm ?? "none",
       phpAuth: options.phpAuth ?? "none",

@@ -310,7 +310,11 @@ function generateTechStackSection(config: ProjectConfig): string {
     }
   }
 
-  if (config.ecosystem === "ruby") lines.push(`- Experimental Ruby ${rubyFrameworkLabel(config)} HTTP recipe; Bundler owns Gemfile and Gemfile.lock; Puma serves JSON routes; Minitest/Rack tests cover request validation.`);
+  if (config.ecosystem === "ruby") {
+    lines.push(`- Experimental Ruby ${rubyFrameworkLabel(config)} HTTP recipe; Bundler owns Gemfile and Gemfile.lock; Puma serves JSON routes; Minitest/Rack tests cover request validation.`);
+    const orm = rubyOrmLabel(config);
+    if (orm) lines.push(`- Database: ${orm} on SQLite with versioned migrations (\`bundle exec rake db:migrate\`)`);
+  }
 
   if (config.ecosystem === "rust") {
     if (config.rustWebFramework !== "none")
@@ -505,6 +509,12 @@ function rubyFrameworkLabel(config: ProjectConfig) {
   return getOptionMetadata("rubyWebFramework", config.rubyWebFramework ?? "sinatra")?.label ?? "Sinatra";
 }
 
+function rubyOrmLabel(config: ProjectConfig) {
+  return config.rubyOrm && config.rubyOrm !== "none"
+    ? getOptionMetadata("rubyOrm", config.rubyOrm)?.label
+    : undefined;
+}
+
 function generateCommandsSection(config: ProjectConfig): string {
   const lines: string[] = ["\n## Common Commands\n"];
 
@@ -587,6 +597,7 @@ function generateCommandsSection(config: ProjectConfig): string {
   } else if (config.ecosystem === "ruby") {
     lines.push(
       "- `bundle install` - Install native dependencies",
+      ...(rubyOrmLabel(config) ? ["- `bundle exec rake db:migrate` - Apply database migrations"] : []),
       "- `bundle exec rake build` - Check Ruby syntax",
       "- `bundle exec rake test` - Run Minitest/Rack integration tests",
       "- `bundle exec ruby bin/proof` - Exercise real HTTP and shutdown",
@@ -694,7 +705,9 @@ function generateCursorRules(config: ProjectConfig): string {
       rules.push(`Logging: ${config.pythonLogging}, configured in src/app/logging_config.py`);
     }
   } else if (config.ecosystem === "ruby") {
-    rules.push("Keep Ruby routes in app.rb, shared Rack host, origin, and body policies in http_policy.rb and request_body_limit.rb, and Minitest/Rack coverage in test/app_test.rb. Bundler owns native dependencies. No database or auth adapters are generated. Environment variables are read from the process; .env.example is documentation. Run bundle exec rake and bundle exec ruby bin/proof before claiming runtime verification.");
+    rules.push("Keep Ruby routes in app.rb, shared Rack host, origin, and body policies in http_policy.rb and request_body_limit.rb, and Minitest/Rack coverage in test/app_test.rb. Bundler owns native dependencies. No auth adapter is generated. Environment variables are read from the process; .env.example is documentation. Run bundle exec rake and bundle exec ruby bin/proof before claiming runtime verification.");
+    const orm = rubyOrmLabel(config);
+    rules.push(orm ? `Persistence uses ${orm} on SQLite: connection and migrator in db.rb, the Items repository in items.rb, migrations under db/. DATABASE_PATH overrides the SQLite file. Change the schema with a new migration, never by editing an applied one.` : "No database adapter is generated.");
   } else if (config.ecosystem === "go") {
     rules.push(`You are working on a Go project.`);
     if (config.goWebFramework !== "none") rules.push(`Web framework: ${config.goWebFramework}`);

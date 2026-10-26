@@ -6005,6 +6005,40 @@ export const TECH_OPTIONS: Record<
       color: "from-gray-400 to-gray-600",
     },
   ],
+  rubyOrm: [
+    {
+      id: "active-record",
+      name: "Active Record",
+      description: "Rails ORM on SQLite with models and versioned migrations",
+      icon: "https://cdn.simpleicons.org/rubyonrails/D30001",
+      color: "from-red-600 to-rose-700",
+      isNew: true,
+    },
+    {
+      id: "sequel",
+      name: "Sequel",
+      description: "Sequel models on SQLite with its migrator",
+      icon: "https://cdn.simpleicons.org/sqlite/003B57",
+      color: "from-sky-500 to-blue-700",
+      isNew: true,
+    },
+    {
+      id: "rom",
+      name: "ROM",
+      description: "ROM SQL relations and repositories on SQLite",
+      icon: "https://cdn.simpleicons.org/ruby/CC342D",
+      color: "from-orange-500 to-red-600",
+      isNew: true,
+    },
+    {
+      id: "none",
+      name: "No ORM",
+      description: "Skip the Ruby database layer",
+      icon: "",
+      color: "from-gray-400 to-gray-600",
+      default: true,
+    },
+  ],
   phpWebFramework: [
     {
       id: "slim",

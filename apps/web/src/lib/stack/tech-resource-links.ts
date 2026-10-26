@@ -2351,6 +2351,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://cycle-orm.dev/docs/intro-about/current/en",
     githubUrl: "https://github.com/cycle/orm",
   },
+  "rubyOrm:active-record": {
+    docsUrl: "https://guides.rubyonrails.org/active_record_basics.html",
+    githubUrl: "https://github.com/rails/rails/tree/main/activerecord",
+  },
+  "rubyOrm:sequel": {
+    docsUrl: "https://sequel.jeremyevans.net/documentation.html",
+    githubUrl: "https://github.com/jeremyevans/sequel",
+  },
+  "rubyOrm:rom": {
+    docsUrl: "https://rom-rb.org/learn/",
+    githubUrl: "https://github.com/rom-rb/rom",
+  },
   "elixirOrm:ecto-sql": {
     docsUrl: "https://hexdocs.pm/ecto_sql/",
     githubUrl: "https://github.com/elixir-ecto/ecto_sql",

@@ -188,7 +188,10 @@ function normalizeGraphConfigForPersistence(
     normalized.dotnetLibraries = [];
   }
 
-  if (!selectedEcosystems.has("ruby")) normalized.rubyWebFramework = "none";
+  if (!selectedEcosystems.has("ruby")) {
+    normalized.rubyWebFramework = "none";
+    normalized.rubyOrm = "none";
+  }
 
   if (!selectedEcosystems.has("php")) {
     normalized.phpWebFramework = "none";
@@ -512,6 +515,7 @@ export function buildBtsConfigForPersistence(
     dotnetDeploy: persistedConfig.dotnetDeploy,
     dotnetLibraries: persistedConfig.dotnetLibraries,
     rubyWebFramework: persistedConfig.rubyWebFramework,
+    rubyOrm: persistedConfig.rubyOrm,
     phpWebFramework: persistedConfig.phpWebFramework,
     phpOrm: persistedConfig.phpOrm,
     phpAuth: persistedConfig.phpAuth,
@@ -713,6 +717,7 @@ export function serializeBtsConfig(
     dotnetDeploy: btsConfig.dotnetDeploy,
     dotnetLibraries: btsConfig.dotnetLibraries,
     rubyWebFramework: btsConfig.rubyWebFramework,
+    rubyOrm: btsConfig.rubyOrm,
     phpWebFramework: btsConfig.phpWebFramework,
     phpOrm: btsConfig.phpOrm,
     phpAuth: btsConfig.phpAuth,

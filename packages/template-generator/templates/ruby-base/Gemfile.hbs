@@ -15,6 +15,19 @@ gem "grape", "4.0.1"
 gem "railties", "8.1.4"
 gem "actionpack", "8.1.4"
 {{/if}}
+{{#if (eq rubyOrm "active-record")}}
+gem "activerecord", "8.1.4"
+{{/if}}
+{{#if (eq rubyOrm "sequel")}}
+gem "sequel", "5.109.0"
+{{/if}}
+{{#if (eq rubyOrm "rom")}}
+gem "rom", "5.4.3"
+gem "rom-sql", "3.7.0"
+{{/if}}
+{{#if (ne rubyOrm "none")}}
+gem "sqlite3", "2.10.2"
+{{/if}}
 gem "puma", "7.1.0"
 gem "rackup", "2.3.1"
 gem "rake", "13.3.1"

@@ -66,6 +66,7 @@ import type {
   VectorDbSchema,
   FileStorageSchema,
   RubyWebFrameworkSchema,
+  RubyOrmSchema,
   EcosystemSchema,
   RustWebFrameworkSchema,
   RustFrontendSchema,
@@ -394,3 +395,4 @@ export type NativeFrontend = Extract<
 >;
 
 export type RubyWebFramework = z.infer<typeof RubyWebFrameworkSchema>;
+export type RubyOrm = z.infer<typeof RubyOrmSchema>;

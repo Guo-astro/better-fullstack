@@ -110,7 +110,7 @@ export async function displayPostInstallInstructions(
 
   if (ecosystem === "ruby") {
     consola.box(
-      `Next steps\n\ncd ${relativePath}\n${depsInstalled ? "" : "bundle install\n"}bundle exec rake build\nbundle exec rake test\nbundle exec ruby bin/server\n\nHTTP: http://127.0.0.1:4567/health\nRuntime proof: bundle exec ruby bin/proof\nExperimental recipe. Database and authentication adapters are not generated.`,
+      `Next steps\n\ncd ${relativePath}\n${depsInstalled ? "" : "bundle install\n"}${config.rubyOrm && config.rubyOrm !== "none" ? "bundle exec rake db:migrate\n" : ""}bundle exec rake build\nbundle exec rake test\nbundle exec ruby bin/server\n\nHTTP: http://127.0.0.1:4567/health\nRuntime proof: bundle exec ruby bin/proof\n${config.rubyOrm && config.rubyOrm !== "none" ? `Database: ${config.rubyOrm} on SQLite (DATABASE_PATH).\n` : ""}Experimental recipe.`,
     );
     return;
   }

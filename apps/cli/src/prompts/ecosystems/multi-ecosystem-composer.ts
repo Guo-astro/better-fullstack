@@ -143,7 +143,7 @@ import {
   getPythonValidationChoice,
   getPythonWebFrameworkChoice,
 } from "@/prompts/ecosystems/python-ecosystem";
-import { getRubyWebFrameworkChoice } from "@/prompts/ecosystems/ruby-ecosystem";
+import { getRubyOrmChoice, getRubyWebFrameworkChoice } from "@/prompts/ecosystems/ruby-ecosystem";
 import {
   getRustApiChoice,
   getRustAuthChoice,
@@ -1448,8 +1448,11 @@ export async function gatherMultiEcosystemConfig(
 
   if (backendEcosystem === "ruby") {
     const rubyWebFramework = promptValue(await getRubyWebFrameworkChoice(flags.rubyWebFramework));
-    Object.assign(backendChoices, { rubyWebFramework });
+    const rubyOrm =
+      rubyWebFramework === "none" ? "none" : promptValue(await getRubyOrmChoice(flags.rubyOrm));
+    Object.assign(backendChoices, { rubyWebFramework, rubyOrm });
     if (rubyWebFramework !== "none") stackPartSpecs.push(`backend:ruby:${rubyWebFramework}`);
+    if (rubyOrm !== "none") stackPartSpecs.push(`backend.orm:ruby:${rubyOrm}`);
   }
 
   if (backendEcosystem === "php") {

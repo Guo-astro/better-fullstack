@@ -241,6 +241,69 @@ describe("Ruby language integration", () => {
     );
   });
 
+  it.each([
+    { orm: "active-record", gem: 'gem "activerecord", "8.1.4"', migration: "db/migrate/20261027000000_create_items.rb" },
+    { orm: "sequel", gem: 'gem "sequel", "5.109.0"', migration: "db/migrations/001_create_items.rb" },
+    { orm: "rom", gem: 'gem "rom-sql", "3.7.0"', migration: "db/migrate/20261027000000_create_items.rb" },
+  ] as const)("persists items through $orm on SQLite", async ({ orm, gem, migration }) => {
+    const result = await createVirtual({
+      ecosystem: "ruby",
+      projectName: "ruby-service",
+      rubyWebFramework: "roda",
+      rubyOrm: orm,
+      aiDocs: ["agents-md"],
+    });
+    if (!result.success || !result.tree) throw new Error(result.error ?? "No Ruby project");
+    const paths = listVirtualTreeFilePaths(result.tree);
+    for (const path of ["db.rb", "items.rb", migration]) expect(paths).toContain(path);
+    expect(paths.some((path) => path.startsWith("orm/"))).toBe(false);
+    expect(content(result.tree, "Gemfile")).toContain(gem);
+    expect(content(result.tree, "Gemfile")).toContain('gem "sqlite3", "2.10.2"');
+    expect(content(result.tree, "app.rb")).toContain('r.is "api/items"');
+    expect(content(result.tree, "Rakefile")).toContain("task :migrate");
+    expect(content(result.tree, "test/app_test.rb")).toContain("BetterFullstack::Database.migrate!");
+    expect(content(result.tree, "bin/proof")).toContain("DATABASE_PATH");
+    expect(content(result.tree, "AGENTS.md")).toContain("bundle exec rake db:migrate");
+    const project = { ...config(), rubyWebFramework: "roda" as const, rubyOrm: orm };
+    expect(generateReproducibleCommand(project)).toContain(`--ruby-orm ${orm}`);
+    const persisted = buildBtsConfigForPersistence(project, {
+      version: "test",
+      createdAt: "2026-10-27T00:00:00.000Z",
+    });
+    expect(persisted.rubyOrm).toBe(orm);
+    expect(
+      persisted.stackParts?.find((part) => part.role === "orm" && part.ecosystem === "ruby")
+        ?.toolId,
+    ).toBe(orm);
+  });
+
+  it("omits the database layer when no Ruby ORM is selected", async () => {
+    const result = await createVirtual({ ecosystem: "ruby", rubyWebFramework: "sinatra" });
+    if (!result.success || !result.tree) throw new Error(result.error ?? "No Ruby project");
+    const paths = listVirtualTreeFilePaths(result.tree);
+    expect(paths).not.toContain("db.rb");
+    expect(content(result.tree, "Gemfile")).not.toContain("sqlite3");
+    expect(content(result.tree, "app.rb")).not.toContain("/api/items");
+  });
+
+  it("accepts a Ruby-owned ORM part in a composed graph", async () => {
+    const result = await createVirtual({
+      stackParts: parseStackPartSpecs([
+        "frontend:typescript:react-vite",
+        "frontend.css:typescript:tailwind",
+        "backend:ruby:grape:api",
+        "api.orm:ruby:sequel",
+      ]),
+      aiDocs: ["none"],
+    });
+    if (!result.success || !result.tree) throw new Error(result.error ?? "No composed project");
+    const api = listVirtualTreeFilePaths(result.tree).find((path) => path.endsWith("/items.rb"));
+    if (!api) throw new Error("Missing Ruby items repository");
+    const root = api.slice(0, -"items.rb".length);
+    expect(content(result.tree, `${root}Gemfile`)).toContain('gem "sequel", "5.109.0"');
+    expect(content(result.tree, `${root}app.rb`)).toContain('post "/api/items"');
+  });
+
   it("round-trips persistence and updates without retaining inactive Ruby defaults", () => {
     const project = config();
     const metadata = { version: "test", createdAt: "2026-10-22T00:00:00.000Z" };

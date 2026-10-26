@@ -589,6 +589,7 @@
   "docsCliSummaryDotnetDotnetDeploy": ".NET 部署目標。",
   "docsCliSummaryDotnetDotnetLibraries": "選用的 .NET 函式庫。",
   "docsCliSummaryRubyRubyWebFramework": "Ruby HTTP 框架。",
+  "docsCliSummaryRubyRubyOrm": "Ruby ORM / 資料庫層。",
   "docsCliSummaryPhpPhpWebFramework": "PHP HTTP 框架。",
   "docsCliSummaryPhpPhpOrm": "PHP ORM / 資料庫層。",
   "docsCliSummaryPhpPhpAuth": "PHP 認證。",

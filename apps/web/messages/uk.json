@@ -590,6 +590,7 @@
   "docsCliSummaryDotnetDotnetDeploy": "Цільове середовище розгортання .NET.",
   "docsCliSummaryDotnetDotnetLibraries": "Необов’язкові бібліотеки .NET.",
   "docsCliSummaryRubyRubyWebFramework": "HTTP-фреймворк Ruby.",
+  "docsCliSummaryRubyRubyOrm": "ORM / шар бази даних Ruby.",
   "docsCliSummaryPhpPhpWebFramework": "HTTP-фреймворк PHP.",
   "docsCliSummaryPhpPhpOrm": "ORM / шар бази даних PHP.",
   "docsCliSummaryPhpPhpAuth": "Автентифікація PHP.",

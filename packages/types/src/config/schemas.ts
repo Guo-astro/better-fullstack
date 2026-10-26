@@ -6,6 +6,10 @@ export const RubyWebFrameworkSchema = z
   .enum(["sinatra", "rails", "roda", "grape", "none"])
   .describe("Ruby HTTP framework");
 
+export const RubyOrmSchema = z
+  .enum(["active-record", "sequel", "rom", "none"])
+  .describe("Ruby ORM / database layer (SQLite-backed)");
+
 export const EcosystemSchema = z
   .enum([
     "typescript",
@@ -1417,6 +1421,7 @@ const STACK_CONFIG_FIELDS = {
   dotnetLibraries: z.array(DotnetLibrariesSchema).describe(".NET application libraries"),
   // Elixir ecosystem options
   rubyWebFramework: RubyWebFrameworkSchema.optional(),
+  rubyOrm: RubyOrmSchema.optional(),
   phpWebFramework: PhpWebFrameworkSchema.default("none"),
   phpOrm: PhpOrmSchema.default("none"),
   phpAuth: PhpAuthSchema.default("none"),
@@ -1741,3 +1746,4 @@ export const SHADCN_FONT_VALUES = ShadcnFontSchema.options;
 export const SHADCN_RADIUS_VALUES = ShadcnRadiusSchema.options;
 
 export const RUBY_WEB_FRAMEWORK_VALUES = RubyWebFrameworkSchema.options;
+export const RUBY_ORM_VALUES = RubyOrmSchema.options;

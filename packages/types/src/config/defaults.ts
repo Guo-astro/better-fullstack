@@ -144,6 +144,7 @@ export const CLI_DEFAULT_PROJECT_CONFIG = {
   dotnetDeploy: "docker",
   dotnetLibraries: [],
   rubyWebFramework: "sinatra",
+  rubyOrm: "none",
   phpWebFramework: "slim",
   phpOrm: "none",
   phpAuth: "none",

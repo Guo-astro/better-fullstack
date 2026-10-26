@@ -1,8 +1,11 @@
-import type { RubyWebFramework } from "@/types";
+import type { RubyOrm, RubyWebFramework } from "@/types";
 
 import { exitCancelled } from "@/presentation/errors";
 import { isCancel, navigableSelect } from "@/prompts/core/navigable";
-import { createStaticSinglePromptResolution } from "@/prompts/core/prompt-contract";
+import {
+  createStaticSinglePromptResolution,
+  type PromptOption,
+} from "@/prompts/core/prompt-contract";
 
 export function resolveRubyWebFrameworkPrompt(value?: RubyWebFramework, allowNone = false) {
   return createStaticSinglePromptResolution(
@@ -29,6 +32,28 @@ export async function getRubyWebFrameworkChoice(value?: RubyWebFramework) {
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "sinatra";
   const response = await navigableSelect<RubyWebFramework>({
     message: "Select Ruby web framework",
+    options: resolution.options,
+    initialValue: resolution.initialValue,
+  });
+  if (isCancel(response)) return exitCancelled("Operation cancelled");
+  return response;
+}
+
+const ORM_OPTIONS: PromptOption<RubyOrm>[] = [
+  { value: "active-record", label: "Active Record", hint: "Rails ORM with versioned migrations" },
+  { value: "sequel", label: "Sequel", hint: "Database toolkit and models with its migrator" },
+  { value: "rom", label: "ROM", hint: "Data mapper with relations and repositories" },
+  { value: "none", label: "None", hint: "No database layer" },
+];
+
+export const resolveRubyOrmPrompt = (value?: RubyOrm) =>
+  createStaticSinglePromptResolution(ORM_OPTIONS, "none", value);
+
+export async function getRubyOrmChoice(value?: RubyOrm) {
+  const resolution = resolveRubyOrmPrompt(value);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
+  const response = await navigableSelect<RubyOrm>({
+    message: "Select Ruby database layer (SQLite)",
     options: resolution.options,
     initialValue: resolution.initialValue,
   });

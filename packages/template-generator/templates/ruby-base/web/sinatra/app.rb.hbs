@@ -1,6 +1,9 @@
 require "json"
 require "sinatra/base"
 require_relative "http_policy"
+{{#if (ne rubyOrm "none")}}
+require_relative "items"
+{{/if}}
 require_relative "name_input"
 require_relative "request_body_limit"
 
@@ -35,6 +38,18 @@ module BetterFullstack
       halt json_response(name.status, error: name.error) if name.is_a?(NameInput::Invalid)
       json_response(200, greeting: "Hello, #{name}!")
     end
+{{#if (ne rubyOrm "none")}}
+
+    get "/api/items" do
+      json_response(200, items: Items.all)
+    end
+
+    post "/api/items" do
+      name = NameInput.parse(request.media_type, request.body)
+      halt json_response(name.status, error: name.error) if name.is_a?(NameInput::Invalid)
+      json_response(201, Items.create(name))
+    end
+{{/if}}
 
     not_found do
       json_response(404, error: "not_found")

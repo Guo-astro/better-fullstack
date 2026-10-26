@@ -2,6 +2,9 @@ require "action_controller/railtie"
 require "json"
 require "securerandom"
 require_relative "http_policy"
+{{#if (ne rubyOrm "none")}}
+require_relative "items"
+{{/if}}
 require_relative "name_input"
 require_relative "request_body_limit"
 
@@ -33,6 +36,19 @@ module BetterFullstack
 
       render json: { greeting: "Hello, #{name}!" }
     end
+{{#if (ne rubyOrm "none")}}
+
+    def items
+      render json: { items: Items.all }
+    end
+
+    def create_item
+      name = NameInput.parse(request.media_type, request.body)
+      return render json: { error: name.error }, status: name.status if name.is_a?(NameInput::Invalid)
+
+      render json: Items.create(name), status: 201
+    end
+{{/if}}
 
     def not_found
       render json: { error: "not_found" }, status: 404
@@ -43,6 +59,10 @@ module BetterFullstack
   Application.routes.draw do
     get "health", to: "better_fullstack/api#health"
     post "api/greetings", to: "better_fullstack/api#greeting"
+{{#if (ne rubyOrm "none")}}
+    get "api/items", to: "better_fullstack/api#items"
+    post "api/items", to: "better_fullstack/api#create_item"
+{{/if}}
     match "/", to: "better_fullstack/api#not_found", via: :all
     match "*path", to: "better_fullstack/api#not_found", via: :all
   end

@@ -105,7 +105,10 @@ import {
   resolvePythonValidationPrompt,
   resolvePythonWebFrameworkPrompt,
 } from "@/prompts/ecosystems/python-ecosystem";
-import { resolveRubyWebFrameworkPrompt } from "@/prompts/ecosystems/ruby-ecosystem";
+import {
+  resolveRubyOrmPrompt,
+  resolveRubyWebFrameworkPrompt,
+} from "@/prompts/ecosystems/ruby-ecosystem";
 import {
   resolveRustApiPrompt,
   resolveRustCachingPrompt,
@@ -174,6 +177,8 @@ import {
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
   RUBY_WEB_FRAMEWORK_VALUES,
+  RUBY_ORM_VALUES,
+  RubyOrmSchema,
   RubyWebFrameworkSchema,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   EMAIL_VALUES,
@@ -782,6 +787,12 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
         allowNone,
       ),
     coverageContexts: [{}, { allowNone: true }],
+  },
+  rubyOrm: {
+    schemaValues: RUBY_ORM_VALUES,
+    resolve: ({ value }: { value?: string } = {}) =>
+      resolveRubyOrmPrompt(value === undefined ? undefined : RubyOrmSchema.parse(value)),
+    coverageContexts: [{}],
   },
   phpWebFramework: {
     schemaValues: PhpWebFrameworkSchema.options,

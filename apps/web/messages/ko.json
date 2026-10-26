@@ -589,6 +589,7 @@
   "docsCliSummaryDotnetDotnetDeploy": ".NET 배포 대상.",
   "docsCliSummaryDotnetDotnetLibraries": "선택적 .NET 라이브러리.",
   "docsCliSummaryRubyRubyWebFramework": "Ruby HTTP 프레임워크.",
+  "docsCliSummaryRubyRubyOrm": "Ruby ORM / 데이터베이스 계층.",
   "docsCliSummaryPhpPhpWebFramework": "PHP HTTP 프레임워크.",
   "docsCliSummaryPhpPhpOrm": "PHP ORM / 데이터베이스 계층.",
   "docsCliSummaryPhpPhpAuth": "PHP 인증.",

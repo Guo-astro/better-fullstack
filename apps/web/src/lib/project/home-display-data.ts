@@ -42,7 +42,16 @@ export const HOME_FEATURE_OPTIONS = {
     "elixirWebFramework",
     "dotnetWebFramework",
   ]),
-  orm: getOptions(["orm", "rustOrm", "pythonOrm", "goOrm", "javaOrm", "elixirOrm", "dotnetOrm"]),
+  orm: getOptions([
+    "orm",
+    "rustOrm",
+    "pythonOrm",
+    "goOrm",
+    "javaOrm",
+    "elixirOrm",
+    "dotnetOrm",
+    "rubyOrm",
+  ]),
   auth: getOptions([
     "auth",
     "rustAuth",

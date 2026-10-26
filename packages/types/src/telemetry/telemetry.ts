@@ -386,6 +386,7 @@ export const TELEMETRY_PROJECT_CONFIG_KEYS = [
   "dotnetDeploy",
   "dotnetLibraries",
   "rubyWebFramework",
+  "rubyOrm",
   "phpWebFramework",
   "phpOrm",
   "phpAuth",

@@ -589,6 +589,7 @@
   "docsCliSummaryDotnetDotnetDeploy": "Cible de déploiement .NET.",
   "docsCliSummaryDotnetDotnetLibraries": "Bibliothèques .NET facultatives.",
   "docsCliSummaryRubyRubyWebFramework": "Framework HTTP Ruby.",
+  "docsCliSummaryRubyRubyOrm": "ORM / couche base de données Ruby.",
   "docsCliSummaryPhpPhpWebFramework": "Framework HTTP PHP.",
   "docsCliSummaryPhpPhpOrm": "ORM / couche de base de données PHP.",
   "docsCliSummaryPhpPhpAuth": "Authentification PHP.",

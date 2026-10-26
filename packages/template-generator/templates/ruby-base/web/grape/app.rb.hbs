@@ -1,6 +1,9 @@
 require "grape"
 require "json"
 require_relative "http_policy"
+{{#if (ne rubyOrm "none")}}
+require_relative "items"
+{{/if}}
 require_relative "name_input"
 require_relative "request_body_limit"
 
@@ -25,6 +28,19 @@ module BetterFullstack
       status 200
       { greeting: "Hello, #{name}!" }
     end
+{{#if (ne rubyOrm "none")}}
+
+    get "/api/items" do
+      { items: Items.all }
+    end
+
+    post "/api/items" do
+      name = NameInput.parse(request.media_type, env["rack.input"])
+      error!({ error: name.error }, name.status) if name.is_a?(NameInput::Invalid)
+      status 201
+      Items.create(name)
+    end
+{{/if}}
 
     route :any, "*path" do
       error!({ error: "not_found" }, 404)
