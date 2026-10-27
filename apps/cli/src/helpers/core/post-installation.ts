@@ -112,8 +112,11 @@ export async function displayPostInstallInstructions(
   }
 
   if (ecosystem === "ruby") {
+    const ruby = config.stackParts?.length
+      ? stackGraphToLegacyProjectConfigForEcosystem(config, "ruby")
+      : config;
     consola.box(
-      `Next steps\n\ncd ${relativePath}\n${depsInstalled ? "" : "bundle install\n"}${(config.rubyOrm && config.rubyOrm !== "none") || config.rubyAuth === "rodauth" ? "bundle exec rake db:migrate\n" : ""}bundle exec rake build\n${config.rubyTesting === "none" ? "" : "bundle exec rake test\n"}bundle exec ruby bin/server\n\nHTTP: http://127.0.0.1:4567/health\nRuntime proof: bundle exec ruby bin/proof\n${config.rubyOrm && config.rubyOrm !== "none" ? `Database: ${config.rubyOrm} on SQLite (DATABASE_PATH).\n` : ""}${config.rubyAuth && config.rubyAuth !== "none" ? `Auth: ${config.rubyAuth}. Set its secrets from .env.example before production.\n` : ""}${config.rubyCache === "redis" ? "Cache: start Redis at REDIS_URL before tests and bin/proof.\n" : config.rubyCache === "memcached" ? "Cache: start Memcached at MEMCACHED_SERVERS before tests and bin/proof.\n" : ""}${config.rubyJobQueue && config.rubyJobQueue !== "none" ? `Jobs: ${config.rubyJobQueue}; run the worker with bundle exec ruby bin/worker${config.rubyJobQueue === "solid-queue" ? "" : " (Redis at JOBS_REDIS_URL)"}.\n` : ""}Experimental recipe.`,
+      `Next steps\n\ncd ${relativePath}\n${depsInstalled ? "" : "bundle install\n"}${(ruby.rubyOrm && ruby.rubyOrm !== "none") || ruby.rubyAuth === "rodauth" ? "bundle exec rake db:migrate\n" : ""}bundle exec rake build\n${ruby.rubyTesting === "none" ? "" : "bundle exec rake test\n"}bundle exec ruby bin/server\n\nHTTP: http://127.0.0.1:4567/health\nRuntime proof: bundle exec ruby bin/proof\n${ruby.rubyOrm && ruby.rubyOrm !== "none" ? `Database: ${ruby.rubyOrm} on SQLite (DATABASE_PATH).\n` : ""}${ruby.rubyAuth && ruby.rubyAuth !== "none" ? `Auth: ${ruby.rubyAuth}. Set its secrets from .env.example before production.\n` : ""}${ruby.rubyCache === "redis" ? "Cache: start Redis at REDIS_URL before tests and bin/proof.\n" : ruby.rubyCache === "memcached" ? "Cache: start Memcached at MEMCACHED_SERVERS before tests and bin/proof.\n" : ""}${ruby.rubyJobQueue && ruby.rubyJobQueue !== "none" ? `Jobs: ${ruby.rubyJobQueue}; run the worker with bundle exec ruby bin/worker${ruby.rubyJobQueue === "solid-queue" ? "" : " (Redis at JOBS_REDIS_URL)"}.\n` : ""}Experimental recipe.`,
     );
     return;
   }

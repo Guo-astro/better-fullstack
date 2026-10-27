@@ -19,15 +19,15 @@ function createStorage(initial: Record<string, string> = {}) {
 }
 
 describe("launch radar release manifest", () => {
-  test("tracks all 164 additions without count drift", () => {
-    expect(LAUNCH_RADAR_TOTAL).toBe(164);
+  test("tracks all 179 additions without count drift", () => {
+    expect(LAUNCH_RADAR_TOTAL).toBe(179);
     expect(LAUNCH_RADAR_GROUPS.map((group) => [group.id, group.count])).toEqual([
       ["typescript", 43],
       ["rust", 20],
       ["python", 20],
       ["go", 20],
       ["java", 20],
-      ["elixir", 21],
+      ["elixir", 36],
       ["dotnet", 20],
     ]);
   });

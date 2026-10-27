@@ -366,6 +366,17 @@ export const CONFIG_SCOPE_REGISTRY = {
         promptKeys: ["elixirRealtime", "elixirJobs"],
       },
       {
+        id: "app-tooling",
+        label: "Logging, Config, Messaging, Templates & CLI",
+        promptKeys: [
+          "elixirLogging",
+          "elixirConfig",
+          "elixirMessageQueue",
+          "elixirTemplating",
+          "elixirCli",
+        ],
+      },
+      {
         id: "type-safety-http",
         label: "Validation, HTTP & JSON",
         promptKeys: ["elixirValidation", "elixirHttp", "elixirJson"],
