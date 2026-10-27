@@ -71,6 +71,7 @@ import {
   RUBY_VALIDATION_VALUES,
   RUBY_CACHE_VALUES,
   RUBY_JOB_QUEUE_VALUES,
+  RUBY_EMAIL_VALUES,
   PHP_WEB_FRAMEWORK_VALUES,
   PHP_ORM_VALUES,
   PHP_AUTH_VALUES,
@@ -734,6 +735,9 @@ function isNativeEcosystemBackendServiceTool(
   if (part.role === "email" && part.ecosystem === "elixir") {
     return (ELIXIR_EMAIL_VALUES as readonly string[]).includes(part.toolId);
   }
+  if (part.role === "email" && part.ecosystem === "ruby") {
+    return (RUBY_EMAIL_VALUES as readonly string[]).includes(part.toolId);
+  }
 
   if (part.role === "caching") {
     if (part.ecosystem === "elixir") {
@@ -837,6 +841,7 @@ const LEGACY_EXTRA_CATEGORIES_BY_ECOSYSTEM = {
     validation: "rubyValidation",
     caching: "rubyCache",
     jobQueue: "rubyJobQueue",
+    email: "rubyEmail",
   },
   php: {
     testing: "phpTesting",
@@ -1291,6 +1296,7 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ...defineTools(RUBY_VALIDATION_VALUES, "validation", "ruby", "rubyValidation"),
   ...defineTools(RUBY_CACHE_VALUES, "caching", "ruby", "rubyCache"),
   ...defineTools(RUBY_JOB_QUEUE_VALUES, "jobQueue", "ruby", "rubyJobQueue"),
+  ...defineTools(RUBY_EMAIL_VALUES, "email", "ruby", "rubyEmail"),
   ...defineTools(PHP_WEB_FRAMEWORK_VALUES, "backend", "php", "phpWebFramework").map(
     (definition) => ({
       ...definition,

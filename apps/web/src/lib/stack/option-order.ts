@@ -114,6 +114,7 @@ export const OPTION_DISPLAY_ORDER: Readonly<Record<string, readonly string[]>> =
   rubyValidation: ["dry-validation", "active-model", "json-schemer", "none"],
   rubyCache: ["redis", "memcached", "memory", "none"],
   rubyJobQueue: ["sidekiq", "resque", "solid-queue", "none"],
+  rubyEmail: ["mail", "action-mailer", "resend", "none"],
   elixirQuality: ["credo", "dialyxir", "excoveralls", "sobelow", "mix_audit", "none"],
   elixirTesting: ["ex_unit", "ex_machina", "wallaby", "mox", "bypass", "stream_data", "none"],
   elixirValidation: ["nimble-options", "ecto-changesets", "peri", "tarams", "none"],

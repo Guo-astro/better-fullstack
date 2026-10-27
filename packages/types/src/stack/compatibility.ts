@@ -591,6 +591,7 @@ export type CompatibilityInput = {
   rubyValidation: string;
   rubyCache: string;
   rubyJobQueue: string;
+  rubyEmail: string;
   phpWebFramework: string;
   phpOrm: string;
   phpAuth: string;

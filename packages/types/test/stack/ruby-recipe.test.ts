@@ -280,6 +280,7 @@ describe("Ruby recipe contracts", () => {
     ["rubyValidation", "validation", "json-schemer", "none"],
     ["rubyCache", "caching", "redis", "none"],
     ["rubyJobQueue", "jobQueue", "sidekiq", "none"],
+    ["rubyEmail", "email", "resend", "none"],
   ] as const)(
     "projects %s as a Ruby-owned %s part",
     (category, role, tool, fallback) => {
@@ -338,6 +339,20 @@ describe("Ruby recipe contracts", () => {
         ]),
       }),
     ).toBeNull();
+  });
+
+  it("allows Action Mailer only on Rails", () => {
+    expect(
+      getDisabledReason({ ...rubySelection(), rubyWebFramework: "rails" }, "rubyEmail", "action-mailer"),
+    ).toBeNull();
+    expect(getDisabledReason(rubySelection(), "rubyEmail", "action-mailer")).toBe(
+      "Action Mailer requires Ruby Rails.",
+    );
+    expect(
+      getRubyRecipeIssue({
+        stackParts: parseStackPartSpecs(["backend:ruby:roda", "backend.email:ruby:action-mailer"]),
+      }),
+    ).toBe("Action Mailer requires Ruby Rails.");
   });
 
   it("rejects selected databases when Ruby is the only backend, in either picker order", () => {

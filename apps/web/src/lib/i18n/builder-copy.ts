@@ -763,6 +763,16 @@ const CATEGORY_NAMES: Record<string, LocalizedMap> = {
     "fr": "Tâches en arrière-plan Ruby",
     "uk": "Фонові завдання Ruby",
   },
+  rubyEmail: {
+    "es": "Correo Ruby",
+    "zh": "Ruby 邮件",
+    "ja": "Ruby メール",
+    "ko": "Ruby 이메일",
+    "zh-Hant": "Ruby 郵件",
+    "de": "Ruby-E-Mail",
+    "fr": "E-mail Ruby",
+    "uk": "Електронна пошта Ruby",
+  },
   rubyAuth: {
     "es": "Auth Ruby",
     "zh": "Ruby 认证",

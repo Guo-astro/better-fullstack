@@ -595,6 +595,7 @@
   "docsCliSummaryRubyRubyValidation": "Ruby 請求驗證。",
   "docsCliSummaryRubyRubyCache": "Ruby 快取儲存。",
   "docsCliSummaryRubyRubyJobQueue": "Ruby 背景工作佇列。",
+  "docsCliSummaryRubyRubyEmail": "Ruby 郵件傳送。",
   "docsCliSummaryPhpPhpWebFramework": "PHP HTTP 框架。",
   "docsCliSummaryPhpPhpOrm": "PHP ORM / 資料庫層。",
   "docsCliSummaryPhpPhpAuth": "PHP 認證。",

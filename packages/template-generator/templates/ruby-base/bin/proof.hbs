@@ -97,6 +97,24 @@ begin
   end
   raise "Job result was wrong" unless job == { "id" => job_id, "status" => "done", "greeting" => "Hello, Ruby!" }
 {{/if}}
+{{#if (or (eq rubyEmail "mail") (eq rubyEmail "action-mailer"))}}
+  require_relative "../support/smtp_capture"
+  smtp = BetterFullstack::SmtpCapture.new
+  sent = system(environment.merge("SMTP_HOST" => "127.0.0.1", "SMTP_PORT" => smtp.port.to_s), RbConfig.ruby, "-r", "./mailer", "-e", "BetterFullstack::Mailer.deliver_welcome(ARGV.fetch(0))", "proof@example.com", chdir: root, out: log, err: log)
+  raise "Welcome email was not sent" unless sent
+  message = Timeout.timeout(5) { smtp.messages.pop }
+  raise "SMTP server received the wrong message" unless message.include?("To: proof@example.com") && message.include?("Subject: Welcome")
+  smtp.close
+{{/if}}
+{{#if (eq rubyEmail "resend")}}
+  require_relative "../support/http_capture"
+  resend = BetterFullstack::HttpCapture.new({ id: "email_proof" })
+  sent = system(environment.merge("RESEND_BASE_URL" => resend.url, "RESEND_API_KEY" => "re_proof_key"), RbConfig.ruby, "-r", "./mailer", "-e", "BetterFullstack::Mailer.deliver_welcome(ARGV.fetch(0))", "proof@example.com", chdir: root, out: log, err: log)
+  raise "Welcome email was not sent" unless sent
+  request = Timeout.timeout(5) { resend.requests.pop }
+  raise "Resend API received the wrong request" unless request.fetch("request").start_with?("POST /emails ") && request.fetch("authorization") == "Bearer re_proof_key" && request.fetch("body").fetch("to") == ["proof@example.com"]
+  resend.close
+{{/if}}
   response = http.post("/api/greetings", "", "Content-Type" => "application/json")
   raise "Empty JSON request was not rejected" unless response.code == "400" && JSON.parse(response.body).fetch("error") == "invalid_json"
 {{#if (ne rubyOrm "none")}}
@@ -133,7 +151,7 @@ begin
   response = http.post("/auth/oidc", "")
   raise "Sign-in without a CSRF token was not rejected" unless response.code == "302" && response["location"].include?("/auth/failure")
 {{/if}}
-  puts JSON.generate(health: "passed", parsed_response: "passed", invalid_request: "passed", frontend_origins: "passed", empty_json: "passed"{{#if (ne rubyOrm "none")}}, persistence: "passed"{{/if}}{{#if (ne rubyAuth "none")}}, authentication: "passed"{{/if}}{{#if (ne rubyCache "none")}}, cache: "passed"{{/if}}{{#if (ne rubyJobQueue "none")}}, background_job: "passed"{{/if}})
+  puts JSON.generate(health: "passed", parsed_response: "passed", invalid_request: "passed", frontend_origins: "passed", empty_json: "passed"{{#if (ne rubyOrm "none")}}, persistence: "passed"{{/if}}{{#if (ne rubyAuth "none")}}, authentication: "passed"{{/if}}{{#if (ne rubyCache "none")}}, cache: "passed"{{/if}}{{#if (ne rubyJobQueue "none")}}, background_job: "passed"{{/if}}{{#if (ne rubyEmail "none")}}, email: "passed"{{/if}})
 rescue StandardError => error
   log.rewind
   warn log.read

@@ -30,6 +30,10 @@ export const RubyJobQueueSchema = z
   .enum(["sidekiq", "resque", "solid-queue", "none"])
   .describe("Ruby background job queue");
 
+export const RubyEmailSchema = z
+  .enum(["mail", "action-mailer", "resend", "none"])
+  .describe("Ruby email delivery");
+
 export const EcosystemSchema = z
   .enum([
     "typescript",
@@ -1491,6 +1495,7 @@ const STACK_CONFIG_FIELDS = {
   rubyValidation: RubyValidationSchema.optional(),
   rubyCache: RubyCacheSchema.optional(),
   rubyJobQueue: RubyJobQueueSchema.optional(),
+  rubyEmail: RubyEmailSchema.optional(),
   phpWebFramework: PhpWebFrameworkSchema.default("none"),
   phpOrm: PhpOrmSchema.default("none"),
   phpAuth: PhpAuthSchema.default("none"),
@@ -1838,3 +1843,4 @@ export const RUBY_TESTING_VALUES = RubyTestingSchema.options;
 export const RUBY_VALIDATION_VALUES = RubyValidationSchema.options;
 export const RUBY_CACHE_VALUES = RubyCacheSchema.options;
 export const RUBY_JOB_QUEUE_VALUES = RubyJobQueueSchema.options;
+export const RUBY_EMAIL_VALUES = RubyEmailSchema.options;

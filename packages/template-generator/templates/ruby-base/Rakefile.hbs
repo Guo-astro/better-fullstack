@@ -34,6 +34,16 @@ namespace :db do
   end
 end
 {{/if}}
+{{#if (ne rubyEmail "none")}}
+
+namespace :email do
+  desc "Send the welcome email to TO"
+  task :welcome, [:to] do |_task, args|
+    require_relative "mailer"
+    puts BetterFullstack::Mailer.deliver_welcome(args.fetch(:to))
+  end
+end
+{{/if}}
 {{#if (eq rubyAuth "jwt")}}
 
 namespace :auth do

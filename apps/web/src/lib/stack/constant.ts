@@ -6140,6 +6140,40 @@ export const TECH_OPTIONS: Record<
       default: true,
     },
   ],
+  rubyEmail: [
+    {
+      id: "mail",
+      name: "Mail",
+      description: "SMTP delivery with the mail gem and a rake send command",
+      icon: "https://cdn.simpleicons.org/ruby/CC342D",
+      color: "from-red-500 to-rose-700",
+      isNew: true,
+    },
+    {
+      id: "action-mailer",
+      name: "Action Mailer",
+      description: "Rails mailer class delivering over SMTP",
+      icon: "https://cdn.simpleicons.org/rubyonrails/D30001",
+      color: "from-red-600 to-red-800",
+      isNew: true,
+    },
+    {
+      id: "resend",
+      name: "Resend",
+      description: "Resend API client authenticated with RESEND_API_KEY",
+      icon: "https://cdn.simpleicons.org/resend/000000",
+      color: "from-gray-700 to-gray-900",
+      isNew: true,
+    },
+    {
+      id: "none",
+      name: "No email",
+      description: "Skip email delivery",
+      icon: "",
+      color: "from-gray-400 to-gray-600",
+      default: true,
+    },
+  ],
   rubyAuth: [
     {
       id: "jwt",

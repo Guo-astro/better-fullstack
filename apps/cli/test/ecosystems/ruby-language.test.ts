@@ -446,6 +446,28 @@ describe("Ruby language integration", () => {
     ).toContain(`--ruby-job-queue ${jobs}`);
   });
 
+  it.each([
+    { email: "mail", framework: "sinatra", library: 'require "mail"', proof: "SmtpCapture.new", env: "SMTP_HOST=" },
+    { email: "action-mailer", framework: "rails", library: "class WelcomeMailer < ActionMailer::Base", proof: "SmtpCapture.new", env: "SMTP_HOST=" },
+    { email: "resend", framework: "roda", library: "Resend::Emails.send(", proof: "HttpCapture.new", env: "RESEND_API_KEY=" },
+  ] as const)("sends the welcome email through $email from a rake task", async ({ email, framework, library, proof, env }) => {
+    const result = await createVirtual({ ecosystem: "ruby", rubyWebFramework: framework, rubyEmail: email });
+    if (!result.success || !result.tree) throw new Error(result.error ?? "No Ruby project");
+    const paths = listVirtualTreeFilePaths(result.tree);
+    expect(paths.some((path) => path.startsWith("email/"))).toBe(false);
+    expect(content(result.tree, "mailer.rb")).toContain(library);
+    expect(content(result.tree, "Rakefile")).toContain("namespace :email do");
+    expect(content(result.tree, "bin/proof")).toContain(proof);
+    expect(content(result.tree, ".env.example")).toContain(env);
+    expect(content(result.tree, "app.rb")).not.toContain("Mailer");
+    expect(paths.filter((path) => path.startsWith("support/"))).toEqual(
+      email === "resend" ? ["support/http_capture.rb"] : ["support/smtp_capture.rb"],
+    );
+    expect(
+      generateReproducibleCommand({ ...config(), rubyWebFramework: framework, rubyEmail: email }),
+    ).toContain(`--ruby-email ${email}`);
+  });
+
   it("rejects Solid Queue outside Rails with Active Record", async () => {
     const result = await createVirtual({
       ecosystem: "ruby",

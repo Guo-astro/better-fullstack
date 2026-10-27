@@ -1165,6 +1165,12 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         source: { kind: "category", category: "rubyJobQueue" },
         configKey: "rubyJobQueue",
       },
+      {
+        flag: "ruby-email",
+        summary: "Ruby email delivery.",
+        source: { kind: "category", category: "rubyEmail" },
+        configKey: "rubyEmail",
+      },
     ],
   },
   {

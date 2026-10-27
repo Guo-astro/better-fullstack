@@ -118,6 +118,8 @@ export const ICON_REGISTRY: Record<string, IconConfig> = {
   sidekiq: { type: "si", slug: "ruby", hex: "CC342D" },
   resque: { type: "si", slug: "redis", hex: "DC382D" },
   "solid-queue": { type: "si", slug: "rubyonrails", hex: "D30001" },
+  mail: { type: "si", slug: "ruby", hex: "CC342D" },
+  "action-mailer": { type: "si", slug: "rubyonrails", hex: "D30001" },
   php: { type: "si", slug: "php", hex: "777BB4" },
   slim: { type: "si", slug: "php", hex: "777BB4" },
   laravel: { type: "si", slug: "laravel", hex: "FF2D20" },

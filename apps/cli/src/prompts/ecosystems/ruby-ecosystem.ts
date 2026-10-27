@@ -7,6 +7,7 @@ import type {
   RubyValidation,
   RubyCache,
   RubyJobQueue,
+  RubyEmail,
   RubyWebFramework,
 } from "@/types";
 
@@ -190,6 +191,32 @@ export async function getRubyJobQueueChoice(
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
   const response = await navigableSelect<RubyJobQueue>({
     message: "Select Ruby background job queue",
+    options: resolution.options,
+    initialValue: resolution.initialValue,
+  });
+  if (isCancel(response)) return exitCancelled("Operation cancelled");
+  return response;
+}
+
+const EMAIL_OPTIONS: PromptOption<RubyEmail>[] = [
+  { value: "mail", label: "Mail", hint: "SMTP delivery with the mail gem" },
+  { value: "action-mailer", label: "Action Mailer", hint: "Rails mailer class with SMTP delivery" },
+  { value: "resend", label: "Resend", hint: "Resend API with RESEND_API_KEY" },
+  { value: "none", label: "None", hint: "No email delivery" },
+];
+
+export function resolveRubyEmailPrompt(value?: RubyEmail, framework?: RubyWebFramework) {
+  const options = EMAIL_OPTIONS.filter(
+    (option) => !getRubyOptionIssue("rubyEmail", option.value, framework, undefined),
+  );
+  return createStaticSinglePromptResolution(options, "none", value);
+}
+
+export async function getRubyEmailChoice(value?: RubyEmail, framework?: RubyWebFramework) {
+  const resolution = resolveRubyEmailPrompt(value, framework);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
+  const response = await navigableSelect<RubyEmail>({
+    message: "Select Ruby email delivery",
     options: resolution.options,
     initialValue: resolution.initialValue,
   });

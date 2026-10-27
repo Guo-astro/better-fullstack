@@ -321,6 +321,8 @@ function generateTechStackSection(config: ProjectConfig): string {
     if (cache) lines.push(`- Cache: ${cache} in cache.rb behind GET /api/cache`);
     const jobs = rubyOptionLabel(config, "rubyJobQueue");
     if (jobs) lines.push(`- Background jobs: ${jobs} in jobs.rb; run the worker with \`bundle exec ruby bin/worker\``);
+    const email = rubyOptionLabel(config, "rubyEmail");
+    if (email) lines.push(`- Email: ${email} in mailer.rb; send a test message with \`bundle exec rake "email:welcome[you@example.com]"\``);
   }
 
   if (config.ecosystem === "rust") {
@@ -533,7 +535,7 @@ function rubyTestingLabel(config: ProjectConfig) {
 
 function rubyOptionLabel(
   config: ProjectConfig,
-  category: "rubyValidation" | "rubyCache" | "rubyJobQueue",
+  category: "rubyValidation" | "rubyCache" | "rubyJobQueue" | "rubyEmail",
 ) {
   const value = config[category];
   return value && value !== "none" ? getOptionMetadata(category, value)?.label : undefined;
@@ -745,6 +747,8 @@ function generateCursorRules(config: ProjectConfig): string {
     if (cache) rules.push(`Caching uses ${cache} through Cache.fetch(key, ttl:) in cache.rb. Always pass a TTL, keep cached values JSON-serializable, and return 503 instead of failing the request when the cache server is down.`);
     const jobs = rubyOptionLabel(config, "rubyJobQueue");
     if (jobs) rules.push(`Background jobs use ${jobs}: GreetingJob and the Jobs service live in jobs.rb, and bin/worker runs them in a separate process. Keep job arguments JSON-serializable and jobs idempotent.`);
+    const email = rubyOptionLabel(config, "rubyEmail");
+    if (email) rules.push(`Email uses ${email} through Mailer.deliver_welcome in mailer.rb. Never expose an endpoint that sends mail to arbitrary addresses, and keep credentials in the process environment.`);
   } else if (config.ecosystem === "go") {
     rules.push(`You are working on a Go project.`);
     if (config.goWebFramework !== "none") rules.push(`Web framework: ${config.goWebFramework}`);

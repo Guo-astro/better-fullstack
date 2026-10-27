@@ -113,6 +113,29 @@ RSpec.describe BetterFullstack::App do
     end
   end
 {{/if}}
+{{#if (ne rubyEmail "none")}}
+
+  describe "welcome email" do
+    it "is delivered" do
+{{#if (eq rubyEmail "resend")}}
+      expect(BetterFullstack::Mailer.deliver_welcome("ruby@example.com")).to eq("email_test")
+      request = RESEND_API.requests.pop
+      expect(request.fetch("request")).to eq("POST /emails HTTP/1.1")
+      expect(request.fetch("authorization")).to eq("Bearer re_test_key")
+      expect(request.fetch("body").values_at("to", "subject")).to eq([["ruby@example.com"], "Welcome"])
+{{else}}
+      deliveries = {{#if (eq rubyEmail "mail")}}Mail::TestMailer.deliveries{{else}}ActionMailer::Base.deliveries{{/if}}
+      deliveries.clear
+      BetterFullstack::Mailer.deliver_welcome("ruby@example.com")
+      expect(deliveries.map { |message| [message.to, message.subject] }).to eq([[["ruby@example.com"], "Welcome"]])
+{{/if}}
+    end
+
+    it "rejects invalid recipients" do
+      expect { BetterFullstack::Mailer.deliver_welcome("not-an-address") }.to raise_error(ArgumentError)
+    end
+  end
+{{/if}}
 {{#if (ne rubyOrm "none")}}
 
   describe "items" do

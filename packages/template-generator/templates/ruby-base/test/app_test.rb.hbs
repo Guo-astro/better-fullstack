@@ -10,6 +10,13 @@ BetterFullstack::Database.migrate!
 require_relative "../auth"
 BetterFullstack::Auth.migrate!
 {{/if}}
+{{#if (eq rubyEmail "resend")}}
+
+require_relative "../support/http_capture"
+RESEND_API = BetterFullstack::HttpCapture.new({ id: "email_test" })
+ENV["RESEND_BASE_URL"] = RESEND_API.url
+ENV["RESEND_API_KEY"] = "re_test_key"
+{{/if}}
 
 {{#if (eq rubyTesting "test-unit")}}
 require "test/unit"
@@ -18,6 +25,9 @@ require "minitest/autorun"
 {{/if}}
 require "rack/test"
 require_relative "../app"
+{{#if (ne rubyEmail "none")}}
+require_relative "../mailer"
+{{/if}}
 {{#if (eq rubyJobQueue "sidekiq")}}
 require "sidekiq/testing"
 {{/if}}
@@ -130,6 +140,27 @@ class AppTest < {{#if (eq rubyTesting "test-unit")}}Test::Unit::TestCase{{else}}
   def test_invalid_jobs_are_not_enqueued
     post "/api/jobs", JSON.generate(name: " "), "CONTENT_TYPE" => "application/json"
     assert_equal 422, last_response.status
+  end
+
+{{/if}}
+{{#if (ne rubyEmail "none")}}
+  def test_welcome_email_is_delivered
+{{#if (eq rubyEmail "resend")}}
+    assert_equal "email_test", BetterFullstack::Mailer.deliver_welcome("ruby@example.com")
+    request = RESEND_API.requests.pop
+    assert_equal "POST /emails HTTP/1.1", request.fetch("request")
+    assert_equal "Bearer re_test_key", request.fetch("authorization")
+    assert_equal [["ruby@example.com"], "Welcome"], request.fetch("body").values_at("to", "subject")
+{{else}}
+    deliveries = {{#if (eq rubyEmail "mail")}}Mail::TestMailer.deliveries{{else}}ActionMailer::Base.deliveries{{/if}}
+    deliveries.clear
+    BetterFullstack::Mailer.deliver_welcome("ruby@example.com")
+    assert_equal [[["ruby@example.com"], "Welcome"]], deliveries.map { |message| [message.to, message.subject] }
+{{/if}}
+  end
+
+  def test_welcome_email_rejects_invalid_recipients
+    assert_raises(ArgumentError) { BetterFullstack::Mailer.deliver_welcome("not-an-address") }
   end
 
 {{/if}}

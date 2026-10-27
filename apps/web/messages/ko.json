@@ -595,6 +595,7 @@
   "docsCliSummaryRubyRubyValidation": "Ruby 요청 검증.",
   "docsCliSummaryRubyRubyCache": "Ruby 캐시 저장소.",
   "docsCliSummaryRubyRubyJobQueue": "Ruby 백그라운드 작업 큐.",
+  "docsCliSummaryRubyRubyEmail": "Ruby 이메일 전송.",
   "docsCliSummaryPhpPhpWebFramework": "PHP HTTP 프레임워크.",
   "docsCliSummaryPhpPhpOrm": "PHP ORM / 데이터베이스 계층.",
   "docsCliSummaryPhpPhpAuth": "PHP 인증.",

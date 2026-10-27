@@ -2451,6 +2451,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://github.com/rails/solid_queue#readme",
     githubUrl: "https://github.com/rails/solid_queue",
   },
+  "rubyEmail:mail": {
+    docsUrl: "https://github.com/mikel/mail#readme",
+    githubUrl: "https://github.com/mikel/mail",
+  },
+  "rubyEmail:action-mailer": {
+    docsUrl: "https://guides.rubyonrails.org/action_mailer_basics.html",
+    githubUrl: "https://github.com/rails/rails/tree/main/actionmailer",
+  },
+  "rubyEmail:resend": {
+    docsUrl: "https://resend.com/docs/send-with-ruby",
+    githubUrl: "https://github.com/resend/resend-ruby",
+  },
   "rubyAuth:jwt": {
     docsUrl: "https://github.com/jwt/ruby-jwt#readme",
     githubUrl: "https://github.com/jwt/ruby-jwt",

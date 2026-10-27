@@ -1300,6 +1300,7 @@ export function generateReproducibleCommand(config: ProjectConfig) {
         `--ruby-validation ${config.rubyValidation ?? "none"}`,
         `--ruby-cache ${config.rubyCache ?? "none"}`,
         `--ruby-job-queue ${config.rubyJobQueue ?? "none"}`,
+        `--ruby-email ${config.rubyEmail ?? "none"}`,
         "--database none",
         "--addons none",
         "--examples none",

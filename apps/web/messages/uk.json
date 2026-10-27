@@ -596,6 +596,7 @@
   "docsCliSummaryRubyRubyValidation": "Валідація запитів Ruby.",
   "docsCliSummaryRubyRubyCache": "Сховище кешу Ruby.",
   "docsCliSummaryRubyRubyJobQueue": "Черга фонових завдань Ruby.",
+  "docsCliSummaryRubyRubyEmail": "Надсилання пошти Ruby.",
   "docsCliSummaryPhpPhpWebFramework": "HTTP-фреймворк PHP.",
   "docsCliSummaryPhpPhpOrm": "ORM / шар бази даних PHP.",
   "docsCliSummaryPhpPhpAuth": "Автентифікація PHP.",
