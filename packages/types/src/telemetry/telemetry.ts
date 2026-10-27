@@ -396,6 +396,7 @@ export const TELEMETRY_PROJECT_CONFIG_KEYS = [
   "phpOrm",
   "phpAuth",
   "phpTesting",
+  "phpValidation",
   "elixirWebFramework",
   "elixirOrm",
   "elixirAuth",

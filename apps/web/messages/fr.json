@@ -597,6 +597,7 @@
   "docsCliSummaryPhpPhpOrm": "ORM / couche de base de données PHP.",
   "docsCliSummaryPhpPhpAuth": "Authentification PHP.",
   "docsCliSummaryPhpPhpTesting": "Lanceur de tests PHP.",
+  "docsCliSummaryPhpPhpValidation": "Bibliothèque de validation PHP.",
   "docsCliSummaryElixirElixirWebFramework": "Framework web Elixir.",
   "docsCliSummaryElixirElixirOrm": "ORM / base de données Elixir.",
   "docsCliSummaryElixirElixirAuth": "Authentification Elixir.",

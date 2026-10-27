@@ -220,6 +220,7 @@ export const STACK_SELECTION_OPTION_CATEGORY_BY_KEY: Record<
   phpOrm: "phpOrm",
   phpAuth: "phpAuth",
   phpTesting: "phpTesting",
+  phpValidation: "phpValidation",
   elixirWebFramework: "elixirWebFramework",
   elixirOrm: "elixirOrm",
   elixirAuth: "elixirAuth",
@@ -428,6 +429,7 @@ export const STACK_SELECTION_URL_KEYS = {
   phpOrm: "phorm",
   phpAuth: "phauth",
   phpTesting: "phtest",
+  phpValidation: "phval",
   elixirWebFramework: "ewf",
   elixirOrm: "eorm",
   elixirAuth: "eauth",
@@ -911,6 +913,7 @@ const CLI_SCALAR_CONFIG_FIELDS = [
   ["phpOrm", "phpOrm"],
   ["phpAuth", "phpAuth"],
   ["phpTesting", "phpTesting"],
+  ["phpValidation", "phpValidation"],
   ["elixirWebFramework", "elixirWebFramework"],
   ["elixirOrm", "elixirOrm"],
   ["elixirAuth", "elixirAuth"],
@@ -2002,6 +2005,7 @@ function getCliGraphStackParts(input: CLIInput): StackPart[] {
   addScopedBackendPart("php", "orm", input.phpOrm);
   addScopedBackendPart("php", "auth", input.phpAuth);
   addScopedBackendPart("php", "testing", input.phpTesting);
+  addScopedBackendPart("php", "validation", input.phpValidation);
   addScopedBackendPart("ruby", "orm", input.rubyOrm);
   addScopedBackendPart("ruby", "auth", input.rubyAuth);
   addScopedBackendPart("elixir", "orm", input.elixirOrm);
@@ -2210,6 +2214,7 @@ function buildProjectConfigBase(
     phpOrm: stack.phpOrm as ProjectConfig["phpOrm"],
     phpAuth: stack.phpAuth as ProjectConfig["phpAuth"],
     phpTesting: stack.phpTesting as ProjectConfig["phpTesting"],
+    phpValidation: stack.phpValidation as ProjectConfig["phpValidation"],
     elixirWebFramework: stack.elixirWebFramework as ProjectConfig["elixirWebFramework"],
     elixirOrm: stack.elixirOrm as ProjectConfig["elixirOrm"],
     elixirAuth: stack.elixirAuth as ProjectConfig["elixirAuth"],
@@ -2317,6 +2322,7 @@ export function isCliDefaultStackSelection(
           "phpOrm",
           "phpAuth",
           "phpTesting",
+          "phpValidation",
           ...ELIXIR_CONFIG_KEYS,
           ...(selection.ecosystem === "typescript" ? REACT_NATIVE_CONFIG_KEYS : []),
         ])
@@ -2769,6 +2775,7 @@ export function generateStackSelectionCommand(selection: StackSelectionInput): s
         `--php-orm ${selection.phpOrm}`,
         `--php-auth ${selection.phpAuth}`,
         `--php-testing ${selection.phpTesting}`,
+        `--php-validation ${selection.phpValidation}`,
         `--database ${selection.database}`,
       ];
       if (selection.versionChannel !== "stable")

@@ -247,6 +247,47 @@ describe("PHP generation and lifecycle", () => {
     expect(getVirtualTreeFileContent(tree, "README.md")).not.toContain("composer test");
   });
 
+  it.each([
+    ["slim", "symfony-validator", "symfony/validator", "Validation::createValidator()"],
+    ["symfony", "respect-validation", "respect/validation", "v::keySet("],
+    ["laravel", "laravel-validation", "laravel/framework", "Validator::make("],
+  ] as const)(
+    "generates %s with %s validating greetings and replays it",
+    async (framework, validation, dependency, call) => {
+      const result = await createVirtual({
+        projectName: `php-${framework}-${validation}`,
+        ecosystem: "php",
+        phpWebFramework: framework,
+        phpValidation: validation,
+      });
+      expect(result.success).toBe(true);
+      const tree = result.tree!;
+      const manifest = JSON.parse(getVirtualTreeFileContent(tree, "composer.json"));
+      expect(Object.keys(manifest.require)).toContain(dependency);
+      const source = framework === "laravel" ? "app" : "src";
+      const greeting = getVirtualTreeFileContent(tree, `${source}/Greeting.php`);
+      expect(greeting).toContain(call);
+      expect(greeting).not.toContain("must be an integer from 1 to 5");
+      expect(generateReproducibleCommand(tree.config)).toContain(`--php-validation ${validation}`);
+      const saved = buildBtsConfigForPersistence(tree.config, {
+        version: "0.0.0",
+        createdAt: "2026-10-27T00:00:00.000Z",
+      });
+      expect(previewBtsConfigUpdate(saved, {}).phpValidation).toBe(validation);
+    },
+  );
+
+  it("rejects Laravel Validation outside Laravel before emitting files", async () => {
+    const result = await createVirtual({
+      ecosystem: "php",
+      phpWebFramework: "slim",
+      phpValidation: "laravel-validation",
+    });
+    expect(result.success).toBe(false);
+    expect(result.error).toContain("Laravel Validation is generated for Laravel");
+    expect(result.tree).toBeUndefined();
+  });
+
   it("rejects Symfony Security outside Symfony before emitting files", async () => {
     const result = await createVirtual({
       ecosystem: "php",

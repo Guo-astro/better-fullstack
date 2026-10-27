@@ -41,6 +41,12 @@
     "lcobucci/clock": "~3.6.0",
     "lcobucci/jwt": "~5.6.1",
 {{/if}}
+{{#if (eq phpValidation "respect-validation")}}
+    "respect/validation": "~3.1.2",
+{{/if}}
+{{#if (eq phpValidation "symfony-validator")}}
+    "symfony/validator": "~8.1.9",
+{{/if}}
 {{#if (eq phpWebFramework "laravel")}}
     "laravel/framework": "~13.38.0"
 {{else if (eq phpWebFramework "symfony")}}

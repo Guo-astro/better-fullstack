@@ -1,6 +1,6 @@
 import { getPhpCapabilityIssue } from "@better-fullstack/types";
 
-import type { PhpAuth, PhpOrm, PhpTesting, PhpWebFramework } from "@/types";
+import type { PhpAuth, PhpOrm, PhpTesting, PhpValidation, PhpWebFramework } from "@/types";
 
 import { exitCancelled } from "@/presentation/errors";
 import { isCancel, navigableSelect } from "@/prompts/core/navigable";
@@ -43,6 +43,25 @@ const TESTING_OPTIONS: PromptOption<PhpTesting>[] = [
   { value: "pest", label: "Pest", hint: "Pest specs that also run the PHPUnit classes" },
   { value: "codeception", label: "Codeception", hint: "Codeception Unit suite over the same tests" },
   { value: "none", label: "None", hint: "No test runner; keep only the HTTP proof" },
+];
+
+const VALIDATION_OPTIONS: PromptOption<PhpValidation>[] = [
+  {
+    value: "symfony-validator",
+    label: "Symfony Validator",
+    hint: "Constraint collection for the greeting payload",
+  },
+  {
+    value: "respect-validation",
+    label: "Respect\\Validation",
+    hint: "Fluent key-set rules for the greeting payload",
+  },
+  {
+    value: "laravel-validation",
+    label: "Laravel Validation",
+    hint: "Laravel validator rules (Laravel only)",
+  },
+  { value: "none", label: "None", hint: "Keep the hand-written payload checks" },
 ];
 
 export function resolvePhpWebFrameworkPrompt(value?: PhpWebFramework) {
@@ -105,6 +124,24 @@ export async function getPhpTestingChoice(value?: PhpTesting) {
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "phpunit";
   const response = await navigableSelect<PhpTesting>({
     message: "Select PHP test runner",
+    options: resolution.options,
+    initialValue: resolution.initialValue,
+  });
+  return isCancel(response) ? exitCancelled("Operation cancelled") : response;
+}
+
+export function resolvePhpValidationPrompt(value?: PhpValidation, framework?: PhpWebFramework) {
+  const options = VALIDATION_OPTIONS.filter(
+    (option) => !getPhpCapabilityIssue(framework, "validation", option.value),
+  );
+  return createStaticSinglePromptResolution(options, "none", value);
+}
+
+export async function getPhpValidationChoice(value?: PhpValidation, framework?: PhpWebFramework) {
+  const resolution = resolvePhpValidationPrompt(value, framework);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
+  const response = await navigableSelect<PhpValidation>({
+    message: "Select PHP validation library",
     options: resolution.options,
     initialValue: resolution.initialValue,
   });

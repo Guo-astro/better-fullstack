@@ -70,7 +70,7 @@ const CORE_KEYS_BY_ECOSYSTEM: Record<string, StackSelectionKey[]> = {
     "dotnetTesting",
   ],
   ruby: ["rubyWebFramework", "rubyOrm", "rubyAuth", "rubyTesting", "rubyValidation"],
-  php: ["phpWebFramework", "phpOrm", "phpAuth", "phpTesting"],
+  php: ["phpWebFramework", "phpOrm", "phpAuth", "phpTesting", "phpValidation"],
   elixir: [
     "elixirWebFramework",
     "database",
@@ -137,6 +137,7 @@ const ROLE_LABELS: Partial<Record<OptionCategory, string>> = {
   phpOrm: "ORM",
   phpAuth: "Authentication",
   phpTesting: "Testing",
+  phpValidation: "Validation",
   elixirWebFramework: "Backend",
   elixirOrm: "ORM",
   elixirAuth: "Authentication",

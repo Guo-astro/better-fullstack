@@ -2359,6 +2359,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://codeception.com/docs/UnitTests",
     githubUrl: "https://github.com/Codeception/Codeception",
   },
+  "phpValidation:symfony-validator": {
+    docsUrl: "https://symfony.com/doc/current/validation.html",
+    githubUrl: "https://github.com/symfony/validator",
+  },
+  "phpValidation:respect-validation": {
+    docsUrl: "https://respect-validation.readthedocs.io/",
+    githubUrl: "https://github.com/Respect/Validation",
+  },
+  "phpValidation:laravel-validation": {
+    docsUrl: "https://laravel.com/docs/13.x/validation",
+    githubUrl: "https://github.com/illuminate/validation",
+  },
   "phpOrm:cycle": {
     docsUrl: "https://cycle-orm.dev/docs/intro-about/current/en",
     githubUrl: "https://github.com/cycle/orm",

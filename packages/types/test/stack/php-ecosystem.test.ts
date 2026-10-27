@@ -191,7 +191,7 @@ describe("PHP graph and transport contract", () => {
     );
     const command = generateStackSelectionCommand(selection);
     expect(command).toContain(
-      "--ecosystem php --php-web-framework slim --php-orm none --php-auth none --php-testing phpunit --database none",
+      "--ecosystem php --php-web-framework slim --php-orm none --php-auth none --php-testing phpunit --php-validation none --database none",
     );
     expect(command).toContain("--no-install");
     const withOrm = { ...selection, phpWebFramework: "symfony", phpOrm: "doctrine" };
@@ -273,5 +273,54 @@ describe("PHP graph and transport contract", () => {
         ).toBeUndefined();
       }
     }
+  });
+
+  it("projects PHP validation as an owned part and keeps Laravel Validation on Laravel", () => {
+    const parts = legacyProjectConfigToStackParts({
+      ...native,
+      phpWebFramework: "laravel",
+      phpValidation: "laravel-validation",
+    });
+    expect(parts).toContainEqual(
+      expect.objectContaining({
+        role: "validation",
+        ecosystem: "php",
+        toolId: "laravel-validation",
+      }),
+    );
+    expect(validateStackParts(parts).issues).toEqual([]);
+    expect(stackPartsToLegacyProjectConfigPartial(parts)).toMatchObject({
+      phpValidation: "laravel-validation",
+    });
+    for (const framework of ["slim", "symfony"] as const) {
+      const issue = getPhpRecipeIssue({
+        ...native,
+        phpWebFramework: framework,
+        phpValidation: "laravel-validation",
+      });
+      expect(issue).toContain("Laravel Validation is generated for Laravel");
+      const mismatched = parseStackPartSpecs([
+        `backend:php:${framework}`,
+        "backend.validation:php:laravel-validation",
+      ]);
+      expect(validateStackParts(mismatched).issues.map((entry) => entry.message)).toContain(issue);
+    }
+    for (const framework of ["slim", "laravel", "symfony"] as const) {
+      for (const validation of ["symfony-validator", "respect-validation"] as const) {
+        expect(
+          getPhpRecipeIssue({ ...native, phpWebFramework: framework, phpValidation: validation }),
+        ).toBeUndefined();
+      }
+    }
+    const selection = parseStackSelectionFromUrlRecord({
+      eco: "php",
+      phwf: "symfony",
+      phval: "respect-validation",
+    });
+    expect(selection.phpValidation).toBe("respect-validation");
+    expect(createStackSelectionSearchParams(selection).get("phval")).toBe("respect-validation");
+    expect(generateStackSelectionCommand(selection)).toContain(
+      "--php-validation respect-validation",
+    );
   });
 });

@@ -6233,6 +6233,37 @@ export const TECH_OPTIONS: Record<
       color: "from-gray-500 to-gray-700",
     },
   ],
+  phpValidation: [
+    {
+      id: "symfony-validator",
+      name: "Symfony Validator",
+      description: "Constraint collection validates the greeting payload on any PHP framework",
+      icon: "https://cdn.simpleicons.org/symfony/000000",
+      color: "from-gray-700 to-gray-900",
+    },
+    {
+      id: "respect-validation",
+      name: "Respect\\Validation",
+      description: "Fluent key-set rules validate the greeting payload on any PHP framework",
+      icon: "",
+      color: "from-emerald-500 to-teal-700",
+    },
+    {
+      id: "laravel-validation",
+      name: "Laravel Validation",
+      description: "Laravel validator rules for the greeting payload on Laravel",
+      icon: "https://cdn.simpleicons.org/laravel/FF2D20",
+      color: "from-red-500 to-red-700",
+    },
+    {
+      id: "none",
+      name: "None",
+      description: "Keep the hand-written payload checks",
+      icon: "",
+      color: "from-gray-500 to-gray-700",
+      default: true,
+    },
+  ],
   phpAuth: [
     {
       id: "firebase-jwt",

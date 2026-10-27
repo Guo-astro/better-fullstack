@@ -598,6 +598,7 @@
   "docsCliSummaryPhpPhpOrm": "ORM / шар бази даних PHP.",
   "docsCliSummaryPhpPhpAuth": "Автентифікація PHP.",
   "docsCliSummaryPhpPhpTesting": "Засіб запуску тестів PHP.",
+  "docsCliSummaryPhpPhpValidation": "Бібліотека валідації PHP.",
   "docsCliSummaryElixirElixirWebFramework": "Вебфреймворк Elixir.",
   "docsCliSummaryElixirElixirOrm": "ORM / база даних Elixir.",
   "docsCliSummaryElixirElixirAuth": "Автентифікація в Elixir.",

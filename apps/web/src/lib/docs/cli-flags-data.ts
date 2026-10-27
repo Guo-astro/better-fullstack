@@ -2545,6 +2545,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "phpunit",
         "multiple": false
+      },
+      {
+        "flag": "--php-validation",
+        "summary": "PHP validation library.",
+        "values": [
+          "symfony-validator",
+          "respect-validation",
+          "laravel-validation",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
       }
     ]
   },
@@ -3009,6 +3022,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "php:--php-orm": m.docsCliSummaryPhpPhpOrm,
   "php:--php-auth": m.docsCliSummaryPhpPhpAuth,
   "php:--php-testing": m.docsCliSummaryPhpPhpTesting,
+  "php:--php-validation": m.docsCliSummaryPhpPhpValidation,
   "elixir:--elixir-web-framework": m.docsCliSummaryElixirElixirWebFramework,
   "elixir:--elixir-orm": m.docsCliSummaryElixirElixirOrm,
   "elixir:--elixir-auth": m.docsCliSummaryElixirElixirAuth,

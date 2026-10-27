@@ -22,6 +22,7 @@ export async function processPhpBaseTemplate(
     phpOrm: config.phpOrm ?? "none",
     phpAuth: config.phpAuth ?? "none",
     phpTesting: config.phpTesting ?? "phpunit",
+    phpValidation: config.phpValidation ?? "none",
     phpPackageName,
     phpSourceDirectory,
   };

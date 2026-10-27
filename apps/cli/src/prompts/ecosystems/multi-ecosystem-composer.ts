@@ -119,6 +119,7 @@ import {
   getPhpAuthChoice,
   getPhpOrmChoice,
   getPhpTestingChoice,
+  getPhpValidationChoice,
   getPhpWebFrameworkChoice,
 } from "@/prompts/ecosystems/php-ecosystem";
 import {
@@ -1500,11 +1501,16 @@ export async function gatherMultiEcosystemConfig(
         : promptValue(await getPhpAuthChoice(flags.phpAuth, phpWebFramework));
     const phpTesting =
       phpWebFramework === "none" ? "none" : promptValue(await getPhpTestingChoice(flags.phpTesting));
-    Object.assign(backendChoices, { phpWebFramework, phpOrm, phpAuth, phpTesting });
+    const phpValidation =
+      phpWebFramework === "none"
+        ? "none"
+        : promptValue(await getPhpValidationChoice(flags.phpValidation, phpWebFramework));
+    Object.assign(backendChoices, { phpWebFramework, phpOrm, phpAuth, phpTesting, phpValidation });
     if (phpWebFramework !== "none") stackPartSpecs.push(`backend:php:${phpWebFramework}`);
     if (phpOrm !== "none") stackPartSpecs.push(`backend.orm:php:${phpOrm}`);
     if (phpAuth !== "none") stackPartSpecs.push(`backend.auth:php:${phpAuth}`);
     if (phpTesting !== "none") stackPartSpecs.push(`backend.testing:php:${phpTesting}`);
+    if (phpValidation !== "none") stackPartSpecs.push(`backend.validation:php:${phpValidation}`);
   }
 
   if (backendEcosystem === "elixir") {

@@ -43,7 +43,18 @@ No test runner or test files are generated. `composer run proof:http` is the onl
 - `{"name":"Ada","repetitions":2}` returns `{"message":"Hello, Ada! Hello, Ada!","repetitions":2}`.
 - Malformed JSON returns 400, invalid values return 422, wrong media types return 415, and bodies over 4096 bytes return 413. Missing routes return JSON with status 404.
 
-{{#if (ne phpOrm "none")}}
+{{#if (ne phpValidation "none")}}
+## Validation
+
+{{#if (eq phpValidation "symfony-validator")}}
+`{{phpSourceDirectory}}/Greeting.php` validates the decoded payload with a Symfony Validator `Collection` constraint, which also rejects unknown fields. The 422 `message` names the field and the violation.
+{{else if (eq phpValidation "respect-validation")}}
+`{{phpSourceDirectory}}/Greeting.php` validates the decoded payload with a Respect\Validation `keySet` rule, which also rejects unknown fields. The 422 `message` is the first Respect violation. Respect\Validation 3 counts name length in characters.
+{{else}}
+`app/Greeting.php` validates the decoded payload with Laravel's validator (`required|string|max:80` and `sometimes|integer:strict|between:1,5`) after rejecting unknown fields. The 422 `message` is the first validator message. Laravel counts name length in characters.
+{{/if}}
+
+{{/if}}{{#if (ne phpOrm "none")}}
 ## Database
 
 {{#if (eq phpOrm "eloquent")}}

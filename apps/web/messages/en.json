@@ -613,6 +613,7 @@
   "docsCliSummaryPhpPhpOrm": "PHP ORM / database layer.",
   "docsCliSummaryPhpPhpAuth": "PHP authentication.",
   "docsCliSummaryPhpPhpTesting": "PHP test runner.",
+  "docsCliSummaryPhpPhpValidation": "PHP validation library.",
   "docsCliSummaryElixirElixirWebFramework": "Elixir web framework.",
   "docsCliSummaryElixirElixirOrm": "Elixir ORM / database.",
   "docsCliSummaryElixirElixirAuth": "Elixir auth.",

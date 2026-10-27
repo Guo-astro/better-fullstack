@@ -154,6 +154,7 @@ export const CLI_DEFAULT_PROJECT_CONFIG = {
   phpOrm: "none",
   phpAuth: "none",
   phpTesting: "phpunit",
+  phpValidation: "none",
   elixirWebFramework: "phoenix",
   elixirOrm: "ecto-sql",
   elixirAuth: "none",

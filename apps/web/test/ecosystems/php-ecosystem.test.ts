@@ -88,5 +88,9 @@ describe("PHP builder recipe", () => {
     expect(stackStateToProjectConfig(withOrm).phpAuth).toBe("firebase-jwt");
     expect(stackStateToProjectConfig(stack).phpTesting).toBe("phpunit");
     expect(generateStackCommand({ ...stack, phpTesting: "pest" })).toContain("--php-testing pest");
+    expect(stackStateToProjectConfig(stack).phpValidation).toBe("none");
+    expect(generateStackCommand({ ...stack, phpValidation: "respect-validation" })).toContain(
+      "--php-validation respect-validation",
+    );
   });
 });

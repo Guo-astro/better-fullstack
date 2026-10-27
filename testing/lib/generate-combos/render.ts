@@ -108,6 +108,7 @@ export function formatNameFromFingerprint(fingerprint: TemplateFingerprint): str
       typeof fingerprint.phpOrm === "string" ? fingerprint.phpOrm : undefined,
       typeof fingerprint.phpAuth === "string" ? fingerprint.phpAuth : undefined,
       typeof fingerprint.phpTesting === "string" ? fingerprint.phpTesting : undefined,
+      typeof fingerprint.phpValidation === "string" ? fingerprint.phpValidation : undefined,
     ],
     elixir: [
       typeof fingerprint.elixirWebFramework === "string"
@@ -392,6 +393,7 @@ export function buildCommand(name: string, config: ProjectConfig): string {
       orderedFlags.push(["php-orm", config.phpOrm]);
       orderedFlags.push(["php-auth", config.phpAuth]);
       orderedFlags.push(["php-testing", config.phpTesting]);
+      orderedFlags.push(["php-validation", config.phpValidation]);
       break;
     case "elixir":
       orderedFlags.push(...elixirFlags);

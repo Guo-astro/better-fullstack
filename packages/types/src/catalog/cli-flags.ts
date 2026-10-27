@@ -1185,6 +1185,12 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         source: { kind: "category", category: "phpTesting" },
         configKey: "phpTesting",
       },
+      {
+        flag: "php-validation",
+        summary: "PHP validation library.",
+        source: { kind: "category", category: "phpValidation" },
+        configKey: "phpValidation",
+      },
     ],
   },
   {

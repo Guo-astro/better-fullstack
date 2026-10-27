@@ -6,7 +6,7 @@ export const PHP_RECIPE_REASONS = {
   database:
     "The PHP recipe does not generate database or migration integration. Use --database none.",
   capability:
-    "The PHP recipe provides REST, Composer, ORM, auth and test runner choices; additional backend capabilities are not implemented.",
+    "The PHP recipe provides REST, Composer, ORM, auth, test runner and validation choices; additional backend capabilities are not implemented.",
   owner: "PHP capabilities must belong to a PHP backend.",
 } as const;
 
@@ -57,13 +57,31 @@ const PHP_CAPABILITY_FRAMEWORKS: Record<string, Record<string, readonly string[]
     pest: ["slim", "laravel", "symfony"],
     codeception: ["slim", "laravel", "symfony"],
   },
+  validation: {
+    "symfony-validator": ["slim", "laravel", "symfony"],
+    "respect-validation": ["slim", "laravel", "symfony"],
+    "laravel-validation": ["laravel"],
+  },
 };
+
+export const PHP_CAPABILITY_CATEGORIES = {
+  phpOrm: { role: "orm", label: "PHP ORM" },
+  phpAuth: { role: "auth", label: "PHP auth" },
+  phpValidation: { role: "validation", label: "PHP validation" },
+} as const;
+
+export type PhpCapabilityCategory = keyof typeof PHP_CAPABILITY_CATEGORIES;
+
+export function isPhpCapabilityCategory(category: string): category is PhpCapabilityCategory {
+  return category in PHP_CAPABILITY_CATEGORIES;
+}
 
 const PHP_CAPABILITY_LABELS: Record<string, string> = {
   eloquent: "Eloquent",
   doctrine: "Doctrine ORM",
   cycle: "Cycle ORM",
   "symfony-security": "Symfony Security",
+  "laravel-validation": "Laravel Validation",
 };
 
 export function isPhpCapabilityRole(role: string): boolean {
@@ -95,10 +113,14 @@ export function getPhpRecipeIssue(config: Partial<ProjectConfig>): string | unde
   if (config.stackParts?.some((part) => part.source !== "provided"))
     return PHP_RECIPE_REASONS.capability;
   if (config.database && config.database !== "none") return PHP_RECIPE_REASONS.database;
-  const ormIssue = getPhpCapabilityIssue(config.phpWebFramework, "orm", config.phpOrm);
-  if (ormIssue) return ormIssue;
-  const authIssue = getPhpCapabilityIssue(config.phpWebFramework, "auth", config.phpAuth);
-  if (authIssue) return authIssue;
+  for (const [category, { role }] of Object.entries(PHP_CAPABILITY_CATEGORIES)) {
+    const issue = getPhpCapabilityIssue(
+      config.phpWebFramework,
+      role,
+      config[category as PhpCapabilityCategory],
+    );
+    if (issue) return issue;
+  }
   for (const key of PHP_UNSUPPORTED_BACKEND_FIELDS) {
     if (config[key] && config[key] !== "none") return PHP_RECIPE_REASONS.capability;
   }

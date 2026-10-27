@@ -43,8 +43,11 @@ import {
 } from "@/platform/crystal-project";
 import {
   getPhpCapabilityIssue,
+  isPhpCapabilityCategory,
+  PHP_CAPABILITY_CATEGORIES,
   PHP_RECIPE_REASONS,
   PHP_UNSUPPORTED_BACKEND_FIELDS,
+  type PhpCapabilityCategory,
 } from "@/stack/php-compatibility";
 import {
   RUBY_OPTION_CATEGORIES,
@@ -588,6 +591,7 @@ export type CompatibilityInput = {
   phpOrm: string;
   phpAuth: string;
   phpTesting: string;
+  phpValidation: string;
   elixirWebFramework: string;
   elixirOrm: string;
   elixirAuth: string;
@@ -2663,28 +2667,17 @@ export const analyzeStackCompatibility = (
     }
   }
 
-  if (
-    nextStack.ecosystem === "php" &&
-    getPhpCapabilityIssue(nextStack.phpWebFramework, "orm", nextStack.phpOrm)
-  ) {
-    nextStack.phpOrm = "none";
-    changed = true;
-    changes.push({
-      category: "phpOrm",
-      message: "PHP ORM set to 'None' (not generated for the selected framework)",
-    });
-  }
-
-  if (
-    nextStack.ecosystem === "php" &&
-    getPhpCapabilityIssue(nextStack.phpWebFramework, "auth", nextStack.phpAuth)
-  ) {
-    nextStack.phpAuth = "none";
-    changed = true;
-    changes.push({
-      category: "phpAuth",
-      message: "PHP auth set to 'None' (not generated for the selected framework)",
-    });
+  if (nextStack.ecosystem === "php") {
+    for (const [category, { role, label }] of Object.entries(PHP_CAPABILITY_CATEGORIES)) {
+      const key = category as PhpCapabilityCategory;
+      if (!getPhpCapabilityIssue(nextStack.phpWebFramework, role, nextStack[key])) continue;
+      nextStack[key] = "none";
+      changed = true;
+      changes.push({
+        category: key,
+        message: `${label} set to 'None' (not generated for the selected framework)`,
+      });
+    }
   }
 
   // ============================================
@@ -3037,8 +3030,8 @@ export const getDisabledReason = (
 
   if (currentStack.ecosystem === "php") {
     if (category === "phpWebFramework" && optionId === "none") return PHP_RECIPE_REASONS.framework;
-    if (category === "phpOrm" || category === "phpAuth") {
-      const role = category === "phpOrm" ? "orm" : "auth";
+    if (isPhpCapabilityCategory(category)) {
+      const { role } = PHP_CAPABILITY_CATEGORIES[category];
       const issue = getPhpCapabilityIssue(currentStack.phpWebFramework, role, optionId);
       if (issue) return issue;
     }
