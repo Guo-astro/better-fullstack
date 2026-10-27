@@ -797,6 +797,45 @@ describe("scaffold-upgrade engine", () => {
     expect(plan.actionable).not.toContain("package.json");
   });
 
+  it("preserves a Go module and imports when updating in a renamed directory", async () => {
+    const root = await makeTempDir();
+    const dir = join(root, "go");
+    const config = makeConfig(dir, {
+      projectName: "proof-go",
+      ecosystem: "go",
+      frontend: [],
+      backend: "none",
+      runtime: "none",
+      api: "none",
+      orm: "none",
+      database: "none",
+      goWebFramework: "gin",
+      goOrm: "gorm",
+      goApi: "grpc-go",
+    });
+    await scaffoldWithBaseline(dir, config);
+    const modulePath = join(dir, "go.mod");
+    const currentModule = await readFile(modulePath, "utf-8");
+    const oldModule = currentModule.replace("go 1.25.0", "go 1.24.0");
+    expect(oldModule).not.toBe(currentModule);
+    await writeFile(modulePath, oldModule);
+    const manifest = await readScaffoldManifest(dir);
+    expect(manifest).not.toBeNull();
+    manifest!.hashes["go.mod"] = hashContent(oldModule);
+    await writeScaffoldManifest(dir, manifest!);
+    const mainPath = join(dir, "cmd/server/main.go");
+    const mainBefore = await readFile(mainPath, "utf-8");
+
+    const plan = await planScaffoldUpgrade(dir);
+    assertSuccess(plan);
+    expect(plan.drift).toContain("go.mod");
+    expect(plan.unchanged).toContain("cmd/server/main.go");
+    const applied = await applyAcknowledged(dir);
+    assertSuccess(applied);
+    expect(await readFile(modulePath, "utf-8")).toBe(currentModule);
+    expect(await readFile(mainPath, "utf-8")).toBe(mainBefore);
+  });
+
   it("appends template-added env keys to an edited .env.example, keeping user keys", async () => {
     const dir = await makeTempDir();
     const config = makeConfig(dir, {

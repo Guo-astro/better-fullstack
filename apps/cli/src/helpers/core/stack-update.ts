@@ -297,12 +297,17 @@ function buffersEqual(left: Buffer | undefined, right: Buffer | undefined): bool
   return Boolean(left && right && left.equals(right));
 }
 
-async function inferProjectName(projectDir: string): Promise<string> {
+export async function inferProjectName(projectDir: string): Promise<string> {
   const packageJsonPath = path.join(projectDir, "package.json");
   const packageJson = await fs.readJson(packageJsonPath).catch(() => null);
   if (packageJson && typeof packageJson.name === "string" && packageJson.name.trim()) {
     return packageJson.name.trim();
   }
+
+  const goMod = await fs.readFile(path.join(projectDir, "go.mod"), "utf-8").catch(() => "");
+  const moduleDirective = goMod.match(/^\s*module\s+(?:"([^"\r\n]+)"|([^\s"]+))/m);
+  const moduleName = moduleDirective?.[1] ?? moduleDirective?.[2];
+  if (moduleName) return moduleName;
 
   return path.basename(projectDir);
 }

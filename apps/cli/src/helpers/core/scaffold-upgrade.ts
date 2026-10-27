@@ -26,6 +26,7 @@ import {
   configFromBtsConfig,
   formatGeneratedTree,
   generateTree,
+  inferProjectName,
   mergeEnvExample,
   mergePackageJson,
   mergePnpmWorkspace,
@@ -296,14 +297,6 @@ async function validatePlanWritePaths(plan: UpgradePlan): Promise<void> {
   for (const relativePath of [...plan.actionable, SCAFFOLD_MANIFEST_FILE]) {
     await validateWritePath(plan.projectRealpath, relativePath);
   }
-}
-
-async function inferProjectName(projectDir: string): Promise<string> {
-  const packageJson = await fs.readJson(path.join(projectDir, "package.json")).catch(() => null);
-  if (packageJson && typeof packageJson.name === "string" && packageJson.name.trim()) {
-    return packageJson.name.trim();
-  }
-  return path.basename(projectDir);
 }
 
 async function computeRenderHashes(tree: VirtualFileTree): Promise<Map<string, string>> {

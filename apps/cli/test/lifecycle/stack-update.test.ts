@@ -1503,6 +1503,29 @@ describe("stack update planner", () => {
     await expectFileContains(join(projectDir, "apps/server/package.json"), "resend");
   });
 
+  it.each(["proof-go", "example.com/team/service/v2"])(
+    "preserves the Go module %s when adding a capability in a renamed directory",
+    async (projectName) => {
+      const root = await makeTempRoot("bfs-stack-update-go-renamed-");
+      const projectDir = join(root, "go");
+      await scaffoldGeneratedProject(
+        makeConfig(projectDir, { ...GO_BASE_CONFIG, projectName, goApi: "grpc-go" }),
+      );
+
+      const plan = await planStackUpdate(projectDir, { goLogging: "zap" });
+      expect(plan.success).toBe(true);
+      if (!plan.success) return;
+      expect(plan.manualReviewBlockers).toEqual([]);
+
+      const result = await applyStackUpdate(projectDir, { goLogging: "zap" });
+      expect(result.success).toBe(true);
+      const module = await readFile(join(projectDir, "go.mod"), "utf-8");
+      expect(module).toStartWith(`module ${projectName}\n`);
+      expect(module).toContain("go.uber.org/zap");
+      await expectFileContains(join(projectDir, "cmd/server/main.go"), `${projectName}/proto`);
+    },
+  );
+
   it("drops none placeholders when adding array-based stack options", async () => {
     const root = await makeTempRoot("bfs-stack-update-arrays-");
     const projectDir = join(root, "app");
