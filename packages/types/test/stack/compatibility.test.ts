@@ -1787,6 +1787,27 @@ describe("compatibility issue helpers", () => {
     );
   });
 
+  it.each(["peri", "tarams"] as const)("requires Ecto for %s validation", (elixirValidation) => {
+    for (const elixirWebFramework of ["none", "phoenix"] as const) {
+      const withoutEcto = {
+        ...DEFAULT_STACK_SELECTION,
+        ecosystem: "elixir" as const,
+        elixirWebFramework,
+        elixirOrm: "none" as const,
+        elixirValidation,
+      };
+      expect(getDisabledReason(withoutEcto, "elixirValidation", elixirValidation)).toBe(
+        "Peri and Tarams require Ecto",
+      );
+      expect(analyzeStackCompatibility(withoutEcto).adjustedStack?.elixirValidation).toBe("none");
+      for (const elixirOrm of ["ecto", "ecto-sql", "myxql", "ecto_sqlite3"] as const) {
+        expect(
+          getDisabledReason({ ...withoutEcto, elixirOrm }, "elixirValidation", elixirValidation),
+        ).toBeNull();
+      }
+    }
+  });
+
   it("routes Elixir context disabled reasons through graph checks", () => {
     const plainElixir = {
       ...DEFAULT_STACK_SELECTION,

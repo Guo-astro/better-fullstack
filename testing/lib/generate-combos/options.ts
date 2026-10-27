@@ -753,13 +753,16 @@ function makeElixirDraft(args: GeneratorArgs): CandidateDraft {
       elixirRealtime: usesPhoenix
         ? sampleScalar(ELIXIR_REALTIME_VALUES, 0.25, "elixirRealtime")
         : "none",
-      elixirJobs:
-        elixirOrm === "ecto-sql" ? sampleScalar(ELIXIR_JOBS_VALUES, 0.55, "elixirJobs") : "none",
+      elixirJobs: sampleScalar(
+        ELIXIR_JOBS_VALUES.filter((value) => value !== "oban" || elixirOrm === "ecto-sql"),
+        0.55,
+        "elixirJobs",
+      ),
       elixirValidation: hasEcto
         ? sampleScalar(ELIXIR_VALIDATION_VALUES, 0.2, "elixirValidation")
         : "none",
       elixirHttp: usesPhoenix ? sampleScalar(ELIXIR_HTTP_VALUES, 0.25, "elixirHttp") : "none",
-      elixirJson: usesPhoenix ? sampleScalar(ELIXIR_JSON_VALUES, 0.05, "elixirJson") : "none",
+      elixirJson: sampleScalar(ELIXIR_JSON_VALUES, 0.05, "elixirJson"),
       elixirEmail: usesPhoenix ? sampleScalar(ELIXIR_EMAIL_VALUES, 0.7, "elixirEmail") : "none",
       elixirCaching: usesPhoenix
         ? sampleScalar(ELIXIR_CACHING_VALUES, 0.75, "elixirCaching")
@@ -783,25 +786,17 @@ function makeElixirDraft(args: GeneratorArgs): CandidateDraft {
       elixirDocumentation: usesPhoenix
         ? sampleScalar(ELIXIR_DOCUMENTATION_VALUES, 0.5, "elixirDocumentation")
         : "none",
-      elixirClustering: usesPhoenix
-        ? sampleScalar(ELIXIR_CLUSTERING_VALUES, 0.6, "elixirClustering")
-        : "none",
-      elixirLogging: usesPhoenix
-        ? sampleScalar(ELIXIR_LOGGING_VALUES, 0.6, "elixirLogging")
-        : "none",
-      elixirConfig: usesPhoenix
-        ? sampleScalar(ELIXIR_CONFIG_VALUES, 0.6, "elixirConfig")
-        : "none",
-      elixirMessageQueue: usesPhoenix
-        ? sampleScalar(ELIXIR_MESSAGE_QUEUE_VALUES, 0.6, "elixirMessageQueue")
-        : "none",
-      elixirTemplating: usesPhoenix
-        ? sampleScalar(ELIXIR_TEMPLATING_VALUES, 0.6, "elixirTemplating")
-        : "none",
-      elixirCli: usesPhoenix
-        ? sampleScalar(ELIXIR_CLI_VALUES, 0.6, "elixirCli")
-        : "none",
-      elixirDeploy: usesPhoenix ? sampleScalar(ELIXIR_DEPLOY_VALUES, 0.65, "elixirDeploy") : "none",
+      elixirClustering: sampleScalar(ELIXIR_CLUSTERING_VALUES, 0.6, "elixirClustering"),
+      elixirLogging: sampleScalar(
+        ELIXIR_LOGGING_VALUES.filter((value) => usesPhoenix || value !== "logster"),
+        0.6,
+        "elixirLogging",
+      ),
+      elixirConfig: sampleScalar(ELIXIR_CONFIG_VALUES, 0.6, "elixirConfig"),
+      elixirMessageQueue: sampleScalar(ELIXIR_MESSAGE_QUEUE_VALUES, 0.6, "elixirMessageQueue"),
+      elixirTemplating: sampleScalar(ELIXIR_TEMPLATING_VALUES, 0.6, "elixirTemplating"),
+      elixirCli: sampleScalar(ELIXIR_CLI_VALUES, 0.6, "elixirCli"),
+      elixirDeploy: sampleScalar(ELIXIR_DEPLOY_VALUES, 0.65, "elixirDeploy"),
       elixirLibraries: usesPhoenix
         ? sampleArray(ELIXIR_LIBRARIES_VALUES, 0.5, 2, "elixirLibraries")
         : [],

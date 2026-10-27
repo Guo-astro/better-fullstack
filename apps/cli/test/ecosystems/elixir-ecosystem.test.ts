@@ -1000,6 +1000,48 @@ describe("Elixir library expansion", () => {
     },
   );
 
+  it.each(["peri", "tarams"] as const)("rejects %s without Ecto", (elixirValidation) => {
+    const input = {
+      ecosystem: "elixir" as const,
+      elixirWebFramework: "none" as const,
+      elixirOrm: "none" as const,
+      elixirValidation,
+    };
+    expect(() =>
+      runWithContext({ silent: true }, () =>
+        validateFullConfig(input, new Set(Object.keys(input)), {} as never),
+      ),
+    ).toThrow("Peri and Tarams require Ecto");
+  });
+
+  it.each(["eex", "solid-liquid", "bbmustache"] as const)(
+    "copies %s templates into release images without a SQL ORM",
+    async (elixirTemplating) => {
+      for (const elixirOrm of ["none", "ecto"] as const) {
+        const result = await createVirtual({
+          ...base,
+          projectName: "elixir-docker-templates",
+          elixirWebFramework: "none",
+          elixirRealtime: "none",
+          elixirHttpServer: "none",
+          elixirOrm,
+          elixirAuth: "none",
+          elixirApi: "none",
+          elixirTemplating,
+          elixirDeploy: "docker",
+        });
+        expect(result.success).toBe(true);
+        expect(getVirtualTreeFileContent(result.tree!, "Dockerfile")).toContain("COPY priv priv");
+        expect(
+          getVirtualTreeFileContent(result.tree!, "mix.exs")?.includes(":runtime_tools, :eex"),
+        ).toBe(elixirTemplating === "eex");
+        expect(
+          listVirtualTreeFilePaths(result.tree!).some((path) => path.startsWith("priv/templates/")),
+        ).toBe(true);
+      }
+    },
+  );
+
   it("rejects Logster without Phoenix", () => {
     const input = {
       ecosystem: "elixir" as const,

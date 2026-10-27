@@ -5,13 +5,17 @@ defmodule {{elixirModuleName}}.MessageQueue do
   def url, do: System.get_env("RABBITMQ_URL", "amqp://guest:guest@localhost:5672")
 
   def publish(payload) do
-    with_channel(fn channel -> AMQP.Basic.publish(channel, "", @queue, payload) end)
+    with_channel(fn channel ->
+      {:ok, _} = AMQP.Queue.declare(channel, @queue, durable: true)
+      AMQP.Basic.publish(channel, "", @queue, payload)
+    end)
   end
 
   def round_trip(payload) do
     with_channel(fn channel ->
-      :ok = AMQP.Basic.publish(channel, "", @queue, payload)
-      receive_one(channel, 40)
+      {:ok, %{queue: queue}} = AMQP.Queue.declare(channel, "", exclusive: true, auto_delete: true)
+      :ok = AMQP.Basic.publish(channel, "", queue, payload)
+      receive_one(channel, queue, 40)
     end)
   end
 
@@ -20,23 +24,22 @@ defmodule {{elixirModuleName}}.MessageQueue do
 
     try do
       {:ok, channel} = AMQP.Channel.open(connection)
-      {:ok, _} = AMQP.Queue.declare(channel, @queue, durable: true)
       fun.(channel)
     after
       AMQP.Connection.close(connection)
     end
   end
 
-  defp receive_one(_channel, 0), do: {:error, :timeout}
+  defp receive_one(_channel, _queue, 0), do: {:error, :timeout}
 
-  defp receive_one(channel, attempts) do
-    case AMQP.Basic.get(channel, @queue, no_ack: true) do
+  defp receive_one(channel, queue, attempts) do
+    case AMQP.Basic.get(channel, queue, no_ack: true) do
       {:ok, body, _meta} ->
         {:ok, body}
 
       {:empty, _meta} ->
         Process.sleep(50)
-        receive_one(channel, attempts - 1)
+        receive_one(channel, queue, attempts - 1)
     end
   end
 {{/if}}

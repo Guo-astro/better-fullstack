@@ -889,6 +889,17 @@ function validateElixirConstraints(config: Partial<ProjectConfig>) {
     });
   }
 
+  if (["peri", "tarams"].includes(config.elixirValidation ?? "none") && !hasEcto) {
+    incompatibilityError({
+      message: "Peri and Tarams require Ecto.",
+      provided: {
+        "elixir-validation": config.elixirValidation ?? "none",
+        "elixir-orm": config.elixirOrm ?? "none",
+      },
+      suggestions: ["Use --elixir-orm ecto", "Use --elixir-validation none"],
+    });
+  }
+
   if (config.elixirJobs === "oban" && config.elixirOrm !== "ecto-sql") {
     incompatibilityError({
       message: "Oban requires Ecto SQL with PostgreSQL in the generated Phoenix scaffold.",

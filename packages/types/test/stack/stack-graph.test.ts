@@ -2365,6 +2365,22 @@ describe("stack graph structural round-trip (phase 0)", () => {
     }
   });
 
+  it.each(["peri", "tarams"] as const)("requires an owner's Ecto selection for %s", (validation) => {
+    const invalidParts = parseStackPartSpecs([
+      "backend:elixir:phoenix",
+      `backend.validation:elixir:${validation}`,
+    ]);
+    expect(validateStackParts(invalidParts).issues.map((issue) => issue.message)).toContain(
+      "Peri and Tarams require Ecto",
+    );
+    const validParts = parseStackPartSpecs([
+      "backend:elixir:phoenix",
+      "backend.orm:elixir:ecto",
+      `backend.validation:elixir:${validation}`,
+    ]);
+    expect(validateStackParts(validParts).issues).toEqual([]);
+  });
+
   it("imports legacy ecosystem extras as backend-owned parts that validate cleanly", () => {
     const elixirBase: Partial<ProjectConfig> = {
       ecosystem: "elixir",

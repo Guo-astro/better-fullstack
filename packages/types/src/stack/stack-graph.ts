@@ -3465,6 +3465,26 @@ function getStackPartCompatibilityIssue(
     }
   }
 
+  if (
+    part.ecosystem === "elixir" &&
+    part.role === "validation" &&
+    ["peri", "tarams"].includes(part.toolId) &&
+    (!context.ownerRole || context.ownerRole === "backend")
+  ) {
+    const ormTool = context.ownerRole
+      ? context.siblingToolIdsByRole?.orm
+      : context.selectedToolIdsByRole?.orm;
+    if (isNoneTool(ormTool)) {
+      return createStackGraphIssue({
+        code: "INCOMPATIBLE_GRAPH_SELECTION",
+        partId: part.id,
+        role: part.role,
+        toolId: part.toolId,
+        message: "Peri and Tarams require Ecto",
+      });
+    }
+  }
+
   if (part.ecosystem === "elixir" && !context.ownerRole) {
     const phoenixRequiredMessage = ELIXIR_PHOENIX_REQUIRED_ROLE_MESSAGES[part.role];
     const isStandaloneI18n = part.role === "i18n" && ELIXIR_STANDALONE_I18N_TOOLS.has(part.toolId);

@@ -2763,6 +2763,14 @@ export const analyzeStackCompatibility = (
     }
 
     if (nextStack.elixirOrm === "none") {
+      if (["peri", "tarams"].includes(nextStack.elixirValidation)) {
+        nextStack.elixirValidation = "none";
+        changed = true;
+        changes.push({
+          category: "elixirValidation",
+          message: "Elixir validation set to 'None' (Peri and Tarams require Ecto)",
+        });
+      }
       if (nextStack.elixirJobs === "oban") {
         nextStack.elixirJobs = "none";
         changed = true;
@@ -4650,6 +4658,15 @@ export const getDisabledReason = (
     currentStack.elixirWebFramework === "none"
   ) {
     return "Logster request logging requires Phoenix";
+  }
+
+  if (
+    category === "elixirValidation" &&
+    ["peri", "tarams"].includes(optionId) &&
+    currentStack.ecosystem === "elixir" &&
+    currentStack.elixirOrm === "none"
+  ) {
+    return "Peri and Tarams require Ecto";
   }
 
   if (
