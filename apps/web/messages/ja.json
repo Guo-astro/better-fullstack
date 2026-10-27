@@ -604,6 +604,7 @@
   "docsCliSummaryPhpPhpCache": "PHP のキャッシュライブラリ。",
   "docsCliSummaryPhpPhpJobQueue": "PHP のバックグラウンドジョブキュー。",
   "docsCliSummaryPhpPhpEmail": "PHP のメールライブラリ。",
+  "docsCliSummaryPhpPhpLogging": "PHP のロギング（フレームワーク別）。",
   "docsCliSummaryElixirElixirWebFramework": "Elixir の Web フレームワーク。",
   "docsCliSummaryElixirElixirOrm": "Elixir の ORM / データベース。",
   "docsCliSummaryElixirElixirAuth": "Elixir の認証。",

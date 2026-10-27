@@ -5,6 +5,7 @@ import type {
   PhpCache,
   PhpEmail,
   PhpJobQueue,
+  PhpLogging,
   PhpOrm,
   PhpTesting,
   PhpValidation,
@@ -125,6 +126,21 @@ const EMAIL_OPTIONS: PromptOption<PhpEmail>[] = [
     hint: "Laravel mailer and Artisan mail:send (Laravel only)",
   },
   { value: "none", label: "None", hint: "No email" },
+];
+
+const LOGGING_OPTIONS: PromptOption<PhpLogging>[] = [
+  { value: "monolog", label: "Monolog", hint: "JSON logs to stderr through PSR-3 (Slim only)" },
+  {
+    value: "laravel-log",
+    label: "Laravel logging",
+    hint: "Log facade on the stderr channel (Laravel only)",
+  },
+  {
+    value: "symfony-monolog",
+    label: "Symfony MonologBundle",
+    hint: "JSON stream handler and autowired logger (Symfony only)",
+  },
+  { value: "none", label: "None", hint: "No application logging" },
 ];
 
 export function resolvePhpWebFrameworkPrompt(value?: PhpWebFramework) {
@@ -259,6 +275,24 @@ export async function getPhpEmailChoice(value?: PhpEmail, framework?: PhpWebFram
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
   const response = await navigableSelect<PhpEmail>({
     message: "Select PHP email library",
+    options: resolution.options,
+    initialValue: resolution.initialValue,
+  });
+  return isCancel(response) ? exitCancelled("Operation cancelled") : response;
+}
+
+export function resolvePhpLoggingPrompt(value?: PhpLogging, framework?: PhpWebFramework) {
+  const options = LOGGING_OPTIONS.filter(
+    (option) => !getPhpCapabilityIssue(framework, "logging", option.value),
+  );
+  return createStaticSinglePromptResolution(options, "none", value);
+}
+
+export async function getPhpLoggingChoice(value?: PhpLogging, framework?: PhpWebFramework) {
+  const resolution = resolvePhpLoggingPrompt(value, framework);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
+  const response = await navigableSelect<PhpLogging>({
+    message: "Select PHP logging",
     options: resolution.options,
     initialValue: resolution.initialValue,
   });

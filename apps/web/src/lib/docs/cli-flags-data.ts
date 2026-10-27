@@ -2663,6 +2663,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "none",
         "multiple": false
+      },
+      {
+        "flag": "--php-logging",
+        "summary": "PHP logging (framework-specific).",
+        "values": [
+          "monolog",
+          "laravel-log",
+          "symfony-monolog",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
       }
     ]
   },
@@ -3175,6 +3188,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "php:--php-cache": m.docsCliSummaryPhpPhpCache,
   "php:--php-job-queue": m.docsCliSummaryPhpPhpJobQueue,
   "php:--php-email": m.docsCliSummaryPhpPhpEmail,
+  "php:--php-logging": m.docsCliSummaryPhpPhpLogging,
   "elixir:--elixir-web-framework": m.docsCliSummaryElixirElixirWebFramework,
   "elixir:--elixir-orm": m.docsCliSummaryElixirElixirOrm,
   "elixir:--elixir-auth": m.docsCliSummaryElixirElixirAuth,

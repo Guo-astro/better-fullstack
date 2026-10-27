@@ -331,6 +331,7 @@ export const SECTIONS_BY_ECOSYSTEM: Record<Ecosystem, readonly BuilderSectionDef
     section("data", "Data & Storage", ["phpOrm", "phpCache"]),
     section("services", "Auth & Services", ["phpAuth", "phpJobQueue", "phpEmail"]),
     section("qualityTesting", "Quality & Testing", ["phpTesting", "phpValidation"]),
+    section("observability", "Observability & Analytics", ["phpLogging"]),
     section("deployScaffold", "Scaffold", ["aiDocs", "git", "install"]),
   ],
   elixir: ELIXIR_SECTIONS,

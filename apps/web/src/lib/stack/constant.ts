@@ -6466,6 +6466,37 @@ export const TECH_OPTIONS: Record<
       default: true,
     },
   ],
+  phpLogging: [
+    {
+      id: "monolog",
+      name: "Monolog",
+      description: "JSON request logs to stderr through a PSR-3 logger on Slim",
+      icon: "https://cdn.simpleicons.org/php/777BB4",
+      color: "from-indigo-500 to-indigo-700",
+    },
+    {
+      id: "laravel-log",
+      name: "Laravel logging",
+      description: "Laravel's Log facade on the stderr channel with JSON output on Laravel",
+      icon: "https://cdn.simpleicons.org/laravel/FF2D20",
+      color: "from-red-500 to-red-700",
+    },
+    {
+      id: "symfony-monolog",
+      name: "Symfony MonologBundle",
+      description: "MonologBundle JSON stream handler with an autowired logger on Symfony",
+      icon: "https://cdn.simpleicons.org/symfony/000000",
+      color: "from-gray-700 to-gray-900",
+    },
+    {
+      id: "none",
+      name: "None",
+      description: "No application logging",
+      icon: "",
+      color: "from-gray-500 to-gray-700",
+      default: true,
+    },
+  ],
   phpAuth: [
     {
       id: "firebase-jwt",

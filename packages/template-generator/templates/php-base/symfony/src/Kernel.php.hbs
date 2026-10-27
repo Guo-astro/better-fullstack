@@ -12,6 +12,9 @@ use App\Security\BearerChallenge;
 use App\Security\BearerTokenHandler;
 {{/if}}
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+{{#if (eq phpLogging "symfony-monolog")}}
+use Symfony\Bundle\MonologBundle\MonologBundle;
+{{/if}}
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 {{#if (eq phpAuth "symfony-security")}}
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
@@ -30,6 +33,9 @@ final class Kernel extends BaseKernel
     public function registerBundles(): iterable
     {
         yield new FrameworkBundle();
+{{#if (eq phpLogging "symfony-monolog")}}
+        yield new MonologBundle();
+{{/if}}
 {{#if (eq phpAuth "symfony-security")}}
         yield new SecurityBundle();
 {{/if}}
@@ -46,6 +52,14 @@ final class Kernel extends BaseKernel
             'php_errors' => ['log' => true],
         ]);
         $container->parameters()->set('app.cors_origin', '%env(default::CORS_ORIGIN)%');
+{{#if (eq phpLogging "symfony-monolog")}}
+        $container->parameters()->set('app.log_path', 'php://stderr');
+        $container->extension('monolog', [
+            'handlers' => [
+                'main' => ['type' => 'stream', 'path' => '%env(default:app.log_path:LOG_PATH)%', 'level' => 'info', 'formatter' => 'monolog.formatter.json'],
+            ],
+        ]);
+{{/if}}
 {{#if (eq phpOrm "doctrine")}}
         $container->parameters()->set('app.database_path', '%kernel.project_dir%/var/database.sqlite');
         $container->extension('doctrine', [

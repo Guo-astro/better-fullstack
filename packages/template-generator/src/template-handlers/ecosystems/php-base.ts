@@ -26,6 +26,7 @@ export async function processPhpBaseTemplate(
     phpCache: config.phpCache ?? "none",
     phpJobQueue: config.phpJobQueue ?? "none",
     phpEmail: config.phpEmail ?? "none",
+    phpLogging: config.phpLogging ?? "none",
     phpPackageName,
     phpSourceDirectory,
   };

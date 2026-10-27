@@ -421,6 +421,55 @@ describe("PHP generation and lifecycle", () => {
     expect(result.tree).toBeUndefined();
   });
 
+  it.each([
+    ["slim", "monolog", "monolog/monolog", "public/index.php"],
+    ["laravel", "laravel-log", "laravel/framework", "routes/api.php"],
+    ["symfony", "symfony-monolog", "symfony/monolog-bundle", "src/Controller/ApiController.php"],
+  ] as const)(
+    "generates %s with its own %s logger and replays it",
+    async (framework, logging, dependency, owner) => {
+      const result = await createVirtual({
+        projectName: `php-${framework}-${logging}`,
+        ecosystem: "php",
+        phpWebFramework: framework,
+        phpLogging: logging,
+      });
+      expect(result.success).toBe(true);
+      const tree = result.tree!;
+      const manifest = JSON.parse(getVirtualTreeFileContent(tree, "composer.json"));
+      expect(Object.keys(manifest.require)).toContain(dependency);
+      expect(hasVirtualFile(tree.root, "tests/LoggingTest.php")).toBe(true);
+      expect(getVirtualTreeFileContent(tree, owner)).toContain(
+        framework === "slim" ? "JsonFormatter" : "greeting.created",
+      );
+      expect(getVirtualTreeFileContent(tree, "bin/proof-http.php")).toContain("greeting.created");
+      expect(generateReproducibleCommand(tree.config)).toContain(`--php-logging ${logging}`);
+      const saved = buildBtsConfigForPersistence(tree.config, {
+        version: "0.0.0",
+        createdAt: "2026-10-27T00:00:00.000Z",
+      });
+      expect(previewBtsConfigUpdate(saved, {}).phpLogging).toBe(logging);
+    },
+  );
+
+  it.each([
+    ["laravel", "monolog", "Monolog is generated for Slim"],
+    ["slim", "laravel-log", "Laravel logging is generated for Laravel"],
+    ["laravel", "symfony-monolog", "Symfony MonologBundle is generated for Symfony"],
+  ] as const)(
+    "rejects %s with %s logging before emitting files",
+    async (framework, logging, error) => {
+      const result = await createVirtual({
+        ecosystem: "php",
+        phpWebFramework: framework,
+        phpLogging: logging,
+      });
+      expect(result.success).toBe(false);
+      expect(result.error).toContain(error);
+      expect(result.tree).toBeUndefined();
+    },
+  );
+
   it("rejects Symfony Security outside Symfony before emitting files", async () => {
     const result = await createVirtual({
       ecosystem: "php",

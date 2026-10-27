@@ -114,6 +114,20 @@ Laravel Mail sends with the MAIL_MAILER mailer (`smtp` to MAIL_HOST and MAIL_POR
 A local SMTP catcher such as Mailpit listens on port 1025. `composer run proof:http` delivers one message to a temporary in-process SMTP listener and checks the recipient and subject; it does not contact a real provider.
 
 {{/if}}
+{{#if (ne phpLogging "none")}}
+## Logging
+
+Each accepted greeting writes one JSON log entry, `greeting.created` with the repetition count, to standard error. The name is not logged.
+{{#if (eq phpLogging "monolog")}}
+`public/index.php` creates a Monolog logger with a JSON `StreamHandler` and passes it to `src/Application.php` as a PSR-3 logger. LOG_LEVEL (default `info`) sets the minimum level.
+{{else if (eq phpLogging "laravel-log")}}
+`routes/api.php` logs through Laravel's `Log` facade. `.env` selects the `stderr` channel with Monolog's JSON formatter; change LOG_CHANNEL to use another Laravel channel.
+{{else}}
+MonologBundle is registered in `src/Kernel.php` with a JSON stream handler, and `src/Controller/ApiController.php` receives the PSR-3 logger. LOG_PATH (default `php://stderr`) chooses the stream.
+{{/if}}
+Logging is owned by the framework: Slim uses Monolog directly, Laravel uses its logging channels, and Symfony uses MonologBundle.
+
+{{/if}}
 {{#if (ne phpAuth "none")}}
 ## Authentication
 

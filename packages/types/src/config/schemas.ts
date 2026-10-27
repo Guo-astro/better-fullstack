@@ -1105,6 +1105,10 @@ export const PhpEmailSchema = z
   .enum(["symfony-mailer", "phpmailer", "laravel-mail", "none"])
   .describe("PHP email library");
 
+export const PhpLoggingSchema = z
+  .enum(["monolog", "laravel-log", "symfony-monolog", "none"])
+  .describe("PHP logging");
+
 export const ElixirWebFrameworkSchema = z
   .enum(["phoenix", "phoenix-live-view", "none"])
   .describe("Elixir web framework");
@@ -1513,6 +1517,7 @@ const STACK_CONFIG_FIELDS = {
   phpCache: PhpCacheSchema.default("none"),
   phpJobQueue: PhpJobQueueSchema.default("none"),
   phpEmail: PhpEmailSchema.default("none"),
+  phpLogging: PhpLoggingSchema.default("none"),
   elixirWebFramework: ElixirWebFrameworkSchema,
   elixirOrm: ElixirOrmSchema,
   elixirAuth: ElixirAuthSchema,
@@ -1815,6 +1820,7 @@ export const PHP_VALIDATION_VALUES = PhpValidationSchema.options;
 export const PHP_CACHE_VALUES = PhpCacheSchema.options;
 export const PHP_JOB_QUEUE_VALUES = PhpJobQueueSchema.options;
 export const PHP_EMAIL_VALUES = PhpEmailSchema.options;
+export const PHP_LOGGING_VALUES = PhpLoggingSchema.options;
 export const ELIXIR_WEB_FRAMEWORK_VALUES = ElixirWebFrameworkSchema.options;
 export const ELIXIR_ORM_VALUES = ElixirOrmSchema.options;
 export const ELIXIR_AUTH_VALUES = ElixirAuthSchema.options;

@@ -605,6 +605,7 @@
   "docsCliSummaryPhpPhpCache": "Бібліотека кешування PHP.",
   "docsCliSummaryPhpPhpJobQueue": "Черга фонових завдань PHP.",
   "docsCliSummaryPhpPhpEmail": "Бібліотека електронної пошти PHP.",
+  "docsCliSummaryPhpPhpLogging": "Логування PHP (залежить від фреймворку).",
   "docsCliSummaryElixirElixirWebFramework": "Вебфреймворк Elixir.",
   "docsCliSummaryElixirElixirOrm": "ORM / база даних Elixir.",
   "docsCliSummaryElixirElixirAuth": "Автентифікація в Elixir.",

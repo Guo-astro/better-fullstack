@@ -20,12 +20,20 @@ use Illuminate\Http\Request;
 {{#if (eq phpCache "laravel-cache")}}
 use Illuminate\Support\Facades\Cache;
 {{/if}}
+{{#if (eq phpLogging "laravel-log")}}
+use Illuminate\Support\Facades\Log;
+{{/if}}
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', fn () => response()->json(['status' => 'ok', 'framework' => 'laravel']));
 
 Route::post('/api/greetings', function (Request $request) {
     [$status, $body] = GreetingEndpoint::respond((string) $request->header('Content-Type', ''), $request->getContent());
+{{#if (eq phpLogging "laravel-log")}}
+    if ($status === 200) {
+        Log::info('greeting.created', ['repetitions' => $body['repetitions']]);
+    }
+{{/if}}
     return response()->json($body, $status);
 });
 {{#if (eq phpOrm "eloquent")}}

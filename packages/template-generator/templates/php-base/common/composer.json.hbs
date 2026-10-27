@@ -51,6 +51,9 @@
     "laminas/laminas-cache": "~4.3.0",
     "laminas/laminas-cache-storage-adapter-filesystem": "~3.2.0",
 {{/if}}
+{{#if (eq phpLogging "monolog")}}
+    "monolog/monolog": "~3.12.1",
+{{/if}}
 {{#if (eq phpEmail "phpmailer")}}
     "phpmailer/phpmailer": "~7.1.1",
 {{/if}}
@@ -65,6 +68,9 @@
 {{/if}}
 {{#if (eq phpEmail "symfony-mailer")}}
     "symfony/mailer": "~8.1.7",
+{{/if}}
+{{#if (eq phpLogging "symfony-monolog")}}
+    "symfony/monolog-bundle": "~4.1.0",
 {{/if}}
 {{#if (eq phpJobQueue "symfony-messenger")}}
     "symfony/doctrine-messenger": "~8.1.9",

@@ -723,6 +723,16 @@ const CATEGORY_NAMES: Record<string, LocalizedMap> = {
     "fr": "E-mail PHP",
     "uk": "Електронна пошта PHP",
   },
+  phpLogging: {
+    "es": "Registro PHP",
+    "zh": "PHP 日志",
+    "ja": "PHP ロギング",
+    "ko": "PHP 로깅",
+    "zh-Hant": "PHP 日誌",
+    "de": "PHP-Logging",
+    "fr": "Journalisation PHP",
+    "uk": "Логування PHP",
+  },
   phpAuth: {
     "es": "Auth PHP",
     "zh": "PHP 认证",

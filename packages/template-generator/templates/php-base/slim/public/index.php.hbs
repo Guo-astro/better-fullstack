@@ -13,6 +13,12 @@ use App\JobQueue;
 {{#if (ne phpOrm "none")}}
 use App\Notes;
 {{/if}}
+{{#if (eq phpLogging "monolog")}}
+use Monolog\Formatter\JsonFormatter;
+use Monolog\Handler\StreamHandler;
+use Monolog\Level;
+use Monolog\Logger;
+{{/if}}
 {{#if (ne phpAuth "none")}}
 use App\TokenVerifier;
 {{/if}}
@@ -32,5 +38,8 @@ Application::create(
 {{/if}}
 {{#if (ne phpJobQueue "none")}}
     jobs: JobQueue::fromEnvironment(dirname(__DIR__)),
+{{/if}}
+{{#if (eq phpLogging "monolog")}}
+    logger: new Logger('app', [(new StreamHandler('php://stderr', Level::fromName(getenv('LOG_LEVEL') ?: 'info')))->setFormatter(new JsonFormatter())]),
 {{/if}}
 )->run();

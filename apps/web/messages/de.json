@@ -604,6 +604,7 @@
   "docsCliSummaryPhpPhpCache": "PHP-Cache-Bibliothek.",
   "docsCliSummaryPhpPhpJobQueue": "PHP-Warteschlange für Hintergrundjobs.",
   "docsCliSummaryPhpPhpEmail": "PHP-E-Mail-Bibliothek.",
+  "docsCliSummaryPhpPhpLogging": "PHP-Logging (frameworkspezifisch).",
   "docsCliSummaryElixirElixirWebFramework": "Web-Framework für Elixir.",
   "docsCliSummaryElixirElixirOrm": "ORM / Datenbank für Elixir.",
   "docsCliSummaryElixirElixirAuth": "Authentifizierung für Elixir.",

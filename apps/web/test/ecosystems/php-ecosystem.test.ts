@@ -101,5 +101,8 @@ describe("PHP builder recipe", () => {
     expect(generateStackCommand({ ...stack, phpEmail: "phpmailer" })).toContain(
       "--php-email phpmailer",
     );
+    expect(generateStackCommand({ ...stack, phpLogging: "monolog" })).toContain(
+      "--php-logging monolog",
+    );
   });
 });

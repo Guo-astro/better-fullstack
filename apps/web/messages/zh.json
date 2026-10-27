@@ -604,6 +604,7 @@
   "docsCliSummaryPhpPhpCache": "PHP 缓存库。",
   "docsCliSummaryPhpPhpJobQueue": "PHP 后台任务队列。",
   "docsCliSummaryPhpPhpEmail": "PHP 邮件库。",
+  "docsCliSummaryPhpPhpLogging": "PHP 日志（按框架区分）。",
   "docsCliSummaryElixirElixirWebFramework": "Elixir Web 框架。",
   "docsCliSummaryElixirElixirOrm": "Elixir ORM / 数据库。",
   "docsCliSummaryElixirElixirAuth": "Elixir 认证。",

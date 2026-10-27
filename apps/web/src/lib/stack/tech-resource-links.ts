@@ -2411,6 +2411,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://laravel.com/docs/13.x/mail",
     githubUrl: "https://github.com/illuminate/mail",
   },
+  "phpLogging:monolog": {
+    docsUrl: "https://seldaek.github.io/monolog/",
+    githubUrl: "https://github.com/Seldaek/monolog",
+  },
+  "phpLogging:laravel-log": {
+    docsUrl: "https://laravel.com/docs/13.x/logging",
+    githubUrl: "https://github.com/illuminate/log",
+  },
+  "phpLogging:symfony-monolog": {
+    docsUrl: "https://symfony.com/doc/current/logging.html",
+    githubUrl: "https://github.com/symfony/monolog-bundle",
+  },
   "phpOrm:cycle": {
     docsUrl: "https://cycle-orm.dev/docs/intro-about/current/en",
     githubUrl: "https://github.com/cycle/orm",

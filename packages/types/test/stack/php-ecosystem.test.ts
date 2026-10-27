@@ -191,7 +191,7 @@ describe("PHP graph and transport contract", () => {
     );
     const command = generateStackSelectionCommand(selection);
     expect(command).toContain(
-      "--ecosystem php --php-web-framework slim --php-orm none --php-auth none --php-testing phpunit --php-validation none --php-cache none --php-job-queue none --php-email none --database none",
+      "--ecosystem php --php-web-framework slim --php-orm none --php-auth none --php-testing phpunit --php-validation none --php-cache none --php-job-queue none --php-email none --php-logging none --database none",
     );
     expect(command).toContain("--no-install");
     const withOrm = { ...selection, phpWebFramework: "symfony", phpOrm: "doctrine" };
@@ -383,5 +383,35 @@ describe("PHP graph and transport contract", () => {
     const selection = parseStackSelectionFromUrlRecord({ eco: "php", phmail: "symfony-mailer" });
     expect(selection.phpEmail).toBe("symfony-mailer");
     expect(generateStackSelectionCommand(selection)).toContain("--php-email symfony-mailer");
+  });
+
+  it("keeps each PHP logging option on the framework that owns logging", () => {
+    for (const [framework, logging] of [
+      ["slim", "monolog"],
+      ["laravel", "laravel-log"],
+      ["symfony", "symfony-monolog"],
+    ] as const) {
+      const parts = legacyProjectConfigToStackParts({
+        ...native,
+        phpWebFramework: framework,
+        phpLogging: logging,
+      });
+      expect(parts).toContainEqual(
+        expect.objectContaining({ role: "logging", ecosystem: "php", toolId: logging }),
+      );
+      expect(validateStackParts(parts).issues).toEqual([]);
+      expect(stackPartsToLegacyProjectConfigPartial(parts)).toMatchObject({ phpLogging: logging });
+    }
+    const issue = getPhpRecipeIssue({
+      ...native,
+      phpWebFramework: "symfony",
+      phpLogging: "monolog",
+    });
+    expect(issue).toContain("Monolog is generated for Slim");
+    const mismatched = parseStackPartSpecs(["backend:php:symfony", "backend.logging:php:monolog"]);
+    expect(validateStackParts(mismatched).issues.map((entry) => entry.message)).toContain(issue);
+    const selection = parseStackSelectionFromUrlRecord({ eco: "php", phlog: "monolog" });
+    expect(selection.phpLogging).toBe("monolog");
+    expect(generateStackSelectionCommand(selection)).toContain("--php-logging monolog");
   });
 });

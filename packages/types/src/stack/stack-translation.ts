@@ -229,6 +229,7 @@ export const STACK_SELECTION_OPTION_CATEGORY_BY_KEY: Record<
   phpCache: "phpCache",
   phpJobQueue: "phpJobQueue",
   phpEmail: "phpEmail",
+  phpLogging: "phpLogging",
   elixirWebFramework: "elixirWebFramework",
   elixirOrm: "elixirOrm",
   elixirAuth: "elixirAuth",
@@ -449,6 +450,7 @@ export const STACK_SELECTION_URL_KEYS = {
   phpCache: "phcache",
   phpJobQueue: "phjobs",
   phpEmail: "phmail",
+  phpLogging: "phlog",
   elixirWebFramework: "ewf",
   elixirOrm: "eorm",
   elixirAuth: "eauth",
@@ -944,6 +946,7 @@ const CLI_SCALAR_CONFIG_FIELDS = [
   ["phpCache", "phpCache"],
   ["phpJobQueue", "phpJobQueue"],
   ["phpEmail", "phpEmail"],
+  ["phpLogging", "phpLogging"],
   ["elixirWebFramework", "elixirWebFramework"],
   ["elixirOrm", "elixirOrm"],
   ["elixirAuth", "elixirAuth"],
@@ -2061,6 +2064,7 @@ function getCliGraphStackParts(input: CLIInput): StackPart[] {
   addScopedBackendPart("php", "caching", input.phpCache);
   addScopedBackendPart("php", "jobQueue", input.phpJobQueue);
   addScopedBackendPart("php", "email", input.phpEmail);
+  addScopedBackendPart("php", "logging", input.phpLogging);
   addScopedBackendPart("ruby", "orm", input.rubyOrm);
   addScopedBackendPart("ruby", "auth", input.rubyAuth);
   addScopedBackendPart("elixir", "orm", input.elixirOrm);
@@ -2278,6 +2282,7 @@ function buildProjectConfigBase(
     phpCache: stack.phpCache as ProjectConfig["phpCache"],
     phpJobQueue: stack.phpJobQueue as ProjectConfig["phpJobQueue"],
     phpEmail: stack.phpEmail as ProjectConfig["phpEmail"],
+    phpLogging: stack.phpLogging as ProjectConfig["phpLogging"],
     elixirWebFramework: stack.elixirWebFramework as ProjectConfig["elixirWebFramework"],
     elixirOrm: stack.elixirOrm as ProjectConfig["elixirOrm"],
     elixirAuth: stack.elixirAuth as ProjectConfig["elixirAuth"],
@@ -2395,6 +2400,7 @@ export function isCliDefaultStackSelection(
           "phpCache",
           "phpJobQueue",
           "phpEmail",
+          "phpLogging",
           ...ELIXIR_CONFIG_KEYS,
           ...(selection.ecosystem === "typescript" ? REACT_NATIVE_CONFIG_KEYS : []),
         ])
@@ -2857,6 +2863,7 @@ export function generateStackSelectionCommand(selection: StackSelectionInput): s
         `--php-cache ${selection.phpCache}`,
         `--php-job-queue ${selection.phpJobQueue}`,
         `--php-email ${selection.phpEmail}`,
+        `--php-logging ${selection.phpLogging}`,
         `--database ${selection.database}`,
       ];
       if (selection.versionChannel !== "stable")

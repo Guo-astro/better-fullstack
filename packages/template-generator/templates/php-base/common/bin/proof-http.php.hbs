@@ -86,6 +86,9 @@ requireProof(proc_close($setup) === 0, 'Database setup failed: ' . file_get_cont
 {{else}}
 $serverEnv = array_merge(getenv(), ['CORS_ORIGIN' => 'http://localhost:5173,http://localhost:8080']);
 {{/if}}
+{{#if (eq phpLogging "laravel-log")}}
+$serverEnv = array_merge($serverEnv, ['LOG_CHANNEL' => 'stderr', 'LOG_STDERR_FORMATTER' => 'Monolog\\Formatter\\JsonFormatter']);
+{{/if}}
 {{#if (ne phpJobQueue "none")}}
 $queuePath = sys_get_temp_dir() . '/bfs-php-queue-' . bin2hex(random_bytes(6));
 $serverEnv['QUEUE_PATH'] = $queuePath;
@@ -119,6 +122,9 @@ try {
     [$status, $body, $headers] = requestProof('http://' . $address . '/api/greetings', 'POST', '{"name":"Ada","repetitions":2}');
     requireProof($status === 200 && $body === ['message' => 'Hello, Ada! Hello, Ada!', 'repetitions' => 2], 'Parsed greeting mismatch.');
     requireProof(in_array('Access-Control-Allow-Origin: http://localhost:5173', $headers, true), 'CORS origin mismatch.');
+{{#if (ne phpLogging "none")}}
+    requireProof(str_contains((string) file_get_contents($log), '"message":"greeting.created"'), 'Greeting log entry missing.');
+{{/if}}
     foreach (['http://localhost:8080', 'http://localhost:51730', 'https://other.example'] as $origin) {
         [$status, $body, $headers] = requestProof('http://' . $address . '/health', 'GET', null, $origin);
         requireProof($status === 200, 'CORS health request failed.');
@@ -217,4 +223,4 @@ try {
 {{/if}}
 }
 if ($failure !== null) exit(1);
-echo json_encode(['php' => PHP_VERSION, 'assertions' => ['health', 'parsed-greeting', 'validation-rejection', 'malformed-json', 'oversized-body', 'missing-route', {{#if (ne phpOrm "none")}}'orm-persistence', {{/if}}{{#if (ne phpAuth "none")}}'bearer-auth', {{/if}}{{#if (ne phpCache "none")}}'cache', {{/if}}{{#if (ne phpJobQueue "none")}}'background-job', {{/if}}{{#if (ne phpEmail "none")}}'smtp-email', {{/if}}'cors', 'cors-allowlist', 'shutdown'], 'success' => true], JSON_THROW_ON_ERROR) . "\n";
+echo json_encode(['php' => PHP_VERSION, 'assertions' => ['health', 'parsed-greeting', 'validation-rejection', 'malformed-json', 'oversized-body', 'missing-route', {{#if (ne phpOrm "none")}}'orm-persistence', {{/if}}{{#if (ne phpAuth "none")}}'bearer-auth', {{/if}}{{#if (ne phpCache "none")}}'cache', {{/if}}{{#if (ne phpJobQueue "none")}}'background-job', {{/if}}{{#if (ne phpEmail "none")}}'smtp-email', {{/if}}{{#if (ne phpLogging "none")}}'json-log', {{/if}}'cors', 'cors-allowlist', 'shutdown'], 'success' => true], JSON_THROW_ON_ERROR) . "\n";

@@ -1227,6 +1227,12 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         source: { kind: "category", category: "phpEmail" },
         configKey: "phpEmail",
       },
+      {
+        flag: "php-logging",
+        summary: "PHP logging (framework-specific).",
+        source: { kind: "category", category: "phpLogging" },
+        configKey: "phpLogging",
+      },
     ],
   },
   {
