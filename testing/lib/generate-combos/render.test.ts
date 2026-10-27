@@ -1,8 +1,35 @@
 import { createCliDefaultProjectConfigBase, type ProjectConfig } from "@better-fullstack/types";
 import { buildCommand, formatNameFromFingerprint } from "@testing/lib/generate-combos/render";
+import { makeBaseConfig } from "@testing/lib/presets";
 import { describe, expect, it } from "bun:test";
 
 describe("smoke combo command rendering", () => {
+  it("preserves all sampled Ruby selections in the smoke command", () => {
+    const config: ProjectConfig = {
+      ...makeBaseConfig("ruby-smoke", "ruby"),
+      rubyWebFramework: "rails",
+      rubyOrm: "active-record",
+      rubyAuth: "rodauth",
+      rubyTesting: "rspec",
+      rubyValidation: "dry-validation",
+      rubyCache: "memory",
+      rubyJobQueue: "solid-queue",
+      rubyEmail: "action-mailer",
+      rubyLogging: "lograge",
+      rubyHttpClient: "faraday",
+    };
+
+    expect(buildCommand("ruby-smoke", config)).toContain(
+      "--ruby-web-framework rails --ruby-orm active-record --ruby-auth rodauth --ruby-testing rspec --ruby-validation dry-validation --ruby-cache memory --ruby-job-queue solid-queue --ruby-email action-mailer --ruby-logging lograge --ruby-http-client faraday",
+    );
+  });
+
+  it("keeps disabled Ruby integrations explicit in preset commands", () => {
+    expect(buildCommand("ruby-smoke", makeBaseConfig("ruby-smoke", "ruby"))).toContain(
+      "--ruby-validation none --ruby-cache none --ruby-job-queue none --ruby-email none --ruby-logging none --ruby-http-client none",
+    );
+  });
+
   it("keeps generated names safe for Phoenix test database identifiers", () => {
     const name = formatNameFromFingerprint({
       ecosystem: "elixir",

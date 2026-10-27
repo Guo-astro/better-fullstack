@@ -405,6 +405,12 @@ export function buildCommand(name: string, config: ProjectConfig): string {
       orderedFlags.push(["ruby-orm", config.rubyOrm ?? "none"]);
       orderedFlags.push(["ruby-auth", config.rubyAuth ?? "none"]);
       orderedFlags.push(["ruby-testing", config.rubyTesting ?? "minitest"]);
+      orderedFlags.push(["ruby-validation", config.rubyValidation]);
+      orderedFlags.push(["ruby-cache", config.rubyCache]);
+      orderedFlags.push(["ruby-job-queue", config.rubyJobQueue]);
+      orderedFlags.push(["ruby-email", config.rubyEmail]);
+      orderedFlags.push(["ruby-logging", config.rubyLogging]);
+      orderedFlags.push(["ruby-http-client", config.rubyHttpClient]);
       break;
     case "php":
       orderedFlags.push(["php-web-framework", config.phpWebFramework]);

@@ -699,6 +699,8 @@ const GRAPH_BACKEND_CONFIGS: GraphBackendConfig[] = [
     ecosystem: "crystal",
     label: "Crystal",
     frameworkCategory: "crystalWebFramework",
+    ormCategory: "crystalOrm",
+    authCategory: "crystalAuth",
   },
   {
     ecosystem: "java",
@@ -1013,7 +1015,7 @@ const GRAPH_BACKEND_ADVANCED_CATEGORY_ORDER_BY_ECOSYSTEM = {
     "caching",
     "search",
   ],
-  crystal: [],
+  crystal: ["crystalTesting", "crystalValidation", "crystalCache", "crystalJobs"],
   java: [
     "javaBuildTool",
     "javaApi",
@@ -1034,7 +1036,15 @@ const GRAPH_BACKEND_ADVANCED_CATEGORY_ORDER_BY_ECOSYSTEM = {
     "rubyLogging",
     "rubyHttpClient",
   ],
-  php: [],
+  php: [
+    "phpTesting",
+    "phpValidation",
+    "phpCache",
+    "phpJobQueue",
+    "phpEmail",
+    "phpLogging",
+    "phpHttpClient",
+  ],
   elixir: [
     "elixirRealtime",
     "elixirJobs",
