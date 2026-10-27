@@ -36,7 +36,7 @@ bundle exec ruby bin/server
 
 The server binds to `127.0.0.1:{{rubyPort}}`. `HOST`, `PORT`, `RACK_ENV`, and `ALLOWED_ORIGIN` are process environment variables. `.env.example` documents values and is not loaded automatically. CORS permits the generated frontend origins `{{rubyWebOrigin}}` by default. Set ALLOWED_ORIGIN to a comma-separated list of trusted frontend origins to override them. Host authorization accepts localhost and loopback addresses. Configure explicit trusted hosts before public hosting.
 
-`http_policy.rb` enforces the host and origin allowlists and answers CORS preflight requests for every framework. `request_body_limit.rb` caps request bodies before the framework reads them, and `name_input.rb` validates the JSON payload.{{#if (eq rubyWebFramework "rails")}} Rails runs in API-only mode from a single `app.rb` application; set `SECRET_KEY_BASE` when `RACK_ENV=production`.{{/if}}
+`http_policy.rb` enforces the host and origin allowlists and answers CORS preflight requests for every framework. `request_body_limit.rb` caps request bodies before the framework reads them, and `name_input.rb` validates the JSON payload{{#if (eq rubyValidation "dry-validation")}} with the dry-validation contract in `name_contract.rb`{{/if}}{{#if (eq rubyValidation "active-model")}} with the Active Model validations in `name_contract.rb`{{/if}}{{#if (eq rubyValidation "json-schemer")}} against the JSON Schemas in `name_contract.rb` (JSONSchemer){{/if}}.{{#if (eq rubyWebFramework "rails")}} Rails runs in API-only mode from a single `app.rb` application; set `SECRET_KEY_BASE` when `RACK_ENV=production`.{{/if}}
 
 {{#if (ne rubyOrm "none")}}
 ## Database

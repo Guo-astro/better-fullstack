@@ -47,6 +47,7 @@ import {
   PHP_UNSUPPORTED_BACKEND_FIELDS,
 } from "@/stack/php-compatibility";
 import {
+  RUBY_OPTION_CATEGORIES,
   RUBY_RECIPE_EXTENSION_REASON,
   RUBY_RECIPE_FRAMEWORK_REASON,
   RUBY_UNSUPPORTED_CONFIG_KEYS,
@@ -582,6 +583,7 @@ export type CompatibilityInput = {
   rubyOrm: string;
   rubyAuth: string;
   rubyTesting: string;
+  rubyValidation: string;
   phpWebFramework: string;
   phpOrm: string;
   phpAuth: string;
@@ -3012,7 +3014,7 @@ export const getDisabledReason = (
   )
     return "Crystal HTTP frameworks require the Crystal ecosystem or a Crystal backend part.";
   if (
-    (category === "rubyOrm" || category === "rubyAuth" || category === "rubyTesting") &&
+    RUBY_OPTION_CATEGORIES.some((entry) => entry === category) &&
     optionId !== "none" &&
     currentStack.ecosystem !== "ruby"
   )

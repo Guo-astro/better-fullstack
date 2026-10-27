@@ -315,6 +315,8 @@ function generateTechStackSection(config: ProjectConfig): string {
     const orm = rubyOrmLabel(config);
     if (orm) lines.push(`- Database: ${orm} on SQLite with versioned migrations (\`bundle exec rake db:migrate\`)`);
     if (config.rubyAuth && config.rubyAuth !== "none") lines.push(`- Auth: ${getOptionMetadata("rubyAuth", config.rubyAuth)?.label ?? config.rubyAuth}`);
+    const validation = rubyOptionLabel(config, "rubyValidation");
+    if (validation) lines.push(`- Validation: ${validation} in name_contract.rb`);
   }
 
   if (config.ecosystem === "rust") {
@@ -525,6 +527,11 @@ function rubyTestingLabel(config: ProjectConfig) {
   return testing === "none" ? undefined : getOptionMetadata("rubyTesting", testing)?.label;
 }
 
+function rubyOptionLabel(config: ProjectConfig, category: "rubyValidation") {
+  const value = config[category];
+  return value && value !== "none" ? getOptionMetadata(category, value)?.label : undefined;
+}
+
 function rubyOrmLabel(config: ProjectConfig) {
   return config.rubyOrm && config.rubyOrm !== "none"
     ? getOptionMetadata("rubyOrm", config.rubyOrm)?.label
@@ -725,6 +732,8 @@ function generateCursorRules(config: ProjectConfig): string {
     const orm = rubyOrmLabel(config);
     rules.push(orm ? `Persistence uses ${orm} on SQLite: connection and migrator in db.rb, the Items repository in items.rb, migrations under db/. DATABASE_PATH overrides the SQLite file. Change the schema with a new migration, never by editing an applied one.` : "No database adapter is generated.");
     rules.push(rubyAuthGuidance(config) ?? "No auth adapter is generated.");
+    const validation = rubyOptionLabel(config, "rubyValidation");
+    if (validation) rules.push(`Request payload rules live in name_contract.rb and use ${validation}. Keep the 422 error codes name_must_be_a_string and name_length_must_be_1_to_80 stable; the tests assert them.`);
   } else if (config.ecosystem === "go") {
     rules.push(`You are working on a Go project.`);
     if (config.goWebFramework !== "none") rules.push(`Web framework: ${config.goWebFramework}`);

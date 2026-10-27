@@ -703,6 +703,16 @@ const CATEGORY_NAMES: Record<string, LocalizedMap> = {
     "fr": "Tests Ruby",
     "uk": "Тестування Ruby",
   },
+  rubyValidation: {
+    "es": "Validación Ruby",
+    "zh": "Ruby 验证",
+    "ja": "Ruby バリデーション",
+    "ko": "Ruby 검증",
+    "zh-Hant": "Ruby 驗證",
+    "de": "Ruby-Validierung",
+    "fr": "Validation Ruby",
+    "uk": "Валідація Ruby",
+  },
   rubyAuth: {
     "es": "Auth Ruby",
     "zh": "Ruby 认证",

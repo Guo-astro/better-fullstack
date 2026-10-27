@@ -1,4 +1,10 @@
-import type { RubyAuth, RubyOrm, RubyTesting, RubyWebFramework } from "@/types";
+import type {
+  RubyAuth,
+  RubyOrm,
+  RubyTesting,
+  RubyValidation,
+  RubyWebFramework,
+} from "@/types";
 
 import { exitCancelled } from "@/presentation/errors";
 import { isCancel, navigableSelect } from "@/prompts/core/navigable";
@@ -98,6 +104,28 @@ export async function getRubyTestingChoice(value?: RubyTesting) {
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "minitest";
   const response = await navigableSelect<RubyTesting>({
     message: "Select Ruby test framework",
+    options: resolution.options,
+    initialValue: resolution.initialValue,
+  });
+  if (isCancel(response)) return exitCancelled("Operation cancelled");
+  return response;
+}
+
+const VALIDATION_OPTIONS: PromptOption<RubyValidation>[] = [
+  { value: "dry-validation", label: "dry-validation", hint: "Contract with schema and rule checks" },
+  { value: "active-model", label: "Active Model Validations", hint: "Rails-style validations on a plain object" },
+  { value: "json-schemer", label: "JSONSchemer", hint: "JSON Schema validation of the request body" },
+  { value: "none", label: "None", hint: "Hand-written request checks" },
+];
+
+export const resolveRubyValidationPrompt = (value?: RubyValidation) =>
+  createStaticSinglePromptResolution(VALIDATION_OPTIONS, "none", value);
+
+export async function getRubyValidationChoice(value?: RubyValidation) {
+  const resolution = resolveRubyValidationPrompt(value);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
+  const response = await navigableSelect<RubyValidation>({
+    message: "Select Ruby request validation",
     options: resolution.options,
     initialValue: resolution.initialValue,
   });

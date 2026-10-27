@@ -18,6 +18,10 @@ export const RubyTestingSchema = z
   .enum(["minitest", "rspec", "test-unit", "none"])
   .describe("Ruby test framework");
 
+export const RubyValidationSchema = z
+  .enum(["dry-validation", "active-model", "json-schemer", "none"])
+  .describe("Ruby request validation");
+
 export const EcosystemSchema = z
   .enum([
     "typescript",
@@ -1446,6 +1450,7 @@ const STACK_CONFIG_FIELDS = {
   rubyOrm: RubyOrmSchema.optional(),
   rubyAuth: RubyAuthSchema.optional(),
   rubyTesting: RubyTestingSchema.optional(),
+  rubyValidation: RubyValidationSchema.optional(),
   phpWebFramework: PhpWebFrameworkSchema.default("none"),
   phpOrm: PhpOrmSchema.default("none"),
   phpAuth: PhpAuthSchema.default("none"),
@@ -1777,3 +1782,4 @@ export const RUBY_WEB_FRAMEWORK_VALUES = RubyWebFrameworkSchema.options;
 export const RUBY_ORM_VALUES = RubyOrmSchema.options;
 export const RUBY_AUTH_VALUES = RubyAuthSchema.options;
 export const RUBY_TESTING_VALUES = RubyTestingSchema.options;
+export const RUBY_VALIDATION_VALUES = RubyValidationSchema.options;

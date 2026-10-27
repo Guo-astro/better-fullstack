@@ -276,6 +276,26 @@ describe("Ruby recipe contracts", () => {
     expect(generateStackSelectionCommand(restored)).toContain("--ruby-testing test-unit");
   });
 
+  it.each([["rubyValidation", "validation", "json-schemer", "none"]] as const)(
+    "projects %s as a Ruby-owned %s part",
+    (category, role, tool, fallback) => {
+      expect(createRubyProjectConfigDefaults()[category]).toBe(fallback);
+      const parts = parseStackPartSpecs(["backend:ruby:roda", `backend.${role}:ruby:${tool}`]);
+      expect(getRubyRecipeIssue({ stackParts: parts })).toBeNull();
+      expect(validateStackParts(parts).issues).toEqual([]);
+      expect(stackPartsToLegacyProjectConfigPartial(parts)[category]).toBe(tool);
+      expect(
+        getDisabledReason(getEcosystemDefaultStackSelection("typescript"), category, tool),
+      ).toBe("Ruby options only apply when the Ruby ecosystem is selected");
+      const restored = parseStackSelectionFromUrlRecord(
+        Object.fromEntries(createStackSelectionSearchParams({ ...rubySelection(), [category]: tool })),
+      );
+      expect(restored[category]).toBe(tool);
+      const flag = category.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+      expect(generateStackSelectionCommand(restored)).toContain(`--${flag} ${tool}`);
+    },
+  );
+
   it("rejects selected databases when Ruby is the only backend, in either picker order", () => {
     const ruby = parseStackPartSpecs(["backend:ruby:sinatra:api"]);
     const database = parseStackPartSpecs(["database:universal:sqlite"]);

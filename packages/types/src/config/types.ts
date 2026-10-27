@@ -69,6 +69,7 @@ import type {
   RubyOrmSchema,
   RubyAuthSchema,
   RubyTestingSchema,
+  RubyValidationSchema,
   EcosystemSchema,
   RustWebFrameworkSchema,
   RustFrontendSchema,
@@ -406,3 +407,4 @@ export type RubyWebFramework = z.infer<typeof RubyWebFrameworkSchema>;
 export type RubyOrm = z.infer<typeof RubyOrmSchema>;
 export type RubyAuth = z.infer<typeof RubyAuthSchema>;
 export type RubyTesting = z.infer<typeof RubyTestingSchema>;
+export type RubyValidation = z.infer<typeof RubyValidationSchema>;

@@ -2473,6 +2473,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "minitest",
         "multiple": false
+      },
+      {
+        "flag": "--ruby-validation",
+        "summary": "Ruby request validation.",
+        "values": [
+          "dry-validation",
+          "active-model",
+          "json-schemer",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
       }
     ]
   },
@@ -2991,6 +3004,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "ruby:--ruby-orm": m.docsCliSummaryRubyRubyOrm,
   "ruby:--ruby-auth": m.docsCliSummaryRubyRubyAuth,
   "ruby:--ruby-testing": m.docsCliSummaryRubyRubyTesting,
+  "ruby:--ruby-validation": m.docsCliSummaryRubyRubyValidation,
   "php:--php-web-framework": m.docsCliSummaryPhpPhpWebFramework,
   "php:--php-orm": m.docsCliSummaryPhpPhpOrm,
   "php:--php-auth": m.docsCliSummaryPhpPhpAuth,

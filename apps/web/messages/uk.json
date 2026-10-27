@@ -593,6 +593,7 @@
   "docsCliSummaryRubyRubyOrm": "ORM / шар бази даних Ruby.",
   "docsCliSummaryRubyRubyAuth": "Автентифікація Ruby.",
   "docsCliSummaryRubyRubyTesting": "Фреймворк тестування Ruby.",
+  "docsCliSummaryRubyRubyValidation": "Валідація запитів Ruby.",
   "docsCliSummaryPhpPhpWebFramework": "HTTP-фреймворк PHP.",
   "docsCliSummaryPhpPhpOrm": "ORM / шар бази даних PHP.",
   "docsCliSummaryPhpPhpAuth": "Автентифікація PHP.",

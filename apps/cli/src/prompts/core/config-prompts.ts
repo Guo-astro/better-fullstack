@@ -54,6 +54,7 @@ import type {
   RubyOrm,
   RubyAuth,
   RubyTesting,
+  RubyValidation,
   PhpWebFramework,
   PhpOrm,
   PhpAuth,
@@ -323,6 +324,7 @@ import {
   getRubyAuthChoice,
   getRubyOrmChoice,
   getRubyTestingChoice,
+  getRubyValidationChoice,
   getRubyWebFrameworkChoice,
 } from "@/prompts/ecosystems/ruby-ecosystem";
 import {
@@ -514,6 +516,7 @@ type PromptGroupResults = {
   rubyOrm: RubyOrm;
   rubyAuth: RubyAuth;
   rubyTesting: RubyTesting;
+  rubyValidation: RubyValidation;
   phpWebFramework: PhpWebFramework;
   phpOrm: PhpOrm;
   phpAuth: PhpAuth;
@@ -706,6 +709,7 @@ const CONFIG_PROMPT_ENTRY_KEY_MAP = {
   rubyOrm: true,
   rubyAuth: true,
   rubyTesting: true,
+  rubyValidation: true,
   phpWebFramework: true,
   phpOrm: true,
   phpAuth: true,
@@ -945,7 +949,8 @@ function scopedPrompt<K extends PromptGroupKey>(
       (key === "rubyWebFramework" ||
         key === "rubyOrm" ||
         key === "rubyAuth" ||
-        key === "rubyTesting") &&
+        key === "rubyTesting" ||
+        key === "rubyValidation") &&
       opts.results.ecosystem !== "ruby"
     )
       return Promise.resolve("none" as PromptGroupResults[K]);
@@ -957,6 +962,7 @@ function scopedPrompt<K extends PromptGroupKey>(
         "rubyOrm",
         "rubyAuth",
         "rubyTesting",
+        "rubyValidation",
         "aiDocs",
         "git",
         "install",
@@ -1917,6 +1923,10 @@ export async function gatherConfig(
       results.ecosystem === "ruby"
         ? getRubyTestingChoice(flags.rubyTesting)
         : Promise.resolve("none" as const),
+    rubyValidation: ({ results }) =>
+      results.ecosystem === "ruby"
+        ? getRubyValidationChoice(flags.rubyValidation)
+        : Promise.resolve("none" as const),
     phpWebFramework: ({ results }) =>
       results.ecosystem === "php"
         ? getPhpWebFrameworkChoice(flags.phpWebFramework)
@@ -2205,6 +2215,7 @@ export async function gatherConfig(
     rubyOrm: result.rubyOrm,
     rubyAuth: result.rubyAuth,
     rubyTesting: result.rubyTesting,
+    rubyValidation: result.rubyValidation,
     phpWebFramework: result.phpWebFramework,
     phpOrm: result.phpOrm,
     phpAuth: result.phpAuth,

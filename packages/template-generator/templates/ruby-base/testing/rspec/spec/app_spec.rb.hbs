@@ -38,6 +38,19 @@ RSpec.describe BetterFullstack::App do
       expect(body).to have_key("error")
     end
   end
+
+  it "reports which validation rule failed" do
+    [
+      [[], "name_must_be_a_string"],
+      [{ "name" => 2 }, "name_must_be_a_string"],
+      [{ "name" => "Ruby", "admin" => true }, "name_must_be_a_string"],
+      [{ "name" => " " }, "name_length_must_be_1_to_80"],
+      [{ "name" => "a" * 81 }, "name_length_must_be_1_to_80"]
+    ].each do |value, error|
+      post_json(value)
+      expect(body).to eq("error" => error)
+    end
+  end
 {{#if (ne rubyOrm "none")}}
 
   describe "items" do

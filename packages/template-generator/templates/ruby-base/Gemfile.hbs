@@ -40,6 +40,15 @@ gem "rack-session", "2.1.2"
 {{#if (or (ne rubyOrm "none") (eq rubyAuth "rodauth"))}}
 gem "sqlite3", "2.10.2"
 {{/if}}
+{{#if (eq rubyValidation "dry-validation")}}
+gem "dry-validation", "1.11.1"
+{{/if}}
+{{#if (eq rubyValidation "active-model")}}
+gem "activemodel", "8.1.4"
+{{/if}}
+{{#if (eq rubyValidation "json-schemer")}}
+gem "json_schemer", "2.5.0"
+{{/if}}
 gem "puma", "7.1.0"
 gem "rackup", "2.3.1"
 gem "rake", "13.3.1"

@@ -2375,6 +2375,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://test-unit.github.io/",
     githubUrl: "https://github.com/test-unit/test-unit",
   },
+  "rubyValidation:dry-validation": {
+    docsUrl: "https://dry-rb.org/gems/dry-validation/",
+    githubUrl: "https://github.com/dry-rb/dry-validation",
+  },
+  "rubyValidation:active-model": {
+    docsUrl: "https://guides.rubyonrails.org/active_model_basics.html",
+    githubUrl: "https://github.com/rails/rails/tree/main/activemodel",
+  },
+  "rubyValidation:json-schemer": {
+    docsUrl: "https://github.com/davishmcclurg/json_schemer#readme",
+    githubUrl: "https://github.com/davishmcclurg/json_schemer",
+  },
   "rubyAuth:jwt": {
     docsUrl: "https://github.com/jwt/ruby-jwt#readme",
     githubUrl: "https://github.com/jwt/ruby-jwt",

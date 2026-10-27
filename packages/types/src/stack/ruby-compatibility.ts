@@ -3,11 +3,18 @@ import type { ProjectConfig, StackPart } from "@/config/types";
 import { getToolingCapability, isToolingOverlayOnly } from "@/capabilities/tooling-capabilities";
 
 export const RUBY_RECIPE_EXTENSION_REASON =
-  "The experimental Ruby recipe provides Sinatra, Rails, Roda, or Grape JSON HTTP, an optional SQLite ORM selected with rubyOrm, optional authentication selected with rubyAuth, and Minitest, RSpec, or Test::Unit request tests selected with rubyTesting. Shared database, authentication, deployment, and other service adapters are not generated.";
+  "The experimental Ruby recipe provides Sinatra, Rails, Roda, or Grape JSON HTTP, an optional SQLite ORM selected with rubyOrm, optional authentication selected with rubyAuth, and Minitest, RSpec, or Test::Unit request tests selected with rubyTesting, and request validation selected with rubyValidation. Shared database, authentication, deployment, and other service adapters are not generated.";
 export const RUBY_RECIPE_FRAMEWORK_REASON =
   "The Ruby HTTP recipe requires a web framework. Use rubyWebFramework=sinatra, rails, roda, or grape, or remove the Ruby backend.";
 
-export const RUBY_OWNED_ROLES = ["orm", "auth", "testing"] as const satisfies readonly StackPart["role"][];
+export const RUBY_OWNED_ROLES = ["orm", "auth", "testing", "validation"] as const satisfies readonly StackPart["role"][];
+
+export const RUBY_OPTION_CATEGORIES = [
+  "rubyOrm",
+  "rubyAuth",
+  "rubyTesting",
+  "rubyValidation",
+] as const satisfies readonly (keyof ProjectConfig)[];
 
 export function isRubyOwnedRole(role: StackPart["role"]): boolean {
   return RUBY_OWNED_ROLES.some((entry) => entry === role);
@@ -151,6 +158,7 @@ export function createRubyProjectConfigDefaults(): Partial<ProjectConfig> {
       ["rubyOrm", "none"],
       ["rubyAuth", "none"],
       ["rubyTesting", "minitest"],
+      ["rubyValidation", "none"],
     ]),
   );
 }

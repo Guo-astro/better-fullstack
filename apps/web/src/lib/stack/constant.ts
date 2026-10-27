@@ -6038,6 +6038,40 @@ export const TECH_OPTIONS: Record<
       color: "from-gray-400 to-gray-600",
     },
   ],
+  rubyValidation: [
+    {
+      id: "dry-validation",
+      name: "dry-validation",
+      description: "Contract with a typed schema, unknown-key rejection, and a length rule",
+      icon: "https://cdn.simpleicons.org/ruby/CC342D",
+      color: "from-red-500 to-red-700",
+      isNew: true,
+    },
+    {
+      id: "active-model",
+      name: "Active Model Validations",
+      description: "Rails-style validates calls on a plain Ruby request object",
+      icon: "https://cdn.simpleicons.org/rubyonrails/D30001",
+      color: "from-red-600 to-rose-700",
+      isNew: true,
+    },
+    {
+      id: "json-schemer",
+      name: "JSONSchemer",
+      description: "JSON Schema validation of the request body",
+      icon: "https://cdn.simpleicons.org/json/000000",
+      color: "from-amber-500 to-orange-600",
+      isNew: true,
+    },
+    {
+      id: "none",
+      name: "Hand-written checks",
+      description: "Validate the request body without a validation library",
+      icon: "",
+      color: "from-gray-400 to-gray-600",
+      default: true,
+    },
+  ],
   rubyAuth: [
     {
       id: "jwt",

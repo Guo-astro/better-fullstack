@@ -60,6 +60,19 @@ class AppTest < {{#if (eq rubyTesting "test-unit")}}Test::Unit::TestCase{{else}}
     end
   end
 
+  def test_validation_error_codes
+    [
+      [[], "name_must_be_a_string"],
+      [{ "name" => 2 }, "name_must_be_a_string"],
+      [{ "name" => "Ruby", "admin" => true }, "name_must_be_a_string"],
+      [{ "name" => " " }, "name_length_must_be_1_to_80"],
+      [{ "name" => "a" * 81 }, "name_length_must_be_1_to_80"]
+    ].each do |value, error|
+      post_json(value)
+      assert_equal({ "error" => error }, JSON.parse(last_response.body))
+    end
+  end
+
 {{#if (ne rubyOrm "none")}}
   def test_items_are_persisted_and_listed
     post "/api/items", JSON.generate(name: "  Ruby  "), "CONTENT_TYPE" => "application/json"

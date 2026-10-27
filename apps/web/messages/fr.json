@@ -592,6 +592,7 @@
   "docsCliSummaryRubyRubyOrm": "ORM / couche base de données Ruby.",
   "docsCliSummaryRubyRubyAuth": "Authentification Ruby.",
   "docsCliSummaryRubyRubyTesting": "Framework de test Ruby.",
+  "docsCliSummaryRubyRubyValidation": "Validation des requêtes Ruby.",
   "docsCliSummaryPhpPhpWebFramework": "Framework HTTP PHP.",
   "docsCliSummaryPhpPhpOrm": "ORM / couche de base de données PHP.",
   "docsCliSummaryPhpPhpAuth": "Authentification PHP.",

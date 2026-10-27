@@ -1147,6 +1147,12 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         source: { kind: "category", category: "rubyTesting" },
         configKey: "rubyTesting",
       },
+      {
+        flag: "ruby-validation",
+        summary: "Ruby request validation.",
+        source: { kind: "category", category: "rubyValidation" },
+        configKey: "rubyValidation",
+      },
     ],
   },
   {

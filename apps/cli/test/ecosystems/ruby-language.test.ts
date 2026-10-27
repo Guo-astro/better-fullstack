@@ -377,6 +377,36 @@ describe("Ruby language integration", () => {
     expect(content(result.tree, "AGENTS.md")).not.toContain("bundle exec rake test");
   });
 
+  it.each([
+    { validation: "dry-validation", library: 'require "dry/validation"', gem: 'gem "dry-validation", "1.11.1"' },
+    { validation: "active-model", library: "include ActiveModel::Validations", gem: 'gem "activemodel", "8.1.4"' },
+    { validation: "json-schemer", library: "JSONSchemer.schema", gem: 'gem "json_schemer", "2.5.0"' },
+  ] as const)("routes greeting validation through $validation", async ({ validation, library, gem }) => {
+    const result = await createVirtual({
+      ecosystem: "ruby",
+      rubyWebFramework: "roda",
+      rubyValidation: validation,
+      aiDocs: ["agents-md"],
+    });
+    if (!result.success || !result.tree) throw new Error(result.error ?? "No Ruby project");
+    const paths = listVirtualTreeFilePaths(result.tree);
+    expect(paths.some((path) => path.startsWith("validation/"))).toBe(false);
+    expect(content(result.tree, "name_contract.rb")).toContain(library);
+    expect(content(result.tree, "name_input.rb")).toContain("NameContract.error_for(payload)");
+    expect(content(result.tree, "Gemfile")).toContain(gem);
+    expect(content(result.tree, "AGENTS.md")).toContain("name_contract.rb");
+    expect(generateReproducibleCommand({ ...config(), rubyValidation: validation })).toContain(
+      `--ruby-validation ${validation}`,
+    );
+  });
+
+  it("keeps hand-written greeting validation when no Ruby validation library is selected", async () => {
+    const result = await createVirtual({ ecosystem: "ruby", rubyWebFramework: "sinatra" });
+    if (!result.success || !result.tree) throw new Error(result.error ?? "No Ruby project");
+    expect(listVirtualTreeFilePaths(result.tree)).not.toContain("name_contract.rb");
+    expect(content(result.tree, "name_input.rb")).toContain('payload.keys == ["name"]');
+  });
+
   it("omits the database layer when no Ruby ORM is selected", async () => {
     const result = await createVirtual({ ecosystem: "ruby", rubyWebFramework: "sinatra" });
     if (!result.success || !result.tree) throw new Error(result.error ?? "No Ruby project");

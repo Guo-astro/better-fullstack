@@ -1267,6 +1267,7 @@ export function generateReproducibleCommand(config: ProjectConfig) {
         `--ruby-orm ${config.rubyOrm ?? "none"}`,
         `--ruby-auth ${config.rubyAuth ?? "none"}`,
         `--ruby-testing ${config.rubyTesting ?? "minitest"}`,
+        `--ruby-validation ${config.rubyValidation ?? "none"}`,
         "--database none",
         "--addons none",
         "--examples none",
