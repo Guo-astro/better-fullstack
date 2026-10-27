@@ -112,6 +112,7 @@ function getRawGraphBackendConnection(config: ProjectConfig): GraphBackendConnec
       const commands = getCrystalCommands({
         crystalWebFramework: backend.toolId,
         crystalOrm: ownedTool("orm"),
+        crystalAuth: ownedTool("auth"),
         crystalTesting: ownedTool("testing") ?? "none",
       });
       const origins =
@@ -128,20 +129,22 @@ function getRawGraphBackendConnection(config: ProjectConfig): GraphBackendConnec
         serverUrl: "http://localhost:3000",
         healthPath: "/health",
         healthUrl: "http://localhost:3000/health",
-        setupCommand: [`cd ${directory}`, "shards install", commands.migrate].filter(Boolean).join(" && "),
+        setupCommand: [`cd ${directory}`, "shards install", commands.migrate, commands.seed]
+          .filter(Boolean)
+          .join(" && "),
         devCommand: `cd ${directory} && ${origins ? `export CORS_ORIGIN=${origins} && ` : ""}${commands.run}`,
         checkCommand: `cd ${directory} && ${commands.build}`,
         testCommand: commands.test ? `cd ${directory} && ${commands.test}` : null,
       };
     }
     case "ruby": {
-      const rubyTesting =
+      const ownedTool = (role: string) =>
         config.stackParts?.find(
-          (part) =>
-            part.role === "testing" && part.ecosystem === "ruby" && part.ownerPartId === backend.id,
-        )?.toolId ??
-        config.rubyTesting ??
-        "minitest";
+          (part) => part.role === role && part.ecosystem === "ruby" && part.ownerPartId === backend.id,
+        )?.toolId;
+      const rubyTesting = ownedTool("testing") ?? config.rubyTesting ?? "minitest";
+      const rubyOrm = ownedTool("orm") ?? "none";
+      const needsMigration = rubyOrm !== "none" || ownedTool("auth") === "rodauth";
       return {
         partId: backend.id,
         ecosystem: backend.ecosystem,
@@ -152,7 +155,9 @@ function getRawGraphBackendConnection(config: ProjectConfig): GraphBackendConnec
         serverUrl: "http://localhost:4567",
         healthPath: "/health",
         healthUrl: "http://localhost:4567/health",
-        setupCommand: `cd ${directory} && bundle install`,
+        setupCommand: needsMigration
+          ? `cd ${directory} && bundle install && bundle exec rake db:migrate`
+          : `cd ${directory} && bundle install`,
         devCommand: `cd ${directory} && bundle exec ruby bin/server`,
         checkCommand: `cd ${directory} && bundle exec rake build`,
         testCommand:
@@ -161,7 +166,11 @@ function getRawGraphBackendConnection(config: ProjectConfig): GraphBackendConnec
     }
     case "php": {
       const ownedParts = (config.stackParts ?? []).filter((part) => part.ownerPartId === backend.id);
-      const hasOrm = ownedParts.some((part) => part.role === "orm" && part.toolId !== "none");
+      const needsDatabaseSetup = ownedParts.some(
+        (part) =>
+          (part.role === "orm" && part.toolId !== "none") ||
+          (part.role === "jobQueue" && part.toolId === "laravel-queue"),
+      );
       const hasTesting = ownedParts.some(
         (part) => part.role === "testing" && part.toolId !== "none",
       );
@@ -175,7 +184,7 @@ function getRawGraphBackendConnection(config: ProjectConfig): GraphBackendConnec
         serverUrl: "http://localhost:8080",
         healthPath: "/health",
         healthUrl: "http://localhost:8080/health",
-        setupCommand: hasOrm
+        setupCommand: needsDatabaseSetup
           ? `cd ${directory} && composer install --no-interaction && composer run db:setup`
           : `cd ${directory} && composer install --no-interaction`,
         devCommand: `cd ${directory} && composer run dev`,

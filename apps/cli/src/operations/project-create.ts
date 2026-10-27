@@ -84,7 +84,7 @@ export const createProjectOperation = defineOperation({
         config.javaBuildTool,
         config.javaWebFramework,
         config.pythonPackageManager,
-        config.crystalWebFramework,
+        config,
       );
       if (input.part?.length) {
         const { getGraphProjectTasks } = await import("@better-fullstack/template-generator");

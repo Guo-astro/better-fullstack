@@ -1,5 +1,7 @@
 import { describe, expect, it } from "bun:test";
 
+import type { ProjectConfig } from "@/config/types";
+
 import {
   getCapabilityInventory,
   GOLDEN_RUNTIME_RECIPES,
@@ -21,6 +23,7 @@ import {
   getStackPartOptions,
 } from "@/stack/stack-graph";
 import {
+  cliInputToProjectConfigPartial,
   createCrystalStackSelection,
   parseStackSelectionFromSearch,
   createStackSelectionSearchParams,
@@ -338,6 +341,30 @@ describe("bounded Crystal HTTP recipe", () => {
     ).toBe("Sidekiq.cr and the Redis cache depend on different shards named redis.");
     const encoded = Object.fromEntries(createStackSelectionSearchParams(sidekiq));
     expect(parseStackSelectionFromSearch(encoded).crystalJobs).toBe("sidekiq");
+  });
+
+  it("expands flat Crystal selections onto the graph framework owner", () => {
+    const config = cliInputToProjectConfigPartial({
+      part: ["frontend:typescript:react-vite", "backend:crystal:kemal"],
+      crystalOrm: "crystal-db",
+      crystalAuth: "jwt",
+    });
+    const lowered = stackGraphToLegacyProjectConfigForEcosystem(
+      config as ProjectConfig,
+      "crystal",
+    );
+    expect([lowered.crystalOrm, lowered.crystalAuth]).toEqual(["crystal-db", "jwt"]);
+    expect(
+      cliInputToProjectConfigPartial({ part: ["backend:crystal:kemal"], crystalCache: "memory" })
+        .crystalCache,
+    ).toBe("memory");
+    expect(
+      cliInputToProjectConfigPartial({ part: ["backend:crystal:lucky"], crystalOrm: "avram" })
+        .crystalOrm,
+    ).toBe("avram");
+    expect(() =>
+      cliInputToProjectConfigPartial({ part: ["backend:crystal:kemal"], crystalOrm: "avram" }),
+    ).toThrow("Avram requires Crystal Lucky.");
   });
 
   it("keeps Crystal experimental without changing the versioned golden recipes", () => {

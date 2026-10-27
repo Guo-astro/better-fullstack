@@ -574,7 +574,7 @@ export const addFeatureOperation = defineOperation({
       existingConfig?.javaBuildTool,
       existingConfig?.javaWebFramework,
       existingConfig?.pythonPackageManager,
-      existingConfig?.crystalWebFramework,
+      existingConfig ?? undefined,
     );
     return {
       success: true as const,

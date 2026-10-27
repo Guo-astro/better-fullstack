@@ -87,6 +87,16 @@ export function getRubyOptionIssue(
   return null;
 }
 
+export function getRubyOwnedToolIssue(
+  role: StackPart["role"],
+  toolId: string,
+  framework: string | undefined,
+  orm: string | undefined,
+): string | null {
+  const category = Object.entries(RUBY_OPTION_RULES).find(([, rule]) => rule.role === role)?.[0];
+  return category ? getRubyOptionIssue(category, toolId, framework, orm) : null;
+}
+
 function getRubyOwnedPartIssue(
   parts: readonly StackPart[],
   backend: Pick<StackPart, "id" | "toolId">,

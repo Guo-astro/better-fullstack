@@ -226,6 +226,7 @@ import {
 } from "@/stack/php-compatibility";
 import {
   getRubyDatabaseSelectionIssue,
+  getRubyOwnedToolIssue,
   isRubyOwnedRole,
   RUBY_RECIPE_EXTENSION_REASON,
 } from "@/stack/ruby-compatibility";
@@ -3213,6 +3214,24 @@ function getStackPartCompatibilityIssue(
       role: part.role,
       toolId: part.toolId,
       message: RUBY_RECIPE_EXTENSION_REASON,
+    });
+  }
+  const rubyOptionIssue =
+    context.ownerEcosystem === "ruby" && part.ecosystem === "ruby"
+      ? getRubyOwnedToolIssue(
+          part.role,
+          part.toolId,
+          context.ownerToolId,
+          context.siblingToolIdsByRole?.orm,
+        )
+      : null;
+  if (rubyOptionIssue) {
+    return createStackGraphIssue({
+      code: "INCOMPATIBLE_OWNER_TOOL",
+      partId: part.id,
+      role: part.role,
+      toolId: part.toolId,
+      message: rubyOptionIssue,
     });
   }
 

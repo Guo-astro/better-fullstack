@@ -349,5 +349,21 @@ export function getCrystalRequestedIssue(
     !applications.every((part) => part.role === "backend" && part.ecosystem === "crystal")
   )
     return null;
-  return getCrystalSelectionIssue({ ...config, ecosystem: "crystal", stackParts: undefined });
+  const [backend] = applications;
+  const ownedSelection = Object.fromEntries(
+    CRYSTAL_OPTION_CATEGORIES.flatMap((category) => {
+      const toolId = parts.find(
+        (part) =>
+          part.ownerPartId === backend.id && part.role === CRYSTAL_OPTION_RULES[category].role,
+      )?.toolId;
+      return toolId ? [[category, toolId]] : [];
+    }),
+  );
+  return getCrystalSelectionIssue({
+    ...config,
+    ...ownedSelection,
+    crystalWebFramework: backend.toolId,
+    ecosystem: "crystal",
+    stackParts: undefined,
+  } as Partial<ProjectConfig>);
 }

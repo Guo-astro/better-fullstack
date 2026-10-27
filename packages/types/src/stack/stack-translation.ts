@@ -1364,6 +1364,19 @@ const GRAPH_SCOPED_PART_GROUPS: readonly ScopedPartGroup[] = [
   },
   {
     ownerRole: "backend",
+    ecosystem: "php",
+    keys: [
+      ["phpTesting", "testing"],
+      ["phpValidation", "validation"],
+      ["phpCache", "caching"],
+      ["phpJobQueue", "jobQueue"],
+      ["phpEmail", "email"],
+      ["phpLogging", "logging"],
+      ["phpHttpClient", "httpClient"],
+    ],
+  },
+  {
+    ownerRole: "backend",
     ecosystem: "crystal",
     keys: [
       ["crystalTesting", "testing"],
@@ -2021,6 +2034,13 @@ export function cliInputToProjectConfigPartial(
 }
 
 function getCliGraphStackParts(input: CLIInput): StackPart[] {
+  return mergeProjectConfigSettingsIntoStackParts(
+    parseStackPartSpecs(expandCliStackPartSpecs(input), "selected"),
+    input,
+  );
+}
+
+export function expandCliStackPartSpecs(input: CLIInput): string[] {
   const inputSpecs = [...(input.part ?? [])];
   const stackParts = parseStackPartSpecs(inputSpecs, "selected");
   const crystalIssue = getCrystalRequestedIssue(input, stackParts);
@@ -2090,26 +2110,15 @@ function getCliGraphStackParts(input: CLIInput): StackPart[] {
   addScopedBackendPart("dotnet", "auth", input.dotnetAuth);
   addScopedBackendPart("php", "orm", input.phpOrm);
   addScopedBackendPart("php", "auth", input.phpAuth);
-  addScopedBackendPart("php", "testing", input.phpTesting);
-  addScopedBackendPart("php", "validation", input.phpValidation);
-  addScopedBackendPart("php", "caching", input.phpCache);
-  addScopedBackendPart("php", "jobQueue", input.phpJobQueue);
-  addScopedBackendPart("php", "email", input.phpEmail);
-  addScopedBackendPart("php", "logging", input.phpLogging);
-  addScopedBackendPart("php", "httpClient", input.phpHttpClient);
   addScopedBackendPart("ruby", "orm", input.rubyOrm);
   addScopedBackendPart("ruby", "auth", input.rubyAuth);
+  addScopedBackendPart("crystal", "orm", input.crystalOrm);
+  addScopedBackendPart("crystal", "auth", input.crystalAuth);
   addScopedBackendPart("elixir", "orm", input.elixirOrm);
   addScopedBackendPart("elixir", "api", input.elixirApi);
   addScopedBackendPart("elixir", "auth", input.elixirAuth);
 
-  return mergeProjectConfigSettingsIntoStackParts(
-    parseStackPartSpecs(
-      expandScopedStackPartSpecs(stackPartSpecs, getCliScopedPartFields(input)),
-      "selected",
-    ),
-    input,
-  );
+  return expandScopedStackPartSpecs(stackPartSpecs, getCliScopedPartFields(input));
 }
 
 function buildProjectConfigBase(

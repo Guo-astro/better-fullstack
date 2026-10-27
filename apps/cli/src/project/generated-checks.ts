@@ -467,26 +467,30 @@ async function commandsForTarget(
         ],
       };
     }
-    case "ruby":
+    case "ruby": {
+      const { rubyTesting } = configForGeneratedTarget(config, target);
       return {
         toolchain: "Ruby + Bundler",
         required: ["ruby", "bundle"],
         commands: [
           display("bundle", ["check"]),
           display("bundle", ["exec", "rake", "build"]),
-          display("bundle", ["exec", "rake", "test"]),
+          ...(rubyTesting === "none" ? [] : [display("bundle", ["exec", "rake", "test"])]),
         ],
       };
-    case "php":
+    }
+    case "php": {
+      const { phpTesting } = configForGeneratedTarget(config, target);
       return {
         toolchain: "PHP + Composer",
         required: ["php", "composer"],
         commands: [
           display("composer", ["install", "--no-interaction"]),
           display("composer", ["run", "build"]),
-          display("composer", ["test"]),
+          ...(phpTesting === "none" ? [] : [display("composer", ["test"])]),
         ],
       };
+    }
     case "elixir":
       return {
         toolchain: "mix",

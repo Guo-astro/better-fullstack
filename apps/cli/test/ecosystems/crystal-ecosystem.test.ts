@@ -185,7 +185,7 @@ describe("Crystal create contract", () => {
       );
       const config = buildProjectConfig({ ecosystem: "crystal", crystalWebFramework: framework });
       expect(generateReproducibleCommand(config)).toContain(`--crystal-web-framework ${framework}`);
-      expect(getInstallCommand("crystal", "svc", undefined, undefined, undefined, undefined, framework)).toContain(
+      expect(getInstallCommand("crystal", "svc", undefined, undefined, undefined, undefined, config)).toContain(
         framework === "athena" ? "crystal spec -Dwithout_libmagic" : "crystal spec &&",
       );
     },

@@ -1,8 +1,9 @@
 import {
   CRYSTAL_PROJECT_DEFAULTS,
+  type CrystalSelection,
   getCrystalCommands,
   getCrystalSelectionIssue,
-  getCrystalRequestedIssue,
+  expandCliStackPartSpecs,
   CreateInputSchema,
   createRubyProjectConfigDefaults,
   getRubyRecipeIssue,
@@ -174,7 +175,7 @@ export function getInstallCommand(
   javaBuildTool?: string,
   javaWebFramework?: string,
   pythonPackageManager?: string,
-  crystalWebFramework?: string,
+  crystal: CrystalSelection = {},
 ): string {
   switch (ecosystem) {
     case "rust":
@@ -191,8 +192,16 @@ export function getInstallCommand(
     case "go":
       return `cd ${projectName} && go mod tidy`;
     case "crystal": {
-      const commands = getCrystalCommands({ crystalWebFramework });
-      return [`cd ${projectName}`, "shards install", commands.build, commands.test, commands.proof]
+      const commands = getCrystalCommands(crystal);
+      return [
+        `cd ${projectName}`,
+        "shards install",
+        commands.migrate,
+        commands.seed,
+        commands.build,
+        commands.test,
+        commands.proof,
+      ]
         .filter(Boolean)
         .join(" && ");
     }
@@ -433,16 +442,14 @@ export function buildProjectConfig(
   input: Record<string, unknown>,
   overrides?: { projectDir: string },
 ): ProjectConfig {
-  const requestedParts = Array.isArray(input.part)
-    ? parseStackPartSpecs(
-        input.part.filter((part): part is string => typeof part === "string"),
-        "selected",
-      )
+  const requestedSpecs = Array.isArray(input.part)
+    ? input.part.filter((part): part is string => typeof part === "string")
     : [];
-  if (requestedParts.some((part) => part.ecosystem === "crystal")) {
-    const issue = getCrystalRequestedIssue(CreateInputSchema.parse(input), requestedParts);
-    if (issue) throw new Error(issue);
-  }
+  const graphSpecs =
+    requestedSpecs.length > 0 &&
+    !isToolingOverlayOnly(parseStackPartSpecs(requestedSpecs, "selected"))
+      ? expandCliStackPartSpecs({ ...CreateInputSchema.parse(input), addons: undefined })
+      : requestedSpecs;
   if (input.ecosystem === "crystal") input = { ...CRYSTAL_PROJECT_DEFAULTS, ...input };
   const projectName = (input.projectName as string) ?? "my-project";
   const ecosystem = (input.ecosystem as ProjectConfig["ecosystem"]) ?? "typescript";
@@ -503,12 +510,9 @@ export function buildProjectConfig(
     ];
   }
 
-  if (Array.isArray(input.part) && input.part.length > 0) {
+  if (graphSpecs.length > 0) {
     let stackParts = mergeProjectConfigSettingsIntoStackParts(
-      parseStackPartSpecs(
-        input.part.filter((part): part is string => typeof part === "string"),
-        "selected",
-      ),
+      parseStackPartSpecs(graphSpecs, "selected"),
       config,
     );
     if (isToolingOverlayOnly(stackParts)) {
@@ -541,7 +545,7 @@ export function buildProjectConfig(
       });
       if (retainedAddons.length) {
         const specs = mergeLegacyAddonParts(
-          input.part.filter((part): part is string => typeof part === "string"),
+          graphSpecs,
           retainedAddons,
           { completeProfiles: false },
         );

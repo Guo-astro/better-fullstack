@@ -369,6 +369,49 @@ describe("Ruby recipe contracts", () => {
     ).toBe("Action Mailer requires Ruby Rails.");
   });
 
+  it("applies Ruby framework and ORM rules to graph validation and owned options", () => {
+    const issues = (specs: string[]) =>
+      validateStackParts(parseStackPartSpecs(specs)).issues.map((issue) => issue.message);
+    expect(issues(["backend:ruby:sinatra", "backend.jobQueue:ruby:solid-queue"])).toContain(
+      "Solid Queue requires Ruby Rails.",
+    );
+    expect(
+      issues(["backend:ruby:rails", "backend.orm:ruby:sequel", "backend.jobQueue:ruby:solid-queue"]),
+    ).toContain("Solid Queue requires the Active Record ORM.");
+    expect(issues(["backend:ruby:grape", "backend.jobQueue:ruby:resque"])).toContain(
+      "Resque requires Ruby Sinatra, Rails or Roda.",
+    );
+    expect(
+      issues([
+        "backend:ruby:rails",
+        "backend.orm:ruby:active-record",
+        "backend.jobQueue:ruby:solid-queue",
+      ]),
+    ).toEqual([]);
+    const parts = parseStackPartSpecs(["backend:ruby:sinatra"]);
+    expect(
+      getStackPartOptions({
+        role: "jobQueue",
+        ecosystem: "ruby",
+        ownerRole: "backend",
+        ownerToolId: "sinatra",
+        ownerEcosystem: "ruby",
+        parts,
+      }),
+    ).not.toContain("solid-queue");
+    expect(() =>
+      stackSelectionToProjectConfig(
+        {
+          ...rubySelection(),
+          stackMode: "multi",
+          stackPartSpecs: ["frontend:typescript:react-vite", "backend:ruby:sinatra"],
+          rubyJobQueue: "solid-queue",
+        },
+        { projectDir: "/virtual", relativePath: "ruby-service" },
+      ),
+    ).toThrow("Solid Queue requires Ruby Rails.");
+  });
+
   it("rejects selected databases when Ruby is the only backend, in either picker order", () => {
     const ruby = parseStackPartSpecs(["backend:ruby:sinatra:api"]);
     const database = parseStackPartSpecs(["database:universal:sqlite"]);

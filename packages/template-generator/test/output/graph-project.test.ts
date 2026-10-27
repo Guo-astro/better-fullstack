@@ -367,6 +367,30 @@ describe("multi-ecosystem project output", () => {
     expect(tasks[0]?.setup).toContain("poetry install");
     expect(tasks[0]?.dev).toContain("poetry run uvicorn");
   });
+
+  it.each([
+    [["backend:ruby:rails", "backend.orm:ruby:active-record"], "bundle exec rake db:migrate"],
+    [["backend:ruby:sinatra", "backend.auth:ruby:rodauth"], "bundle exec rake db:migrate"],
+    [["backend:php:laravel", "backend.jobQueue:php:laravel-queue"], "composer run db:setup"],
+    [
+      ["backend:crystal:marten", "backend.orm:crystal:marten-orm", "backend.auth:crystal:marten-auth"],
+      "crystal run manage.cr -- migrate && AUTH_PASSWORD=change-me crystal run manage.cr -- seed",
+    ],
+  ])("prepares the database owned by %j during setup", (specs, command) => {
+    const setup = getGraphBackendConnections(
+      configFor(["frontend:typescript:react-vite", ...specs]),
+    )[0]?.setupCommand;
+    expect(setup).toContain(command);
+  });
+
+  it("skips database setup for services without persistence", () => {
+    const setups = ["backend:ruby:sinatra", "backend:php:laravel"].map(
+      (backend) =>
+        getGraphBackendConnections(configFor(["frontend:typescript:react-vite", backend]))[0]
+          ?.setupCommand,
+    );
+    expect(setups.some((setup) => setup?.includes("db:"))).toBe(false);
+  });
 });
 
 it("launches native package scripts through Bash with their paths and assigned ports", async () => {

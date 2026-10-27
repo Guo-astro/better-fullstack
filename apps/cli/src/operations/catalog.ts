@@ -82,7 +82,7 @@ function getGuidance() {
       java: "Backend/API: Spring Boot with Maven or Gradle Wrapper, optional Spring Data JPA, Spring Security, app libraries, and Java testing libraries.",
       dotnet:
         "Backend/API: ASP.NET Core Minimal APIs, MVC, or Blazor with EF Core/Dapper, Identity/Auth0, SignalR, xUnit, and Docker-ready output.",
-      ruby: "Experimental Sinatra, Rails, Roda, or Grape HTTP service with Bundler, Puma, validated JSON routes, optional Active Record, Sequel, or ROM on SQLite, and Minitest/Rack tests. No authentication or deployment adapters.",
+      ruby: "Experimental Sinatra, Rails, Roda, or Grape HTTP service with Bundler, Puma, and validated JSON routes. Optional Active Record, Sequel, or ROM on SQLite; JWT, OmniAuth, or Rodauth authentication; Minitest, RSpec, or Test::Unit tests; request validation; Redis, Memcached, or in-process caching; Sidekiq, Resque, or Solid Queue jobs; Mail, Action Mailer, or Resend email; request logging; and a Faraday, HTTParty, or HTTPX client. No deployment adapters.",
       elixir:
         "Phoenix: Phoenix or Phoenix LiveView with Ecto SQL, PostgreSQL-ready config, REST or Absinthe, Channels/Presence, Oban, and Mix releases/Docker.",
     },
