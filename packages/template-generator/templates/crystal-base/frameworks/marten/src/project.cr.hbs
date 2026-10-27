@@ -1,4 +1,7 @@
 require "marten"
+{{#if (eq crystalAuth "marten-auth")}}
+require "marten_auth"
+{{/if}}
 {{#if (eq crystalOrm "marten-orm")}}
 require "sqlite3"
 {{/if}}
@@ -8,6 +11,14 @@ require "./cors_middleware"
 {{#if (eq crystalOrm "marten-orm")}}
 require "./apps/greetings/app"
 require "./apps/greetings/models/**"
+{{/if}}
+{{#if (eq crystalAuth "marten-auth")}}
+require "./apps/accounts/app"
+require "./apps/accounts/models/**"
+require "./session_auth"
+{{/if}}
+{{#if (eq crystalAuth "jwt")}}
+require "./token_auth"
 {{/if}}
 {{#if (ne crystalOrm "none")}}
 require "./greeting_store"

@@ -2049,6 +2049,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "none",
         "multiple": false
+      },
+      {
+        "flag": "--crystal-auth",
+        "summary": "Crystal authentication.",
+        "values": [
+          "jwt",
+          "kemal-session",
+          "marten-auth",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
       }
     ]
   },
@@ -2951,6 +2964,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "go:--go-di": m.docsCliSummaryGoGoDi,
   "crystal:--crystal-web-framework": m.docsCliSummaryCrystalCrystalWebFramework,
   "crystal:--crystal-orm": m.docsCliSummaryCrystalCrystalOrm,
+  "crystal:--crystal-auth": m.docsCliSummaryCrystalCrystalAuth,
   "java:--java-web-framework": m.docsCliSummaryJavaJavaWebFramework,
   "java:--java-language": m.docsCliSummaryJavaJavaLanguage,
   "java:--java-build-tool": m.docsCliSummaryJavaJavaBuildTool,

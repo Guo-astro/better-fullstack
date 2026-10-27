@@ -161,6 +161,7 @@ function normalizeGraphConfigForPersistence(
 
   if (!selectedEcosystems.has("crystal")) normalized.crystalWebFramework = "none";
   if (!selectedEcosystems.has("crystal")) normalized.crystalOrm = "none";
+  if (!selectedEcosystems.has("crystal")) normalized.crystalAuth = "none";
 
   if (!selectedEcosystems.has("java")) {
     normalized.javaLanguage = "java";
@@ -499,6 +500,7 @@ export function buildBtsConfigForPersistence(
     javaLanguage: persistedConfig.javaLanguage,
     crystalWebFramework: persistedConfig.crystalWebFramework,
     crystalOrm: persistedConfig.crystalOrm,
+    crystalAuth: persistedConfig.crystalAuth,
     javaWebFramework: persistedConfig.javaWebFramework,
     javaBuildTool: persistedConfig.javaBuildTool,
     javaOrm: persistedConfig.javaOrm,
@@ -705,6 +707,7 @@ export function serializeBtsConfig(
     javaLanguage: btsConfig.javaLanguage,
     crystalWebFramework: btsConfig.crystalWebFramework,
     crystalOrm: btsConfig.crystalOrm,
+    crystalAuth: btsConfig.crystalAuth,
     javaWebFramework: btsConfig.javaWebFramework,
     javaBuildTool: btsConfig.javaBuildTool,
     javaOrm: btsConfig.javaOrm,

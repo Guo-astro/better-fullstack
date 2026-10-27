@@ -89,6 +89,7 @@ export function formatNameFromFingerprint(fingerprint: TemplateFingerprint): str
     crystal: [
       typeof fingerprint.crystalWebFramework === "string" ? fingerprint.crystalWebFramework : undefined,
       typeof fingerprint.crystalOrm === "string" ? fingerprint.crystalOrm : undefined,
+      typeof fingerprint.crystalAuth === "string" ? fingerprint.crystalAuth : undefined,
     ],
     java: [
       typeof fingerprint.javaWebFramework === "string" ? fingerprint.javaWebFramework : undefined,
@@ -375,6 +376,7 @@ export function buildCommand(name: string, config: ProjectConfig): string {
     case "crystal":
       orderedFlags.push(["crystal-web-framework", config.crystalWebFramework]);
       orderedFlags.push(["crystal-orm", config.crystalOrm]);
+      orderedFlags.push(["crystal-auth", config.crystalAuth]);
       break;
     case "java":
       orderedFlags.push(...sharedServiceFlags, ...javaFlags);

@@ -109,7 +109,7 @@ function getRawGraphBackendConnection(config: ProjectConfig): GraphBackendConnec
       const orm = (config.stackParts ?? []).find(
         (part) => part.ownerPartId === backend.id && part.role === "orm",
       )?.toolId;
-      const commands = getCrystalCommands(backend.toolId, orm);
+      const commands = getCrystalCommands({ crystalWebFramework: backend.toolId, crystalOrm: orm });
       const origins =
         [...new Set(getGraphFrontendPorts(config).values())]
           .map((port) => `http://localhost:${port}`)

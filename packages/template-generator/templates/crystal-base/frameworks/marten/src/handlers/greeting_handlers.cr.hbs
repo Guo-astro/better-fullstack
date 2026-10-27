@@ -43,3 +43,34 @@ class GreetingsHandler < ApiHandler
   end
 end
 {{/if}}
+{{#if (ne crystalAuth "none")}}
+
+class LoginHandler < ApiHandler
+  http_method_names :post
+  protect_from_forgery false
+
+  def post
+    respond {{#if (eq crystalAuth "jwt")}}TokenAuth.login(request.body){{else}}SessionAuth.sign_in(request){{/if}}
+  end
+end
+
+class MeHandler < ApiHandler
+  http_method_names :get
+
+  def get
+    respond {{#if (eq crystalAuth "jwt")}}TokenAuth.current_user(request.headers["Authorization"]?){{else}}SessionAuth.current_user(request){{/if}}
+  end
+end
+{{/if}}
+{{#if (eq crystalAuth "marten-auth")}}
+
+class LogoutHandler < ApiHandler
+  http_method_names :post
+  protect_from_forgery false
+
+  def post
+    MartenAuth.sign_out(request)
+    head 204
+  end
+end
+{{/if}}

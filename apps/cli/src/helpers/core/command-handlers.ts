@@ -703,6 +703,7 @@ export async function createProjectHandler(
               goDI: "none",
               crystalWebFramework: "none",
               crystalOrm: "none",
+              crystalAuth: "none",
               javaWebFramework: "none",
               javaBuildTool: "none",
               javaOrm: "none",

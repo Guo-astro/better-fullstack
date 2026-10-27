@@ -889,6 +889,10 @@ export const CrystalOrmSchema = z
   .enum(["crystal-db", "avram", "marten-orm", "none"])
   .describe("Experimental Crystal database layer");
 
+export const CrystalAuthSchema = z
+  .enum(["jwt", "kemal-session", "marten-auth", "none"])
+  .describe("Experimental Crystal authentication");
+
 export const JavaLanguageSchema = z
   .enum(["java", "kotlin"])
   .describe("JVM language variant for the Java ecosystem (java or kotlin)");
@@ -1412,6 +1416,7 @@ const STACK_CONFIG_FIELDS = {
   // Java ecosystem options
   crystalWebFramework: CrystalWebFrameworkSchema.default("none"),
   crystalOrm: CrystalOrmSchema.default("none"),
+  crystalAuth: CrystalAuthSchema.default("none"),
   javaLanguage: JavaLanguageSchema.optional(),
   javaWebFramework: JavaWebFrameworkSchema,
   javaBuildTool: JavaBuildToolSchema,
@@ -1713,6 +1718,7 @@ export const GO_DI_VALUES = GoDISchema.options;
 export const JAVA_LANGUAGE_VALUES = JavaLanguageSchema.options;
 export const CRYSTAL_WEB_FRAMEWORK_VALUES = CrystalWebFrameworkSchema.options;
 export const CRYSTAL_ORM_VALUES = CrystalOrmSchema.options;
+export const CRYSTAL_AUTH_VALUES = CrystalAuthSchema.options;
 export const JAVA_WEB_FRAMEWORK_VALUES = JavaWebFrameworkSchema.options;
 export const JAVA_BUILD_TOOL_VALUES = JavaBuildToolSchema.options;
 export const JAVA_ORM_VALUES = JavaOrmSchema.options;

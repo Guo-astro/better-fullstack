@@ -6,6 +6,7 @@ import type {
 } from "@testing/lib/generate-combos/types";
 
 import {
+  CRYSTAL_AUTH_VALUES,
   CRYSTAL_ORM_VALUES,
   CRYSTAL_WEB_FRAMEWORK_VALUES,
   type CrystalOptionCategory,
@@ -895,6 +896,7 @@ function createValidationBase(projectName: string, draft: CandidateDraft): Proje
     goDI: "none",
     crystalWebFramework: "none",
     crystalOrm: "none",
+    crystalAuth: "none",
     javaWebFramework: "none",
     javaBuildTool: "none",
     javaOrm: "none",
@@ -1046,13 +1048,22 @@ function createDraft(ecosystem: Ecosystem, args: GeneratorArgs): CandidateDraft 
         "crystalWebFramework",
       );
       const crystalOptions = <T extends string>(category: CrystalOptionCategory, values: readonly T[]) =>
-        values.filter((value) => !getCrystalOptionIssue(category, value, crystalWebFramework));
+        values.filter((value) => !getCrystalOptionIssue(category, value, { crystalWebFramework }));
+      const crystalOrm = sampleScalar(crystalOptions("crystalOrm", CRYSTAL_ORM_VALUES), 0.5, "crystalOrm");
       return {
         ecosystem: "crystal",
         options: {
           ...createCommonOptions("crystal", args),
           crystalWebFramework,
-          crystalOrm: sampleScalar(crystalOptions("crystalOrm", CRYSTAL_ORM_VALUES), 0.5, "crystalOrm"),
+          crystalOrm,
+          crystalAuth: sampleScalar(
+            CRYSTAL_AUTH_VALUES.filter(
+              (value) =>
+                !getCrystalOptionIssue("crystalAuth", value, { crystalWebFramework, crystalOrm }),
+            ),
+            0.5,
+            "crystalAuth",
+          ),
         },
       };
     }

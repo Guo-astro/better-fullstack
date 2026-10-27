@@ -12,6 +12,9 @@ crystal run scripts/db_migrate.cr
 {{#if (eq crystalOrm "marten-orm")}}
 crystal run manage.cr -- migrate
 {{/if}}
+{{#if (eq crystalAuth "marten-auth")}}
+AUTH_PASSWORD=change-me crystal run manage.cr -- seed
+{{/if}}
 {{#if (eq crystalWebFramework "athena")}}
 shards build --release -Dwithout_libmagic
 crystal spec -Dwithout_libmagic
@@ -57,6 +60,22 @@ Avram 1.5.0 stores greetings in PostgreSQL at `DATABASE_URL`. `crystal run scrip
 Marten's ORM stores greetings in SQLite at `DATABASE_PATH`, which defaults to `development.sqlite3`. Run `crystal run manage.cr -- migrate` before starting the server; `crystal run manage.cr -- genmigrations` writes new migrations after model changes. Specs run migrations against an in-memory database. The SQLite shard links the system `libsqlite3`.
 
 {{/if}}
-Auth, deployment, native addons, and service overlays are unsupported. Use an explicit mixed graph to add an independently owned frontend or another service; keep Crystal's manifest and native commands in its service directory.
+{{#if (ne crystalAuth "none")}}
+`POST /api/auth/login` with `{"username":"...","password":"..."}` signs in; wrong credentials return 401. `GET /api/me` returns `{"username":"..."}` for a signed-in caller and 401 otherwise.{{#if (ne crystalAuth "marten-auth")}} The only account is `AUTH_USERNAME` (default `demo`) with `AUTH_PASSWORD`; while `AUTH_PASSWORD` is unset every sign-in fails. Credentials are compared in constant time. Replace this single account with a user store before production.{{/if}}
+
+{{/if}}
+{{#if (eq crystalAuth "jwt")}}
+crystal-community/jwt 1.7.2 issues HS256 tokens that expire after one hour. Send them as `Authorization: Bearer <token>`. Set `JWT_SECRET` to a long random value; without it each boot uses a random secret and earlier tokens stop working. Decoding pins HS256, so unsigned or differently signed tokens are rejected. There is no revocation list.
+
+{{/if}}
+{{#if (eq crystalAuth "kemal-session")}}
+kemal-session 1.6.0 stores the signed-in username in a server-side session. Sign-in rotates the session id, `POST /api/auth/logout` destroys it, and the `app_session` cookie is HttpOnly, SameSite=Lax, and Secure unless `SESSION_SECURE=false`. Set `SESSION_SECRET`; without it each boot signs cookies with a random secret. Sessions use kemal-session's memory engine, so they reset on restart and are not shared across processes.
+
+{{/if}}
+{{#if (eq crystalAuth "marten-auth")}}
+Marten Auth 0.2.1 stores users in the `accounts_user` table with bcrypt password hashes and signs them in through Marten sessions. `crystal run manage.cr -- seed` creates or updates the user named by `AUTH_USERNAME` (default `demo@example.com`) with `AUTH_PASSWORD`. `POST /api/auth/logout` clears the session. Session cookies are HttpOnly and Secure unless `SESSION_SECURE=false`. Marten's default store keeps the session in a signed cookie, so a copied cookie stays valid until it expires; set `MARTEN_SECRET_KEY` so sessions survive restarts.
+
+{{/if}}
+Deployment, native addons, and service overlays are unsupported. Use an explicit mixed graph to add an independently owned frontend or another service; keep Crystal's manifest and native commands in its service directory.
 
 Named service replay uses `--part backend:crystal:{{#if (eq crystalWebFramework "none")}}kemal{{else}}{{crystalWebFramework}}{{/if}}:reports@services/reports`. The optional `@relative-path` suffix preserves the directory; percent-encode special path characters. Parent directories and absolute paths are rejected by the part parser. Existing part bindings without a suffix retain their defaults.

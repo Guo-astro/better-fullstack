@@ -17,13 +17,17 @@ export async function processCrystalBaseTemplate(vfs: VirtualFileSystem, templat
   const directories = [
     ...frameworkDirectories.map((directory) => `frameworks/${directory}`),
     ...(config.crystalOrm === "none" ? [] : [`orm/${config.crystalOrm}`]),
-    ...(config.crystalOrm !== "none" && !frameworkDirectories.includes("request") ? ["frameworks/request"] : []),
+    ...(config.crystalAuth === "none" ? [] : [`auth/${config.crystalAuth}`]),
+    ...(["jwt", "kemal-session"].includes(config.crystalAuth) ? ["auth/credentials"] : []),
+    ...((config.crystalOrm !== "none" || config.crystalAuth === "jwt") && !frameworkDirectories.includes("request")
+      ? ["frameworks/request"]
+      : []),
   ];
   renderTemplateTree(vfs, templates, {
     prefix: "crystal-base/",
     targetPath,
     context,
-    skip: (templatePath) => templatePath.startsWith("crystal-base/frameworks/") || templatePath.startsWith("crystal-base/orm/"),
+    skip: (templatePath) => ["frameworks/", "orm/", "auth/"].some((directory) => templatePath.startsWith(`crystal-base/${directory}`)),
   });
   for (const directory of directories) {
     renderTemplateTree(vfs, templates, { prefix: `crystal-base/${directory}/`, targetPath, context });

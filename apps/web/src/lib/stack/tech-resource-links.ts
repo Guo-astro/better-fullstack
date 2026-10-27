@@ -2411,6 +2411,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://martenframework.com/docs/models-and-databases",
     githubUrl: "https://github.com/martenframework/marten",
   },
+  "crystalAuth:jwt": {
+    docsUrl: "https://github.com/crystal-community/jwt#readme",
+    githubUrl: "https://github.com/crystal-community/jwt",
+  },
+  "crystalAuth:kemal-session": {
+    docsUrl: "https://github.com/kemalcr/kemal-session#readme",
+    githubUrl: "https://github.com/kemalcr/kemal-session",
+  },
+  "crystalAuth:marten-auth": {
+    docsUrl: "https://martenframework.com/docs/authentication",
+    githubUrl: "https://github.com/martenframework/marten-auth",
+  },
   "elixirOrm:ecto-sql": {
     docsUrl: "https://hexdocs.pm/ecto_sql/",
     githubUrl: "https://github.com/elixir-ecto/ecto_sql",

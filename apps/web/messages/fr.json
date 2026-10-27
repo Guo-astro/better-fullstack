@@ -777,5 +777,6 @@
   "builderComposerJsWorkspace": "Workspace JavaScript",
   "builderComposerNativeToolchains": "Toolchains natives",
   "docsCliSummaryCrystalCrystalWebFramework": "Framework HTTP expérimental Crystal.",
-  "docsCliSummaryCrystalCrystalOrm": "Couche de base de données expérimentale Crystal."
+  "docsCliSummaryCrystalCrystalOrm": "Couche de base de données expérimentale Crystal.",
+  "docsCliSummaryCrystalCrystalAuth": "Authentification expérimentale Crystal."
 }

@@ -2,6 +2,9 @@ require "athena"
 require "./app_config"
 require "./greeting_request"
 require "./http_guard"
+{{#if (eq crystalAuth "jwt")}}
+require "./token_auth"
+{{/if}}
 {{#if (ne crystalOrm "none")}}
 require "./greeting_store"
 {{/if}}
@@ -31,6 +34,18 @@ class GreetingController < ATH::Controller
   @[ARTA::Post("/api/greetings")]
   def create_greeting(request : AHTTP::Request) : AHTTP::Response
     json_response GreetingStore.create(request.body.try(&.gets_to_end) || "")
+  end
+
+{{/if}}
+{{#if (eq crystalAuth "jwt")}}
+  @[ARTA::Post("/api/auth/login")]
+  def login(request : AHTTP::Request) : AHTTP::Response
+    json_response TokenAuth.login(request.body.try(&.gets_to_end) || "")
+  end
+
+  @[ARTA::Get("/api/me")]
+  def me(request : AHTTP::Request) : AHTTP::Response
+    json_response TokenAuth.current_user(request.headers["Authorization"]?)
   end
 
 {{/if}}

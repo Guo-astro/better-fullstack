@@ -125,6 +125,7 @@ export const TEMPLATE_FINGERPRINT_KEYS = [
   "goDI",
   "crystalWebFramework",
   "crystalOrm",
+  "crystalAuth",
   "javaWebFramework",
   "javaBuildTool",
   "javaOrm",

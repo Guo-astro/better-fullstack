@@ -2,6 +2,9 @@ require "lucky"
 require "./app_config"
 require "./greeting_request"
 require "./http_guard"
+{{#if (eq crystalAuth "jwt")}}
+require "./token_auth"
+{{/if}}
 {{#if (ne crystalOrm "none")}}
 require "./greeting_store"
 {{/if}}
@@ -82,6 +85,20 @@ end
 class Api::Greetings::Create < ApiAction
   post "/api/greetings" do
     respond GreetingStore.create(params.body)
+  end
+end
+
+{{/if}}
+{{#if (eq crystalAuth "jwt")}}
+class Api::Auth::Login::Create < ApiAction
+  post "/api/auth/login" do
+    respond TokenAuth.login(params.body)
+  end
+end
+
+class Api::Me::Show < ApiAction
+  get "/api/me" do
+    respond TokenAuth.current_user(request.headers["Authorization"]?)
   end
 end
 

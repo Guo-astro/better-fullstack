@@ -1,5 +1,5 @@
-import type { CrystalOrm, CrystalWebFramework } from "@/types";
-import { CrystalOrmSchema, CrystalWebFrameworkSchema, getCrystalOptionIssue } from "@/types";
+import type { CrystalAuth, CrystalOrm, CrystalSelection, CrystalWebFramework } from "@/types";
+import { CrystalAuthSchema, CrystalOrmSchema, CrystalWebFrameworkSchema, getCrystalOptionIssue } from "@/types";
 import { exitCancelled } from "@/presentation/errors";
 import { isCancel, navigableSelect } from "@/prompts/core/navigable";
 import { createStaticSinglePromptResolution } from "@/prompts/core/prompt-contract";
@@ -27,21 +27,40 @@ export async function getCrystalWebFrameworkChoice(value?: CrystalWebFramework) 
   return response;
 }
 
-export function resolveCrystalOrmPrompt(value?: string, framework?: string) {
+export function resolveCrystalOrmPrompt(value?: string, selection: CrystalSelection = {}) {
   const selected = value === undefined ? undefined : CrystalOrmSchema.parse(value);
   const options = [
     { value: "crystal-db" as const, label: "crystal-db (SQLite)", hint: "Parameterized SQL with any HTTP framework" },
     { value: "avram" as const, label: "Avram (PostgreSQL)", hint: "Lucky's type-safe ORM and migrations" },
     { value: "marten-orm" as const, label: "Marten ORM (SQLite)", hint: "Marten models and migrations" },
     { value: "none" as const, label: "None" },
-  ].filter((option) => !getCrystalOptionIssue("crystalOrm", option.value, framework));
+  ].filter((option) => !getCrystalOptionIssue("crystalOrm", option.value, selection));
   return createStaticSinglePromptResolution(options, "none", selected);
 }
 
-export async function getCrystalOrmChoice(value?: CrystalOrm, framework?: string) {
-  const resolution = resolveCrystalOrmPrompt(value, framework);
+export async function getCrystalOrmChoice(value?: CrystalOrm, selection: CrystalSelection = {}) {
+  const resolution = resolveCrystalOrmPrompt(value, selection);
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
   const response = await navigableSelect<CrystalOrm>({ message: "Select Crystal database layer", options: resolution.options, initialValue: resolution.initialValue });
+  if (isCancel(response)) return exitCancelled("Operation cancelled");
+  return response;
+}
+
+export function resolveCrystalAuthPrompt(value?: string, selection: CrystalSelection = {}) {
+  const selected = value === undefined ? undefined : CrystalAuthSchema.parse(value);
+  const options = [
+    { value: "jwt" as const, label: "JWT bearer tokens", hint: "Signed HS256 tokens with any HTTP framework" },
+    { value: "kemal-session" as const, label: "Kemal Session", hint: "Cookie sessions for Kemal" },
+    { value: "marten-auth" as const, label: "Marten Auth", hint: "Stored users and sessions for Marten ORM" },
+    { value: "none" as const, label: "None" },
+  ].filter((option) => !getCrystalOptionIssue("crystalAuth", option.value, selection));
+  return createStaticSinglePromptResolution(options, "none", selected);
+}
+
+export async function getCrystalAuthChoice(value?: CrystalAuth, selection: CrystalSelection = {}) {
+  const resolution = resolveCrystalAuthPrompt(value, selection);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
+  const response = await navigableSelect<CrystalAuth>({ message: "Select Crystal authentication", options: resolution.options, initialValue: resolution.initialValue });
   if (isCancel(response)) return exitCancelled("Operation cancelled");
   return response;
 }

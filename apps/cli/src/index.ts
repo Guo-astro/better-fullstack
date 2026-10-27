@@ -214,6 +214,7 @@ export async function createVirtual(
       crystalWebFramework:
         options.crystalWebFramework ?? (ecosystem === "crystal" ? "kemal" : "none"),
       crystalOrm: options.crystalOrm ?? "none",
+      crystalAuth: options.crystalAuth ?? "none",
       javaWebFramework:
         options.javaWebFramework || (options.ecosystem === "java" ? "spring-boot" : "none"),
       javaLanguage: options.javaLanguage || "java",

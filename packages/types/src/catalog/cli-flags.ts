@@ -962,7 +962,7 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
     title: "Crystal flags",
     description: "Experimental Kemal, Lucky, Athena, or Marten HTTP service with Crystal and Shards.",
     ecosystem: "crystal",
-    flags: [{ flag: "crystal-web-framework", summary: "Crystal HTTP framework.", source: { kind: "category", category: "crystalWebFramework" }, configKey: "crystalWebFramework" }, { flag: "crystal-orm", summary: "Crystal database layer.", source: { kind: "category", category: "crystalOrm" }, configKey: "crystalOrm" }],
+    flags: [{ flag: "crystal-web-framework", summary: "Crystal HTTP framework.", source: { kind: "category", category: "crystalWebFramework" }, configKey: "crystalWebFramework" }, { flag: "crystal-orm", summary: "Crystal database layer.", source: { kind: "category", category: "crystalOrm" }, configKey: "crystalOrm" }, { flag: "crystal-auth", summary: "Crystal authentication.", source: { kind: "category", category: "crystalAuth" }, configKey: "crystalAuth" }],
   },
   {
     id: "java",

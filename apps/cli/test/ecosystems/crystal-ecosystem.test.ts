@@ -240,6 +240,58 @@ describe("Crystal create contract", () => {
     ).rejects.toThrow("Avram requires Crystal Lucky.");
   });
 
+  it.each([
+    ["athena", "none", "jwt", "src/token_auth.cr", "github: crystal-community/jwt"],
+    ["kemal", "none", "kemal-session", "src/auth_credentials.cr", "github: kemalcr/kemal-session"],
+    ["marten", "marten-orm", "marten-auth", "seed.cr", "github: martenframework/marten-auth"],
+  ] as const)(
+    "renders %s with %s storage and %s sign-in",
+    async (framework, orm, auth, ownedFile, dependency) => {
+      const result = await createVirtual({
+        ecosystem: "crystal",
+        crystalWebFramework: framework,
+        crystalOrm: orm,
+        crystalAuth: auth,
+      });
+      expect(result.success).toBe(true);
+      if (!result.tree) throw new Error(result.error);
+      const root = result.tree.root;
+      expect(content(root, "shard.yml")).toContain(dependency);
+      expect(hasFile(root, ownedFile)).toBe(true);
+      expect(content(root, "scripts/http_proof.cr")).toContain('client.get("/api/me", auth_headers)');
+      const config = buildProjectConfig({
+        ecosystem: "crystal",
+        crystalWebFramework: framework,
+        crystalOrm: orm,
+        crystalAuth: auth,
+      });
+      expect(generateReproducibleCommand(config)).toContain(`--crystal-auth ${auth}`);
+    },
+  );
+
+  it("rejects sign-in options the selected stack cannot run", async () => {
+    for (const [framework, orm, auth, message] of [
+      ["lucky", "none", "kemal-session", "Kemal Session requires Crystal Kemal."],
+      ["marten", "crystal-db", "marten-auth", "Marten Auth requires Marten ORM."],
+      ["none", "none", "jwt", "JWT requires Crystal"],
+    ] as const) {
+      const result = await createVirtual({
+        ecosystem: "crystal",
+        crystalWebFramework: framework,
+        crystalOrm: orm,
+        crystalAuth: auth,
+      });
+      expect(result.success).toBe(false);
+      expect(result.error).toContain(message);
+    }
+    await expect(
+      planProjectOperation.invoke({
+        projectName: "crystal-auth",
+        part: ["backend:crystal:marten", "backend.auth:crystal:marten-auth"],
+      }),
+    ).rejects.toThrow("Marten Auth requires Marten ORM.");
+  });
+
   it("rejects unsupported selections before rendering", async () => {
     const result = await createVirtual({ ecosystem: "crystal", database: "postgres" });
     expect(result.success).toBe(false);

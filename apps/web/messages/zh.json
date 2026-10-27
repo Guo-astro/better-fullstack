@@ -777,5 +777,6 @@
   "builderComposerJsWorkspace": "JavaScript 工作区",
   "builderComposerNativeToolchains": "原生工具链",
   "docsCliSummaryCrystalCrystalWebFramework": "实验性 Crystal HTTP 框架。",
-  "docsCliSummaryCrystalCrystalOrm": "实验性 Crystal 数据库层。"
+  "docsCliSummaryCrystalCrystalOrm": "实验性 Crystal 数据库层。",
+  "docsCliSummaryCrystalCrystalAuth": "实验性 Crystal 身份验证。"
 }

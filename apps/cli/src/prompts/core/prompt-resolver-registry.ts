@@ -1,3 +1,4 @@
+import type { CrystalSelection } from "@/types";
 import { resolveApiPrompt } from "@/prompts/architecture/api";
 import { resolveBackendPrompt } from "@/prompts/architecture/backend";
 import { resolveFrontendPrompt } from "@/prompts/architecture/frontend";
@@ -24,7 +25,7 @@ import { resolveFormsPrompt } from "@/prompts/developer/forms";
 import { resolveTestingPrompt } from "@/prompts/developer/testing";
 import { resolveUILibraryPrompt } from "@/prompts/developer/ui-library";
 import { resolveValidationPrompt } from "@/prompts/developer/validation";
-import { resolveCrystalOrmPrompt, resolveCrystalWebFrameworkPrompt } from "@/prompts/ecosystems/crystal-ecosystem";
+import { resolveCrystalAuthPrompt, resolveCrystalOrmPrompt, resolveCrystalWebFrameworkPrompt } from "@/prompts/ecosystems/crystal-ecosystem";
 import {
   resolveDotnetApiPrompt,
   resolveDotnetAuthPrompt,
@@ -206,6 +207,7 @@ import {
   GO_DI_VALUES,
   CRYSTAL_WEB_FRAMEWORK_VALUES,
   CRYSTAL_ORM_VALUES,
+  CRYSTAL_AUTH_VALUES,
   GO_LOGGING_VALUES,
   GO_MIGRATIONS_VALUES,
   GO_ORM_VALUES,
@@ -703,9 +705,15 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
   },
   crystalOrm: {
     schemaValues: CRYSTAL_ORM_VALUES,
-    resolve: ({ value, crystalWebFramework }: { value?: string; crystalWebFramework?: string } = {}) =>
-      resolveCrystalOrmPrompt(value, crystalWebFramework),
+    resolve: ({ value, ...selection }: { value?: string } & CrystalSelection = {}) =>
+      resolveCrystalOrmPrompt(value, selection),
     coverageContexts: [{ crystalWebFramework: "kemal" }, { crystalWebFramework: "lucky" }, { crystalWebFramework: "marten" }],
+  },
+  crystalAuth: {
+    schemaValues: CRYSTAL_AUTH_VALUES,
+    resolve: ({ value, ...selection }: { value?: string } & CrystalSelection = {}) =>
+      resolveCrystalAuthPrompt(value, selection),
+    coverageContexts: [{ crystalWebFramework: "kemal" }, { crystalWebFramework: "lucky" }, { crystalWebFramework: "marten", crystalOrm: "marten-orm" }],
   },
   javaWebFramework: {
     schemaValues: JAVA_WEB_FRAMEWORK_VALUES,

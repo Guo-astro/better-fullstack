@@ -191,7 +191,7 @@ export function getInstallCommand(
     case "go":
       return `cd ${projectName} && go mod tidy`;
     case "crystal": {
-      const commands = getCrystalCommands(crystalWebFramework);
+      const commands = getCrystalCommands({ crystalWebFramework });
       return [`cd ${projectName}`, "shards install", commands.build, commands.test, commands.proof]
         .filter(Boolean)
         .join(" && ");

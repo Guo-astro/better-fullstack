@@ -190,6 +190,7 @@ export const STACK_SELECTION_OPTION_CATEGORY_BY_KEY: Record<
   javaLanguage: "javaLanguage",
   crystalWebFramework: "crystalWebFramework",
   crystalOrm: "crystalOrm",
+  crystalAuth: "crystalAuth",
   javaWebFramework: "javaWebFramework",
   javaBuildTool: "javaBuildTool",
   javaOrm: "javaOrm",
@@ -396,6 +397,7 @@ export const STACK_SELECTION_URL_KEYS = {
   javaLanguage: "jlang",
   crystalWebFramework: "cwf",
   crystalOrm: "corm",
+  crystalAuth: "cauth",
   javaWebFramework: "jwf",
   javaBuildTool: "jbt",
   javaOrm: "jorm",
@@ -882,6 +884,7 @@ const CLI_SCALAR_CONFIG_FIELDS = [
   ["javaLanguage", "javaLanguage"],
   ["crystalWebFramework", "crystalWebFramework"],
   ["crystalOrm", "crystalOrm"],
+  ["crystalAuth", "crystalAuth"],
   ["javaWebFramework", "javaWebFramework"],
   ["javaBuildTool", "javaBuildTool"],
   ["javaOrm", "javaOrm"],
@@ -1035,6 +1038,7 @@ const GO_CONFIG_KEYS = [
 const CRYSTAL_CONFIG_KEYS = [
   "crystalWebFramework",
   "crystalOrm",
+  "crystalAuth",
 ] as const satisfies readonly (keyof CliDefaultProjectConfigBase)[];
 
 const JAVA_CONFIG_KEYS = [
@@ -2164,6 +2168,7 @@ function buildProjectConfigBase(
     javaLanguage: stack.javaLanguage as ProjectConfig["javaLanguage"],
     crystalWebFramework: stack.crystalWebFramework as ProjectConfig["crystalWebFramework"],
     crystalOrm: stack.crystalOrm as ProjectConfig["crystalOrm"],
+    crystalAuth: stack.crystalAuth as ProjectConfig["crystalAuth"],
     javaWebFramework: stack.javaWebFramework as ProjectConfig["javaWebFramework"],
     javaBuildTool: stack.javaBuildTool as ProjectConfig["javaBuildTool"],
     javaOrm: stack.javaOrm as ProjectConfig["javaOrm"],
@@ -2741,7 +2746,7 @@ export function generateStackSelectionCommand(selection: StackSelectionInput): s
     case "go":
       return generateGoCommand(selection, projectName);
     case "crystal":
-      return `${getBaseCommand(selection)} ${projectName} --ecosystem crystal --crystal-web-framework ${selection.crystalWebFramework} --crystal-orm ${selection.crystalOrm} --package-manager ${selection.packageManager} --workspace-shape ${selection.workspaceShape} --version-channel ${selection.versionChannel} --addons none --examples none ${formatArrayFlag("ai-docs", selection.aiDocs)} ${selection.git === "false" ? "--no-git" : "--git"} ${selection.install === "false" ? "--no-install" : "--install"}`;
+      return `${getBaseCommand(selection)} ${projectName} --ecosystem crystal --crystal-web-framework ${selection.crystalWebFramework} --crystal-orm ${selection.crystalOrm} --crystal-auth ${selection.crystalAuth} --package-manager ${selection.packageManager} --workspace-shape ${selection.workspaceShape} --version-channel ${selection.versionChannel} --addons none --examples none ${formatArrayFlag("ai-docs", selection.aiDocs)} ${selection.git === "false" ? "--no-git" : "--git"} ${selection.install === "false" ? "--no-install" : "--install"}`;
     case "java":
       return generateJavaCommand(selection, projectName);
     case "dotnet":

@@ -252,6 +252,26 @@ describe("bounded Crystal HTTP recipe", () => {
     expect(validateStackParts(parts).issues).toEqual([]);
   });
 
+  it("resets Marten Auth when its ORM goes away and keeps JWT on any framework", () => {
+    const martenAuth = createCrystalStackSelection({
+      crystalWebFramework: "marten",
+      crystalOrm: "marten-orm",
+      crystalAuth: "marten-auth",
+    });
+    expect(analyzeStackCompatibility(martenAuth).adjustedStack).toBeNull();
+    const withoutOrm = analyzeStackCompatibility({ ...martenAuth, crystalOrm: "crystal-db" });
+    expect(withoutOrm.adjustedStack?.crystalAuth).toBe("none");
+    expect(getDisabledReason({ ...martenAuth, crystalOrm: "none" }, "crystalAuth", "marten-auth")).toBe(
+      "Marten Auth requires Marten ORM.",
+    );
+    expect(getDisabledReason(martenAuth, "crystalAuth", "kemal-session")).toBe(
+      "Kemal Session requires Crystal Kemal.",
+    );
+    expect(getDisabledReason(martenAuth, "crystalAuth", "jwt")).toBeNull();
+    const encoded = Object.fromEntries(createStackSelectionSearchParams(martenAuth));
+    expect(parseStackSelectionFromSearch(encoded).crystalAuth).toBe("marten-auth");
+  });
+
   it("keeps Crystal experimental without changing the versioned golden recipes", () => {
     expect(GOLDEN_RUNTIME_RECIPES).toHaveLength(8);
     const kemal = getCapabilityInventory().find(

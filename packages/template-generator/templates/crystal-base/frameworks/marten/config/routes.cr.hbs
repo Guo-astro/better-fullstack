@@ -5,4 +5,11 @@ Marten.routes.draw do
 {{#if (ne crystalOrm "none")}}
   path "/api/greetings", GreetingsHandler, name: "greetings"
 {{/if}}
+{{#if (ne crystalAuth "none")}}
+  path "/api/auth/login", LoginHandler, name: "login"
+  path "/api/me", MeHandler, name: "me"
+{{/if}}
+{{#if (eq crystalAuth "marten-auth")}}
+  path "/api/auth/logout", LogoutHandler, name: "logout"
+{{/if}}
 end

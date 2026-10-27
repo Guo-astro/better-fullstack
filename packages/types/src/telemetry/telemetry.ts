@@ -365,6 +365,7 @@ export const TELEMETRY_PROJECT_CONFIG_KEYS = [
   "goDI",
   "crystalWebFramework",
   "crystalOrm",
+  "crystalAuth",
   "javaLanguage",
   "javaWebFramework",
   "javaBuildTool",

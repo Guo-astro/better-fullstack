@@ -66,6 +66,8 @@ The service exposes `/health`, a validated greeting at `/api/hello?name=Crystal`
 
 Add a database layer with `--crystal-orm`. `crystal-db` runs parameterized SQL on SQLite with any framework, `avram` uses Lucky's PostgreSQL ORM and migrations, and `marten-orm` uses Marten models and migrations on SQLite. Each one adds `GET` and `POST /api/greetings`, a spec against a real database, and proof assertions that a stored greeting is listed. Avram works only with Lucky and Marten ORM only with Marten; other pairings are rejected.
 
+Add sign-in with `--crystal-auth`. `jwt` issues HS256 bearer tokens with any framework, `kemal-session` keeps a server-side session for Kemal, and `marten-auth` stores bcrypt users through Marten ORM. Each one adds `POST /api/auth/login` and a protected `GET /api/me`; the session options also add `POST /api/auth/logout`. `jwt` and `kemal-session` check one account from `AUTH_USERNAME` and `AUTH_PASSWORD`, while `marten-auth` seeds that account into the database.
+
 Append a relative directory to a binding, such as `backend:crystal:kemal:audit@services/audit%20api`. Directory segments accept ASCII letters, digits, spaces, dots, underscores, hyphens, `@`, `:`, and `%`. Encode special characters in the binding. Applications cannot share a destination or nest one destination inside another.
 
 TypeScript frontends and backends use `apps/web` and `apps/server`. React Native apps use `apps/native`. Custom directories for these applications are rejected because their templates require the default paths.

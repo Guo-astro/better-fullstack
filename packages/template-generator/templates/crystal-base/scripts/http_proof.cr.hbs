@@ -4,6 +4,10 @@ require "json"
 require "socket"
 
 server_env = {"HOST" => "127.0.0.1", "KEMAL_ENV" => "production", "CORS_ORIGIN" => "http://localhost:5173,http://localhost:8080"}
+{{#if (ne crystalAuth "none")}}
+server_env["AUTH_USERNAME"] = "{{#if (eq crystalAuth "marten-auth")}}proof@example.com{{else}}proof{{/if}}"
+server_env["AUTH_PASSWORD"] = "proof-password"
+{{/if}}
 {{#if (ne crystalOrm "none")}}
 database_path = File.tempname("proof", ".sqlite3")
 {{/if}}
@@ -13,6 +17,9 @@ server_env["DATABASE_URL"] = "sqlite3://#{database_path}"
 {{#if (eq crystalOrm "marten-orm")}}
 server_env["DATABASE_PATH"] = database_path
 raise "migration failed" unless Process.run("crystal", ["run", "manage.cr", "--", "migrate"], env: server_env, output: Process::Redirect::Inherit, error: Process::Redirect::Inherit).success?
+{{#if (eq crystalAuth "marten-auth")}}
+raise "seed failed" unless Process.run("crystal", ["run", "manage.cr", "--", "seed"], env: server_env, output: Process::Redirect::Inherit, error: Process::Redirect::Inherit).success?
+{{/if}}
 {{/if}}
 {{#if (eq crystalOrm "avram")}}
 raise "migration failed" unless Process.run("crystal", ["run", "scripts/db_migrate.cr"], output: Process::Redirect::Inherit, error: Process::Redirect::Inherit).success?
@@ -89,6 +96,28 @@ begin
   rejected_greeting = client.post("/api/greetings", headers, %({"name":"  "}))
   raise "invalid greeting stored" unless rejected_greeting.status_code == 422
 {{/if}}
+{{#if (ne crystalAuth "none")}}
+  username = server_env["AUTH_USERNAME"]
+  rejected_login = client.post("/api/auth/login", headers, {username: username, password: "wrong"}.to_json)
+  raise "wrong password accepted" unless rejected_login.status_code == 401
+  raise "anonymous user accepted" unless client.get("/api/me").status_code == 401
+  login = client.post("/api/auth/login", headers, {username: username, password: "proof-password"}.to_json)
+  raise "sign-in failed" unless login.status_code == 200
+{{#if (eq crystalAuth "jwt")}}
+  auth_headers = HTTP::Headers{"Authorization" => "Bearer #{JSON.parse(login.body)["token"].as_s}"}
+  raise "tampered token accepted" unless client.get("/api/me", HTTP::Headers{"Authorization" => "Bearer #{JSON.parse(login.body)["token"].as_s}x"}).status_code == 401
+{{else}}
+  auth_headers = login.cookies.add_request_headers(HTTP::Headers.new)
+{{/if}}
+  me = client.get("/api/me", auth_headers)
+  raise "signed-in user missing" unless me.status_code == 200 && JSON.parse(me.body)["username"].as_s == username
+{{#if (ne crystalAuth "jwt")}}
+  logout = client.post("/api/auth/logout", auth_headers)
+  raise "sign-out failed" unless logout.status_code == 204
+  signed_out = {{#if (eq crystalAuth "kemal-session")}}auth_headers{{else}}logout.cookies.add_request_headers(HTTP::Headers.new){{/if}}
+  raise "signed-out session accepted" unless client.get("/api/me", signed_out).status_code == 401
+{{/if}}
+{{/if}}
   oversized = client.post("/api/echo", headers, %({"name":"#{"x" * 5000}"}))
   raise "oversized body accepted" unless oversized.status_code == {{#if (eq crystalWebFramework "marten")}}400{{else}}413{{/if}}
   client.close
@@ -107,7 +136,7 @@ begin
   rescue ex : Socket::Error
     raise "listener remained open: #{ex.message}"
   end
-  puts ({proof: "crystal-{{crystalWebFramework}}-http-v1", success: true, assertions: ["invalid-port", "health-json", "hello-json", "cors", "cors-allowlist", "content-type", "blank-name-422", "post-json", "malformed-json-400", "wrong-type-422", "body-limit-{{#if (eq crystalWebFramework "marten")}}400{{else}}413{{/if}}", "sigterm-exit", "port-released"{{#if (ne crystalOrm "none")}}, "{{crystalOrm}}-persisted-greeting"{{/if}}]}).to_json
+  puts ({proof: "crystal-{{crystalWebFramework}}-http-v1", success: true, assertions: ["invalid-port", "health-json", "hello-json", "cors", "cors-allowlist", "content-type", "blank-name-422", "post-json", "malformed-json-400", "wrong-type-422", "body-limit-{{#if (eq crystalWebFramework "marten")}}400{{else}}413{{/if}}", "sigterm-exit", "port-released"{{#if (ne crystalOrm "none")}}, "{{crystalOrm}}-persisted-greeting"{{/if}}{{#if (ne crystalAuth "none")}}, "{{crystalAuth}}-current-user"{{/if}}]}).to_json
 ensure
   unless finished
     if process.exists?

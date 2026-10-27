@@ -557,6 +557,7 @@ export type CompatibilityInput = {
   javaLanguage: string;
   crystalWebFramework: string;
   crystalOrm: string;
+  crystalAuth: string;
   javaWebFramework: string;
   javaBuildTool: string;
   javaOrm: string;
@@ -833,7 +834,7 @@ function analyzeCrystalStackCompatibility(stack: CompatibilityInput): Compatibil
   const nextStack = { ...stack };
   const changes: CompatibilityAnalysisResult["changes"] = [];
   for (const category of CRYSTAL_OPTION_CATEGORIES) {
-    const issue = getCrystalOptionIssue(category, nextStack[category], nextStack.crystalWebFramework);
+    const issue = getCrystalOptionIssue(category, nextStack[category], nextStack);
     if (!issue) continue;
     nextStack[category] = "none";
     changes.push({ category, message: `${getCategoryDisplayName(category)} set to 'None' (${issue})` });
@@ -2991,6 +2992,7 @@ export const getDisabledReason = (
     ![
       "crystalWebFramework",
       "crystalOrm",
+      "crystalAuth",
       "aiDocs",
       "git",
       "install",
@@ -3002,7 +3004,7 @@ export const getDisabledReason = (
     return "Crystal's bounded recipe supports its HTTP framework only. Use a mixed graph for independently owned tools.";
   }
   if (currentStack.ecosystem === "crystal" && isCrystalOptionCategory(category))
-    return getCrystalOptionIssue(category, optionId, currentStack.crystalWebFramework);
+    return getCrystalOptionIssue(category, optionId, currentStack);
   if (
     category === "crystalWebFramework" &&
     optionId !== "none" &&

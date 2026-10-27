@@ -17,13 +17,14 @@ const optionValue = (name: string, fallback: string) => {
   return index < 0 ? fallback : (process.argv[index + 1] ?? fallback);
 };
 const orm = optionValue("--orm", "none");
+const auth = optionValue("--auth", "none");
 const outputIndex = process.argv.indexOf("--output");
 const requestedOutput = outputIndex < 0 ? undefined : process.argv[outputIndex + 1];
 if (outputIndex >= 0 && (!requestedOutput || requestedOutput.startsWith("--"))) {
   throw new Error("--output requires a directory");
 }
 const outputDir = resolve(
-  requestedOutput ?? join(repoRoot, `testing/.smoke-output/crystal-runtime-proof-${framework}-${orm}`),
+  requestedOutput ?? join(repoRoot, `testing/.smoke-output/crystal-runtime-proof-${framework}-${orm}-${auth}`),
 );
 const git = (args: string[]) => {
   const result = Bun.spawnSync(["git", ...args], { cwd: repoRoot });
@@ -55,6 +56,8 @@ const flags = [
   framework,
   "--crystal-orm",
   orm,
+  "--crystal-auth",
+  auth,
   "--database",
   "none",
   "--addons",
@@ -92,7 +95,7 @@ const cliSha256 = createHash("sha256")
   .digest("hex");
 const receipt = {
   schemaVersion: 1,
-  recipe: orm === "none" ? `crystal-${framework}` : `crystal-${framework}-${orm}`,
+  recipe: ["crystal", framework, orm, auth].filter((part) => part !== "none").join("-"),
   maturity: "experimental",
   evidence: "unqualified-observation",
   revision,

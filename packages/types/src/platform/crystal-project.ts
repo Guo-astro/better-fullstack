@@ -5,6 +5,7 @@ import { isToolingOverlayOnly } from "@/capabilities/tooling-capabilities";
 export const CRYSTAL_PROJECT_DEFAULTS = {
   crystalWebFramework: "kemal",
   crystalOrm: "none",
+  crystalAuth: "none",
   frontend: ["none"],
   backend: "none",
   runtime: "none",
@@ -82,6 +83,20 @@ const CRYSTAL_FRAMEWORK_LABELS: Record<string, string> = {
 
 const CRYSTAL_HTTP_FRAMEWORKS = ["kemal", "lucky", "athena", "marten"];
 
+type CrystalOptionRule = {
+  label: string;
+  frameworks: readonly string[];
+  orms?: readonly string[];
+};
+
+export type CrystalSelection = {
+  crystalWebFramework?: string;
+  crystalOrm?: string;
+  crystalAuth?: string;
+};
+
+const CRYSTAL_ORM_LABELS: Record<string, string> = { "marten-orm": "Marten ORM" };
+
 export const CRYSTAL_OPTION_RULES = {
   crystalOrm: {
     role: "orm",
@@ -91,12 +106,17 @@ export const CRYSTAL_OPTION_RULES = {
       "marten-orm": { label: "Marten ORM", frameworks: ["marten"] },
     },
   },
+  crystalAuth: {
+    role: "auth",
+    options: {
+      jwt: { label: "JWT", frameworks: CRYSTAL_HTTP_FRAMEWORKS },
+      "kemal-session": { label: "Kemal Session", frameworks: ["kemal"] },
+      "marten-auth": { label: "Marten Auth", frameworks: ["marten"], orms: ["marten-orm"] },
+    },
+  },
 } as const satisfies Record<
   string,
-  {
-    role: StackPart["role"];
-    options: Record<string, { label: string; frameworks: readonly string[] }>;
-  }
+  { role: StackPart["role"]; options: Record<string, CrystalOptionRule> }
 >;
 
 export type CrystalOptionCategory = keyof typeof CRYSTAL_OPTION_RULES;
@@ -110,17 +130,26 @@ export function isCrystalOptionCategory(category: string): category is CrystalOp
 export function getCrystalOptionIssue(
   category: CrystalOptionCategory,
   optionId: string | undefined,
-  framework: string | undefined,
+  selection: CrystalSelection,
 ): string | null {
-  const options: Record<string, { label: string; frameworks: readonly string[] }> =
-    CRYSTAL_OPTION_RULES[category].options;
+  const options: Record<string, CrystalOptionRule> = CRYSTAL_OPTION_RULES[category].options;
   const rule = optionId ? options[optionId] : undefined;
-  if (!rule || rule.frameworks.includes(framework ?? "none")) return null;
-  const frameworks = rule.frameworks.map((id) => CRYSTAL_FRAMEWORK_LABELS[id] ?? id).join(" or ");
-  return `${rule.label} requires Crystal ${frameworks}.`;
+  if (!rule) return null;
+  if (!rule.frameworks.includes(selection.crystalWebFramework ?? "none")) {
+    const frameworks = rule.frameworks.map((id) => CRYSTAL_FRAMEWORK_LABELS[id] ?? id).join(" or ");
+    return `${rule.label} requires Crystal ${frameworks}.`;
+  }
+  if (rule.orms && !rule.orms.includes(selection.crystalOrm ?? "none")) {
+    return `${rule.label} requires ${rule.orms.map((id) => CRYSTAL_ORM_LABELS[id] ?? id).join(" or ")}.`;
+  }
+  return null;
 }
 
-function getCrystalOwnedPartIssue(part: StackPart, owner: StackPart): string | null {
+function getCrystalOwnedPartIssue(
+  part: StackPart,
+  owner: StackPart,
+  parts: readonly StackPart[],
+): string | null {
   const category = CRYSTAL_OPTION_CATEGORIES.find(
     (candidate) => CRYSTAL_OPTION_RULES[candidate].role === part.role,
   );
@@ -128,7 +157,13 @@ function getCrystalOwnedPartIssue(part: StackPart, owner: StackPart): string | n
     const name = `${owner.toolId.charAt(0).toUpperCase()}${owner.toolId.slice(1)}`;
     return `Crystal ${name} does not support the owned '${part.toolId}' selection.`;
   }
-  return getCrystalOptionIssue(category, part.toolId, owner.toolId);
+  const orm = parts.find(
+    (candidate) => candidate.ownerPartId === owner.id && candidate.role === "orm",
+  )?.toolId;
+  return getCrystalOptionIssue(category, part.toolId, {
+    crystalWebFramework: owner.toolId,
+    crystalOrm: orm,
+  });
 }
 
 export function getCrystalCompilerFlags(framework: string | undefined): string[] {
@@ -140,10 +175,15 @@ const CRYSTAL_MIGRATION_COMMANDS: Record<string, string> = {
   "marten-orm": "crystal run manage.cr -- migrate",
 };
 
-export function getCrystalCommands(framework: string | undefined, orm?: string) {
+export function getCrystalCommands(selection: CrystalSelection) {
+  const framework = selection.crystalWebFramework;
   const flags = getCrystalCompilerFlags(framework).map((flag) => ` ${flag}`).join("");
   return {
-    migrate: orm ? CRYSTAL_MIGRATION_COMMANDS[orm] : undefined,
+    migrate: selection.crystalOrm ? CRYSTAL_MIGRATION_COMMANDS[selection.crystalOrm] : undefined,
+    seed:
+      selection.crystalAuth === "marten-auth"
+        ? "AUTH_PASSWORD=change-me crystal run manage.cr -- seed"
+        : undefined,
     build: `shards build --release${flags}`,
     test: `crystal spec${flags}`,
     run: `crystal run src/server.cr${flags}`,
@@ -207,7 +247,7 @@ export function getCrystalSelectionIssue(config: Partial<ProjectConfig>): string
     );
     for (const part of ownedParts) {
       const owner = backendsById.get(part.ownerPartId ?? "");
-      const issue = owner ? getCrystalOwnedPartIssue(part, owner) : null;
+      const issue = owner ? getCrystalOwnedPartIssue(part, owner, ownedParts) : null;
       if (issue) return issue;
     }
     const crystalPartIds = new Set([...backendsById.keys(), ...ownedParts.map((part) => part.id)]);
@@ -240,7 +280,7 @@ export function getCrystalSelectionIssue(config: Partial<ProjectConfig>): string
   if ((config.frontend ?? []).some(selected))
     return "Use an explicit mixed graph to combine a frontend with Crystal.";
   for (const category of CRYSTAL_OPTION_CATEGORIES) {
-    const issue = getCrystalOptionIssue(category, config[category], config.crystalWebFramework);
+    const issue = getCrystalOptionIssue(category, config[category], config);
     if (issue) return issue;
   }
   if ((config.addons ?? []).some(selected) || parts.some((part) => part.source !== "provided"))

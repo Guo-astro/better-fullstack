@@ -777,5 +777,6 @@
   "builderComposerJsWorkspace": "Робочий простір JavaScript",
   "builderComposerNativeToolchains": "Нативні тулчейни",
   "docsCliSummaryCrystalCrystalWebFramework": "Експериментальний HTTP-фреймворк Crystal.",
-  "docsCliSummaryCrystalCrystalOrm": "Експериментальний шар бази даних Crystal."
+  "docsCliSummaryCrystalCrystalOrm": "Експериментальний шар бази даних Crystal.",
+  "docsCliSummaryCrystalCrystalAuth": "Експериментальна автентифікація Crystal."
 }

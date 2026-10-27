@@ -115,6 +115,7 @@ export function makeBaseConfig(name: string, ecosystem: Ecosystem): ProjectConfi
     goDI: "none",
     crystalWebFramework: "none",
     crystalOrm: "none",
+    crystalAuth: "none",
     javaWebFramework: "none",
     javaBuildTool: "none",
     javaOrm: "none",

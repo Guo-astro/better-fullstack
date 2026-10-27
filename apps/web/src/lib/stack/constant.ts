@@ -6921,6 +6921,12 @@ export const TECH_OPTIONS: Record<
     { id: "marten-orm", name: "Marten ORM (SQLite)", description: "Marten models and migrations on SQLite", icon: "https://cdn.simpleicons.org/sqlite", color: "from-slate-500 to-zinc-600", default: false },
     { id: "none", name: "None", description: "No database layer", icon: "", color: "from-gray-400 to-gray-600", default: true },
   ],
+  crystalAuth: [
+    { id: "jwt", name: "JWT bearer tokens", description: "HS256 bearer tokens protecting a current-user route", icon: "https://cdn.simpleicons.org/jsonwebtokens", color: "from-slate-500 to-zinc-600", default: false },
+    { id: "kemal-session", name: "Kemal Session", description: "Signed cookie sessions with sign-in and sign-out for Kemal", icon: "https://cdn.simpleicons.org/crystal", color: "from-slate-500 to-zinc-600", default: false },
+    { id: "marten-auth", name: "Marten Auth", description: "Marten users with bcrypt passwords and session sign-in", icon: "https://cdn.simpleicons.org/crystal", color: "from-slate-500 to-zinc-600", default: false },
+    { id: "none", name: "None", description: "No authentication", icon: "", color: "from-gray-400 to-gray-600", default: true },
+  ],
   javaWebFramework: [
     {
       id: "ktor",

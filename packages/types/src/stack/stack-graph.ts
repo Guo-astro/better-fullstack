@@ -111,6 +111,7 @@ import {
   JAVA_TESTING_LIBRARIES_VALUES,
   CRYSTAL_WEB_FRAMEWORK_VALUES,
   CRYSTAL_ORM_VALUES,
+  CRYSTAL_AUTH_VALUES,
   JAVA_WEB_FRAMEWORK_VALUES,
   JOB_QUEUE_VALUES,
   LOGGING_VALUES,
@@ -369,7 +370,7 @@ const LEGACY_BACKEND_CATEGORY_BY_ECOSYSTEM = {
 } as const satisfies Record<LegacyBackendEcosystem, keyof ProjectConfig>;
 
 const LEGACY_CAPABILITY_CATEGORIES_BY_ECOSYSTEM = {
-  crystal: { orm: "crystalOrm" },
+  crystal: { orm: "crystalOrm", auth: "crystalAuth" },
   rust: {
     orm: "rustOrm",
     api: "rustApi",
@@ -1213,6 +1214,7 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ...defineTools(GO_DI_VALUES, "libraries", "go", "goDI"),
   ...defineTools(CRYSTAL_WEB_FRAMEWORK_VALUES, "backend", "crystal", "crystalWebFramework"),
   ...defineTools(CRYSTAL_ORM_VALUES, "orm", "crystal", "crystalOrm"),
+  ...defineTools(CRYSTAL_AUTH_VALUES, "auth", "crystal", "crystalAuth"),
   ...defineTools(JAVA_WEB_FRAMEWORK_VALUES, "backend", "java", "javaWebFramework"),
   ...defineTools(JAVA_LANGUAGE_VALUES, "language", "java", "javaLanguage"),
   ...defineTools(JAVA_BUILD_TOOL_VALUES, "buildTool", "java", "javaBuildTool"),
