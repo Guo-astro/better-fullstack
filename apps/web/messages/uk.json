@@ -631,6 +631,7 @@
   "docsCliSummaryElixirElixirConfig": "Конфігурація під час виконання в Elixir.",
   "docsCliSummaryElixirElixirMessageQueue": "Клієнт брокера повідомлень для Elixir.",
   "docsCliSummaryElixirElixirTemplating": "Рушій текстових шаблонів для Elixir.",
+  "docsCliSummaryElixirElixirCli": "Інструменти командного рядка для Elixir.",
   "docsCliSummaryElixirElixirDeploy": "Цільове середовище розгортання Elixir.",
   "docsCliSummaryElixirElixirLibraries": "Бібліотеки Elixir.",
   "docsSectionStart": "Початок",

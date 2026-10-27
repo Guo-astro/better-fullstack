@@ -630,6 +630,7 @@
   "docsCliSummaryElixirElixirConfig": "Elixir 런타임 설정.",
   "docsCliSummaryElixirElixirMessageQueue": "Elixir 메시지 브로커 클라이언트.",
   "docsCliSummaryElixirElixirTemplating": "Elixir 텍스트 템플릿 엔진.",
+  "docsCliSummaryElixirElixirCli": "Elixir 명령줄 도구.",
   "docsCliSummaryElixirElixirDeploy": "Elixir 배포 대상.",
   "docsCliSummaryElixirElixirLibraries": "Elixir 라이브러리.",
   "docsSectionStart": "시작",

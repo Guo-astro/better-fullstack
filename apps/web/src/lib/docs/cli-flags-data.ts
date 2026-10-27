@@ -3002,6 +3002,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "multiple": false
       },
       {
+        "flag": "--elixir-cli",
+        "summary": "Elixir command-line tooling.",
+        "values": [
+          "option-parser",
+          "optimus",
+          "owl",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
+      },
+      {
         "flag": "--elixir-templating",
         "summary": "Elixir text templating engine.",
         "values": [
@@ -3279,6 +3292,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "elixir:--elixir-documentation": m.docsCliSummaryElixirElixirDocumentation,
   "elixir:--elixir-clustering": m.docsCliSummaryElixirElixirClustering,
   "elixir:--elixir-logging": m.docsCliSummaryElixirElixirLogging,
+  "elixir:--elixir-cli": m.docsCliSummaryElixirElixirCli,
   "elixir:--elixir-templating": m.docsCliSummaryElixirElixirTemplating,
   "elixir:--elixir-message-queue": m.docsCliSummaryElixirElixirMessageQueue,
   "elixir:--elixir-config": m.docsCliSummaryElixirElixirConfig,

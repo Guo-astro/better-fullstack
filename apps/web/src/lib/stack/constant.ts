@@ -7375,6 +7375,40 @@ export const TECH_OPTIONS: Record<
       default: true,
     },
   ],
+  elixirCli: [
+    {
+      id: "option-parser",
+      name: "OptionParser",
+      description: "Built-in argument parsing in a Mix task",
+      icon: "",
+      color: "from-purple-500 to-fuchsia-600",
+      isNew: true,
+    },
+    {
+      id: "optimus",
+      name: "Optimus",
+      description: "Declarative options with validation and help",
+      icon: "",
+      color: "from-blue-500 to-indigo-600",
+      isNew: true,
+    },
+    {
+      id: "owl",
+      name: "Owl",
+      description: "Boxed terminal output on top of OptionParser",
+      icon: "",
+      color: "from-amber-500 to-yellow-600",
+      isNew: true,
+    },
+    {
+      id: "none",
+      name: "No CLI",
+      description: "Skip the command-line entry point",
+      icon: "",
+      color: "from-gray-400 to-gray-600",
+      default: true,
+    },
+  ],
   elixirDeploy: [
     {
       id: "docker",

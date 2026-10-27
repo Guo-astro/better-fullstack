@@ -2872,6 +2872,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://hexdocs.pm/bbmustache/",
     githubUrl: "https://github.com/soranoba/bbmustache",
   },
+  "elixirCli:option-parser": {
+    docsUrl: "https://hexdocs.pm/elixir/OptionParser.html",
+    githubUrl: "https://github.com/elixir-lang/elixir",
+  },
+  "elixirCli:optimus": {
+    docsUrl: "https://hexdocs.pm/optimus/",
+    githubUrl: "https://github.com/savonarola/optimus",
+  },
+  "elixirCli:owl": {
+    docsUrl: "https://hexdocs.pm/owl/",
+    githubUrl: "https://github.com/fuelen/owl",
+  },
   "elixirLibraries:ex_aws": {
     docsUrl: "https://hexdocs.pm/ex_aws/",
     githubUrl: "https://github.com/ex-aws/ex_aws",

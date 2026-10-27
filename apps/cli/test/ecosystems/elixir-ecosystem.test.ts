@@ -1141,4 +1141,46 @@ describe("Elixir library expansion", () => {
       expect(mix.includes("{:solid,") || mix.includes("{:bbmustache,")).toBe(dependency !== null);
     },
   );
+
+  it.each([
+    ["option-parser", "OptionParser.parse(argv", null],
+    ["optimus", "Optimus.parse(spec(), argv)", '{:optimus, "~> 0.6"}'],
+    ["owl", "Owl.Box.new(", '{:owl, "~> 0.13"}'],
+  ] as const)("adds a greet Mix task backed by %s", async (elixirCli, parser, dependency) => {
+    const result = await createVirtual({
+      ...base,
+      projectName: "elixir-cli",
+      elixirWebFramework: "none",
+      elixirRealtime: "none",
+      elixirOrm: "none",
+      elixirAuth: "none",
+      elixirApi: "none",
+      elixirHttpServer: "none",
+      elixirI18n: "none",
+      elixirCli,
+    });
+
+    expect(result.success).toBe(true);
+    const tree = result.tree!;
+    expect(getVirtualTreeFileContent(tree, "lib/elixir_cli/cli.ex")).toContain(parser);
+    expect(getVirtualTreeFileContent(tree, "lib/mix/tasks/elixir_cli.greet.ex")).toContain(
+      "defmodule Mix.Tasks.ElixirCli.Greet do",
+    );
+    expect(hasVirtualFile(tree.root, "test/elixir_cli/cli_test.exs")).toBe(true);
+    const mix = getVirtualTreeFileContent(tree, "mix.exs") ?? "";
+    expect(mix.includes("{:optimus,") || mix.includes("{:owl,")).toBe(dependency !== null);
+    if (dependency) expect(mix).toContain(dependency);
+  });
+
+  it("omits the greet task when no CLI is selected", async () => {
+    const result = await createVirtual({
+      ...base,
+      projectName: "elixir-no-cli",
+      elixirCli: "none",
+    });
+
+    expect(result.success).toBe(true);
+    expect(hasVirtualFile(result.tree!.root, "lib/mix/tasks/elixir_no_cli.greet.ex")).toBe(false);
+    expect(hasVirtualFile(result.tree!.root, "lib/elixir_no_cli/cli.ex")).toBe(false);
+  });
 });

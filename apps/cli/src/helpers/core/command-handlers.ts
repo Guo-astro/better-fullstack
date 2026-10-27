@@ -770,6 +770,7 @@ export async function createProjectHandler(
               elixirConfig: "none",
               elixirMessageQueue: "none",
               elixirTemplating: "none",
+              elixirCli: "none",
               elixirDeploy: "none",
               elixirLibraries: [],
               aiDocs: [],

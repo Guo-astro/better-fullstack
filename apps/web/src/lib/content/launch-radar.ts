@@ -78,6 +78,7 @@ export const NEW_OPTION_IDS_BY_CATEGORY = {
   elixirConfig: ["dotenvy", "skogsra", "confex"],
   elixirMessageQueue: ["amqp", "gnat", "brod"],
   elixirTemplating: ["eex", "solid-liquid", "bbmustache"],
+  elixirCli: ["option-parser", "optimus", "owl"],
   elixirLibraries: ["ex_aws", "floki", "rustler"],
   pythonWebFramework: ["aiohttp", "streamlit"],
   pythonOrm: ["pymongo"],
@@ -236,6 +237,7 @@ const ELIXIR_CATEGORIES = [
   "elixirConfig",
   "elixirMessageQueue",
   "elixirTemplating",
+  "elixirCli",
   "elixirLibraries",
 ] as const;
 const DOTNET_CATEGORIES = ["dotnetLibraries"] as const;

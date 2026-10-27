@@ -39,6 +39,9 @@ This project was created with [Better Fullstack](https://github.com/Marve10s/Bet
 {{#if (ne elixirTemplating "none")}}
 - Templating: {{elixirTemplating}}
 {{/if}}
+{{#if (ne elixirCli "none")}}
+- CLI: {{elixirCli}}
+{{/if}}
 
 ## Setup
 
@@ -249,6 +252,25 @@ Plain `mix test` skips the broker test.
 ```sh
 mix run -e 'IO.write({{elixirModuleName}}.Templates.welcome("Ada", 2))'
 ```
+{{/if}}
+
+{{#if (ne elixirCli "none")}}
+## Command line
+
+`mix {{elixirAppName}}.greet` runs `{{elixirModuleName}}.CLI`, which parses its arguments with
+{{#if (eq elixirCli "optimus")}}
+Optimus (typed options, validation errors, and `--help`).
+{{else if (eq elixirCli "owl")}}
+`OptionParser` and prints the result in an Owl box.
+{{else if (eq elixirCli "option-parser")}}
+the built-in `OptionParser`.
+{{/if}}
+
+```sh
+mix {{elixirAppName}}.greet --name Ada --times 2
+```
+
+Invalid options print an error and exit with status 1.
 {{/if}}
 
 {{#if (eq elixirObservability "prom_ex")}}

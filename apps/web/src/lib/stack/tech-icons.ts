@@ -223,6 +223,9 @@ export const ICON_REGISTRY: Record<string, IconConfig> = {
   eex: { type: "si", slug: "elixir", hex: "4B275F" },
   "solid-liquid": { type: "si", slug: "elixir", hex: "4B275F" },
   bbmustache: { type: "si", slug: "erlang", hex: "A90533" },
+  "option-parser": { type: "si", slug: "elixir", hex: "4B275F" },
+  optimus: { type: "si", slug: "elixir", hex: "4B275F" },
+  owl: { type: "si", slug: "elixir", hex: "4B275F" },
   "mix-release": { type: "si", slug: "elixir", hex: "4B275F" },
   gigalixir: { type: "si", slug: "elixir", hex: "4B275F" },
 

@@ -334,6 +334,7 @@ export function buildCommand(name: string, config: ProjectConfig): string {
     ["elixir-config", config.elixirConfig],
     ["elixir-message-queue", config.elixirMessageQueue],
     ["elixir-templating", config.elixirTemplating],
+    ["elixir-cli", config.elixirCli],
     ["elixir-deploy", config.elixirDeploy],
     ["elixir-libraries", withExplicitNone(config.elixirLibraries)],
   ];

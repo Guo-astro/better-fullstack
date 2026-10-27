@@ -646,6 +646,7 @@
   "docsCliSummaryElixirElixirConfig": "Elixir runtime configuration.",
   "docsCliSummaryElixirElixirMessageQueue": "Elixir message broker client.",
   "docsCliSummaryElixirElixirTemplating": "Elixir text templating engine.",
+  "docsCliSummaryElixirElixirCli": "Elixir command-line tooling.",
   "docsCliSummaryElixirElixirDeploy": "Elixir deploy target.",
   "docsCliSummaryElixirElixirLibraries": "Elixir libraries.",
   "docsSectionStart": "Start",

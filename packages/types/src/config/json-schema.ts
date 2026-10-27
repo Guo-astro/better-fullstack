@@ -60,6 +60,7 @@ import {
   ElixirConfigSchema,
   ElixirMessageQueueSchema,
   ElixirTemplatingSchema,
+  ElixirCliSchema,
   ElixirRealtimeSchema,
   ElixirTestingSchema,
   ElixirValidationSchema,
@@ -414,6 +415,10 @@ export function getElixirTemplatingJsonSchema() {
   return z.toJSONSchema(ElixirTemplatingSchema);
 }
 
+export function getElixirCliJsonSchema() {
+  return z.toJSONSchema(ElixirCliSchema);
+}
+
 export function getElixirDeployJsonSchema() {
   return z.toJSONSchema(ElixirDeploySchema);
 }
@@ -505,6 +510,7 @@ export function getAllJsonSchemas() {
     elixirConfig: getElixirConfigJsonSchema(),
     elixirMessageQueue: getElixirMessageQueueJsonSchema(),
     elixirTemplating: getElixirTemplatingJsonSchema(),
+    elixirCli: getElixirCliJsonSchema(),
     elixirDeploy: getElixirDeployJsonSchema(),
     createInput: getCreateInputJsonSchema(),
     projectConfig: getProjectConfigJsonSchema(),

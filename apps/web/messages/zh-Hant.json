@@ -630,6 +630,7 @@
   "docsCliSummaryElixirElixirConfig": "Elixir 執行階段設定。",
   "docsCliSummaryElixirElixirMessageQueue": "Elixir 訊息代理用戶端。",
   "docsCliSummaryElixirElixirTemplating": "Elixir 文字範本引擎。",
+  "docsCliSummaryElixirElixirCli": "Elixir 命令列工具。",
   "docsCliSummaryElixirElixirDeploy": "Elixir 部署目標。",
   "docsCliSummaryElixirElixirLibraries": "Elixir 函式庫。",
   "docsSectionStart": "開始",

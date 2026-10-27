@@ -630,6 +630,7 @@
   "docsCliSummaryElixirElixirConfig": "Elixir の実行時設定。",
   "docsCliSummaryElixirElixirMessageQueue": "Elixir のメッセージブローカークライアント。",
   "docsCliSummaryElixirElixirTemplating": "Elixir のテキストテンプレートエンジン。",
+  "docsCliSummaryElixirElixirCli": "Elixir のコマンドラインツール。",
   "docsCliSummaryElixirElixirDeploy": "Elixir のデプロイ先。",
   "docsCliSummaryElixirElixirLibraries": "Elixir のライブラリ。",
   "docsSectionStart": "はじめる",

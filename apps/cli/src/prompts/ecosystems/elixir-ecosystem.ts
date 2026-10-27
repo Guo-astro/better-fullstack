@@ -20,6 +20,7 @@ import type {
   ElixirConfig,
   ElixirMessageQueue,
   ElixirTemplating,
+  ElixirCli,
   ElixirRealtime,
   ElixirTesting,
   ElixirValidation,
@@ -38,6 +39,7 @@ import {
   ElixirLoggingSchema,
   ElixirMessageQueueSchema,
   ElixirTemplatingSchema,
+  ElixirCliSchema,
 } from "@/types";
 
 function makeChoice<T extends string>(
@@ -266,6 +268,13 @@ const TEMPLATING_OPTIONS: PromptOption<ElixirTemplating>[] = [
   { value: "none", label: "None", hint: "No text templating module" },
 ];
 
+const CLI_OPTIONS: PromptOption<ElixirCli>[] = [
+  { value: "option-parser", label: "OptionParser", hint: "Built-in argument parsing in a Mix task" },
+  { value: "optimus", label: "Optimus", hint: "Declarative options with validation and help" },
+  { value: "owl", label: "Owl", hint: "Boxed terminal output on top of OptionParser" },
+  { value: "none", label: "None", hint: "No command-line entry point" },
+];
+
 const DEPLOY_OPTIONS: PromptOption<ElixirDeploy>[] = [
   { value: "docker", label: "Docker", hint: "Dockerfile for Phoenix releases" },
   { value: "fly", label: "Fly.io", hint: "Fly.io release config" },
@@ -336,6 +345,12 @@ export const resolveElixirTemplatingPrompt = (value?: string) =>
     "none",
     ElixirTemplatingSchema.optional().parse(value),
   );
+export const resolveElixirCliPrompt = (value?: string) =>
+  createStaticSinglePromptResolution(
+    CLI_OPTIONS,
+    "none",
+    ElixirCliSchema.optional().parse(value),
+  );
 export const resolveElixirDeployPrompt = (value?: ElixirDeploy) =>
   createStaticSinglePromptResolution(DEPLOY_OPTIONS, "none", value);
 export const getElixirWebFrameworkChoice = (value?: ElixirWebFramework) =>
@@ -384,6 +399,8 @@ export const getElixirMessageQueueChoice = (value?: ElixirMessageQueue) =>
   makeChoice("Select Elixir message broker client", MESSAGE_QUEUE_OPTIONS, "none", value);
 export const getElixirTemplatingChoice = (value?: ElixirTemplating) =>
   makeChoice("Select Elixir templating", TEMPLATING_OPTIONS, "none", value);
+export const getElixirCliChoice = (value?: ElixirCli) =>
+  makeChoice("Select Elixir command-line tooling", CLI_OPTIONS, "none", value);
 export const getElixirDeployChoice = (value?: ElixirDeploy) =>
   makeChoice("Select Elixir deploy target", DEPLOY_OPTIONS, "none", value);
 

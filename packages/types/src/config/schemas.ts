@@ -1221,6 +1221,10 @@ export const ElixirTemplatingSchema = z
   .enum(["eex", "solid-liquid", "bbmustache", "none"])
   .describe("Elixir text templating engine");
 
+export const ElixirCliSchema = z
+  .enum(["option-parser", "optimus", "owl", "none"])
+  .describe("Elixir command-line tooling");
+
 export const ElixirDeploySchema = z
   .enum(["docker", "fly", "gigalixir", "mix-release", "none"])
   .describe("Elixir deployment target");
@@ -1565,6 +1569,7 @@ const STACK_CONFIG_FIELDS = {
   elixirConfig: ElixirConfigSchema,
   elixirMessageQueue: ElixirMessageQueueSchema,
   elixirTemplating: ElixirTemplatingSchema,
+  elixirCli: ElixirCliSchema,
   elixirDeploy: ElixirDeploySchema,
   elixirLibraries: z.array(ElixirLibrariesSchema).describe("Elixir libraries"),
   // AI documentation files
@@ -1873,6 +1878,7 @@ export const ELIXIR_LOGGING_VALUES = ElixirLoggingSchema.options;
 export const ELIXIR_CONFIG_VALUES = ElixirConfigSchema.options;
 export const ELIXIR_MESSAGE_QUEUE_VALUES = ElixirMessageQueueSchema.options;
 export const ELIXIR_TEMPLATING_VALUES = ElixirTemplatingSchema.options;
+export const ELIXIR_CLI_VALUES = ElixirCliSchema.options;
 export const ELIXIR_DEPLOY_VALUES = ElixirDeploySchema.options;
 export const AI_DOCS_VALUES = AiDocsSchema.options;
 export const SHADCN_BASE_VALUES = ShadcnBaseSchema.options;

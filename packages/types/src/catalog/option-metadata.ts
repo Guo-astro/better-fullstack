@@ -44,6 +44,7 @@ import {
   ELIXIR_CONFIG_VALUES,
   ELIXIR_MESSAGE_QUEUE_VALUES,
   ELIXIR_TEMPLATING_VALUES,
+  ELIXIR_CLI_VALUES,
   ELIXIR_REALTIME_VALUES,
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
@@ -488,6 +489,7 @@ export const ELIXIR_CATEGORY_ORDER = [
   "elixirConfig",
   "elixirMessageQueue",
   "elixirTemplating",
+  "elixirCli",
   "elixirDeploy",
   "elixirLibraries",
   "aiDocs",
@@ -1022,6 +1024,7 @@ const CATEGORY_DEFINITIONS = {
   elixirConfig: { values: ELIXIR_CONFIG_VALUES, displayName: "Elixir Config" },
   elixirMessageQueue: { values: ELIXIR_MESSAGE_QUEUE_VALUES, displayName: "Elixir Message Queue" },
   elixirTemplating: { values: ELIXIR_TEMPLATING_VALUES, displayName: "Elixir Templating" },
+  elixirCli: { values: ELIXIR_CLI_VALUES, displayName: "Elixir CLI" },
   elixirDeploy: { values: ELIXIR_DEPLOY_VALUES, displayName: "Elixir Deploy" },
   elixirLibraries: {
     values: ELIXIR_LIBRARIES_VALUES,
@@ -2099,6 +2102,11 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
     eex: "EEx",
     "solid-liquid": "Solid (Liquid)",
     bbmustache: "bbmustache",
+  },
+  elixirCli: {
+    "option-parser": "OptionParser",
+    optimus: "Optimus",
+    owl: "Owl",
   },
   elixirDeploy: {
     docker: "Docker",

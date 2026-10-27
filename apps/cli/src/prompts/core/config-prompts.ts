@@ -51,6 +51,7 @@ import type {
   ElixirConfig,
   ElixirMessageQueue,
   ElixirTemplating,
+  ElixirCli,
   ElixirRealtime,
   ElixirTesting,
   ElixirValidation,
@@ -268,6 +269,7 @@ import {
   getElixirConfigChoice,
   getElixirMessageQueueChoice,
   getElixirTemplatingChoice,
+  getElixirCliChoice,
   getElixirRealtimeChoice,
   getElixirTestingChoice,
   getElixirValidationChoice,
@@ -586,6 +588,7 @@ type PromptGroupResults = {
   elixirConfig: ElixirConfig;
   elixirMessageQueue: ElixirMessageQueue;
   elixirTemplating: ElixirTemplating;
+  elixirCli: ElixirCli;
   elixirDeploy: ElixirDeploy;
   elixirLibraries: ElixirLibraries[];
   // Keep at end
@@ -797,6 +800,7 @@ const CONFIG_PROMPT_ENTRY_KEY_MAP = {
   elixirConfig: true,
   elixirMessageQueue: true,
   elixirTemplating: true,
+  elixirCli: true,
   elixirDeploy: true,
   elixirLibraries: true,
   aiDocs: true,
@@ -2165,6 +2169,10 @@ export async function gatherConfig(
       if (results.ecosystem !== "elixir") return Promise.resolve("none" as ElixirTemplating);
       return getElixirTemplatingChoice(flags.elixirTemplating);
     },
+    elixirCli: ({ results }) => {
+      if (results.ecosystem !== "elixir") return Promise.resolve("none" as ElixirCli);
+      return getElixirCliChoice(flags.elixirCli);
+    },
     elixirDeploy: ({ results }) => {
       if (results.ecosystem !== "elixir") return Promise.resolve("none" as ElixirDeploy);
       return getElixirDeployChoice(flags.elixirDeploy);
@@ -2401,6 +2409,7 @@ export async function gatherConfig(
     elixirConfig: result.elixirConfig,
     elixirMessageQueue: result.elixirMessageQueue,
     elixirTemplating: result.elixirTemplating,
+    elixirCli: result.elixirCli,
     elixirDeploy: result.elixirDeploy,
     elixirLibraries: result.elixirLibraries,
     // AI documentation files

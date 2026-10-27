@@ -83,6 +83,7 @@ import {
   getElixirConfigChoice,
   getElixirMessageQueueChoice,
   getElixirTemplatingChoice,
+  getElixirCliChoice,
   getElixirRealtimeChoice,
   getElixirTestingChoice,
   getElixirValidationChoice,
@@ -1743,6 +1744,12 @@ export async function gatherMultiEcosystemConfig(
         : await scopedPromptValue("elixir", "elixirTemplating", configScope, backendSections, () =>
             getElixirTemplatingChoice(flags.elixirTemplating),
           );
+    const elixirCli =
+      elixirWebFramework === "none"
+        ? "none"
+        : await scopedPromptValue("elixir", "elixirCli", configScope, backendSections, () =>
+            getElixirCliChoice(flags.elixirCli),
+          );
     const elixirDeploy =
       elixirWebFramework === "none"
         ? "none"
@@ -1779,6 +1786,7 @@ export async function gatherMultiEcosystemConfig(
       elixirConfig,
       elixirMessageQueue,
       elixirTemplating,
+      elixirCli,
       elixirDeploy,
       elixirLibraries,
     });
@@ -1822,6 +1830,9 @@ export async function gatherMultiEcosystemConfig(
     }
     if (elixirTemplating !== "none") {
       stackPartSpecs.push(`backend.templating:elixir:${elixirTemplating}`);
+    }
+    if (elixirCli !== "none") {
+      stackPartSpecs.push(`backend.cli:elixir:${elixirCli}`);
     }
     if (elixirDeploy !== "none") stackPartSpecs.push(`backend.deploy:elixir:${elixirDeploy}`);
     for (const library of elixirLibraries) {

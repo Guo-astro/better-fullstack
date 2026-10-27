@@ -256,6 +256,12 @@ defmodule {{elixirModuleName}}.MixProject do
 {{#if (eq elixirTemplating "bbmustache")}}
       {:bbmustache, "~> 1.12"},
 {{/if}}
+{{#if (eq elixirCli "optimus")}}
+      {:optimus, "~> 0.6"},
+{{/if}}
+{{#if (eq elixirCli "owl")}}
+      {:owl, "~> 0.13"},
+{{/if}}
 {{#if (includes elixirLibraries "ex_aws")}}
       {:ex_aws, "~> 2.7"},
       {:ex_aws_s3, "~> 2.5"},

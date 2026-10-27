@@ -50,6 +50,7 @@ export async function processElixirBaseTemplate(
   const hasSettings = config.elixirConfig !== "none";
   const hasMessageQueue = config.elixirMessageQueue !== "none";
   const hasTemplates = config.elixirTemplating !== "none";
+  const hasCli = config.elixirCli !== "none";
   const templateExtension = {
     eex: ".eex",
     "solid-liquid": ".liquid",
@@ -112,6 +113,8 @@ export async function processElixirBaseTemplate(
       if (!hasMessageQueue && /\/message_queue(_test)?\.exs?(\.hbs)?$/.test(templatePath))
         return true;
       if (!hasTemplates && /\/templates(_test)?\.exs?(\.hbs)?$/.test(templatePath)) return true;
+      if (!hasCli && /\/cli(_test)?\.exs?(\.hbs)?$/.test(templatePath)) return true;
+      if (!hasCli && templatePath.includes("lib/mix/tasks/")) return true;
       if (
         templatePath.includes("priv/templates/welcome.") &&
         !templatePath.endsWith(`welcome${templateExtension}`)

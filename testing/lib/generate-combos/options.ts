@@ -53,6 +53,7 @@ import {
   ELIXIR_CONFIG_VALUES,
   ELIXIR_MESSAGE_QUEUE_VALUES,
   ELIXIR_TEMPLATING_VALUES,
+  ELIXIR_CLI_VALUES,
   ELIXIR_REALTIME_VALUES,
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
@@ -795,6 +796,9 @@ function makeElixirDraft(args: GeneratorArgs): CandidateDraft {
       elixirTemplating: usesPhoenix
         ? sampleScalar(ELIXIR_TEMPLATING_VALUES, 0.6, "elixirTemplating")
         : "none",
+      elixirCli: usesPhoenix
+        ? sampleScalar(ELIXIR_CLI_VALUES, 0.6, "elixirCli")
+        : "none",
       elixirDeploy: usesPhoenix ? sampleScalar(ELIXIR_DEPLOY_VALUES, 0.65, "elixirDeploy") : "none",
       elixirLibraries: usesPhoenix
         ? sampleArray(ELIXIR_LIBRARIES_VALUES, 0.5, 2, "elixirLibraries")
@@ -1029,6 +1033,7 @@ function createValidationBase(projectName: string, draft: CandidateDraft): Proje
     elixirConfig: "none",
     elixirMessageQueue: "none",
     elixirTemplating: "none",
+    elixirCli: "none",
     elixirDeploy: "none",
     elixirLibraries: [],
     aiDocs: [],

@@ -596,6 +596,7 @@ export function buildCompatibilityInputFromConfig(
     elixirConfig: asString(config.elixirConfig),
     elixirMessageQueue: asString(config.elixirMessageQueue),
     elixirTemplating: asString(config.elixirTemplating),
+    elixirCli: asString(config.elixirCli),
     elixirDeploy: asString(config.elixirDeploy),
     elixirLibraries: asStringArray(config.elixirLibraries),
   };

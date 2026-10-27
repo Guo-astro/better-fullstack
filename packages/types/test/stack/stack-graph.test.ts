@@ -45,6 +45,7 @@ import {
   ELIXIR_CONFIG_VALUES,
   ELIXIR_MESSAGE_QUEUE_VALUES,
   ELIXIR_TEMPLATING_VALUES,
+  ELIXIR_CLI_VALUES,
   ELIXIR_REALTIME_VALUES,
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
@@ -2261,6 +2262,7 @@ describe("stack graph structural round-trip (phase 0)", () => {
           elixirConfig: ELIXIR_CONFIG_VALUES,
           elixirMessageQueue: ELIXIR_MESSAGE_QUEUE_VALUES,
           elixirTemplating: ELIXIR_TEMPLATING_VALUES,
+          elixirCli: ELIXIR_CLI_VALUES,
           elixirDeploy: ELIXIR_DEPLOY_VALUES,
         },
         arrays: {
@@ -2320,6 +2322,7 @@ describe("stack graph structural round-trip (phase 0)", () => {
       "elixirConfig",
       "elixirMessageQueue",
       "elixirTemplating",
+      "elixirCli",
       "elixirDeploy",
     ]);
 
