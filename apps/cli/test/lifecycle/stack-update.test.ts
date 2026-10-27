@@ -1526,6 +1526,21 @@ describe("stack update planner", () => {
     },
   );
 
+  it("preserves the Elixir application when adding a capability in a directory named elixir", async () => {
+    const root = await makeTempRoot("bfs-stack-update-elixir-renamed-");
+    const projectDir = join(root, "elixir");
+    await scaffoldGeneratedProject(
+      makeConfig(projectDir, { ...ELIXIR_BASE_CONFIG, projectName: "proof-elixir" }),
+    );
+
+    const result = await applyStackUpdate(projectDir, { elixirLogging: "logger-json" });
+    expect(result.success).toBe(true);
+    const mixProject = await readFile(join(projectDir, "mix.exs"), "utf-8");
+    expect(mixProject).toContain("app: :proof_elixir");
+    expect(mixProject).toContain(":logger_json");
+    expect(await pathExists(join(projectDir, "lib/elixir.ex"))).toBe(false);
+  });
+
   it("drops none placeholders when adding array-based stack options", async () => {
     const root = await makeTempRoot("bfs-stack-update-arrays-");
     const projectDir = join(root, "app");
