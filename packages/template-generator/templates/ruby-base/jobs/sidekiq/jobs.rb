@@ -4,6 +4,7 @@ require "sidekiq"
 
 module BetterFullstack
   module Jobs
+    QUEUE = ENV.fetch("JOBS_QUEUE", "default")
     RESULT_TTL_SECONDS = 3600
     REDIS = { url: ENV.fetch("JOBS_REDIS_URL", "redis://127.0.0.1:6379/1") }.freeze
 
@@ -12,6 +13,7 @@ module BetterFullstack
 
     class GreetingJob
       include Sidekiq::Job
+      sidekiq_options queue: QUEUE
 
       def perform(id, name)
         Jobs.store(id, "status" => "done", "greeting" => "Hello, #{name}!")

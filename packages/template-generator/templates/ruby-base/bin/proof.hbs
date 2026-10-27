@@ -21,7 +21,7 @@ environment["DATABASE_PATH"] = database.path
 request_log = Tempfile.new(["requests", ".log"])
 environment.merge!("LOG_PATH" => request_log.path, "LOG_LEVEL" => "info")
 {{/if}}
-{{#if (eq rubyJobQueue "resque")}}
+{{#if (or (eq rubyJobQueue "resque") (eq rubyJobQueue "sidekiq"))}}
 environment["JOBS_QUEUE"] = "proof-#{SecureRandom.hex(4)}"
 {{/if}}
 {{#if (ne rubyHttpClient "none")}}
@@ -117,6 +117,9 @@ begin
   raise "Job result was wrong" unless job == { "id" => job_id, "status" => "done", "greeting" => "Hello, Ruby!" }
 {{#if (eq rubyJobQueue "resque")}}
   system(environment, RbConfig.ruby, "-r", "./jobs", "-e", "Resque.remove_queue(BetterFullstack::Jobs::QUEUE)", chdir: root, out: log, err: log)
+{{/if}}
+{{#if (eq rubyJobQueue "sidekiq")}}
+  system(environment, RbConfig.ruby, "-r", "./jobs", "-r", "sidekiq/api", "-e", "Sidekiq::Queue.new(BetterFullstack::Jobs::QUEUE).clear", chdir: root, out: log, err: log)
 {{/if}}
 {{/if}}
 {{#if (or (eq rubyEmail "mail") (eq rubyEmail "action-mailer"))}}
