@@ -325,6 +325,8 @@ function generateTechStackSection(config: ProjectConfig): string {
     if (email) lines.push(`- Email: ${email} in mailer.rb; send a test message with \`bundle exec rake "email:welcome[you@example.com]"\``);
     const logging = rubyOptionLabel(config, "rubyLogging");
     if (logging) lines.push(`- Request logging: ${logging}`);
+    const httpClient = rubyOptionLabel(config, "rubyHttpClient");
+    if (httpClient) lines.push(`- HTTP client: ${httpClient} in upstream.rb behind GET /api/upstream`);
   }
 
   if (config.ecosystem === "rust") {
@@ -537,7 +539,13 @@ function rubyTestingLabel(config: ProjectConfig) {
 
 function rubyOptionLabel(
   config: ProjectConfig,
-  category: "rubyValidation" | "rubyCache" | "rubyJobQueue" | "rubyEmail" | "rubyLogging",
+  category:
+    | "rubyValidation"
+    | "rubyCache"
+    | "rubyJobQueue"
+    | "rubyEmail"
+    | "rubyLogging"
+    | "rubyHttpClient",
 ) {
   const value = config[category];
   return value && value !== "none" ? getOptionMetadata(category, value)?.label : undefined;
@@ -753,6 +761,8 @@ function generateCursorRules(config: ProjectConfig): string {
     if (email) rules.push(`Email uses ${email} through Mailer.deliver_welcome in mailer.rb. Never expose an endpoint that sends mail to arbitrary addresses, and keep credentials in the process environment.`);
     const logging = rubyOptionLabel(config, "rubyLogging");
     if (logging) rules.push(config.rubyLogging === "lograge" ? "Request logs come from Lograge, configured in the Rails application in app.rb; keep one line per request." : `Request logging uses ${logging} in request_logger.rb, mounted as the outermost Rack middleware. Never log request bodies or credentials.`);
+    const httpClient = rubyOptionLabel(config, "rubyHttpClient");
+    if (httpClient) rules.push(`Outbound HTTP uses ${httpClient} in upstream.rb. Keep explicit timeouts, read the upstream base URL from UPSTREAM_URL, and never build request URLs from user input.`);
   } else if (config.ecosystem === "go") {
     rules.push(`You are working on a Go project.`);
     if (config.goWebFramework !== "none") rules.push(`Web framework: ${config.goWebFramework}`);

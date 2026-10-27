@@ -282,6 +282,7 @@ describe("Ruby recipe contracts", () => {
     ["rubyJobQueue", "jobQueue", "sidekiq", "none"],
     ["rubyEmail", "email", "resend", "none"],
     ["rubyLogging", "logging", "semantic-logger", "logger"],
+    ["rubyHttpClient", "httpClient", "httpx", "none"],
   ] as const)(
     "projects %s as a Ruby-owned %s part",
     (category, role, tool, fallback) => {

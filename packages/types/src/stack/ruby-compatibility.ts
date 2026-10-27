@@ -3,11 +3,11 @@ import type { ProjectConfig, StackPart } from "@/config/types";
 import { getToolingCapability, isToolingOverlayOnly } from "@/capabilities/tooling-capabilities";
 
 export const RUBY_RECIPE_EXTENSION_REASON =
-  "The experimental Ruby recipe provides Sinatra, Rails, Roda, or Grape JSON HTTP, an optional SQLite ORM selected with rubyOrm, optional authentication selected with rubyAuth, Minitest, RSpec, or Test::Unit request tests selected with rubyTesting, request validation selected with rubyValidation, a Redis, Memcached, or in-process cache selected with rubyCache, Sidekiq, Resque, or Solid Queue background jobs selected with rubyJobQueue, Mail, Action Mailer, or Resend email selected with rubyEmail, and Ruby Logger, Semantic Logger, Ougai, or Lograge request logging selected with rubyLogging. Shared database, authentication, deployment, and other service adapters are not generated.";
+  "The experimental Ruby recipe provides Sinatra, Rails, Roda, or Grape JSON HTTP, an optional SQLite ORM selected with rubyOrm, optional authentication selected with rubyAuth, Minitest, RSpec, or Test::Unit request tests selected with rubyTesting, request validation selected with rubyValidation, a Redis, Memcached, or in-process cache selected with rubyCache, Sidekiq, Resque, or Solid Queue background jobs selected with rubyJobQueue, Mail, Action Mailer, or Resend email selected with rubyEmail, Ruby Logger, Semantic Logger, Ougai, or Lograge request logging selected with rubyLogging, and a Faraday, HTTParty, or HTTPX upstream client selected with rubyHttpClient. Shared database, authentication, deployment, and other service adapters are not generated.";
 export const RUBY_RECIPE_FRAMEWORK_REASON =
   "The Ruby HTTP recipe requires a web framework. Use rubyWebFramework=sinatra, rails, roda, or grape, or remove the Ruby backend.";
 
-export const RUBY_OWNED_ROLES = ["orm", "auth", "testing", "validation", "caching", "jobQueue", "email", "logging"] as const satisfies readonly StackPart["role"][];
+export const RUBY_OWNED_ROLES = ["orm", "auth", "testing", "validation", "caching", "jobQueue", "email", "logging", "httpClient"] as const satisfies readonly StackPart["role"][];
 
 export const RUBY_OPTION_CATEGORIES = [
   "rubyOrm",
@@ -18,6 +18,7 @@ export const RUBY_OPTION_CATEGORIES = [
   "rubyJobQueue",
   "rubyEmail",
   "rubyLogging",
+  "rubyHttpClient",
 ] as const satisfies readonly (keyof ProjectConfig)[];
 
 export function isRubyOwnedRole(role: StackPart["role"]): boolean {
@@ -251,6 +252,7 @@ export function createRubyProjectConfigDefaults(): Partial<ProjectConfig> {
       ["rubyJobQueue", "none"],
       ["rubyEmail", "none"],
       ["rubyLogging", "logger"],
+      ["rubyHttpClient", "none"],
     ]),
   );
 }

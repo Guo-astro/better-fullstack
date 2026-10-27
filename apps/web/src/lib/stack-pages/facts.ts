@@ -79,6 +79,7 @@ const CORE_KEYS_BY_ECOSYSTEM: Record<string, StackSelectionKey[]> = {
     "rubyJobQueue",
     "rubyEmail",
     "rubyLogging",
+    "rubyHttpClient",
   ],
   php: [
     "phpWebFramework",
@@ -158,6 +159,7 @@ const ROLE_LABELS: Partial<Record<OptionCategory, string>> = {
   rubyJobQueue: "Background Jobs",
   rubyEmail: "Email",
   rubyLogging: "Logging",
+  rubyHttpClient: "HTTP Client",
   phpWebFramework: "Backend",
   phpOrm: "ORM",
   phpAuth: "Authentication",

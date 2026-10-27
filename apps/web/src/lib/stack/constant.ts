@@ -6215,6 +6215,40 @@ export const TECH_OPTIONS: Record<
       color: "from-gray-400 to-gray-600",
     },
   ],
+  rubyHttpClient: [
+    {
+      id: "faraday",
+      name: "Faraday",
+      description: "Faraday connection with timeouts and error middleware behind GET /api/upstream",
+      icon: "https://cdn.simpleicons.org/ruby/CC342D",
+      color: "from-sky-500 to-blue-700",
+      isNew: true,
+    },
+    {
+      id: "httparty",
+      name: "HTTParty",
+      description: "HTTParty GET with open and read timeouts behind GET /api/upstream",
+      icon: "https://cdn.simpleicons.org/ruby/CC342D",
+      color: "from-pink-500 to-rose-700",
+      isNew: true,
+    },
+    {
+      id: "httpx",
+      name: "HTTPX",
+      description: "HTTPX session with connect and request timeouts behind GET /api/upstream",
+      icon: "https://cdn.simpleicons.org/ruby/CC342D",
+      color: "from-teal-500 to-emerald-700",
+      isNew: true,
+    },
+    {
+      id: "none",
+      name: "No HTTP client",
+      description: "Skip the upstream HTTP client",
+      icon: "",
+      color: "from-gray-400 to-gray-600",
+      default: true,
+    },
+  ],
   rubyAuth: [
     {
       id: "jwt",

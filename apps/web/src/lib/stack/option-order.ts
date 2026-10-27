@@ -116,6 +116,7 @@ export const OPTION_DISPLAY_ORDER: Readonly<Record<string, readonly string[]>> =
   rubyJobQueue: ["sidekiq", "resque", "solid-queue", "none"],
   rubyEmail: ["mail", "action-mailer", "resend", "none"],
   rubyLogging: ["logger", "semantic-logger", "ougai", "lograge", "none"],
+  rubyHttpClient: ["faraday", "httparty", "httpx", "none"],
   elixirQuality: ["credo", "dialyxir", "excoveralls", "sobelow", "mix_audit", "none"],
   elixirTesting: ["ex_unit", "ex_machina", "wallaby", "mox", "bypass", "stream_data", "none"],
   elixirValidation: ["nimble-options", "ecto-changesets", "peri", "tarams", "none"],

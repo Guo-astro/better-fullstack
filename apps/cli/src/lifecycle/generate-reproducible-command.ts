@@ -1322,6 +1322,7 @@ export function generateReproducibleCommand(config: ProjectConfig) {
         `--ruby-job-queue ${config.rubyJobQueue ?? "none"}`,
         `--ruby-email ${config.rubyEmail ?? "none"}`,
         `--ruby-logging ${config.rubyLogging ?? "logger"}`,
+        `--ruby-http-client ${config.rubyHttpClient ?? "none"}`,
         "--database none",
         "--addons none",
         "--examples none",

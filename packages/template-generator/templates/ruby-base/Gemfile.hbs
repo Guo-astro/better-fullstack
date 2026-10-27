@@ -88,6 +88,15 @@ gem "ougai", "2.1.0"
 {{#if (eq rubyLogging "lograge")}}
 gem "lograge", "0.15.1"
 {{/if}}
+{{#if (eq rubyHttpClient "faraday")}}
+gem "faraday", "2.15.1"
+{{/if}}
+{{#if (eq rubyHttpClient "httparty")}}
+gem "httparty", "0.24.3"
+{{/if}}
+{{#if (eq rubyHttpClient "httpx")}}
+gem "httpx", "1.9.0"
+{{/if}}
 gem "puma", "7.1.0"
 gem "rackup", "2.3.1"
 gem "rake", "13.3.1"

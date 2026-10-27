@@ -400,6 +400,7 @@ export const TELEMETRY_PROJECT_CONFIG_KEYS = [
   "rubyJobQueue",
   "rubyEmail",
   "rubyLogging",
+  "rubyHttpClient",
   "phpWebFramework",
   "phpOrm",
   "phpAuth",

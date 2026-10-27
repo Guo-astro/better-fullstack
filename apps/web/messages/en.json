@@ -613,6 +613,7 @@
   "docsCliSummaryRubyRubyJobQueue": "Ruby background job queue.",
   "docsCliSummaryRubyRubyEmail": "Ruby email delivery.",
   "docsCliSummaryRubyRubyLogging": "Ruby request logging.",
+  "docsCliSummaryRubyRubyHttpClient": "Ruby HTTP client.",
   "docsCliSummaryPhpPhpWebFramework": "PHP HTTP framework.",
   "docsCliSummaryPhpPhpOrm": "PHP ORM / database layer.",
   "docsCliSummaryPhpPhpAuth": "PHP authentication.",

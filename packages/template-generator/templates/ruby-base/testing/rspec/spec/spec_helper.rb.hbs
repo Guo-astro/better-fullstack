@@ -21,6 +21,12 @@ ENV["RESEND_API_KEY"] = "re_test_key"
 require "tmpdir"
 ENV["LOG_PATH"] = File.join(Dir.mktmpdir, "requests.log")
 {{/if}}
+{{#if (ne rubyHttpClient "none")}}
+
+require_relative "../support/http_capture"
+UPSTREAM = BetterFullstack::HttpCapture.new({ status: "ok" })
+ENV["UPSTREAM_URL"] = UPSTREAM.url.chomp("/")
+{{/if}}
 
 require "rack/test"
 require_relative "../app"

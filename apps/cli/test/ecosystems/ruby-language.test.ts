@@ -493,6 +493,26 @@ describe("Ruby language integration", () => {
     expect(content(result.tree, "Gemfile")).toContain('gem "logger", "1.7.0"');
   });
 
+it.each([
+  { client: "faraday", framework: "rails", marker: "Faraday.new(", gem: 'gem "faraday", "2.15.1"' },
+  { client: "httparty", framework: "sinatra", marker: "HTTParty.get(", gem: 'gem "httparty", "0.24.3"' },
+  { client: "httpx", framework: "grape", marker: "HTTPX.with(", gem: 'gem "httpx", "1.9.0"' },
+] as const)("calls the upstream API with $client", async ({ client, framework, marker, gem }) => {
+  const result = await createVirtual({ ecosystem: "ruby", rubyWebFramework: framework, rubyHttpClient: client });
+  if (!result.success || !result.tree) throw new Error(result.error ?? "No Ruby project");
+  const paths = listVirtualTreeFilePaths(result.tree);
+  expect(paths.some((path) => path.startsWith("http-client/"))).toBe(false);
+  expect(content(result.tree, "upstream.rb")).toContain(marker);
+  expect(content(result.tree, "upstream.rb")).toContain('ENV.fetch("UPSTREAM_URL", "http://127.0.0.1:4567")');
+  expect(content(result.tree, "app.rb")).toContain("Upstream.health");
+  expect(content(result.tree, "test/app_test.rb")).toContain("UPSTREAM.requests.pop");
+  expect(paths).toContain("support/http_capture.rb");
+  expect(content(result.tree, "Gemfile")).toContain(gem);
+  expect(
+    generateReproducibleCommand({ ...config(), rubyWebFramework: framework, rubyHttpClient: client }),
+  ).toContain(`--ruby-http-client ${client}`);
+});
+
   it("rejects Solid Queue outside Rails with Active Record", async () => {
     const result = await createVirtual({
       ecosystem: "ruby",

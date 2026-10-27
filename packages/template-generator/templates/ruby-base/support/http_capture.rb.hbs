@@ -1,4 +1,4 @@
-{{#if (eq rubyEmail "resend")}}
+{{#if (or (eq rubyEmail "resend") (ne rubyHttpClient "none"))}}
 require "json"
 require "socket"
 
@@ -29,7 +29,7 @@ module BetterFullstack
         headers[name.downcase] = value.strip
       end
       body = client.read(Integer(headers.fetch("content-length", "0"), 10))
-      @requests << { "request" => request_line, "authorization" => headers["authorization"], "body" => JSON.parse(body) }
+      @requests << { "request" => request_line, "authorization" => headers["authorization"], "body" => body.empty? ? nil : JSON.parse(body) }
       client.write("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: #{@response.bytesize}\r\nConnection: close\r\n\r\n#{@response}")
     ensure
       client.close

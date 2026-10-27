@@ -35,6 +35,9 @@ bundle exec ruby bin/server
 {{#if (ne rubyCache "none")}}
 - GET `/api/cache` returns `{"value":{"computed_at":"..."},"cached":false}` on a miss and the same value with `"cached":true` until the 30-second TTL expires{{#if (ne rubyCache "memory")}}, or 503 `cache_unavailable` when the cache server is unreachable{{/if}}.
 {{/if}}
+{{#if (ne rubyHttpClient "none")}}
+- GET `/api/upstream` returns the upstream `/health` JSON fetched with the HTTP client, or 502 when the upstream is unreachable.
+{{/if}}
 {{#if (ne rubyJobQueue "none")}}
 - POST `/api/jobs` accepts the greeting body, enqueues a job, and returns 202 with `{"id":"...","status":"queued"}`. GET `/api/jobs/:id` returns `queued` until a worker runs it, then `{"id":"...","status":"done","greeting":"Hello, Ruby!"}`.
 {{/if}}
@@ -84,6 +87,12 @@ The server binds to `127.0.0.1:{{rubyPort}}`. `HOST`, `PORT`, `RACK_ENV`, and `A
 ## Email
 
 `mailer.rb` sends a welcome message through {{#if (eq rubyEmail "mail")}}the mail gem over SMTP{{/if}}{{#if (eq rubyEmail "action-mailer")}}an Action Mailer class over SMTP{{/if}}{{#if (eq rubyEmail "resend")}}the Resend API{{/if}}. Send one with `bundle exec rake "email:welcome[you@example.com]"`. {{#if (eq rubyEmail "resend")}}Set `RESEND_API_KEY` and a `MAIL_FROM` address on a domain verified in Resend.{{else}}Set `SMTP_HOST`, `SMTP_PORT`, and optional `SMTP_USERNAME` and `SMTP_PASSWORD` (the default `127.0.0.1:1025` matches local capture tools such as Mailpit).{{/if}} No HTTP route sends email, so the service cannot be used to mail arbitrary addresses. Tests use {{#if (eq rubyEmail "resend")}}a local HTTP server in place of the Resend API{{else}}the library test delivery method{{/if}}, and `bin/proof` delivers a message to a local {{#if (eq rubyEmail "resend")}}HTTP{{else}}SMTP{{/if}} capture server.
+
+{{/if}}
+{{#if (ne rubyHttpClient "none")}}
+## Upstream HTTP client
+
+`upstream.rb` calls `GET {UPSTREAM_URL}/health` with {{#if (eq rubyHttpClient "faraday")}}a Faraday connection (2-second open and 5-second request timeouts, error-raising middleware){{/if}}{{#if (eq rubyHttpClient "httparty")}}HTTParty (2-second open and 5-second read timeouts){{/if}}{{#if (eq rubyHttpClient "httpx")}}an HTTPX session (2-second connect and 5-second request timeouts){{/if}}. `GET /api/upstream` returns `{"upstream":{...}}` with the parsed response, or 502 `upstream_unavailable` when the upstream fails or times out. `UPSTREAM_URL` defaults to this service (`http://127.0.0.1:{{rubyPort}}`), so the route works out of the box; point it at the API you depend on. The URL comes from the environment only, never from request input. Tests use a local HTTP server as the upstream, and `bin/proof` calls the running service through the client.
 
 {{/if}}
 {{#if (ne rubyLogging "none")}}

@@ -597,6 +597,7 @@
   "docsCliSummaryRubyRubyJobQueue": "Ruby のバックグラウンドジョブキュー。",
   "docsCliSummaryRubyRubyEmail": "Ruby のメール送信。",
   "docsCliSummaryRubyRubyLogging": "Ruby のリクエストログ。",
+  "docsCliSummaryRubyRubyHttpClient": "Ruby の HTTP クライアント。",
   "docsCliSummaryPhpPhpWebFramework": "PHP の HTTP フレームワーク。",
   "docsCliSummaryPhpPhpOrm": "PHP の ORM / データベース層。",
   "docsCliSummaryPhpPhpAuth": "PHP の認証。",

@@ -1177,6 +1177,12 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         source: { kind: "category", category: "rubyLogging" },
         configKey: "rubyLogging",
       },
+      {
+        flag: "ruby-http-client",
+        summary: "Ruby HTTP client.",
+        source: { kind: "category", category: "rubyHttpClient" },
+        configKey: "rubyHttpClient",
+      },
     ],
   },
   {

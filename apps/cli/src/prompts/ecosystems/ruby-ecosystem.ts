@@ -9,6 +9,7 @@ import type {
   RubyJobQueue,
   RubyEmail,
   RubyLogging,
+  RubyHttpClient,
   RubyWebFramework,
 } from "@/types";
 
@@ -245,6 +246,28 @@ export async function getRubyLoggingChoice(value?: RubyLogging, framework?: Ruby
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "logger";
   const response = await navigableSelect<RubyLogging>({
     message: "Select Ruby request logging",
+    options: resolution.options,
+    initialValue: resolution.initialValue,
+  });
+  if (isCancel(response)) return exitCancelled("Operation cancelled");
+  return response;
+}
+
+const HTTP_CLIENT_OPTIONS: PromptOption<RubyHttpClient>[] = [
+  { value: "faraday", label: "Faraday", hint: "Faraday connection with timeouts and error middleware" },
+  { value: "httparty", label: "HTTParty", hint: "HTTParty GET with open and read timeouts" },
+  { value: "httpx", label: "HTTPX", hint: "HTTPX session with connect and request timeouts" },
+  { value: "none", label: "None", hint: "No upstream HTTP client" },
+];
+
+export const resolveRubyHttpClientPrompt = (value?: RubyHttpClient) =>
+  createStaticSinglePromptResolution(HTTP_CLIENT_OPTIONS, "none", value);
+
+export async function getRubyHttpClientChoice(value?: RubyHttpClient) {
+  const resolution = resolveRubyHttpClientPrompt(value);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
+  const response = await navigableSelect<RubyHttpClient>({
+    message: "Select Ruby HTTP client",
     options: resolution.options,
     initialValue: resolution.initialValue,
   });

@@ -324,7 +324,7 @@ export const SECTIONS_BY_ECOSYSTEM: Record<Ecosystem, readonly BuilderSectionDef
     section("frameworkBuild", "Framework & Build", ["rubyWebFramework"]),
     section("data", "Data & Storage", ["rubyOrm", "rubyCache"]),
     section("services", "Auth & Services", ["rubyAuth", "rubyJobQueue", "rubyEmail"]),
-    section("libraries", "Libraries & Utilities", ["rubyValidation"]),
+    section("libraries", "Libraries & Utilities", ["rubyValidation", "rubyHttpClient"]),
     section("qualityTesting", "Quality & Testing", ["rubyTesting"]),
     section("observability", "Observability & Analytics", ["rubyLogging"]),
     section("deployScaffold", "Deploy & Scaffold", ["aiDocs", "git", "install"]),

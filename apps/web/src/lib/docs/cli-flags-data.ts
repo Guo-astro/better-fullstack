@@ -2591,6 +2591,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "logger",
         "multiple": false
+      },
+      {
+        "flag": "--ruby-http-client",
+        "summary": "Ruby HTTP client.",
+        "values": [
+          "faraday",
+          "httparty",
+          "httpx",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
       }
     ]
   },
@@ -3262,6 +3275,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "ruby:--ruby-job-queue": m.docsCliSummaryRubyRubyJobQueue,
   "ruby:--ruby-email": m.docsCliSummaryRubyRubyEmail,
   "ruby:--ruby-logging": m.docsCliSummaryRubyRubyLogging,
+  "ruby:--ruby-http-client": m.docsCliSummaryRubyRubyHttpClient,
   "php:--php-web-framework": m.docsCliSummaryPhpPhpWebFramework,
   "php:--php-orm": m.docsCliSummaryPhpPhpOrm,
   "php:--php-auth": m.docsCliSummaryPhpPhpAuth,

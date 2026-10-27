@@ -6,7 +6,7 @@ import { getGraphBackendConnections } from "@/graph/graph-backend";
 import { getGraphFrontendPorts } from "@/graph/graph-frontend";
 import { renderTemplateTree, type TemplateData } from "@/template-handlers/core/utils";
 
-const RUBY_VARIANT_DIRECTORIES = ["web", "orm", "auth", "testing", "validation", "cache", "jobs", "email", "logging"] as const;
+const RUBY_VARIANT_DIRECTORIES = ["web", "orm", "auth", "testing", "validation", "cache", "jobs", "email", "logging", "http-client"] as const;
 
 export async function processRubyBaseTemplate(
   vfs: VirtualFileSystem,
@@ -37,6 +37,7 @@ export async function processRubyBaseTemplate(
     rubyJobQueue: config.rubyJobQueue ?? "none",
     rubyEmail: config.rubyEmail ?? "none",
     rubyLogging: config.rubyLogging ?? "logger",
+    rubyHttpClient: config.rubyHttpClient ?? "none",
     rubyPort: connection ? new URL(connection.serverUrl).port : "4567",
     rubyWebOrigin,
   };
@@ -59,6 +60,7 @@ export async function processRubyBaseTemplate(
     jobs: context.rubyJobQueue,
     email: context.rubyEmail,
     logging: context.rubyLogging,
+    "http-client": context.rubyHttpClient,
   };
   for (const [directory, option] of Object.entries(variants)) {
     if (!option || option === "none") continue;

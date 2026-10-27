@@ -22,6 +22,12 @@ ENV["RESEND_API_KEY"] = "re_test_key"
 require "tmpdir"
 ENV["LOG_PATH"] = File.join(Dir.mktmpdir, "requests.log")
 {{/if}}
+{{#if (ne rubyHttpClient "none")}}
+
+require_relative "../support/http_capture"
+UPSTREAM = BetterFullstack::HttpCapture.new({ status: "ok" })
+ENV["UPSTREAM_URL"] = UPSTREAM.url.chomp("/")
+{{/if}}
 
 {{#if (eq rubyTesting "test-unit")}}
 require "test/unit"
@@ -83,6 +89,28 @@ class AppTest < {{#if (eq rubyTesting "test-unit")}}Test::Unit::TestCase{{else}}
     entries = lines.filter_map { |line| JSON.parse(line) if line.start_with?("{") }
     assert entries.any? { |entry| {{#if (eq rubyLogging "semantic-logger")}}entry.fetch("payload", {}){{else}}entry{{/if}}.values_at("method", "path", "status") == ["GET", "/health", 200] }
 {{/if}}
+  end
+
+{{/if}}
+{{#if (ne rubyHttpClient "none")}}
+  def test_upstream_health_is_fetched_with_the_http_client
+    get "/api/upstream"
+    assert_equal 200, last_response.status
+    assert_equal({ "upstream" => { "status" => "ok" } }, JSON.parse(last_response.body))
+    assert_equal "GET /health HTTP/1.1", UPSTREAM.requests.pop.fetch("request")
+  end
+
+  def test_unreachable_upstream_returns_502
+    closed = TCPServer.new("127.0.0.1", 0)
+    port = closed.addr[1]
+    closed.close
+    previous = ENV["UPSTREAM_URL"]
+    ENV["UPSTREAM_URL"] = "http://127.0.0.1:#{port}"
+    get "/api/upstream"
+    assert_equal({ "error" => "upstream_unavailable" }, JSON.parse(last_response.body))
+    assert_equal 502, last_response.status
+  ensure
+    ENV["UPSTREAM_URL"] = previous
   end
 
 {{/if}}

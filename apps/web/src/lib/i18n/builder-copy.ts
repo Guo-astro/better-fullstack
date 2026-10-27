@@ -813,6 +813,16 @@ const CATEGORY_NAMES: Record<string, LocalizedMap> = {
     "fr": "Journalisation Ruby",
     "uk": "Логування Ruby",
   },
+  rubyHttpClient: {
+    "es": "Cliente HTTP Ruby",
+    "zh": "Ruby HTTP 客户端",
+    "ja": "Ruby HTTP クライアント",
+    "ko": "Ruby HTTP 클라이언트",
+    "zh-Hant": "Ruby HTTP 用戶端",
+    "de": "Ruby-HTTP-Client",
+    "fr": "Client HTTP Ruby",
+    "uk": "HTTP-клієнт Ruby",
+  },
   rubyAuth: {
     "es": "Auth Ruby",
     "zh": "Ruby 认证",

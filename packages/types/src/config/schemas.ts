@@ -38,6 +38,10 @@ export const RubyLoggingSchema = z
   .enum(["logger", "semantic-logger", "ougai", "lograge", "none"])
   .describe("Ruby request logging");
 
+export const RubyHttpClientSchema = z
+  .enum(["faraday", "httparty", "httpx", "none"])
+  .describe("Ruby HTTP client");
+
 export const EcosystemSchema = z
   .enum([
     "typescript",
@@ -1536,6 +1540,7 @@ const STACK_CONFIG_FIELDS = {
   rubyJobQueue: RubyJobQueueSchema.optional(),
   rubyEmail: RubyEmailSchema.optional(),
   rubyLogging: RubyLoggingSchema.optional(),
+  rubyHttpClient: RubyHttpClientSchema.optional(),
   phpWebFramework: PhpWebFrameworkSchema.default("none"),
   phpOrm: PhpOrmSchema.default("none"),
   phpAuth: PhpAuthSchema.default("none"),
@@ -1898,3 +1903,4 @@ export const RUBY_CACHE_VALUES = RubyCacheSchema.options;
 export const RUBY_JOB_QUEUE_VALUES = RubyJobQueueSchema.options;
 export const RUBY_EMAIL_VALUES = RubyEmailSchema.options;
 export const RUBY_LOGGING_VALUES = RubyLoggingSchema.options;
+export const RUBY_HTTP_CLIENT_VALUES = RubyHttpClientSchema.options;

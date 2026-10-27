@@ -74,6 +74,7 @@ import type {
   RubyJobQueueSchema,
   RubyEmailSchema,
   RubyLoggingSchema,
+  RubyHttpClientSchema,
   EcosystemSchema,
   RustWebFrameworkSchema,
   RustFrontendSchema,
@@ -446,3 +447,4 @@ export type RubyCache = z.infer<typeof RubyCacheSchema>;
 export type RubyJobQueue = z.infer<typeof RubyJobQueueSchema>;
 export type RubyEmail = z.infer<typeof RubyEmailSchema>;
 export type RubyLogging = z.infer<typeof RubyLoggingSchema>;
+export type RubyHttpClient = z.infer<typeof RubyHttpClientSchema>;

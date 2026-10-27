@@ -338,6 +338,7 @@ export const CONFIG_SCOPE_REGISTRY = {
       "rubyJobQueue",
       "rubyEmail",
       "rubyLogging",
+      "rubyHttpClient",
     ],
     sections: [],
   },

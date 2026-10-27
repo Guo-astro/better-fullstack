@@ -164,6 +164,7 @@ import {
   getRubyJobQueueChoice,
   getRubyEmailChoice,
   getRubyLoggingChoice,
+  getRubyHttpClientChoice,
   getRubyWebFrameworkChoice,
 } from "@/prompts/ecosystems/ruby-ecosystem";
 import {
@@ -1520,6 +1521,10 @@ export async function gatherMultiEcosystemConfig(
       rubyWebFramework === "none"
         ? "none"
         : promptValue(await getRubyLoggingChoice(flags.rubyLogging, rubyWebFramework));
+    const rubyHttpClient =
+      rubyWebFramework === "none"
+        ? "none"
+        : promptValue(await getRubyHttpClientChoice(flags.rubyHttpClient));
     Object.assign(backendChoices, {
       rubyWebFramework,
       rubyOrm,
@@ -1530,6 +1535,7 @@ export async function gatherMultiEcosystemConfig(
       rubyJobQueue,
       rubyEmail,
       rubyLogging,
+      rubyHttpClient,
     });
     if (rubyWebFramework !== "none") stackPartSpecs.push(`backend:ruby:${rubyWebFramework}`);
     if (rubyOrm !== "none") stackPartSpecs.push(`backend.orm:ruby:${rubyOrm}`);
@@ -1541,6 +1547,8 @@ export async function gatherMultiEcosystemConfig(
     if (rubyJobQueue !== "none") stackPartSpecs.push(`backend.jobQueue:ruby:${rubyJobQueue}`);
     if (rubyEmail !== "none") stackPartSpecs.push(`backend.email:ruby:${rubyEmail}`);
     if (rubyLogging !== "none") stackPartSpecs.push(`backend.logging:ruby:${rubyLogging}`);
+    if (rubyHttpClient !== "none")
+      stackPartSpecs.push(`backend.httpClient:ruby:${rubyHttpClient}`);
   }
 
   if (backendEcosystem === "php") {

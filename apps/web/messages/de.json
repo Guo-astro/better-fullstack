@@ -597,6 +597,7 @@
   "docsCliSummaryRubyRubyJobQueue": "Ruby-Hintergrundjob-Warteschlange.",
   "docsCliSummaryRubyRubyEmail": "Ruby-E-Mail-Versand.",
   "docsCliSummaryRubyRubyLogging": "Ruby-Anfrageprotokollierung.",
+  "docsCliSummaryRubyRubyHttpClient": "Ruby-HTTP-Client.",
   "docsCliSummaryPhpPhpWebFramework": "PHP-HTTP-Framework.",
   "docsCliSummaryPhpPhpOrm": "PHP-ORM / Datenbankschicht.",
   "docsCliSummaryPhpPhpAuth": "PHP-Authentifizierung.",

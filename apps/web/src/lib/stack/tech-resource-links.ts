@@ -2515,6 +2515,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://github.com/roidrage/lograge#readme",
     githubUrl: "https://github.com/roidrage/lograge",
   },
+  "rubyHttpClient:faraday": {
+    docsUrl: "https://lostisland.github.io/faraday/",
+    githubUrl: "https://github.com/lostisland/faraday",
+  },
+  "rubyHttpClient:httparty": {
+    docsUrl: "https://github.com/jnunemaker/httparty#readme",
+    githubUrl: "https://github.com/jnunemaker/httparty",
+  },
+  "rubyHttpClient:httpx": {
+    docsUrl: "https://honeyryderchuck.gitlab.io/httpx/",
+    githubUrl: "https://gitlab.com/os85/httpx",
+  },
   "rubyAuth:jwt": {
     docsUrl: "https://github.com/jwt/ruby-jwt#readme",
     githubUrl: "https://github.com/jwt/ruby-jwt",

@@ -17,6 +17,9 @@ environment = { "HOST" => "127.0.0.1", "PORT" => port.to_s, "RACK_ENV" => "produ
 database = Tempfile.new(["proof", ".sqlite3"])
 environment["DATABASE_PATH"] = database.path
 {{/if}}
+{{#if (ne rubyHttpClient "none")}}
+environment["UPSTREAM_URL"] = "http://127.0.0.1:#{port}"
+{{/if}}
 {{#if (eq rubyAuth "jwt")}}
 environment["JWT_SECRET"] = SecureRandom.hex(32)
 {{/if}}
@@ -75,6 +78,10 @@ begin
   raise "Valid request failed" unless response.code == "200" && JSON.parse(response.body) == { "greeting" => "Hello, Ruby!" }
   response = http.post("/api/greetings", JSON.generate(name: " "), "Content-Type" => "application/json")
   raise "Invalid request was accepted" unless response.code == "422" && JSON.parse(response.body).fetch("error") == "name_length_must_be_1_to_80"
+{{#if (ne rubyHttpClient "none")}}
+  response = http.get("/api/upstream")
+  raise "Upstream call failed: #{response.body}" unless response.code == "200" && JSON.parse(response.body) == { "upstream" => { "status" => "ok", "service" => "{{rubyWebFramework}}" } }
+{{/if}}
 {{#if (ne rubyCache "none")}}
   first = http.get("/api/cache")
   raise "Cache read failed; start the cache server: #{first.body}" unless first.code == "200"
@@ -158,7 +165,7 @@ begin
     sleep 0.1
   end
 {{/if}}
-  puts JSON.generate(health: "passed", parsed_response: "passed", invalid_request: "passed", frontend_origins: "passed", empty_json: "passed"{{#if (ne rubyOrm "none")}}, persistence: "passed"{{/if}}{{#if (ne rubyAuth "none")}}, authentication: "passed"{{/if}}{{#if (ne rubyCache "none")}}, cache: "passed"{{/if}}{{#if (ne rubyJobQueue "none")}}, background_job: "passed"{{/if}}{{#if (ne rubyEmail "none")}}, email: "passed"{{/if}}{{#if (ne rubyLogging "none")}}, request_logging: "passed"{{/if}})
+  puts JSON.generate(health: "passed", parsed_response: "passed", invalid_request: "passed", frontend_origins: "passed", empty_json: "passed"{{#if (ne rubyOrm "none")}}, persistence: "passed"{{/if}}{{#if (ne rubyAuth "none")}}, authentication: "passed"{{/if}}{{#if (ne rubyCache "none")}}, cache: "passed"{{/if}}{{#if (ne rubyJobQueue "none")}}, background_job: "passed"{{/if}}{{#if (ne rubyEmail "none")}}, email: "passed"{{/if}}{{#if (ne rubyLogging "none")}}, request_logging: "passed"{{/if}}{{#if (ne rubyHttpClient "none")}}, upstream_http: "passed"{{/if}})
 rescue StandardError => error
   log.rewind
   warn log.read

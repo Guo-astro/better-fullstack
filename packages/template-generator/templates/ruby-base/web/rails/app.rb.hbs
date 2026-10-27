@@ -13,6 +13,9 @@ require_relative "cache"
 {{#if (ne rubyJobQueue "none")}}
 require_relative "jobs"
 {{/if}}
+{{#if (ne rubyHttpClient "none")}}
+require_relative "upstream"
+{{/if}}
 require_relative "http_policy"
 {{#if (ne rubyOrm "none")}}
 require_relative "items"
@@ -73,6 +76,13 @@ module BetterFullstack
       render json: body, status: status_code
     end
 {{/if}}
+{{#if (ne rubyHttpClient "none")}}
+
+    def upstream
+      status_code, body = Upstream.health
+      render json: body, status: status_code
+    end
+{{/if}}
 {{#if (ne rubyJobQueue "none")}}
 
     def create_job
@@ -122,6 +132,9 @@ module BetterFullstack
     post "api/greetings", to: "better_fullstack/api#greeting"
 {{#if (ne rubyCache "none")}}
     get "api/cache", to: "better_fullstack/api#cached_value"
+{{/if}}
+{{#if (ne rubyHttpClient "none")}}
+    get "api/upstream", to: "better_fullstack/api#upstream"
 {{/if}}
 {{#if (ne rubyJobQueue "none")}}
     post "api/jobs", to: "better_fullstack/api#create_job"

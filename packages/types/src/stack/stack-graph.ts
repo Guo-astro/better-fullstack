@@ -73,6 +73,7 @@ import {
   RUBY_JOB_QUEUE_VALUES,
   RUBY_EMAIL_VALUES,
   RUBY_LOGGING_VALUES,
+  RUBY_HTTP_CLIENT_VALUES,
   PHP_WEB_FRAMEWORK_VALUES,
   PHP_ORM_VALUES,
   PHP_AUTH_VALUES,
@@ -856,6 +857,7 @@ const LEGACY_EXTRA_CATEGORIES_BY_ECOSYSTEM = {
     jobQueue: "rubyJobQueue",
     email: "rubyEmail",
     logging: "rubyLogging",
+    httpClient: "rubyHttpClient",
   },
   php: {
     testing: "phpTesting",
@@ -1320,6 +1322,7 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ...defineTools(RUBY_JOB_QUEUE_VALUES, "jobQueue", "ruby", "rubyJobQueue"),
   ...defineTools(RUBY_EMAIL_VALUES, "email", "ruby", "rubyEmail"),
   ...defineTools(RUBY_LOGGING_VALUES, "logging", "ruby", "rubyLogging"),
+  ...defineTools(RUBY_HTTP_CLIENT_VALUES, "httpClient", "ruby", "rubyHttpClient"),
   ...defineTools(PHP_WEB_FRAMEWORK_VALUES, "backend", "php", "phpWebFramework").map(
     (definition) => ({
       ...definition,

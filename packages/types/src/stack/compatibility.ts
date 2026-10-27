@@ -596,6 +596,7 @@ export type CompatibilityInput = {
   rubyJobQueue: string;
   rubyEmail: string;
   rubyLogging: string;
+  rubyHttpClient: string;
   phpWebFramework: string;
   phpOrm: string;
   phpAuth: string;

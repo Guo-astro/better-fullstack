@@ -9,6 +9,9 @@ require_relative "cache"
 {{#if (ne rubyJobQueue "none")}}
 require_relative "jobs"
 {{/if}}
+{{#if (ne rubyHttpClient "none")}}
+require_relative "upstream"
+{{/if}}
 require_relative "http_policy"
 {{#if (ne rubyOrm "none")}}
 require_relative "items"
@@ -44,6 +47,14 @@ module BetterFullstack
 
     get "/api/cache" do
       status_code, body = Cache.demo
+      status status_code
+      body
+    end
+{{/if}}
+{{#if (ne rubyHttpClient "none")}}
+
+    get "/api/upstream" do
+      status_code, body = Upstream.health
       status status_code
       body
     end

@@ -1032,6 +1032,7 @@ const GRAPH_BACKEND_ADVANCED_CATEGORY_ORDER_BY_ECOSYSTEM = {
     "rubyJobQueue",
     "rubyEmail",
     "rubyLogging",
+    "rubyHttpClient",
   ],
   php: [],
   elixir: [

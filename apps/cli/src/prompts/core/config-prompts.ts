@@ -64,6 +64,7 @@ import type {
   RubyJobQueue,
   RubyEmail,
   RubyLogging,
+  RubyHttpClient,
   PhpWebFramework,
   PhpOrm,
   PhpAuth,
@@ -355,6 +356,7 @@ import {
   getRubyJobQueueChoice,
   getRubyEmailChoice,
   getRubyLoggingChoice,
+  getRubyHttpClientChoice,
   getRubyWebFrameworkChoice,
 } from "@/prompts/ecosystems/ruby-ecosystem";
 import {
@@ -555,6 +557,7 @@ type PromptGroupResults = {
   rubyJobQueue: RubyJobQueue;
   rubyEmail: RubyEmail;
   rubyLogging: RubyLogging;
+  rubyHttpClient: RubyHttpClient;
   phpWebFramework: PhpWebFramework;
   phpOrm: PhpOrm;
   phpAuth: PhpAuth;
@@ -767,6 +770,7 @@ const CONFIG_PROMPT_ENTRY_KEY_MAP = {
   rubyJobQueue: true,
   rubyEmail: true,
   rubyLogging: true,
+  rubyHttpClient: true,
   phpWebFramework: true,
   phpOrm: true,
   phpAuth: true,
@@ -1022,7 +1026,8 @@ function scopedPrompt<K extends PromptGroupKey>(
         key === "rubyCache" ||
         key === "rubyJobQueue" ||
         key === "rubyEmail" ||
-        key === "rubyLogging") &&
+        key === "rubyLogging" ||
+        key === "rubyHttpClient") &&
       opts.results.ecosystem !== "ruby"
     )
       return Promise.resolve("none" as PromptGroupResults[K]);
@@ -1039,6 +1044,7 @@ function scopedPrompt<K extends PromptGroupKey>(
         "rubyJobQueue",
         "rubyEmail",
         "rubyLogging",
+        "rubyHttpClient",
         "aiDocs",
         "git",
         "install",
@@ -2035,6 +2041,10 @@ export async function gatherConfig(
       results.ecosystem === "ruby"
         ? getRubyLoggingChoice(flags.rubyLogging, results.rubyWebFramework)
         : Promise.resolve("none" as const),
+    rubyHttpClient: ({ results }) =>
+      results.ecosystem === "ruby"
+        ? getRubyHttpClientChoice(flags.rubyHttpClient)
+        : Promise.resolve("none" as const),
     phpWebFramework: ({ results }) =>
       results.ecosystem === "php"
         ? getPhpWebFrameworkChoice(flags.phpWebFramework)
@@ -2376,6 +2386,7 @@ export async function gatherConfig(
     rubyJobQueue: result.rubyJobQueue,
     rubyEmail: result.rubyEmail,
     rubyLogging: result.rubyLogging,
+    rubyHttpClient: result.rubyHttpClient,
     phpWebFramework: result.phpWebFramework,
     phpOrm: result.phpOrm,
     phpAuth: result.phpAuth,

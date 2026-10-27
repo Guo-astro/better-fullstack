@@ -127,6 +127,7 @@ import {
   resolveRubyJobQueuePrompt,
   resolveRubyEmailPrompt,
   resolveRubyLoggingPrompt,
+  resolveRubyHttpClientPrompt,
   resolveRubyWebFrameworkPrompt,
 } from "@/prompts/ecosystems/ruby-ecosystem";
 import {
@@ -210,6 +211,7 @@ import {
   RUBY_JOB_QUEUE_VALUES,
   RUBY_EMAIL_VALUES,
   RUBY_LOGGING_VALUES,
+  RUBY_HTTP_CLIENT_VALUES,
   RubyAuthSchema,
   RubyOrmSchema,
   RubyTestingSchema,
@@ -218,6 +220,7 @@ import {
   RubyJobQueueSchema,
   RubyEmailSchema,
   RubyLoggingSchema,
+  RubyHttpClientSchema,
   RubyWebFrameworkSchema,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   EMAIL_VALUES,
@@ -939,6 +942,12 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
         value === undefined ? undefined : RubyLoggingSchema.parse(value),
         rubyWebFramework === undefined ? undefined : RubyWebFrameworkSchema.parse(rubyWebFramework),
       ),
+  },
+  rubyHttpClient: {
+    schemaValues: RUBY_HTTP_CLIENT_VALUES,
+    resolve: ({ value }: { value?: string } = {}) =>
+      resolveRubyHttpClientPrompt(value === undefined ? undefined : RubyHttpClientSchema.parse(value)),
+    coverageContexts: [{}],
   },
   phpWebFramework: {
     schemaValues: PhpWebFrameworkSchema.options,

@@ -46,6 +46,30 @@ RSpec.describe BetterFullstack::App do
 {{/if}}
   end
 {{/if}}
+{{#if (ne rubyHttpClient "none")}}
+
+  describe "upstream HTTP client" do
+    it "fetches the upstream health" do
+      get "/api/upstream"
+      expect(last_response.status).to eq(200)
+      expect(body).to eq("upstream" => { "status" => "ok" })
+      expect(UPSTREAM.requests.pop.fetch("request")).to eq("GET /health HTTP/1.1")
+    end
+
+    it "returns 502 when the upstream is unreachable" do
+      closed = TCPServer.new("127.0.0.1", 0)
+      port = closed.addr[1]
+      closed.close
+      previous = ENV["UPSTREAM_URL"]
+      ENV["UPSTREAM_URL"] = "http://127.0.0.1:#{port}"
+      get "/api/upstream"
+      expect(last_response.status).to eq(502)
+      expect(body).to eq("error" => "upstream_unavailable")
+    ensure
+      ENV["UPSTREAM_URL"] = previous
+    end
+  end
+{{/if}}
 
   it "rejects invalid request shapes" do
     [nil, [], {}, { "name" => 2 }, { "name" => " " }, { "name" => "a" * 81 }, { "name" => "Ruby", "admin" => true }].each do |value|
