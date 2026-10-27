@@ -1772,6 +1772,14 @@ describe("compatibility issue helpers", () => {
     const withGettext = analyzeStackCompatibility({ ...plainElixir, elixirI18n: "gettext" });
     expect(withGettext.adjustedStack?.elixirI18n).toBe("none");
 
+    const withLogster = analyzeStackCompatibility({ ...plainElixir, elixirLogging: "logster" });
+    expect(withLogster.adjustedStack?.elixirLogging).toBe("none");
+    const withLoggerJson = analyzeStackCompatibility({
+      ...plainElixir,
+      elixirLogging: "logger-json",
+    });
+    expect(withLoggerJson.adjustedStack?.elixirLogging ?? "logger-json").toBe("logger-json");
+
     const withLinguist = analyzeStackCompatibility({ ...plainElixir, elixirI18n: "linguist" });
     expect(withLinguist.adjustedStack?.elixirI18n ?? "linguist").toBe("linguist");
     expect(withLinguist.changes).not.toContainEqual(
@@ -1816,6 +1824,12 @@ describe("compatibility issue helpers", () => {
     );
     expect(getDisabledReason(plainElixir, "elixirI18n", "linguist")).toBeNull();
     expect(getDisabledReason(plainElixir, "elixirI18n", "ex-cldr-messages")).toBeNull();
+    expect(getDisabledReason(plainElixir, "elixirLogging", "logster")).toBe(
+      "Logster request logging requires Phoenix",
+    );
+    expect(getDisabledReason(plainElixir, "elixirLogging", "logger-json")).toBeNull();
+    expect(getDisabledReason(plainElixir, "elixirLogging", "logger-file-backend")).toBeNull();
+    expect(getDisabledReason(phoenixBase, "elixirLogging", "logster")).toBeNull();
     expect(getDisabledReason(plainElixir, "elixirHttpServer", "bandit")).toBe(
       "HTTP server adapters require Phoenix",
     );

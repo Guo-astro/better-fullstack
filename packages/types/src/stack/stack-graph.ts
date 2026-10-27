@@ -189,6 +189,7 @@ import {
   ELIXIR_APPLICATION_FRAMEWORK_VALUES,
   ELIXIR_DOCUMENTATION_VALUES,
   ELIXIR_CLUSTERING_VALUES,
+  ELIXIR_LOGGING_VALUES,
   StackPartRoleSchema,
   STATE_MANAGEMENT_VALUES,
   TESTING_VALUES,
@@ -347,6 +348,9 @@ const ELIXIR_PHOENIX_REQUIRED_ROLE_MESSAGES: Partial<Record<StackPartRole, strin
   runtime: "HTTP server adapters require Phoenix",
 };
 const ELIXIR_STANDALONE_I18N_TOOLS = new Set(["linguist", "ex-cldr-messages"]);
+const ELIXIR_PHOENIX_REQUIRED_TOOL_MESSAGES: Record<string, string> = {
+  logster: "Logster request logging requires Phoenix",
+};
 const ELIXIR_UNSUPPORTED_GRAPH_TOOL_MESSAGES: Record<string, string> = {};
 export const ELIXIR_UNSUPPORTED_GRAPH_TOOLS = new Set(
   Object.keys(ELIXIR_UNSUPPORTED_GRAPH_TOOL_MESSAGES),
@@ -831,6 +835,7 @@ const LEGACY_EXTRA_CATEGORIES_BY_ECOSYSTEM = {
     libraries: "elixirApplicationFramework",
     documentation: "elixirDocumentation",
     config: "elixirClustering",
+    logging: "elixirLogging",
     deploy: "elixirDeploy",
   },
 } as const satisfies Record<
@@ -1307,6 +1312,7 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
     ownerless: true,
   }),
   ...defineTools(ELIXIR_CLUSTERING_VALUES, "config", "elixir", "elixirClustering"),
+  ...defineTools(ELIXIR_LOGGING_VALUES, "logging", "elixir", "elixirLogging"),
   ...defineTools(ELIXIR_DEPLOY_VALUES, "deploy", "elixir", "elixirDeploy"),
   {
     toolId: "convex",
@@ -3399,6 +3405,16 @@ function getStackPartCompatibilityIssue(
         role: part.role,
         toolId: part.toolId,
         message: phoenixRequiredMessage,
+      });
+    }
+    const phoenixRequiredToolMessage = ELIXIR_PHOENIX_REQUIRED_TOOL_MESSAGES[part.toolId];
+    if (phoenixRequiredToolMessage) {
+      return createStackGraphIssue({
+        code: "MISSING_OWNER_PART",
+        partId: part.id,
+        role: part.role,
+        toolId: part.toolId,
+        message: phoenixRequiredToolMessage,
       });
     }
 

@@ -1152,6 +1152,10 @@ export const ElixirClusteringSchema = z
   .enum(["libcluster", "dns-cluster", "distributed-erlang", "none"])
   .describe("Elixir clustering library");
 
+export const ElixirLoggingSchema = z
+  .enum(["logger-json", "logger-file-backend", "logster", "none"])
+  .describe("Elixir structured logging or log backend");
+
 export const ElixirDeploySchema = z
   .enum(["docker", "fly", "gigalixir", "mix-release", "none"])
   .describe("Elixir deployment target");
@@ -1479,6 +1483,7 @@ const STACK_CONFIG_FIELDS = {
   elixirApplicationFramework: ElixirApplicationFrameworkSchema,
   elixirDocumentation: ElixirDocumentationSchema,
   elixirClustering: ElixirClusteringSchema,
+  elixirLogging: ElixirLoggingSchema,
   elixirDeploy: ElixirDeploySchema,
   elixirLibraries: z.array(ElixirLibrariesSchema).describe("Elixir libraries"),
   // AI documentation files
@@ -1774,6 +1779,7 @@ export const ELIXIR_HTTP_SERVER_VALUES = ElixirHttpServerSchema.options;
 export const ELIXIR_APPLICATION_FRAMEWORK_VALUES = ElixirApplicationFrameworkSchema.options;
 export const ELIXIR_DOCUMENTATION_VALUES = ElixirDocumentationSchema.options;
 export const ELIXIR_CLUSTERING_VALUES = ElixirClusteringSchema.options;
+export const ELIXIR_LOGGING_VALUES = ElixirLoggingSchema.options;
 export const ELIXIR_DEPLOY_VALUES = ElixirDeploySchema.options;
 export const AI_DOCS_VALUES = AiDocsSchema.options;
 export const SHADCN_BASE_VALUES = ShadcnBaseSchema.options;

@@ -3,6 +3,10 @@ defmodule {{elixirModuleName}}.Application do
 
   @impl true
   def start(_type, _args) do
+{{#if (eq elixirLogging "logger-file-backend")}}
+    LoggerBackends.add({LoggerFileBackend, :file_log})
+
+{{/if}}
 {{#if (and (eq elixirObservability "opentelemetry") (ne elixirWebFramework "none"))}}
 {{#if (eq elixirHttpServer "bandit")}}
     OpentelemetryBandit.setup()

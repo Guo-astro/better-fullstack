@@ -1314,6 +1314,12 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         configKey: "elixirClustering",
       },
       {
+        flag: "elixir-logging",
+        summary: "Elixir logging.",
+        source: { kind: "category", category: "elixirLogging" },
+        configKey: "elixirLogging",
+      },
+      {
         flag: "elixir-deploy",
         summary: "Elixir deploy target.",
         source: { kind: "category", category: "elixirDeploy" },

@@ -16,6 +16,7 @@ import type {
   ElixirApplicationFramework,
   ElixirDocumentation,
   ElixirClustering,
+  ElixirLogging,
   ElixirRealtime,
   ElixirTesting,
   ElixirValidation,
@@ -29,6 +30,7 @@ import {
   createStaticSinglePromptResolution,
   type PromptOption,
 } from "@/prompts/core/prompt-contract";
+import { ElixirLoggingSchema } from "@/types";
 
 function makeChoice<T extends string>(
   message: string,
@@ -224,6 +226,17 @@ const CLUSTERING_OPTIONS: PromptOption<ElixirClustering>[] = [
   { value: "none", label: "None", hint: "No cluster topology" },
 ];
 
+const LOGGING_OPTIONS: PromptOption<ElixirLogging>[] = [
+  { value: "logger-json", label: "LoggerJSON", hint: "Structured JSON log lines from Logger" },
+  {
+    value: "logger-file-backend",
+    label: "LoggerFileBackend",
+    hint: "Write Logger output to a rotating file",
+  },
+  { value: "logster", label: "Logster", hint: "One logfmt line per Phoenix request" },
+  { value: "none", label: "None", hint: "Default console Logger" },
+];
+
 const DEPLOY_OPTIONS: PromptOption<ElixirDeploy>[] = [
   { value: "docker", label: "Docker", hint: "Dockerfile for Phoenix releases" },
   { value: "fly", label: "Fly.io", hint: "Fly.io release config" },
@@ -270,6 +283,12 @@ export const resolveElixirDocumentationPrompt = (value?: ElixirDocumentation) =>
   createStaticSinglePromptResolution(DOCUMENTATION_OPTIONS, "none", value);
 export const resolveElixirClusteringPrompt = (value?: ElixirClustering) =>
   createStaticSinglePromptResolution(CLUSTERING_OPTIONS, "none", value);
+export const resolveElixirLoggingPrompt = (value?: string) =>
+  createStaticSinglePromptResolution(
+    LOGGING_OPTIONS,
+    "none",
+    ElixirLoggingSchema.optional().parse(value),
+  );
 export const resolveElixirDeployPrompt = (value?: ElixirDeploy) =>
   createStaticSinglePromptResolution(DEPLOY_OPTIONS, "none", value);
 export const getElixirWebFrameworkChoice = (value?: ElixirWebFramework) =>
@@ -310,6 +329,8 @@ export const getElixirDocumentationChoice = (value?: ElixirDocumentation) =>
   makeChoice("Select Elixir documentation", DOCUMENTATION_OPTIONS, "none", value);
 export const getElixirClusteringChoice = (value?: ElixirClustering) =>
   makeChoice("Select Elixir clustering", CLUSTERING_OPTIONS, "none", value);
+export const getElixirLoggingChoice = (value?: ElixirLogging) =>
+  makeChoice("Select Elixir logging", LOGGING_OPTIONS, "none", value);
 export const getElixirDeployChoice = (value?: ElixirDeploy) =>
   makeChoice("Select Elixir deploy target", DEPLOY_OPTIONS, "none", value);
 

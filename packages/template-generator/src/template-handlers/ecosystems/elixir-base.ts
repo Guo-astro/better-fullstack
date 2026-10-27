@@ -46,6 +46,7 @@ export async function processElixirBaseTemplate(
   const hasMox = config.elixirTesting === "mox";
   const hasBypass = config.elixirTesting === "bypass";
   const hasWallaby = hasPhoenix && config.elixirTesting === "wallaby";
+  const hasLogging = config.elixirLogging !== "none";
 
   renderTemplateTree(vfs, templates, {
     prefix,
@@ -97,6 +98,7 @@ export async function processElixirBaseTemplate(
       if (!hasClusterModule && /\/cluster(_test)?\.exs?(\.hbs)?$/.test(templatePath)) return true;
       if (!hasI18nModule && /\/i18n(_test)?\.exs?(\.hbs)?$/.test(templatePath)) return true;
       if (!hasJiffy && /\/json(_test)?\.exs?(\.hbs)?$/.test(templatePath)) return true;
+      if (!hasLogging && templatePath.includes("/logging_test.exs")) return true;
       return false;
     },
     outputPath: (relativePath) =>

@@ -253,6 +253,9 @@ export function displayConfig(config: Partial<ProjectConfig>) {
     if (config.elixirClustering && config.elixirClustering !== "none") {
       configDisplay.push(`${pc.blue("Elixir Clustering:")} ${String(config.elixirClustering)}`);
     }
+    if (config.elixirLogging && config.elixirLogging !== "none") {
+      configDisplay.push(`${pc.blue("Elixir Logging:")} ${String(config.elixirLogging)}`);
+    }
     if (config.elixirDeploy && config.elixirDeploy !== "none") {
       configDisplay.push(`${pc.blue("Elixir Deploy:")} ${String(config.elixirDeploy)}`);
     }

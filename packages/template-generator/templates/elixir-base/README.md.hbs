@@ -27,6 +27,9 @@ This project was created with [Better Fullstack](https://github.com/Marve10s/Bet
 {{#if (ne elixirTesting "none")}}
 - Testing: {{elixirTesting}}
 {{/if}}
+{{#if (ne elixirLogging "none")}}
+- Logging: {{elixirLogging}}
+{{/if}}
 
 ## Setup
 
@@ -136,6 +139,23 @@ do not provision machines or certify a hosted deployment.
 Exq stores jobs in Redis. Start Redis and set `REDIS_URL` (default `redis://localhost:6379`)
 before `mix phx.server` or `iex -S mix`. Enqueue the sample job with
 `{{elixirModuleName}}.Workers.SampleWorker.enqueue("Ada")`. Tests use `Exq.Mock` and need no Redis.
+{{/if}}
+
+{{#if (ne elixirLogging "none")}}
+## Logging
+
+{{#if (eq elixirLogging "logger-json")}}
+LoggerJSON formats every `Logger` call as one JSON object per line, including `request_id`
+metadata. Run `mix run -e 'require Logger; Logger.info("hello")'` to see the output.
+{{/if}}
+{{#if (eq elixirLogging "logger-file-backend")}}
+LoggerFileBackend appends `info` and higher log lines to `log/{{elixirAppName}}.log`, alongside the
+console output. Change the path or level under `config :logger, :file_log`.
+{{/if}}
+{{#if (eq elixirLogging "logster")}}
+Logster replaces Phoenix's request log with one logfmt line per request, for example
+`method=GET path=/api/health status=200 duration=0.412`.
+{{/if}}
 {{/if}}
 
 {{#if (eq elixirObservability "prom_ex")}}

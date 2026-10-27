@@ -942,6 +942,15 @@ function appendGraphExtraFlags(flags: string[], config: ProjectConfig) {
     appendChangedGraphStringFlag(
       flags,
       config,
+      "logging",
+      "elixir",
+      "elixir-logging",
+      config.elixirLogging,
+      "none",
+    );
+    appendChangedGraphStringFlag(
+      flags,
+      config,
       "deploy",
       "elixir",
       "elixir-deploy",
@@ -1211,6 +1220,7 @@ function getElixirFlags(config: ProjectConfig) {
   flags.push(`--elixir-application-framework ${config.elixirApplicationFramework}`);
   flags.push(`--elixir-documentation ${config.elixirDocumentation}`);
   flags.push(`--elixir-clustering ${config.elixirClustering}`);
+  flags.push(`--elixir-logging ${config.elixirLogging}`);
   flags.push(`--elixir-deploy ${config.elixirDeploy}`);
   flags.push(formatArrayFlag("elixir-libraries", config.elixirLibraries));
 

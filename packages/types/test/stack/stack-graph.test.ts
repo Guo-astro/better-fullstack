@@ -41,6 +41,7 @@ import {
   ELIXIR_APPLICATION_FRAMEWORK_VALUES,
   ELIXIR_DOCUMENTATION_VALUES,
   ELIXIR_CLUSTERING_VALUES,
+  ELIXIR_LOGGING_VALUES,
   ELIXIR_REALTIME_VALUES,
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
@@ -2253,6 +2254,7 @@ describe("stack graph structural round-trip (phase 0)", () => {
           elixirApplicationFramework: ELIXIR_APPLICATION_FRAMEWORK_VALUES,
           elixirDocumentation: ELIXIR_DOCUMENTATION_VALUES,
           elixirClustering: ELIXIR_CLUSTERING_VALUES,
+          elixirLogging: ELIXIR_LOGGING_VALUES,
           elixirDeploy: ELIXIR_DEPLOY_VALUES,
         },
         arrays: {
@@ -2308,6 +2310,7 @@ describe("stack graph structural round-trip (phase 0)", () => {
       "elixirApplicationFramework",
       "elixirDocumentation",
       "elixirClustering",
+      "elixirLogging",
       "elixirDeploy",
     ]);
 

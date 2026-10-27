@@ -23,7 +23,9 @@ import {
 } from "@test/support/virtual-tree-utils";
 import { describe, expect, it } from "bun:test";
 
+import { validateFullConfig } from "@/config/config-validation";
 import { createVirtual } from "@/index";
+import { runWithContext } from "@/presentation/context";
 
 const base = {
   ecosystem: "elixir" as const,
@@ -953,4 +955,65 @@ describe("Elixir library expansion", () => {
       expect(mix.includes('{:phoenix_live_view, "~> 1.0"}')).toBe(hasHeex);
     },
   );
+
+  it.each([
+    ["logger-json", "none", '{:logger_json, "~> 7.0"}', "LoggerJSON.Formatters.Basic"],
+    [
+      "logger-file-backend",
+      "none",
+      '{:logger_file_backend, "~> 0.1"}',
+      "config :logger, :file_log",
+    ],
+    ["logster", "phoenix", '{:logster, "~> 1.1"}', "config :phoenix, :logger, false"],
+  ] as const)(
+    "wires %s logging into config with a generated test",
+    async (elixirLogging, elixirWebFramework, dependency, configLine) => {
+      const hasPhoenix = elixirWebFramework !== "none";
+      const result = await createVirtual({
+        ...base,
+        projectName: "elixir-logging",
+        elixirWebFramework,
+        elixirRealtime: "none",
+        elixirOrm: "none",
+        elixirAuth: "none",
+        elixirApi: hasPhoenix ? "rest" : "none",
+        elixirHttpServer: hasPhoenix ? "bandit" : "none",
+        elixirI18n: "none",
+        elixirLogging,
+      });
+
+      expect(result.success).toBe(true);
+      const tree = result.tree!;
+      expect(getVirtualTreeFileContent(tree, "mix.exs")).toContain(dependency);
+      expect(getVirtualTreeFileContent(tree, "config/config.exs")).toContain(configLine);
+      expect(hasVirtualFile(tree.root, "test/elixir_logging/logging_test.exs")).toBe(true);
+      expect(
+        getVirtualTreeFileContent(tree, "lib/elixir_logging/application.ex")?.includes(
+          "LoggerBackends.add({LoggerFileBackend, :file_log})",
+        ),
+      ).toBe(elixirLogging === "logger-file-backend");
+      expect(
+        getVirtualTreeFileContent(tree, "lib/elixir_logging_web/endpoint.ex")?.includes(
+          "plug Logster.Plugs.Logger",
+        ) ?? false,
+      ).toBe(elixirLogging === "logster");
+    },
+  );
+
+  it("rejects Logster without Phoenix", () => {
+    const input = {
+      ecosystem: "elixir" as const,
+      elixirWebFramework: "none" as const,
+      elixirLogging: "logster" as const,
+    };
+    expect(() =>
+      runWithContext({ silent: true }, () =>
+        validateFullConfig(
+          input,
+          new Set(["ecosystem", "elixirWebFramework", "elixirLogging"]),
+          {} as never,
+        ),
+      ),
+    ).toThrow("Logster request logging requires Phoenix");
+  });
 });

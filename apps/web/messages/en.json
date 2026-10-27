@@ -633,6 +633,7 @@
   "docsCliSummaryElixirElixirApplicationFramework": "Elixir application framework.",
   "docsCliSummaryElixirElixirDocumentation": "Elixir documentation.",
   "docsCliSummaryElixirElixirClustering": "Elixir clustering.",
+  "docsCliSummaryElixirElixirLogging": "Elixir logging.",
   "docsCliSummaryElixirElixirDeploy": "Elixir deploy target.",
   "docsCliSummaryElixirElixirLibraries": "Elixir libraries.",
   "docsSectionStart": "Start",

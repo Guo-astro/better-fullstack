@@ -123,7 +123,7 @@ defmodule {{elixirModuleName}}.MixProject do
 {{#if (eq elixirHttp "tesla")}}
       {:tesla, "~> 1.20"},
 {{/if}}
-{{#if (or (ne elixirWebFramework "none") (eq elixirJson "jason"))}}
+{{#if (or (ne elixirWebFramework "none") (eq elixirJson "jason") (and (eq elixirLogging "logger-json") (ne elixirJson "elixir-json")))}}
       {:jason, "~> 1.4"},
 {{/if}}
 {{#if (eq elixirJson "jiffy")}}
@@ -221,6 +221,16 @@ defmodule {{elixirModuleName}}.MixProject do
 {{/if}}
 {{#if (eq elixirClustering "dns-cluster")}}
       {:dns_cluster, "~> 0.3"},
+{{/if}}
+{{#if (eq elixirLogging "logger-json")}}
+      {:logger_json, "~> 7.0"},
+{{/if}}
+{{#if (eq elixirLogging "logger-file-backend")}}
+      {:logger_file_backend, "~> 0.1"},
+      {:logger_backends, "~> 1.0"},
+{{/if}}
+{{#if (eq elixirLogging "logster")}}
+      {:logster, "~> 1.1"},
 {{/if}}
 {{#if (includes elixirLibraries "ex_aws")}}
       {:ex_aws, "~> 2.7"},

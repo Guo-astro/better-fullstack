@@ -6934,6 +6934,40 @@ export const TECH_OPTIONS: Record<
       default: true,
     },
   ],
+  elixirLogging: [
+    {
+      id: "logger-json",
+      name: "LoggerJSON",
+      description: "Structured JSON log lines from Logger",
+      icon: "",
+      color: "from-sky-500 to-blue-600",
+      isNew: true,
+    },
+    {
+      id: "logger-file-backend",
+      name: "LoggerFileBackend",
+      description: "Append Logger output to a log file",
+      icon: "",
+      color: "from-amber-500 to-orange-600",
+      isNew: true,
+    },
+    {
+      id: "logster",
+      name: "Logster",
+      description: "One logfmt line per Phoenix request",
+      icon: "",
+      color: "from-emerald-500 to-teal-600",
+      isNew: true,
+    },
+    {
+      id: "none",
+      name: "Default Logger",
+      description: "Keep the built-in console Logger",
+      icon: "",
+      color: "from-gray-400 to-gray-600",
+      default: true,
+    },
+  ],
   elixirDeploy: [
     {
       id: "docker",

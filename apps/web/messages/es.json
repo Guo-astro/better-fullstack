@@ -617,6 +617,7 @@
   "docsCliSummaryElixirElixirApplicationFramework": "Framework de aplicaciones Elixir.",
   "docsCliSummaryElixirElixirDocumentation": "Documentación de Elixir.",
   "docsCliSummaryElixirElixirClustering": "Clustering en Elixir.",
+  "docsCliSummaryElixirElixirLogging": "Registro de logs en Elixir.",
   "docsCliSummaryElixirElixirDeploy": "Destino de despliegue Elixir.",
   "docsCliSummaryElixirElixirLibraries": "Bibliotecas Elixir.",
   "docsSectionStart": "Empezar",

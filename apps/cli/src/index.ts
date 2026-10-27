@@ -277,6 +277,7 @@ export async function createVirtual(
       elixirApplicationFramework: options.elixirApplicationFramework || "none",
       elixirDocumentation: options.elixirDocumentation || "none",
       elixirClustering: options.elixirClustering || "none",
+      elixirLogging: options.elixirLogging || "none",
       elixirDeploy: options.elixirDeploy || "none",
       elixirLibraries: options.elixirLibraries || [],
       // AI documentation files (canonical default ships both CLAUDE.md + AGENTS.md)

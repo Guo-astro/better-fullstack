@@ -40,6 +40,7 @@ import {
   ELIXIR_APPLICATION_FRAMEWORK_VALUES,
   ELIXIR_DOCUMENTATION_VALUES,
   ELIXIR_CLUSTERING_VALUES,
+  ELIXIR_LOGGING_VALUES,
   ELIXIR_REALTIME_VALUES,
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
@@ -462,6 +463,7 @@ export const ELIXIR_CATEGORY_ORDER = [
   "elixirApplicationFramework",
   "elixirDocumentation",
   "elixirClustering",
+  "elixirLogging",
   "elixirDeploy",
   "elixirLibraries",
   "aiDocs",
@@ -959,6 +961,7 @@ const CATEGORY_DEFINITIONS = {
   },
   elixirDocumentation: { values: ELIXIR_DOCUMENTATION_VALUES, displayName: "Elixir Documentation" },
   elixirClustering: { values: ELIXIR_CLUSTERING_VALUES, displayName: "Elixir Clustering" },
+  elixirLogging: { values: ELIXIR_LOGGING_VALUES, displayName: "Elixir Logging" },
   elixirDeploy: { values: ELIXIR_DEPLOY_VALUES, displayName: "Elixir Deploy" },
   elixirLibraries: {
     values: ELIXIR_LIBRARIES_VALUES,
@@ -1977,6 +1980,11 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
     libcluster: "libcluster",
     "dns-cluster": "DNSCluster",
     "distributed-erlang": "Distributed Erlang",
+  },
+  elixirLogging: {
+    "logger-json": "LoggerJSON",
+    "logger-file-backend": "LoggerFileBackend",
+    logster: "Logster",
   },
   elixirDeploy: {
     docker: "Docker",

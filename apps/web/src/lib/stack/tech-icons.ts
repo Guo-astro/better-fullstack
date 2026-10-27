@@ -200,6 +200,9 @@ export const ICON_REGISTRY: Record<string, IconConfig> = {
   libcluster: { type: "si", slug: "elixir", hex: "4B275F" },
   "dns-cluster": { type: "si", slug: "phoenixframework", hex: "FD4F00" },
   "distributed-erlang": { type: "si", slug: "erlang", hex: "A90533" },
+  "logger-json": { type: "si", slug: "json", hex: "000000" },
+  "logger-file-backend": { type: "si", slug: "elixir", hex: "4B275F" },
+  logster: { type: "si", slug: "phoenixframework", hex: "FD4F00" },
   "mix-release": { type: "si", slug: "elixir", hex: "4B275F" },
   gigalixir: { type: "si", slug: "elixir", hex: "4B275F" },
 

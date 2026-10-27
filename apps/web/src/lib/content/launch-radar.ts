@@ -74,6 +74,7 @@ export const NEW_OPTION_IDS_BY_CATEGORY = {
   elixirApplicationFramework: ["ash"],
   elixirDocumentation: ["ex_doc"],
   elixirClustering: ["libcluster"],
+  elixirLogging: ["logger-json", "logger-file-backend", "logster"],
   elixirLibraries: ["ex_aws", "floki", "rustler"],
   pythonWebFramework: ["aiohttp", "streamlit"],
   pythonOrm: ["pymongo"],
@@ -228,6 +229,7 @@ const ELIXIR_CATEGORIES = [
   "elixirApplicationFramework",
   "elixirDocumentation",
   "elixirClustering",
+  "elixirLogging",
   "elixirLibraries",
 ] as const;
 const DOTNET_CATEGORIES = ["dotnetLibraries"] as const;

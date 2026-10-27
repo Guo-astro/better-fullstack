@@ -798,6 +798,11 @@ function validateElixirConstraints(config: Partial<ProjectConfig>) {
         value: config.elixirTesting === "wallaby" ? config.elixirTesting : "none",
         message: "Wallaby browser tests require Phoenix.",
       },
+      {
+        flag: "elixir-logging",
+        value: config.elixirLogging === "logster" ? config.elixirLogging : "none",
+        message: "Logster request logging requires Phoenix.",
+      },
     ];
 
     for (const selection of phoenixOnlySelections) {

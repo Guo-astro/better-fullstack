@@ -2818,6 +2818,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "multiple": false
       },
       {
+        "flag": "--elixir-logging",
+        "summary": "Elixir logging.",
+        "values": [
+          "logger-json",
+          "logger-file-backend",
+          "logster",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
+      },
+      {
         "flag": "--elixir-deploy",
         "summary": "Elixir deploy target.",
         "values": [
@@ -3042,6 +3055,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "elixir:--elixir-application-framework": m.docsCliSummaryElixirElixirApplicationFramework,
   "elixir:--elixir-documentation": m.docsCliSummaryElixirElixirDocumentation,
   "elixir:--elixir-clustering": m.docsCliSummaryElixirElixirClustering,
+  "elixir:--elixir-logging": m.docsCliSummaryElixirElixirLogging,
   "elixir:--elixir-deploy": m.docsCliSummaryElixirElixirDeploy,
   "elixir:--elixir-libraries": m.docsCliSummaryElixirElixirLibraries,
 };

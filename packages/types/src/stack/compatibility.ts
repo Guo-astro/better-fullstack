@@ -611,6 +611,7 @@ export type CompatibilityInput = {
   elixirApplicationFramework: string;
   elixirDocumentation: string;
   elixirClustering: string;
+  elixirLogging: string;
   elixirDeploy: string;
   elixirLibraries: string[];
 };
@@ -2693,6 +2694,7 @@ export const analyzeStackCompatibility = (
         "elixirObservability",
         "elixirI18n",
         "elixirHttpServer",
+        "elixirLogging",
       ];
 
       for (const key of dependentKeys) {
@@ -2702,7 +2704,9 @@ export const analyzeStackCompatibility = (
             ? value === "phoenix-telemetry"
             : key === "elixirI18n"
               ? value === "gettext"
-              : value !== "none";
+              : key === "elixirLogging"
+                ? value === "logster"
+                : value !== "none";
 
         if (shouldClear) {
           nextStack[key] = "none" as never;
@@ -4571,6 +4575,7 @@ export const getDisabledReason = (
     "elixirApplicationFramework",
     "elixirDocumentation",
     "elixirClustering",
+    "elixirLogging",
     "elixirDeploy",
   ]);
 
@@ -4587,6 +4592,15 @@ export const getDisabledReason = (
     currentStack.elixirWebFramework === "none"
   ) {
     return "Wallaby browser tests require Phoenix";
+  }
+
+  if (
+    category === "elixirLogging" &&
+    optionId === "logster" &&
+    currentStack.ecosystem === "elixir" &&
+    currentStack.elixirWebFramework === "none"
+  ) {
+    return "Logster request logging requires Phoenix";
   }
 
   if (
@@ -4835,6 +4849,7 @@ const ELIXIR_GRAPH_DISABLED_REASON_ROLES: Partial<Record<CompatibilityCategory, 
   elixirApplicationFramework: "libraries",
   elixirDocumentation: "documentation",
   elixirClustering: "config",
+  elixirLogging: "logging",
   elixirDeploy: "deploy",
 };
 

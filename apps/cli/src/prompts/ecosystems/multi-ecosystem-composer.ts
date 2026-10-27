@@ -79,6 +79,7 @@ import {
   getElixirApplicationFrameworkChoice,
   getElixirDocumentationChoice,
   getElixirClusteringChoice,
+  getElixirLoggingChoice,
   getElixirRealtimeChoice,
   getElixirTestingChoice,
   getElixirValidationChoice,
@@ -1630,6 +1631,12 @@ export async function gatherMultiEcosystemConfig(
         : await scopedPromptValue("elixir", "elixirClustering", configScope, backendSections, () =>
             getElixirClusteringChoice(flags.elixirClustering),
           );
+    const elixirLogging =
+      elixirWebFramework === "none"
+        ? "none"
+        : await scopedPromptValue("elixir", "elixirLogging", configScope, backendSections, () =>
+            getElixirLoggingChoice(flags.elixirLogging),
+          );
     const elixirDeploy =
       elixirWebFramework === "none"
         ? "none"
@@ -1662,6 +1669,7 @@ export async function gatherMultiEcosystemConfig(
       elixirApplicationFramework,
       elixirDocumentation,
       elixirClustering,
+      elixirLogging,
       elixirDeploy,
       elixirLibraries,
     });
@@ -1693,6 +1701,9 @@ export async function gatherMultiEcosystemConfig(
     }
     if (elixirClustering !== "none") {
       stackPartSpecs.push(`backend.config:elixir:${elixirClustering}`);
+    }
+    if (elixirLogging !== "none") {
+      stackPartSpecs.push(`backend.logging:elixir:${elixirLogging}`);
     }
     if (elixirDeploy !== "none") stackPartSpecs.push(`backend.deploy:elixir:${elixirDeploy}`);
     for (const library of elixirLibraries) {

@@ -289,6 +289,7 @@ const ELIXIR_SECTIONS: readonly BuilderSectionDef[] = [
     "elixirJobs",
     "elixirEmail",
     "elixirClustering",
+    "elixirLogging",
   ]),
   section("libraries", "Libraries & Utilities", [
     "elixirValidation",

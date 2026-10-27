@@ -56,6 +56,7 @@ import {
   resolveElixirApplicationFrameworkPrompt,
   resolveElixirDocumentationPrompt,
   resolveElixirClusteringPrompt,
+  resolveElixirLoggingPrompt,
   resolveElixirRealtimePrompt,
   resolveElixirTestingPrompt,
   resolveElixirValidationPrompt,
@@ -179,6 +180,7 @@ import {
   ELIXIR_APPLICATION_FRAMEWORK_VALUES,
   ELIXIR_DOCUMENTATION_VALUES,
   ELIXIR_CLUSTERING_VALUES,
+  ELIXIR_LOGGING_VALUES,
   ELIXIR_REALTIME_VALUES,
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
@@ -982,6 +984,11 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
   elixirClustering: {
     schemaValues: ELIXIR_CLUSTERING_VALUES,
     resolve: ({ value }: { value?: string } = {}) => resolveElixirClusteringPrompt(value as any),
+    coverageContexts: [{}],
+  },
+  elixirLogging: {
+    schemaValues: ELIXIR_LOGGING_VALUES,
+    resolve: ({ value }: { value?: string } = {}) => resolveElixirLoggingPrompt(value),
     coverageContexts: [{}],
   },
   elixirDeploy: {

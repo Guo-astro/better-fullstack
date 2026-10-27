@@ -2660,6 +2660,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://hexdocs.pm/elixir/Node.html",
     githubUrl: "https://github.com/elixir-lang/elixir",
   },
+  "elixirLogging:logger-json": {
+    docsUrl: "https://hexdocs.pm/logger_json/",
+    githubUrl: "https://github.com/Nebo15/logger_json",
+  },
+  "elixirLogging:logger-file-backend": {
+    docsUrl: "https://hexdocs.pm/logger_file_backend/",
+    githubUrl: "https://github.com/onkel-dirtus/logger_file_backend",
+  },
+  "elixirLogging:logster": {
+    docsUrl: "https://hexdocs.pm/logster/1.1.1/",
+    githubUrl: "https://github.com/navinpeiris/logster",
+  },
   "elixirLibraries:ex_aws": {
     docsUrl: "https://hexdocs.pm/ex_aws/",
     githubUrl: "https://github.com/ex-aws/ex_aws",

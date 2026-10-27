@@ -240,6 +240,7 @@ export const STACK_SELECTION_OPTION_CATEGORY_BY_KEY: Record<
   elixirApplicationFramework: "elixirApplicationFramework",
   elixirDocumentation: "elixirDocumentation",
   elixirClustering: "elixirClustering",
+  elixirLogging: "elixirLogging",
   elixirDeploy: "elixirDeploy",
   elixirLibraries: "elixirLibraries",
 };
@@ -449,6 +450,7 @@ export const STACK_SELECTION_URL_KEYS = {
   elixirApplicationFramework: "eaf",
   elixirDocumentation: "edoc",
   elixirClustering: "ecluster",
+  elixirLogging: "elog",
   elixirDeploy: "edeploy",
   elixirLibraries: "elib",
 } as const satisfies Record<StackSelectionKey, string>;
@@ -933,6 +935,7 @@ const CLI_SCALAR_CONFIG_FIELDS = [
   ["elixirApplicationFramework", "elixirApplicationFramework"],
   ["elixirDocumentation", "elixirDocumentation"],
   ["elixirClustering", "elixirClustering"],
+  ["elixirLogging", "elixirLogging"],
   ["elixirDeploy", "elixirDeploy"],
 ] as const satisfies readonly (readonly [keyof CLIInput, keyof ProjectConfig])[];
 
@@ -1094,6 +1097,7 @@ const ELIXIR_CONFIG_KEYS = [
   "elixirApplicationFramework",
   "elixirDocumentation",
   "elixirClustering",
+  "elixirLogging",
   "elixirDeploy",
   "elixirLibraries",
 ] as const satisfies readonly (keyof CliDefaultProjectConfigBase)[];
@@ -1309,6 +1313,7 @@ const GRAPH_SCOPED_PART_GROUPS: readonly ScopedPartGroup[] = [
       ["elixirApplicationFramework", "libraries"],
       ["elixirDocumentation", "documentation"],
       ["elixirClustering", "config"],
+      ["elixirLogging", "logging"],
       ["elixirDeploy", "deploy"],
     ],
   },
@@ -2235,6 +2240,7 @@ function buildProjectConfigBase(
       stack.elixirApplicationFramework as ProjectConfig["elixirApplicationFramework"],
     elixirDocumentation: stack.elixirDocumentation as ProjectConfig["elixirDocumentation"],
     elixirClustering: stack.elixirClustering as ProjectConfig["elixirClustering"],
+    elixirLogging: stack.elixirLogging as ProjectConfig["elixirLogging"],
     elixirDeploy: stack.elixirDeploy as ProjectConfig["elixirDeploy"],
     elixirLibraries: toUniqueNonNoneArray(
       stack.elixirLibraries,
@@ -2733,6 +2739,7 @@ function generateElixirCommand(selection: StackSelectionInput, projectName: stri
     `--elixir-application-framework ${selection.elixirApplicationFramework}`,
     `--elixir-documentation ${selection.elixirDocumentation}`,
     `--elixir-clustering ${selection.elixirClustering}`,
+    `--elixir-logging ${selection.elixirLogging}`,
     `--elixir-deploy ${selection.elixirDeploy}`,
     formatArrayFlag("elixir-libraries", selection.elixirLibraries),
     formatArrayFlag("ai-docs", selection.aiDocs),
