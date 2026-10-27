@@ -213,7 +213,9 @@ export const DEPENDENCY_UPDATE_POLICIES: Readonly<Record<string, DependencyUpdat
   },
   typescript: {
     pinnedVersion: "^6.0.3",
-    reason: "TypeScript 7 currently breaks generated database package type portability (TS2883).",
+    holdLatestChannel: true,
+    reason:
+      "TypeScript 7 lacks the classic compiler API required by generated tsdown builds and breaks database package type portability (TS2883).",
   },
   turbo: {
     pinnedVersion: "2.10.11",
