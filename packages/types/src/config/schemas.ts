@@ -34,6 +34,10 @@ export const RubyEmailSchema = z
   .enum(["mail", "action-mailer", "resend", "none"])
   .describe("Ruby email delivery");
 
+export const RubyLoggingSchema = z
+  .enum(["logger", "semantic-logger", "ougai", "lograge", "none"])
+  .describe("Ruby request logging");
+
 export const EcosystemSchema = z
   .enum([
     "typescript",
@@ -1514,6 +1518,7 @@ const STACK_CONFIG_FIELDS = {
   rubyCache: RubyCacheSchema.optional(),
   rubyJobQueue: RubyJobQueueSchema.optional(),
   rubyEmail: RubyEmailSchema.optional(),
+  rubyLogging: RubyLoggingSchema.optional(),
   phpWebFramework: PhpWebFrameworkSchema.default("none"),
   phpOrm: PhpOrmSchema.default("none"),
   phpAuth: PhpAuthSchema.default("none"),
@@ -1868,3 +1873,4 @@ export const RUBY_VALIDATION_VALUES = RubyValidationSchema.options;
 export const RUBY_CACHE_VALUES = RubyCacheSchema.options;
 export const RUBY_JOB_QUEUE_VALUES = RubyJobQueueSchema.options;
 export const RUBY_EMAIL_VALUES = RubyEmailSchema.options;
+export const RUBY_LOGGING_VALUES = RubyLoggingSchema.options;

@@ -281,6 +281,7 @@ describe("Ruby recipe contracts", () => {
     ["rubyCache", "caching", "redis", "none"],
     ["rubyJobQueue", "jobQueue", "sidekiq", "none"],
     ["rubyEmail", "email", "resend", "none"],
+    ["rubyLogging", "logging", "semantic-logger", "logger"],
   ] as const)(
     "projects %s as a Ruby-owned %s part",
     (category, role, tool, fallback) => {
@@ -339,6 +340,18 @@ describe("Ruby recipe contracts", () => {
         ]),
       }),
     ).toBeNull();
+  });
+
+  it.each([
+    ["rubyLogging", "lograge", "Lograge requires Ruby Rails."],
+    ["rubyJobQueue", "resque", "Resque requires Ruby Sinatra, Rails or Roda."],
+  ] as const)("rejects %s %s on Grape", (category, tool, reason) => {
+    const grape = { ...rubySelection(), rubyWebFramework: "grape" };
+    expect(getDisabledReason(grape, category, tool)).toBe(reason);
+    expect(getDisabledReason({ ...grape, rubyWebFramework: "rails" }, category, tool)).toBeNull();
+    expect(
+      getRubyRecipeIssue({ ...createRubyProjectConfigDefaults(), ecosystem: "ruby", rubyWebFramework: "grape", [category]: tool }),
+    ).toBe(reason);
   });
 
   it("allows Action Mailer only on Rails", () => {

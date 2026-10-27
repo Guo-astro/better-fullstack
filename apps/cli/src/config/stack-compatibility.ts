@@ -561,6 +561,7 @@ export function buildCompatibilityInputFromConfig(
     rubyCache: asString(config.rubyCache),
     rubyJobQueue: asString(config.rubyJobQueue),
     rubyEmail: asString(config.rubyEmail),
+    rubyLogging: asString(config.rubyLogging),
     phpWebFramework: asString(config.phpWebFramework),
     phpOrm: asString(config.phpOrm),
     phpAuth: asString(config.phpAuth),

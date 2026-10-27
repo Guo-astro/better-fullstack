@@ -73,6 +73,7 @@ import type {
   RubyCacheSchema,
   RubyJobQueueSchema,
   RubyEmailSchema,
+  RubyLoggingSchema,
   EcosystemSchema,
   RustWebFrameworkSchema,
   RustFrontendSchema,
@@ -436,3 +437,4 @@ export type RubyValidation = z.infer<typeof RubyValidationSchema>;
 export type RubyCache = z.infer<typeof RubyCacheSchema>;
 export type RubyJobQueue = z.infer<typeof RubyJobQueueSchema>;
 export type RubyEmail = z.infer<typeof RubyEmailSchema>;
+export type RubyLogging = z.infer<typeof RubyLoggingSchema>;

@@ -1,4 +1,7 @@
 require "action_controller/railtie"
+{{#if (eq rubyLogging "lograge")}}
+require "lograge"
+{{/if}}
 require "json"
 require "securerandom"
 {{#if (ne rubyAuth "none")}}
@@ -16,6 +19,9 @@ require_relative "items"
 {{/if}}
 require_relative "name_input"
 require_relative "request_body_limit"
+{{#if (and (ne rubyLogging "none") (ne rubyLogging "lograge"))}}
+require_relative "request_logger"
+{{/if}}
 
 module BetterFullstack
   class Application < Rails::Application
@@ -27,13 +33,22 @@ module BetterFullstack
 {{#if (eq rubyJobQueue "solid-queue")}}
     config.active_job.queue_adapter = :solid_queue
 {{/if}}
+{{#if (eq rubyLogging "lograge")}}
+    config.logger = ActiveSupport::Logger.new(ENV["LOG_PATH"] || (Rails.env.test? ? File::NULL : $stdout))
+    config.lograge.enabled = true
+    config.lograge.formatter = Lograge::Formatters::KeyValue.new
+{{else}}
     config.logger = ActiveSupport::Logger.new(Rails.env.test? ? File::NULL : $stdout)
+{{/if}}
     config.secret_key_base = ENV.fetch("SECRET_KEY_BASE") { Rails.env.production? ? nil : SecureRandom.hex(64) }
 {{#if (ne rubyAuth "none")}}
     config.middleware.insert_before 0, Auth
 {{/if}}
     config.middleware.insert_before 0, HttpPolicy
     config.middleware.insert_before 0, RequestBodyLimit, -> { HttpPolicy.allowed_origins }
+{{#if (and (ne rubyLogging "none") (ne rubyLogging "lograge"))}}
+    config.middleware.insert_before 0, RequestLogger
+{{/if}}
   end
 
   class ApiController < ActionController::API

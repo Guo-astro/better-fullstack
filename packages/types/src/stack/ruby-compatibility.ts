@@ -3,11 +3,11 @@ import type { ProjectConfig, StackPart } from "@/config/types";
 import { getToolingCapability, isToolingOverlayOnly } from "@/capabilities/tooling-capabilities";
 
 export const RUBY_RECIPE_EXTENSION_REASON =
-  "The experimental Ruby recipe provides Sinatra, Rails, Roda, or Grape JSON HTTP, an optional SQLite ORM selected with rubyOrm, optional authentication selected with rubyAuth, Minitest, RSpec, or Test::Unit request tests selected with rubyTesting, request validation selected with rubyValidation, a Redis, Memcached, or in-process cache selected with rubyCache, Sidekiq, Resque, or Solid Queue background jobs selected with rubyJobQueue, and Mail, Action Mailer, or Resend email selected with rubyEmail. Shared database, authentication, deployment, and other service adapters are not generated.";
+  "The experimental Ruby recipe provides Sinatra, Rails, Roda, or Grape JSON HTTP, an optional SQLite ORM selected with rubyOrm, optional authentication selected with rubyAuth, Minitest, RSpec, or Test::Unit request tests selected with rubyTesting, request validation selected with rubyValidation, a Redis, Memcached, or in-process cache selected with rubyCache, Sidekiq, Resque, or Solid Queue background jobs selected with rubyJobQueue, Mail, Action Mailer, or Resend email selected with rubyEmail, and Ruby Logger, Semantic Logger, Ougai, or Lograge request logging selected with rubyLogging. Shared database, authentication, deployment, and other service adapters are not generated.";
 export const RUBY_RECIPE_FRAMEWORK_REASON =
   "The Ruby HTTP recipe requires a web framework. Use rubyWebFramework=sinatra, rails, roda, or grape, or remove the Ruby backend.";
 
-export const RUBY_OWNED_ROLES = ["orm", "auth", "testing", "validation", "caching", "jobQueue", "email"] as const satisfies readonly StackPart["role"][];
+export const RUBY_OWNED_ROLES = ["orm", "auth", "testing", "validation", "caching", "jobQueue", "email", "logging"] as const satisfies readonly StackPart["role"][];
 
 export const RUBY_OPTION_CATEGORIES = [
   "rubyOrm",
@@ -17,6 +17,7 @@ export const RUBY_OPTION_CATEGORIES = [
   "rubyCache",
   "rubyJobQueue",
   "rubyEmail",
+  "rubyLogging",
 ] as const satisfies readonly (keyof ProjectConfig)[];
 
 export function isRubyOwnedRole(role: StackPart["role"]): boolean {
@@ -44,6 +45,7 @@ export const RUBY_OPTION_RULES: Partial<
   rubyJobQueue: {
     role: "jobQueue",
     options: {
+      resque: { label: "Resque", frameworks: ["sinatra", "rails", "roda"] },
       "solid-queue": { label: "Solid Queue", frameworks: ["rails"], orms: ["active-record"] },
     },
   },
@@ -51,6 +53,12 @@ export const RUBY_OPTION_RULES: Partial<
     role: "email",
     options: {
       "action-mailer": { label: "Action Mailer", frameworks: ["rails"] },
+    },
+  },
+  rubyLogging: {
+    role: "logging",
+    options: {
+      lograge: { label: "Lograge", frameworks: ["rails"] },
     },
   },
 };
@@ -66,7 +74,9 @@ export function getRubyOptionIssue(
   const rule = optionId ? options?.[optionId] : undefined;
   if (!rule) return null;
   if (!rule.frameworks.includes(framework ?? "none")) {
-    const frameworks = rule.frameworks.map((id) => RUBY_FRAMEWORK_LABELS[id] ?? id).join(" or ");
+    const names = rule.frameworks.map((id) => RUBY_FRAMEWORK_LABELS[id] ?? id);
+    const frameworks =
+      names.length > 1 ? `${names.slice(0, -1).join(", ")} or ${names.at(-1)}` : names[0];
     return `${rule.label} requires Ruby ${frameworks}.`;
   }
   if (rule.orms && !rule.orms.includes(orm ?? "none")) {
@@ -240,6 +250,7 @@ export function createRubyProjectConfigDefaults(): Partial<ProjectConfig> {
       ["rubyCache", "none"],
       ["rubyJobQueue", "none"],
       ["rubyEmail", "none"],
+      ["rubyLogging", "logger"],
     ]),
   );
 }

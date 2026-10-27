@@ -1025,7 +1025,14 @@ const GRAPH_BACKEND_ADVANCED_CATEGORY_ORDER_BY_ECOSYSTEM = {
     "caching",
     "search",
   ],
-  ruby: ["rubyTesting", "rubyValidation", "rubyCache", "rubyJobQueue", "rubyEmail"],
+  ruby: [
+    "rubyTesting",
+    "rubyValidation",
+    "rubyCache",
+    "rubyJobQueue",
+    "rubyEmail",
+    "rubyLogging",
+  ],
   php: [],
   elixir: [
     "elixirRealtime",

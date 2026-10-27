@@ -1171,6 +1171,12 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         source: { kind: "category", category: "rubyEmail" },
         configKey: "rubyEmail",
       },
+      {
+        flag: "ruby-logging",
+        summary: "Ruby request logging.",
+        source: { kind: "category", category: "rubyLogging" },
+        configKey: "rubyLogging",
+      },
     ],
   },
   {

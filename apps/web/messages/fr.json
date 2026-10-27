@@ -596,6 +596,7 @@
   "docsCliSummaryRubyRubyCache": "Stockage de cache Ruby.",
   "docsCliSummaryRubyRubyJobQueue": "File de tâches en arrière-plan Ruby.",
   "docsCliSummaryRubyRubyEmail": "Envoi d’e-mails Ruby.",
+  "docsCliSummaryRubyRubyLogging": "Journalisation des requêtes Ruby.",
   "docsCliSummaryPhpPhpWebFramework": "Framework HTTP PHP.",
   "docsCliSummaryPhpPhpOrm": "ORM / couche de base de données PHP.",
   "docsCliSummaryPhpPhpAuth": "Authentification PHP.",

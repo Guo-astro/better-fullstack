@@ -15,6 +15,9 @@ require_relative "items"
 {{/if}}
 require_relative "name_input"
 require_relative "request_body_limit"
+{{#if (and (ne rubyLogging "none") (ne rubyLogging "lograge"))}}
+require_relative "request_logger"
+{{/if}}
 
 module BetterFullstack
   class Api < Grape::API
@@ -89,6 +92,9 @@ module BetterFullstack
   end
 
   App = Rack::Builder.app do
+{{#if (and (ne rubyLogging "none") (ne rubyLogging "lograge"))}}
+    use RequestLogger
+{{/if}}
     use RequestBodyLimit, -> { HttpPolicy.allowed_origins }
     use HttpPolicy
 {{#if (ne rubyAuth "none")}}

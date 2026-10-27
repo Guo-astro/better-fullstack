@@ -76,6 +76,18 @@ gem "actionmailer", "8.1.4"
 {{#if (eq rubyEmail "resend")}}
 gem "resend", "1.18.0"
 {{/if}}
+{{#if (or (eq rubyLogging "logger") (eq rubyLogging "semantic-logger"))}}
+gem "logger", "1.7.0"
+{{/if}}
+{{#if (eq rubyLogging "semantic-logger")}}
+gem "semantic_logger", "5.1.0"
+{{/if}}
+{{#if (eq rubyLogging "ougai")}}
+gem "ougai", "2.1.0"
+{{/if}}
+{{#if (eq rubyLogging "lograge")}}
+gem "lograge", "0.15.1"
+{{/if}}
 gem "puma", "7.1.0"
 gem "rackup", "2.3.1"
 gem "rake", "13.3.1"

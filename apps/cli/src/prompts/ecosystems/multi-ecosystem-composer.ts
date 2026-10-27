@@ -160,6 +160,7 @@ import {
   getRubyCacheChoice,
   getRubyJobQueueChoice,
   getRubyEmailChoice,
+  getRubyLoggingChoice,
   getRubyWebFrameworkChoice,
 } from "@/prompts/ecosystems/ruby-ecosystem";
 import {
@@ -1508,6 +1509,10 @@ export async function gatherMultiEcosystemConfig(
       rubyWebFramework === "none"
         ? "none"
         : promptValue(await getRubyEmailChoice(flags.rubyEmail, rubyWebFramework));
+    const rubyLogging =
+      rubyWebFramework === "none"
+        ? "none"
+        : promptValue(await getRubyLoggingChoice(flags.rubyLogging, rubyWebFramework));
     Object.assign(backendChoices, {
       rubyWebFramework,
       rubyOrm,
@@ -1517,6 +1522,7 @@ export async function gatherMultiEcosystemConfig(
       rubyCache,
       rubyJobQueue,
       rubyEmail,
+      rubyLogging,
     });
     if (rubyWebFramework !== "none") stackPartSpecs.push(`backend:ruby:${rubyWebFramework}`);
     if (rubyOrm !== "none") stackPartSpecs.push(`backend.orm:ruby:${rubyOrm}`);
@@ -1527,6 +1533,7 @@ export async function gatherMultiEcosystemConfig(
     if (rubyCache !== "none") stackPartSpecs.push(`backend.caching:ruby:${rubyCache}`);
     if (rubyJobQueue !== "none") stackPartSpecs.push(`backend.jobQueue:ruby:${rubyJobQueue}`);
     if (rubyEmail !== "none") stackPartSpecs.push(`backend.email:ruby:${rubyEmail}`);
+    if (rubyLogging !== "none") stackPartSpecs.push(`backend.logging:ruby:${rubyLogging}`);
   }
 
   if (backendEcosystem === "php") {

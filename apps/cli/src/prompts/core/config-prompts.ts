@@ -61,6 +61,7 @@ import type {
   RubyCache,
   RubyJobQueue,
   RubyEmail,
+  RubyLogging,
   PhpWebFramework,
   PhpOrm,
   PhpAuth,
@@ -347,6 +348,7 @@ import {
   getRubyCacheChoice,
   getRubyJobQueueChoice,
   getRubyEmailChoice,
+  getRubyLoggingChoice,
   getRubyWebFrameworkChoice,
 } from "@/prompts/ecosystems/ruby-ecosystem";
 import {
@@ -545,6 +547,7 @@ type PromptGroupResults = {
   rubyCache: RubyCache;
   rubyJobQueue: RubyJobQueue;
   rubyEmail: RubyEmail;
+  rubyLogging: RubyLogging;
   phpWebFramework: PhpWebFramework;
   phpOrm: PhpOrm;
   phpAuth: PhpAuth;
@@ -752,6 +755,7 @@ const CONFIG_PROMPT_ENTRY_KEY_MAP = {
   rubyCache: true,
   rubyJobQueue: true,
   rubyEmail: true,
+  rubyLogging: true,
   phpWebFramework: true,
   phpOrm: true,
   phpAuth: true,
@@ -1003,7 +1007,8 @@ function scopedPrompt<K extends PromptGroupKey>(
         key === "rubyValidation" ||
         key === "rubyCache" ||
         key === "rubyJobQueue" ||
-        key === "rubyEmail") &&
+        key === "rubyEmail" ||
+        key === "rubyLogging") &&
       opts.results.ecosystem !== "ruby"
     )
       return Promise.resolve("none" as PromptGroupResults[K]);
@@ -1019,6 +1024,7 @@ function scopedPrompt<K extends PromptGroupKey>(
         "rubyCache",
         "rubyJobQueue",
         "rubyEmail",
+        "rubyLogging",
         "aiDocs",
         "git",
         "install",
@@ -2007,6 +2013,10 @@ export async function gatherConfig(
       results.ecosystem === "ruby"
         ? getRubyEmailChoice(flags.rubyEmail, results.rubyWebFramework)
         : Promise.resolve("none" as const),
+    rubyLogging: ({ results }) =>
+      results.ecosystem === "ruby"
+        ? getRubyLoggingChoice(flags.rubyLogging, results.rubyWebFramework)
+        : Promise.resolve("none" as const),
     phpWebFramework: ({ results }) =>
       results.ecosystem === "php"
         ? getPhpWebFrameworkChoice(flags.phpWebFramework)
@@ -2334,6 +2344,7 @@ export async function gatherConfig(
     rubyCache: result.rubyCache,
     rubyJobQueue: result.rubyJobQueue,
     rubyEmail: result.rubyEmail,
+    rubyLogging: result.rubyLogging,
     phpWebFramework: result.phpWebFramework,
     phpOrm: result.phpOrm,
     phpAuth: result.phpAuth,

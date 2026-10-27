@@ -86,6 +86,12 @@ The server binds to `127.0.0.1:{{rubyPort}}`. `HOST`, `PORT`, `RACK_ENV`, and `A
 `mailer.rb` sends a welcome message through {{#if (eq rubyEmail "mail")}}the mail gem over SMTP{{/if}}{{#if (eq rubyEmail "action-mailer")}}an Action Mailer class over SMTP{{/if}}{{#if (eq rubyEmail "resend")}}the Resend API{{/if}}. Send one with `bundle exec rake "email:welcome[you@example.com]"`. {{#if (eq rubyEmail "resend")}}Set `RESEND_API_KEY` and a `MAIL_FROM` address on a domain verified in Resend.{{else}}Set `SMTP_HOST`, `SMTP_PORT`, and optional `SMTP_USERNAME` and `SMTP_PASSWORD` (the default `127.0.0.1:1025` matches local capture tools such as Mailpit).{{/if}} No HTTP route sends email, so the service cannot be used to mail arbitrary addresses. Tests use {{#if (eq rubyEmail "resend")}}a local HTTP server in place of the Resend API{{else}}the library test delivery method{{/if}}, and `bin/proof` delivers a message to a local {{#if (eq rubyEmail "resend")}}HTTP{{else}}SMTP{{/if}} capture server.
 
 {{/if}}
+{{#if (ne rubyLogging "none")}}
+## Request logging
+
+{{#if (eq rubyLogging "lograge")}}Lograge replaces the default Rails request logs with one key=value line per controller request (`method=GET path=/health ... status=200 duration=...`).{{else}}`request_logger.rb` is Rack middleware that logs every request{{#if (eq rubyLogging "logger")}} as a Ruby `Logger` line (`method=GET path=/health status=200 duration_ms=1.2`){{/if}}{{#if (eq rubyLogging "semantic-logger")}} as a Semantic Logger JSON event with `method`, `path`, `status`, and `duration_ms` in its payload{{/if}}{{#if (eq rubyLogging "ougai")}} as an Ougai JSON line with `method`, `path`, `status`, and `duration_ms` fields{{/if}}. `LOG_LEVEL` sets the level (default `info`).{{/if}} Logs go to stdout; set `LOG_PATH` to write them to a file instead.
+
+{{/if}}
 Use Ctrl-C to stop the foreground server. Add future routes in `app.rb`{{#if (eq rubyTesting "rspec")}} and behavior specs in `spec/app_spec.rb`{{/if}}{{#if (or (eq rubyTesting "minitest") (eq rubyTesting "test-unit"))}} and behavior tests in `test/app_test.rb`{{/if}}. Keep Gemfile ownership inside this service when composed with other languages.
 
 This source recipe is experimental. Generation, build, and runtime claims require proof for the exact producer revision and toolchains.

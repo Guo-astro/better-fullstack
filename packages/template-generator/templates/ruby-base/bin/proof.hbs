@@ -151,7 +151,14 @@ begin
   response = http.post("/auth/oidc", "")
   raise "Sign-in without a CSRF token was not rejected" unless response.code == "302" && response["location"].include?("/auth/failure")
 {{/if}}
-  puts JSON.generate(health: "passed", parsed_response: "passed", invalid_request: "passed", frontend_origins: "passed", empty_json: "passed"{{#if (ne rubyOrm "none")}}, persistence: "passed"{{/if}}{{#if (ne rubyAuth "none")}}, authentication: "passed"{{/if}}{{#if (ne rubyCache "none")}}, cache: "passed"{{/if}}{{#if (ne rubyJobQueue "none")}}, background_job: "passed"{{/if}}{{#if (ne rubyEmail "none")}}, email: "passed"{{/if}})
+{{#if (ne rubyLogging "none")}}
+  deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + 5
+  until File.read(log.path).match?({{#if (or (eq rubyLogging "logger") (eq rubyLogging "lograge"))}}/method=POST path=\/api\/greetings .*status=200/{{else}}/"path":"\/api\/greetings","status":200/{{/if}})
+    raise "Request was not logged" if Process.clock_gettime(Process::CLOCK_MONOTONIC) >= deadline
+    sleep 0.1
+  end
+{{/if}}
+  puts JSON.generate(health: "passed", parsed_response: "passed", invalid_request: "passed", frontend_origins: "passed", empty_json: "passed"{{#if (ne rubyOrm "none")}}, persistence: "passed"{{/if}}{{#if (ne rubyAuth "none")}}, authentication: "passed"{{/if}}{{#if (ne rubyCache "none")}}, cache: "passed"{{/if}}{{#if (ne rubyJobQueue "none")}}, background_job: "passed"{{/if}}{{#if (ne rubyEmail "none")}}, email: "passed"{{/if}}{{#if (ne rubyLogging "none")}}, request_logging: "passed"{{/if}})
 rescue StandardError => error
   log.rewind
   warn log.read

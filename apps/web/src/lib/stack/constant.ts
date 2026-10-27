@@ -6174,6 +6174,47 @@ export const TECH_OPTIONS: Record<
       default: true,
     },
   ],
+  rubyLogging: [
+    {
+      id: "logger",
+      name: "Ruby Logger",
+      description: "Rack middleware writing one standard Logger line per request",
+      icon: "https://cdn.simpleicons.org/ruby/CC342D",
+      color: "from-red-500 to-red-700",
+      default: true,
+    },
+    {
+      id: "semantic-logger",
+      name: "Semantic Logger",
+      description: "Structured JSON request events with Semantic Logger",
+      icon: "https://cdn.simpleicons.org/ruby/CC342D",
+      color: "from-violet-500 to-purple-700",
+      isNew: true,
+    },
+    {
+      id: "ougai",
+      name: "Ougai",
+      description: "JSON request logs from an Ougai logger",
+      icon: "https://cdn.simpleicons.org/ruby/CC342D",
+      color: "from-amber-500 to-orange-700",
+      isNew: true,
+    },
+    {
+      id: "lograge",
+      name: "Lograge",
+      description: "One key=value line per Rails controller request",
+      icon: "https://cdn.simpleicons.org/rubyonrails/D30001",
+      color: "from-red-600 to-red-800",
+      isNew: true,
+    },
+    {
+      id: "none",
+      name: "No request logging",
+      description: "Skip request logging",
+      icon: "",
+      color: "from-gray-400 to-gray-600",
+    },
+  ],
   rubyAuth: [
     {
       id: "jwt",

@@ -2487,6 +2487,22 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://resend.com/docs/send-with-ruby",
     githubUrl: "https://github.com/resend/resend-ruby",
   },
+  "rubyLogging:logger": {
+    docsUrl: "https://ruby.github.io/logger/",
+    githubUrl: "https://github.com/ruby/logger",
+  },
+  "rubyLogging:semantic-logger": {
+    docsUrl: "https://logger.rocketjob.io/",
+    githubUrl: "https://github.com/reidmorrison/semantic_logger",
+  },
+  "rubyLogging:ougai": {
+    docsUrl: "https://github.com/tilfin/ougai#readme",
+    githubUrl: "https://github.com/tilfin/ougai",
+  },
+  "rubyLogging:lograge": {
+    docsUrl: "https://github.com/roidrage/lograge#readme",
+    githubUrl: "https://github.com/roidrage/lograge",
+  },
   "rubyAuth:jwt": {
     docsUrl: "https://github.com/jwt/ruby-jwt#readme",
     githubUrl: "https://github.com/jwt/ruby-jwt",

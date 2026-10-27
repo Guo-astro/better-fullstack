@@ -156,6 +156,7 @@ export const CLI_DEFAULT_PROJECT_CONFIG = {
   rubyCache: "none",
   rubyJobQueue: "none",
   rubyEmail: "none",
+  rubyLogging: "logger",
   phpWebFramework: "slim",
   phpOrm: "none",
   phpAuth: "none",

@@ -8,6 +8,7 @@ import type {
   RubyCache,
   RubyJobQueue,
   RubyEmail,
+  RubyLogging,
   RubyWebFramework,
 } from "@/types";
 
@@ -217,6 +218,33 @@ export async function getRubyEmailChoice(value?: RubyEmail, framework?: RubyWebF
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
   const response = await navigableSelect<RubyEmail>({
     message: "Select Ruby email delivery",
+    options: resolution.options,
+    initialValue: resolution.initialValue,
+  });
+  if (isCancel(response)) return exitCancelled("Operation cancelled");
+  return response;
+}
+
+const LOGGING_OPTIONS: PromptOption<RubyLogging>[] = [
+  { value: "logger", label: "Ruby Logger", hint: "Standard library Logger writing one line per request" },
+  { value: "semantic-logger", label: "Semantic Logger", hint: "Structured JSON request logs" },
+  { value: "ougai", label: "Ougai", hint: "JSON request logs with Ougai" },
+  { value: "lograge", label: "Lograge", hint: "One-line Rails controller request logs" },
+  { value: "none", label: "None", hint: "No request logging" },
+];
+
+export function resolveRubyLoggingPrompt(value?: RubyLogging, framework?: RubyWebFramework) {
+  const options = LOGGING_OPTIONS.filter(
+    (option) => !getRubyOptionIssue("rubyLogging", option.value, framework, undefined),
+  );
+  return createStaticSinglePromptResolution(options, "logger", value);
+}
+
+export async function getRubyLoggingChoice(value?: RubyLogging, framework?: RubyWebFramework) {
+  const resolution = resolveRubyLoggingPrompt(value, framework);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "logger";
+  const response = await navigableSelect<RubyLogging>({
+    message: "Select Ruby request logging",
     options: resolution.options,
     initialValue: resolution.initialValue,
   });

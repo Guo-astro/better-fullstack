@@ -16,6 +16,11 @@ RESEND_API = BetterFullstack::HttpCapture.new({ id: "email_test" })
 ENV["RESEND_BASE_URL"] = RESEND_API.url
 ENV["RESEND_API_KEY"] = "re_test_key"
 {{/if}}
+{{#if (ne rubyLogging "none")}}
+
+require "tmpdir"
+ENV["LOG_PATH"] = File.join(Dir.mktmpdir, "requests.log")
+{{/if}}
 
 require "rack/test"
 require_relative "../app"

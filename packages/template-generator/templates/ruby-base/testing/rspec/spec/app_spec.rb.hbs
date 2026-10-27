@@ -30,6 +30,22 @@ RSpec.describe BetterFullstack::App do
     expect(last_response.status).to eq(200)
     expect(body).to eq("greeting" => "Hello, Ruby!")
   end
+{{#if (ne rubyLogging "none")}}
+
+  it "logs each request" do
+    get "/health"
+{{#if (eq rubyLogging "semantic-logger")}}
+    SemanticLogger.flush
+{{/if}}
+    lines = File.readlines(ENV.fetch("LOG_PATH"))
+{{#if (or (eq rubyLogging "logger") (eq rubyLogging "lograge"))}}
+    expect(lines).to include(a_string_matching(/method=GET path=\/health .*status=200/))
+{{else}}
+    entries = lines.filter_map { |line| JSON.parse(line) if line.start_with?("{") }
+    expect(entries.map { |entry| {{#if (eq rubyLogging "semantic-logger")}}entry.fetch("payload", {}){{else}}entry{{/if}}.values_at("method", "path", "status") }).to include(["GET", "/health", 200])
+{{/if}}
+  end
+{{/if}}
 
   it "rejects invalid request shapes" do
     [nil, [], {}, { "name" => 2 }, { "name" => " " }, { "name" => "a" * 81 }, { "name" => "Ruby", "admin" => true }].each do |value|

@@ -2564,6 +2564,20 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "none",
         "multiple": false
+      },
+      {
+        "flag": "--ruby-logging",
+        "summary": "Ruby request logging.",
+        "values": [
+          "logger",
+          "semantic-logger",
+          "ougai",
+          "lograge",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "logger",
+        "multiple": false
       }
     ]
   },
@@ -3194,6 +3208,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "ruby:--ruby-cache": m.docsCliSummaryRubyRubyCache,
   "ruby:--ruby-job-queue": m.docsCliSummaryRubyRubyJobQueue,
   "ruby:--ruby-email": m.docsCliSummaryRubyRubyEmail,
+  "ruby:--ruby-logging": m.docsCliSummaryRubyRubyLogging,
   "php:--php-web-framework": m.docsCliSummaryPhpPhpWebFramework,
   "php:--php-orm": m.docsCliSummaryPhpPhpOrm,
   "php:--php-auth": m.docsCliSummaryPhpPhpAuth,

@@ -421,7 +421,7 @@ describe("Ruby language integration", () => {
 
   it.each([
     { jobs: "sidekiq", framework: "sinatra", orm: "none", backend: "include Sidekiq::Job", gem: 'gem "sidekiq", "8.1.7"' },
-    { jobs: "resque", framework: "grape", orm: "sequel", backend: "Resque.enqueue(GreetingJob", gem: 'gem "resque", "3.2.0"' },
+    { jobs: "resque", framework: "roda", orm: "sequel", backend: "Resque.enqueue(GreetingJob", gem: 'gem "resque", "3.2.0"' },
     { jobs: "solid-queue", framework: "rails", orm: "active-record", backend: "class GreetingJob < ActiveJob::Base", gem: 'gem "solid_queue", "1.7.0"' },
   ] as const)("runs greeting jobs through $jobs with a worker command", async ({ jobs, framework, orm, backend, gem }) => {
     const result = await createVirtual({
@@ -466,6 +466,31 @@ describe("Ruby language integration", () => {
     expect(
       generateReproducibleCommand({ ...config(), rubyWebFramework: framework, rubyEmail: email }),
     ).toContain(`--ruby-email ${email}`);
+  });
+
+  it.each([
+    { logging: "logger", framework: "sinatra", file: "request_logger.rb", marker: 'require "logger"' },
+    { logging: "semantic-logger", framework: "roda", file: "request_logger.rb", marker: 'SemanticLogger["http"]' },
+    { logging: "ougai", framework: "grape", file: "request_logger.rb", marker: "Ougai::Logger.new(" },
+    { logging: "lograge", framework: "rails", file: "app.rb", marker: "config.lograge.enabled = true" },
+  ] as const)("logs every request with $logging", async ({ logging, framework, file, marker }) => {
+    const result = await createVirtual({ ecosystem: "ruby", rubyWebFramework: framework, rubyLogging: logging });
+    if (!result.success || !result.tree) throw new Error(result.error ?? "No Ruby project");
+    const paths = listVirtualTreeFilePaths(result.tree);
+    expect(paths.some((path) => path.startsWith("logging/"))).toBe(false);
+    expect(paths.includes("request_logger.rb")).toBe(logging !== "lograge");
+    expect(content(result.tree, file)).toContain(marker);
+    expect(content(result.tree, "bin/proof")).toContain("Request was not logged");
+    expect(
+      generateReproducibleCommand({ ...config(), rubyWebFramework: framework, rubyLogging: logging }),
+    ).toContain(`--ruby-logging ${logging}`);
+  });
+
+  it("defaults Ruby projects to Ruby Logger request logging", async () => {
+    const result = await createVirtual({ ecosystem: "ruby", rubyWebFramework: "sinatra" });
+    if (!result.success || !result.tree) throw new Error(result.error ?? "No Ruby project");
+    expect(content(result.tree, "app.rb")).toContain("use RequestLogger");
+    expect(content(result.tree, "Gemfile")).toContain('gem "logger", "1.7.0"');
   });
 
   it("rejects Solid Queue outside Rails with Active Record", async () => {
