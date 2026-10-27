@@ -530,6 +530,7 @@ export function buildCompatibilityInputFromConfig(
     crystalWebFramework: asString(config.crystalWebFramework, "kemal"),
     crystalOrm: asString(config.crystalOrm, "none"),
     crystalAuth: asString(config.crystalAuth, "none"),
+    crystalTesting: asString(config.crystalTesting, "spec"),
     javaWebFramework: asString(config.javaWebFramework),
     javaBuildTool: asString(config.javaBuildTool),
     javaOrm: asString(config.javaOrm),

@@ -68,6 +68,8 @@ Add a database layer with `--crystal-orm`. `crystal-db` runs parameterized SQL o
 
 Add sign-in with `--crystal-auth`. `jwt` issues HS256 bearer tokens with any framework, `kemal-session` keeps a server-side session for Kemal, and `marten-auth` stores bcrypt users through Marten ORM. Each one adds `POST /api/auth/login` and a protected `GET /api/me`; the session options also add `POST /api/auth/logout`. `jwt` and `kemal-session` check one account from `AUTH_USERNAME` and `AUTH_PASSWORD`, while `marten-auth` seeds that account into the database.
 
+Choose test tooling with `--crystal-testing`. `spec` keeps Crystal's built-in Spec files, `spectator` adds a Spectator spec that runs in the same `crystal spec` run, and `spec-kemal` adds in-memory HTTP specs for Kemal routes. `spec-kemal` works only with Kemal. `none` generates no specs.
+
 Append a relative directory to a binding, such as `backend:crystal:kemal:audit@services/audit%20api`. Directory segments accept ASCII letters, digits, spaces, dots, underscores, hyphens, `@`, `:`, and `%`. Encode special characters in the binding. Applications cannot share a destination or nest one destination inside another.
 
 TypeScript frontends and backends use `apps/web` and `apps/server`. React Native apps use `apps/native`. Custom directories for these applications are rejected because their templates require the default paths.

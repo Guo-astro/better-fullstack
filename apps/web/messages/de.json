@@ -787,5 +787,6 @@
   "builderComposerNativeToolchains": "Native Toolchains",
   "docsCliSummaryCrystalCrystalWebFramework": "Experimentelles Crystal-HTTP-Framework.",
   "docsCliSummaryCrystalCrystalOrm": "Experimentelle Crystal-Datenbankschicht.",
-  "docsCliSummaryCrystalCrystalAuth": "Experimentelle Crystal-Authentifizierung."
+  "docsCliSummaryCrystalCrystalAuth": "Experimentelle Crystal-Authentifizierung.",
+  "docsCliSummaryCrystalCrystalTesting": "Experimentelle Crystal-Testwerkzeuge."
 }

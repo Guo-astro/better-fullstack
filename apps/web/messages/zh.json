@@ -787,5 +787,6 @@
   "builderComposerNativeToolchains": "原生工具链",
   "docsCliSummaryCrystalCrystalWebFramework": "实验性 Crystal HTTP 框架。",
   "docsCliSummaryCrystalCrystalOrm": "实验性 Crystal 数据库层。",
-  "docsCliSummaryCrystalCrystalAuth": "实验性 Crystal 身份验证。"
+  "docsCliSummaryCrystalCrystalAuth": "实验性 Crystal 身份验证。",
+  "docsCliSummaryCrystalCrystalTesting": "实验性 Crystal 测试工具。"
 }

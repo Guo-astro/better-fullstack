@@ -116,6 +116,7 @@ import {
   CRYSTAL_WEB_FRAMEWORK_VALUES,
   CRYSTAL_ORM_VALUES,
   CRYSTAL_AUTH_VALUES,
+  CRYSTAL_TESTING_VALUES,
   JAVA_WEB_FRAMEWORK_VALUES,
   JOB_QUEUE_VALUES,
   LOGGING_VALUES,
@@ -504,6 +505,7 @@ export const CATEGORY_ORDER = [
     "crystalWebFramework",
     "crystalOrm",
     "crystalAuth",
+    "crystalTesting",
     ...JAVA_CATEGORY_ORDER,
     ...DOTNET_CATEGORY_ORDER,
     ...RUBY_CATEGORY_ORDER,
@@ -525,7 +527,7 @@ export function getCategoryOrderForEcosystem(
     case "go":
       return GO_CATEGORY_ORDER;
     case "crystal":
-      return ["crystalWebFramework", "crystalOrm", "crystalAuth", "aiDocs", "git", "install"];
+      return ["crystalWebFramework", "crystalOrm", "crystalAuth", "crystalTesting", "aiDocs", "git", "install"];
     case "java":
       return JAVA_CATEGORY_ORDER;
     case "dotnet":
@@ -900,6 +902,10 @@ const CATEGORY_DEFINITIONS = {
   crystalAuth: {
     values: CRYSTAL_AUTH_VALUES,
     displayName: "Crystal Auth",
+  },
+  crystalTesting: {
+    values: CRYSTAL_TESTING_VALUES,
+    displayName: "Crystal Testing",
   },
   javaWebFramework: { values: JAVA_WEB_FRAMEWORK_VALUES, displayName: "Java Web Framework" },
   javaBuildTool: { values: JAVA_BUILD_TOOL_VALUES, displayName: "Java Build Tool" },
@@ -1718,6 +1724,7 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
   crystalWebFramework: { kemal: "Kemal", lucky: "Lucky", athena: "Athena", marten: "Marten", none: "None" },
   crystalOrm: { "crystal-db": "crystal-db (SQLite)", avram: "Avram (PostgreSQL)", "marten-orm": "Marten ORM (SQLite)", none: "None" },
   crystalAuth: { jwt: "JWT bearer tokens", "kemal-session": "Kemal Session", "marten-auth": "Marten Auth", none: "None" },
+  crystalTesting: { spec: "Crystal Spec", spectator: "Spectator", "spec-kemal": "spec-kemal", none: "None" },
   javaWebFramework: {
     "spring-boot": "Spring Boot",
     ktor: "Ktor",

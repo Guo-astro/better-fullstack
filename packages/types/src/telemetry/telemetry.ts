@@ -366,6 +366,7 @@ export const TELEMETRY_PROJECT_CONFIG_KEYS = [
   "crystalWebFramework",
   "crystalOrm",
   "crystalAuth",
+  "crystalTesting",
   "javaLanguage",
   "javaWebFramework",
   "javaBuildTool",

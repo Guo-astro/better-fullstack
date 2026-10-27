@@ -106,10 +106,14 @@ function getRawGraphBackendConnection(config: ProjectConfig): GraphBackendConnec
 
   switch (backend.ecosystem) {
     case "crystal": {
-      const orm = (config.stackParts ?? []).find(
-        (part) => part.ownerPartId === backend.id && part.role === "orm",
-      )?.toolId;
-      const commands = getCrystalCommands({ crystalWebFramework: backend.toolId, crystalOrm: orm });
+      const ownedTool = (role: string) =>
+        (config.stackParts ?? []).find((part) => part.ownerPartId === backend.id && part.role === role)
+          ?.toolId;
+      const commands = getCrystalCommands({
+        crystalWebFramework: backend.toolId,
+        crystalOrm: ownedTool("orm"),
+        crystalTesting: ownedTool("testing") ?? "none",
+      });
       const origins =
         [...new Set(getGraphFrontendPorts(config).values())]
           .map((port) => `http://localhost:${port}`)
@@ -127,7 +131,7 @@ function getRawGraphBackendConnection(config: ProjectConfig): GraphBackendConnec
         setupCommand: [`cd ${directory}`, "shards install", commands.migrate].filter(Boolean).join(" && "),
         devCommand: `cd ${directory} && ${origins ? `export CORS_ORIGIN=${origins} && ` : ""}${commands.run}`,
         checkCommand: `cd ${directory} && ${commands.build}`,
-        testCommand: `cd ${directory} && ${commands.test}`,
+        testCommand: commands.test ? `cd ${directory} && ${commands.test}` : null,
       };
     }
     case "ruby": {

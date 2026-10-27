@@ -1,6 +1,7 @@
 import {
   getVirtualFileContent as content,
   hasVirtualFile as hasFile,
+  listVirtualTreeFilePaths,
 } from "@test/support/virtual-tree-utils";
 import { describe, expect, it, spyOn } from "bun:test";
 import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
@@ -290,6 +291,38 @@ describe("Crystal create contract", () => {
         part: ["backend:crystal:marten", "backend.auth:crystal:marten-auth"],
       }),
     ).rejects.toThrow("Marten Auth requires Marten ORM.");
+  });
+
+  it.each([
+    ["spectator", ["spec/greeting_spec.cr", "spec/greeting_spectator_spec.cr"], "gitlab: arctic-fox/spectator"],
+    ["spec-kemal", ["spec/greeting_spec.cr", "spec/server_spec.cr"], "github: kemalcr/spec-kemal"],
+    ["none", [], undefined],
+  ] as const)("renders %s test tooling", async (testing, specs, dependency) => {
+    const result = await createVirtual({
+      ecosystem: "crystal",
+      crystalWebFramework: "kemal",
+      crystalTesting: testing,
+    });
+    expect(result.success).toBe(true);
+    if (!result.tree) throw new Error(result.error);
+    const specFiles = listVirtualTreeFilePaths(result.tree)
+      .map((file) => file.replace(/^\//, ""))
+      .filter((file) => file.startsWith("spec/"))
+      .sort();
+    expect(specFiles).toEqual([...specs]);
+    if (dependency) expect(content(result.tree.root, "shard.yml")).toContain(dependency);
+    const config = buildProjectConfig({ ecosystem: "crystal", crystalWebFramework: "kemal", crystalTesting: testing });
+    expect(generateReproducibleCommand(config)).toContain(`--crystal-testing ${testing}`);
+  });
+
+  it("rejects spec-kemal without Kemal", async () => {
+    const result = await createVirtual({
+      ecosystem: "crystal",
+      crystalWebFramework: "lucky",
+      crystalTesting: "spec-kemal",
+    });
+    expect(result.success).toBe(false);
+    expect(result.error).toContain("spec-kemal requires Crystal Kemal.");
   });
 
   it("rejects unsupported selections before rendering", async () => {

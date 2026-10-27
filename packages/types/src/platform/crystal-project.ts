@@ -6,6 +6,7 @@ export const CRYSTAL_PROJECT_DEFAULTS = {
   crystalWebFramework: "kemal",
   crystalOrm: "none",
   crystalAuth: "none",
+  crystalTesting: "spec",
   frontend: ["none"],
   backend: "none",
   runtime: "none",
@@ -93,6 +94,7 @@ export type CrystalSelection = {
   crystalWebFramework?: string;
   crystalOrm?: string;
   crystalAuth?: string;
+  crystalTesting?: string;
 };
 
 const CRYSTAL_ORM_LABELS: Record<string, string> = { "marten-orm": "Marten ORM" };
@@ -112,6 +114,12 @@ export const CRYSTAL_OPTION_RULES = {
       jwt: { label: "JWT", frameworks: CRYSTAL_HTTP_FRAMEWORKS },
       "kemal-session": { label: "Kemal Session", frameworks: ["kemal"] },
       "marten-auth": { label: "Marten Auth", frameworks: ["marten"], orms: ["marten-orm"] },
+    },
+  },
+  crystalTesting: {
+    role: "testing",
+    options: {
+      "spec-kemal": { label: "spec-kemal", frameworks: ["kemal"] },
     },
   },
 } as const satisfies Record<
@@ -185,7 +193,7 @@ export function getCrystalCommands(selection: CrystalSelection) {
         ? "AUTH_PASSWORD=change-me crystal run manage.cr -- seed"
         : undefined,
     build: `shards build --release${flags}`,
-    test: `crystal spec${flags}`,
+    test: selection.crystalTesting === "none" ? undefined : `crystal spec${flags}`,
     run: `crystal run src/server.cr${flags}`,
     proof: framework && framework !== "none" ? "crystal run scripts/http_proof.cr" : undefined,
   };

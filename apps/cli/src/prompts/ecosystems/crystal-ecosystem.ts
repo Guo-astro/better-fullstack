@@ -1,5 +1,5 @@
-import type { CrystalAuth, CrystalOrm, CrystalSelection, CrystalWebFramework } from "@/types";
-import { CrystalAuthSchema, CrystalOrmSchema, CrystalWebFrameworkSchema, getCrystalOptionIssue } from "@/types";
+import type { CrystalAuth, CrystalTesting, CrystalOrm, CrystalSelection, CrystalWebFramework } from "@/types";
+import { CrystalAuthSchema, CrystalTestingSchema, CrystalOrmSchema, CrystalWebFrameworkSchema, getCrystalOptionIssue } from "@/types";
 import { exitCancelled } from "@/presentation/errors";
 import { isCancel, navigableSelect } from "@/prompts/core/navigable";
 import { createStaticSinglePromptResolution } from "@/prompts/core/prompt-contract";
@@ -61,6 +61,25 @@ export async function getCrystalAuthChoice(value?: CrystalAuth, selection: Cryst
   const resolution = resolveCrystalAuthPrompt(value, selection);
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
   const response = await navigableSelect<CrystalAuth>({ message: "Select Crystal authentication", options: resolution.options, initialValue: resolution.initialValue });
+  if (isCancel(response)) return exitCancelled("Operation cancelled");
+  return response;
+}
+
+export function resolveCrystalTestingPrompt(value?: string, selection: CrystalSelection = {}) {
+  const selected = value === undefined ? undefined : CrystalTestingSchema.parse(value);
+  const options = [
+    { value: "spec" as const, label: "Crystal Spec", hint: "Built-in spec runner" },
+    { value: "spectator" as const, label: "Spectator", hint: "RSpec-style specs with doubles beside Spec" },
+    { value: "spec-kemal" as const, label: "spec-kemal", hint: "In-memory Kemal route specs" },
+    { value: "none" as const, label: "None" },
+  ].filter((option) => !getCrystalOptionIssue("crystalTesting", option.value, selection));
+  return createStaticSinglePromptResolution(options, "spec", selected);
+}
+
+export async function getCrystalTestingChoice(value?: CrystalTesting, selection: CrystalSelection = {}) {
+  const resolution = resolveCrystalTestingPrompt(value, selection);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "spec";
+  const response = await navigableSelect<CrystalTesting>({ message: "Select Crystal test tooling", options: resolution.options, initialValue: resolution.initialValue });
   if (isCancel(response)) return exitCancelled("Operation cancelled");
   return response;
 }

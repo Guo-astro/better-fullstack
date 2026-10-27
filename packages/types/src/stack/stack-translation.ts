@@ -191,6 +191,7 @@ export const STACK_SELECTION_OPTION_CATEGORY_BY_KEY: Record<
   crystalWebFramework: "crystalWebFramework",
   crystalOrm: "crystalOrm",
   crystalAuth: "crystalAuth",
+  crystalTesting: "crystalTesting",
   javaWebFramework: "javaWebFramework",
   javaBuildTool: "javaBuildTool",
   javaOrm: "javaOrm",
@@ -407,6 +408,7 @@ export const STACK_SELECTION_URL_KEYS = {
   crystalWebFramework: "cwf",
   crystalOrm: "corm",
   crystalAuth: "cauth",
+  crystalTesting: "ctest",
   javaWebFramework: "jwf",
   javaBuildTool: "jbt",
   javaOrm: "jorm",
@@ -903,6 +905,7 @@ const CLI_SCALAR_CONFIG_FIELDS = [
   ["crystalWebFramework", "crystalWebFramework"],
   ["crystalOrm", "crystalOrm"],
   ["crystalAuth", "crystalAuth"],
+  ["crystalTesting", "crystalTesting"],
   ["javaWebFramework", "javaWebFramework"],
   ["javaBuildTool", "javaBuildTool"],
   ["javaOrm", "javaOrm"],
@@ -1066,6 +1069,7 @@ const CRYSTAL_CONFIG_KEYS = [
   "crystalWebFramework",
   "crystalOrm",
   "crystalAuth",
+  "crystalTesting",
 ] as const satisfies readonly (keyof CliDefaultProjectConfigBase)[];
 
 const JAVA_CONFIG_KEYS = [
@@ -1316,6 +1320,11 @@ const GRAPH_SCOPED_PART_GROUPS: readonly ScopedPartGroup[] = [
       ["rubyCache", "caching"],
       ["rubyJobQueue", "jobQueue"],
     ],
+  },
+  {
+    ownerRole: "backend",
+    ecosystem: "crystal",
+    keys: [["crystalTesting", "testing"]],
   },
   {
     ownerRole: "backend",
@@ -2210,6 +2219,7 @@ function buildProjectConfigBase(
     crystalWebFramework: stack.crystalWebFramework as ProjectConfig["crystalWebFramework"],
     crystalOrm: stack.crystalOrm as ProjectConfig["crystalOrm"],
     crystalAuth: stack.crystalAuth as ProjectConfig["crystalAuth"],
+    crystalTesting: stack.crystalTesting as ProjectConfig["crystalTesting"],
     javaWebFramework: stack.javaWebFramework as ProjectConfig["javaWebFramework"],
     javaBuildTool: stack.javaBuildTool as ProjectConfig["javaBuildTool"],
     javaOrm: stack.javaOrm as ProjectConfig["javaOrm"],
@@ -2808,7 +2818,7 @@ export function generateStackSelectionCommand(selection: StackSelectionInput): s
     case "go":
       return generateGoCommand(selection, projectName);
     case "crystal":
-      return `${getBaseCommand(selection)} ${projectName} --ecosystem crystal --crystal-web-framework ${selection.crystalWebFramework} --crystal-orm ${selection.crystalOrm} --crystal-auth ${selection.crystalAuth} --package-manager ${selection.packageManager} --workspace-shape ${selection.workspaceShape} --version-channel ${selection.versionChannel} --addons none --examples none ${formatArrayFlag("ai-docs", selection.aiDocs)} ${selection.git === "false" ? "--no-git" : "--git"} ${selection.install === "false" ? "--no-install" : "--install"}`;
+      return `${getBaseCommand(selection)} ${projectName} --ecosystem crystal --crystal-web-framework ${selection.crystalWebFramework} --crystal-orm ${selection.crystalOrm} --crystal-auth ${selection.crystalAuth} --crystal-testing ${selection.crystalTesting} --package-manager ${selection.packageManager} --workspace-shape ${selection.workspaceShape} --version-channel ${selection.versionChannel} --addons none --examples none ${formatArrayFlag("ai-docs", selection.aiDocs)} ${selection.git === "false" ? "--no-git" : "--git"} ${selection.install === "false" ? "--no-install" : "--install"}`;
     case "java":
       return generateJavaCommand(selection, projectName);
     case "dotnet":

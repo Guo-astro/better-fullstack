@@ -110,9 +110,13 @@ describe("bounded Crystal HTTP recipe", () => {
       parts
         .filter((part) => part.source !== "provided")
         .map((part) => [part.role, part.ecosystem, part.toolId]),
-    ).toEqual([["backend", "crystal", "kemal"]]);
+    ).toEqual([
+      ["backend", "crystal", "kemal"],
+      ["testing", "crystal", "spec"],
+    ]);
     expect(validateStackParts(parts).issues).toEqual([]);
     expect(stackPartsToLegacyProjectConfigPartial(parts).crystalWebFramework).toBe("kemal");
+    expect(stackPartsToLegacyProjectConfigPartial(parts).crystalTesting).toBe("spec");
   });
 
   it("preserves custom identities and paths when projecting a mixed graph", () => {
@@ -270,6 +274,19 @@ describe("bounded Crystal HTTP recipe", () => {
     expect(getDisabledReason(martenAuth, "crystalAuth", "jwt")).toBeNull();
     const encoded = Object.fromEntries(createStackSelectionSearchParams(martenAuth));
     expect(parseStackSelectionFromSearch(encoded).crystalAuth).toBe("marten-auth");
+  });
+
+  it("keeps spec-kemal on Kemal and round-trips the test tooling through the URL", () => {
+    const specKemal = createCrystalStackSelection({ crystalTesting: "spec-kemal" });
+    expect(analyzeStackCompatibility(specKemal).adjustedStack).toBeNull();
+    const lucky = analyzeStackCompatibility({ ...specKemal, crystalWebFramework: "lucky" });
+    expect(lucky.adjustedStack?.crystalTesting).toBe("none");
+    expect(getDisabledReason({ ...specKemal, crystalWebFramework: "athena" }, "crystalTesting", "spec-kemal")).toBe(
+      "spec-kemal requires Crystal Kemal.",
+    );
+    expect(getDisabledReason({ ...specKemal, crystalWebFramework: "athena" }, "crystalTesting", "spectator")).toBeNull();
+    const encoded = Object.fromEntries(createStackSelectionSearchParams(specKemal));
+    expect(parseStackSelectionFromSearch(encoded).crystalTesting).toBe("spec-kemal");
   });
 
   it("keeps Crystal experimental without changing the versioned golden recipes", () => {

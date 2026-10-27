@@ -6,6 +6,7 @@ import {
   getStandaloneBackendEcosystem,
   hasJavaScriptWorkspaceRoot,
   isToolingOverlayOnly,
+  stackGraphToLegacyProjectConfigForEcosystem,
   toDotnetIdentifierSegment,
   type OptionCategory,
 } from "@better-fullstack/types";
@@ -78,7 +79,9 @@ export async function displayPostInstallInstructions(
   }
 
   if (ecosystem === "crystal") {
-    const commands = getCrystalCommands(config);
+    const commands = getCrystalCommands(
+      config.stackParts?.length ? stackGraphToLegacyProjectConfigForEcosystem(config, "crystal") : config,
+    );
     const steps = [`cd ${relativePath}`, depsInstalled ? undefined : "shards install", commands.migrate, commands.seed, commands.build, commands.test, commands.proof, commands.proof ? "HOST=127.0.0.1 PORT=3000 ./bin/server" : "./bin/server"];
     consola.box(`Next steps\n\n${steps.filter(Boolean).join("\n")}\n\nExperimental recipe. Runtime proof has not been recorded.`);
     return;

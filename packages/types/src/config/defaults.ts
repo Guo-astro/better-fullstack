@@ -125,6 +125,7 @@ export const CLI_DEFAULT_PROJECT_CONFIG = {
   crystalWebFramework: "kemal",
   crystalOrm: "none",
   crystalAuth: "none",
+  crystalTesting: "spec",
   javaWebFramework: "spring-boot",
   javaBuildTool: "maven",
   javaOrm: "none",

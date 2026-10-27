@@ -2499,6 +2499,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://martenframework.com/docs/authentication",
     githubUrl: "https://github.com/martenframework/marten-auth",
   },
+  "crystalTesting:spec": {
+    docsUrl: "https://crystal-lang.org/reference/latest/guides/testing.html",
+    githubUrl: "https://github.com/crystal-lang/crystal",
+  },
+  "crystalTesting:spectator": {
+    docsUrl: "https://gitlab.com/arctic-fox/spectator/-/wikis/home",
+    githubUrl: "https://gitlab.com/arctic-fox/spectator",
+  },
+  "crystalTesting:spec-kemal": {
+    docsUrl: "https://github.com/kemalcr/spec-kemal#readme",
+    githubUrl: "https://github.com/kemalcr/spec-kemal",
+  },
   "elixirOrm:ecto-sql": {
     docsUrl: "https://hexdocs.pm/ecto_sql/",
     githubUrl: "https://github.com/elixir-ecto/ecto_sql",

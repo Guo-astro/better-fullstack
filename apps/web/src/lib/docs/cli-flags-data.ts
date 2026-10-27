@@ -2062,6 +2062,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "none",
         "multiple": false
+      },
+      {
+        "flag": "--crystal-testing",
+        "summary": "Crystal test tooling.",
+        "values": [
+          "spec",
+          "spectator",
+          "spec-kemal",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "spec",
+        "multiple": false
       }
     ]
   },
@@ -3083,6 +3096,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "crystal:--crystal-web-framework": m.docsCliSummaryCrystalCrystalWebFramework,
   "crystal:--crystal-orm": m.docsCliSummaryCrystalCrystalOrm,
   "crystal:--crystal-auth": m.docsCliSummaryCrystalCrystalAuth,
+  "crystal:--crystal-testing": m.docsCliSummaryCrystalCrystalTesting,
   "java:--java-web-framework": m.docsCliSummaryJavaJavaWebFramework,
   "java:--java-language": m.docsCliSummaryJavaJavaLanguage,
   "java:--java-build-tool": m.docsCliSummaryJavaJavaBuildTool,

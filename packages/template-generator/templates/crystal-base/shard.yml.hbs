@@ -58,3 +58,15 @@ dependencies:
     github: martenframework/marten-auth
     version: 0.2.1
 {{/if}}
+{{#if (eq crystalTesting "spectator")}}
+development_dependencies:
+  spectator:
+    gitlab: arctic-fox/spectator
+    version: 0.12.4
+{{/if}}
+{{#if (eq crystalTesting "spec-kemal")}}
+development_dependencies:
+  spec-kemal:
+    github: kemalcr/spec-kemal
+    version: 1.3.0
+{{/if}}

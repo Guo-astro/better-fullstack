@@ -787,5 +787,6 @@
   "builderComposerNativeToolchains": "Нативні тулчейни",
   "docsCliSummaryCrystalCrystalWebFramework": "Експериментальний HTTP-фреймворк Crystal.",
   "docsCliSummaryCrystalCrystalOrm": "Експериментальний шар бази даних Crystal.",
-  "docsCliSummaryCrystalCrystalAuth": "Експериментальна автентифікація Crystal."
+  "docsCliSummaryCrystalCrystalAuth": "Експериментальна автентифікація Crystal.",
+  "docsCliSummaryCrystalCrystalTesting": "Експериментальні інструменти тестування Crystal."
 }

@@ -876,7 +876,7 @@ export async function verifyCrystal(comboName: string, projectDir: string): Prom
   for (const [step, command, args] of [
     ["install", "shards", ["install"]],
     ["build", "shards", ["build", "--release", ...flags]],
-    ["test", "crystal", ["spec", ...flags]],
+    ...(existsSync(join(projectDir, "spec")) ? [["test", "crystal", ["spec", ...flags]] as const] : []),
   ] as const) {
     steps.push(await runStep(step, command, [...args], projectDir));
     if (!steps.at(-1)!.success) return wrapResult("crystal", comboName, projectDir, steps);

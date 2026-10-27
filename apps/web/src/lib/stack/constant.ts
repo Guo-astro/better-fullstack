@@ -7231,6 +7231,12 @@ export const TECH_OPTIONS: Record<
     { id: "marten-auth", name: "Marten Auth", description: "Marten users with bcrypt passwords and session sign-in", icon: "https://cdn.simpleicons.org/crystal", color: "from-slate-500 to-zinc-600", default: false },
     { id: "none", name: "None", description: "No authentication", icon: "", color: "from-gray-400 to-gray-600", default: true },
   ],
+  crystalTesting: [
+    { id: "spec", name: "Crystal Spec", description: "Built-in spec runner for greeting, store, and auth specs", icon: "https://cdn.simpleicons.org/crystal", color: "from-slate-500 to-zinc-600", default: true },
+    { id: "spectator", name: "Spectator", description: "RSpec-style specs with let, subject, and doubles beside Spec", icon: "https://cdn.simpleicons.org/crystal", color: "from-slate-500 to-zinc-600", default: false },
+    { id: "spec-kemal", name: "spec-kemal", description: "In-memory HTTP specs for Kemal routes", icon: "https://cdn.simpleicons.org/crystal", color: "from-slate-500 to-zinc-600", default: false },
+    { id: "none", name: "None", description: "No specs", icon: "", color: "from-gray-400 to-gray-600", default: false },
+  ],
   javaWebFramework: [
     {
       id: "ktor",

@@ -17,10 +17,14 @@ AUTH_PASSWORD=change-me crystal run manage.cr -- seed
 {{/if}}
 {{#if (eq crystalWebFramework "athena")}}
 shards build --release -Dwithout_libmagic
+{{#if (ne crystalTesting "none")}}
 crystal spec -Dwithout_libmagic
+{{/if}}
 {{else}}
 shards build --release
+{{#if (ne crystalTesting "none")}}
 crystal spec
+{{/if}}
 {{/if}}
 {{#if (eq crystalWebFramework "none")}}
 ./bin/server
@@ -74,6 +78,18 @@ kemal-session 1.6.0 stores the signed-in username in a server-side session. Sign
 {{/if}}
 {{#if (eq crystalAuth "marten-auth")}}
 Marten Auth 0.2.1 stores users in the `accounts_user` table with bcrypt password hashes and signs them in through Marten sessions. `crystal run manage.cr -- seed` creates or updates the user named by `AUTH_USERNAME` (default `demo@example.com`) with `AUTH_PASSWORD`. `POST /api/auth/logout` clears the session. Session cookies are HttpOnly and Secure unless `SESSION_SECURE=false`. Marten's default store keeps the session in a signed cookie, so a copied cookie stays valid until it expires; set `MARTEN_SECRET_KEY` so sessions survive restarts.
+
+{{/if}}
+{{#if (eq crystalTesting "spectator")}}
+Spectator 0.12.4 runs `spec/greeting_spectator_spec.cr` in the same `crystal spec` run as the built-in Spec files, and a failure in either fails the run. Use `Spectator.describe` with `let`, `subject`, `sample`, doubles, and mocks for new specs.
+
+{{/if}}
+{{#if (eq crystalTesting "spec-kemal")}}
+spec-kemal 1.3.0 sends requests through the Kemal handler chain in memory. `spec/server_spec.cr` sets `KEMAL_ENV=test` before requiring `src/server.cr`, so `Kemal.run` registers the routes without binding a port.
+
+{{/if}}
+{{#if (eq crystalTesting "none")}}
+No specs are generated. Add a `spec/` directory and run `crystal spec` when you add tests.
 
 {{/if}}
 Deployment, native addons, and service overlays are unsupported. Use an explicit mixed graph to add an independently owned frontend or another service; keep Crystal's manifest and native commands in its service directory.
