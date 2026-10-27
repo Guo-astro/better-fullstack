@@ -6,7 +6,7 @@ export const PHP_RECIPE_REASONS = {
   database:
     "The PHP recipe does not generate database or migration integration. Use --database none.",
   capability:
-    "The PHP recipe provides REST, Composer, ORM, auth, test runner and validation choices; additional backend capabilities are not implemented.",
+    "The PHP recipe provides REST, Composer, ORM, auth, test runner, validation and cache choices; additional backend capabilities are not implemented.",
   owner: "PHP capabilities must belong to a PHP backend.",
 } as const;
 
@@ -62,12 +62,19 @@ const PHP_CAPABILITY_FRAMEWORKS: Record<string, Record<string, readonly string[]
     "respect-validation": ["slim", "laravel", "symfony"],
     "laravel-validation": ["laravel"],
   },
+  caching: {
+    "symfony-cache": ["slim", "laravel", "symfony"],
+    "laminas-cache": ["slim", "laravel", "symfony"],
+    predis: ["slim", "laravel", "symfony"],
+    "laravel-cache": ["laravel"],
+  },
 };
 
 export const PHP_CAPABILITY_CATEGORIES = {
   phpOrm: { role: "orm", label: "PHP ORM" },
   phpAuth: { role: "auth", label: "PHP auth" },
   phpValidation: { role: "validation", label: "PHP validation" },
+  phpCache: { role: "caching", label: "PHP cache" },
 } as const;
 
 export type PhpCapabilityCategory = keyof typeof PHP_CAPABILITY_CATEGORIES;
@@ -82,6 +89,7 @@ const PHP_CAPABILITY_LABELS: Record<string, string> = {
   cycle: "Cycle ORM",
   "symfony-security": "Symfony Security",
   "laravel-validation": "Laravel Validation",
+  "laravel-cache": "Laravel Cache",
 };
 
 export function isPhpCapabilityRole(role: string): boolean {

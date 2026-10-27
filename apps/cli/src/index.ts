@@ -254,6 +254,7 @@ export async function createVirtual(
       phpAuth: options.phpAuth ?? "none",
       phpTesting: options.phpTesting ?? (options.ecosystem === "php" ? "phpunit" : "none"),
       phpValidation: options.phpValidation ?? "none",
+      phpCache: options.phpCache ?? "none",
       elixirWebFramework:
         options.elixirWebFramework || (options.ecosystem === "elixir" ? "phoenix" : "none"),
       elixirOrm: options.elixirOrm || (options.ecosystem === "elixir" ? "ecto-sql" : "none"),

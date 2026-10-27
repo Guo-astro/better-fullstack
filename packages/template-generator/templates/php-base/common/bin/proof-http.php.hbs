@@ -50,6 +50,9 @@ requireProof(proc_close($setup) === 0, 'Database setup failed: ' . file_get_cont
 {{else}}
 $serverEnv = array_merge(getenv(), ['CORS_ORIGIN' => 'http://localhost:5173,http://localhost:8080']);
 {{/if}}
+{{#if (ne phpCache "none")}}
+$serverEnv['CACHE_NAMESPACE'] = 'proof' . bin2hex(random_bytes(6));
+{{/if}}
 {{#if (ne phpAuth "none")}}
 require $root . '/vendor/autoload.php';
 $proofSecret = bin2hex(random_bytes(32));
@@ -107,6 +110,12 @@ try {
     [$status, $body] = requestProof('http://' . $address . '/api/notes', 'POST', '{"title":""}');
     requireProof($status === 422, 'Invalid note accepted.');
 {{/if}}
+{{#if (ne phpCache "none")}}
+    [$status, $first] = requestProof('http://' . $address . '/api/cached-time');
+    requireProof($status === 200 && $first['cached'] === false && is_string($first['value']), 'Cache miss mismatch{{#if (eq phpCache "predis")}}; set REDIS_URL to a running Redis server{{/if}}.');
+    [$status, $second] = requestProof('http://' . $address . '/api/cached-time');
+    requireProof($status === 200 && $second === ['value' => $first['value'], 'cached' => true], 'Cached value was not reused.');
+{{/if}}
 } catch (Throwable $error) {
     $failure = $error->getMessage();
 } finally {
@@ -127,4 +136,4 @@ try {
 {{/if}}
 }
 if ($failure !== null) exit(1);
-echo json_encode(['php' => PHP_VERSION, 'assertions' => ['health', 'parsed-greeting', 'validation-rejection', 'malformed-json', 'oversized-body', 'missing-route', {{#if (ne phpOrm "none")}}'orm-persistence', {{/if}}{{#if (ne phpAuth "none")}}'bearer-auth', {{/if}}'cors', 'cors-allowlist', 'shutdown'], 'success' => true], JSON_THROW_ON_ERROR) . "\n";
+echo json_encode(['php' => PHP_VERSION, 'assertions' => ['health', 'parsed-greeting', 'validation-rejection', 'malformed-json', 'oversized-body', 'missing-route', {{#if (ne phpOrm "none")}}'orm-persistence', {{/if}}{{#if (ne phpAuth "none")}}'bearer-auth', {{/if}}{{#if (ne phpCache "none")}}'cache', {{/if}}'cors', 'cors-allowlist', 'shutdown'], 'success' => true], JSON_THROW_ON_ERROR) . "\n";

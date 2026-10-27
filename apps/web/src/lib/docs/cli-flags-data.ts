@@ -2571,6 +2571,20 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "none",
         "multiple": false
+      },
+      {
+        "flag": "--php-cache",
+        "summary": "PHP cache library.",
+        "values": [
+          "symfony-cache",
+          "laminas-cache",
+          "predis",
+          "laravel-cache",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
       }
     ]
   },
@@ -3050,6 +3064,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "php:--php-auth": m.docsCliSummaryPhpPhpAuth,
   "php:--php-testing": m.docsCliSummaryPhpPhpTesting,
   "php:--php-validation": m.docsCliSummaryPhpPhpValidation,
+  "php:--php-cache": m.docsCliSummaryPhpPhpCache,
   "elixir:--elixir-web-framework": m.docsCliSummaryElixirElixirWebFramework,
   "elixir:--elixir-orm": m.docsCliSummaryElixirElixirOrm,
   "elixir:--elixir-auth": m.docsCliSummaryElixirElixirAuth,

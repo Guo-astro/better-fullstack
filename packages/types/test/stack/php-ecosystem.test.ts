@@ -191,7 +191,7 @@ describe("PHP graph and transport contract", () => {
     );
     const command = generateStackSelectionCommand(selection);
     expect(command).toContain(
-      "--ecosystem php --php-web-framework slim --php-orm none --php-auth none --php-testing phpunit --php-validation none --database none",
+      "--ecosystem php --php-web-framework slim --php-orm none --php-auth none --php-testing phpunit --php-validation none --php-cache none --database none",
     );
     expect(command).toContain("--no-install");
     const withOrm = { ...selection, phpWebFramework: "symfony", phpOrm: "doctrine" };
@@ -322,5 +322,27 @@ describe("PHP graph and transport contract", () => {
     expect(generateStackSelectionCommand(selection)).toContain(
       "--php-validation respect-validation",
     );
+  });
+
+  it("projects a PHP cache as an owned part and keeps Laravel Cache on Laravel", () => {
+    const parts = legacyProjectConfigToStackParts({ ...native, phpCache: "predis" });
+    expect(parts).toContainEqual(
+      expect.objectContaining({ role: "caching", ecosystem: "php", toolId: "predis" }),
+    );
+    expect(validateStackParts(parts).issues).toEqual([]);
+    expect(stackPartsToLegacyProjectConfigPartial(parts)).toMatchObject({ phpCache: "predis" });
+    const issue = getPhpRecipeIssue({ ...native, phpCache: "laravel-cache" });
+    expect(issue).toContain("Laravel Cache is generated for Laravel");
+    const mismatched = parseStackPartSpecs([
+      "backend:php:slim",
+      "backend.caching:php:laravel-cache",
+    ]);
+    expect(validateStackParts(mismatched).issues.map((entry) => entry.message)).toContain(issue);
+    expect(
+      getPhpRecipeIssue({ ...native, phpWebFramework: "laravel", phpCache: "laravel-cache" }),
+    ).toBeUndefined();
+    const selection = parseStackSelectionFromUrlRecord({ eco: "php", phcache: "laminas-cache" });
+    expect(selection.phpCache).toBe("laminas-cache");
+    expect(generateStackSelectionCommand(selection)).toContain("--php-cache laminas-cache");
   });
 });

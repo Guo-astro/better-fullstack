@@ -1294,6 +1294,7 @@ export function generateReproducibleCommand(config: ProjectConfig) {
         `--php-auth ${config.phpAuth ?? "none"}`,
         `--php-testing ${config.phpTesting ?? "phpunit"}`,
         `--php-validation ${config.phpValidation ?? "none"}`,
+        `--php-cache ${config.phpCache ?? "none"}`,
         "--database none",
       ];
       appendCommonFlags(flags, config);

@@ -75,6 +75,7 @@ import {
   PHP_AUTH_VALUES,
   PHP_TESTING_VALUES,
   PHP_VALIDATION_VALUES,
+  PHP_CACHE_VALUES,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   EFFECT_VALUES,
   EMAIL_VALUES,
@@ -747,6 +748,9 @@ function isNativeEcosystemBackendServiceTool(
     if (part.ecosystem === "ruby") {
       return (RUBY_CACHE_VALUES as readonly string[]).includes(part.toolId);
     }
+    if (part.ecosystem === "php") {
+      return (PHP_CACHE_VALUES as readonly string[]).includes(part.toolId);
+    }
   }
 
   if (part.role === "observability") {
@@ -823,7 +827,7 @@ const LEGACY_EXTRA_CATEGORIES_BY_ECOSYSTEM = {
     validation: "dotnetValidation",
   },
   ruby: { testing: "rubyTesting", validation: "rubyValidation", caching: "rubyCache" },
-  php: { testing: "phpTesting", validation: "phpValidation" },
+  php: { testing: "phpTesting", validation: "phpValidation", caching: "phpCache" },
   elixir: {
     realtime: "elixirRealtime",
     jobQueue: "elixirJobs",
@@ -1284,6 +1288,7 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   })),
   ...defineTools(PHP_TESTING_VALUES, "testing", "php", "phpTesting"),
   ...defineTools(PHP_VALIDATION_VALUES, "validation", "php", "phpValidation"),
+  ...defineTools(PHP_CACHE_VALUES, "caching", "php", "phpCache"),
   ...defineTools(["composer"], "packageManager", "php").map((definition) => ({
     ...definition,
     selectable: false,

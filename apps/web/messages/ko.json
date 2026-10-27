@@ -599,6 +599,7 @@
   "docsCliSummaryPhpPhpAuth": "PHP 인증.",
   "docsCliSummaryPhpPhpTesting": "PHP 테스트 러너.",
   "docsCliSummaryPhpPhpValidation": "PHP 검증 라이브러리.",
+  "docsCliSummaryPhpPhpCache": "PHP 캐시 라이브러리.",
   "docsCliSummaryElixirElixirWebFramework": "Elixir 웹 프레임워크.",
   "docsCliSummaryElixirElixirOrm": "Elixir ORM / 데이터베이스.",
   "docsCliSummaryElixirElixirAuth": "Elixir 인증.",

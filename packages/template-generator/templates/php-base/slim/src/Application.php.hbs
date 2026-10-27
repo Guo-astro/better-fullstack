@@ -16,7 +16,7 @@ use Throwable;
 
 final class Application
 {
-    public static function create(string $corsOrigin = ''{{#if (ne phpOrm "none")}}, ?Notes $notes = null{{/if}}{{#if (ne phpAuth "none")}}, ?TokenVerifier $tokens = null{{/if}}): App
+    public static function create(string $corsOrigin = ''{{#if (ne phpOrm "none")}}, ?Notes $notes = null{{/if}}{{#if (ne phpAuth "none")}}, ?TokenVerifier $tokens = null{{/if}}{{#if (ne phpCache "none")}}, ?CachedClock $clock = null{{/if}}): App
     {
         $app = AppFactory::create();
         $app->get('/health', function (ServerRequestInterface $request, ResponseInterface $response): ResponseInterface {
@@ -80,6 +80,13 @@ final class Application
                     return self::json($response, ['error' => 'unauthorized'], 401)->withHeader('WWW-Authenticate', 'Bearer');
                 }
                 return self::json($response, ['subject' => $subject]);
+            });
+        }
+{{/if}}
+{{#if (ne phpCache "none")}}
+        if ($clock !== null) {
+            $app->get('/api/cached-time', function (ServerRequestInterface $request, ResponseInterface $response) use ($clock): ResponseInterface {
+                return self::json($response, $clock->read());
             });
         }
 {{/if}}

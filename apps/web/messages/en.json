@@ -615,6 +615,7 @@
   "docsCliSummaryPhpPhpAuth": "PHP authentication.",
   "docsCliSummaryPhpPhpTesting": "PHP test runner.",
   "docsCliSummaryPhpPhpValidation": "PHP validation library.",
+  "docsCliSummaryPhpPhpCache": "PHP cache library.",
   "docsCliSummaryElixirElixirWebFramework": "Elixir web framework.",
   "docsCliSummaryElixirElixirOrm": "Elixir ORM / database.",
   "docsCliSummaryElixirElixirAuth": "Elixir auth.",

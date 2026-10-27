@@ -68,6 +68,24 @@ Cycle ORM stores notes in SQLite. `src/Notes.php` declares the ORM schema, creat
 Run `composer run db:setup` once before `composer run dev`. `GET /api/notes` lists notes. `POST /api/notes` accepts `{"title":"..."}` with 1 to 120 bytes of trimmed text and returns 201 with `id` and `title`. Invalid notes return 422 and malformed JSON returns 400. {{#if (eq phpTesting "none")}}`composer run proof:http` uses{{else}}`composer test` and `composer run proof:http` use{{/if}} temporary SQLite databases. Migrations beyond this starter schema are not generated.
 
 {{/if}}
+{{#if (ne phpCache "none")}}
+## Cache
+
+`GET /api/cached-time` returns `{"value":"<timestamp>","cached":false}` on a cache miss and the same value with `"cached":true` until it expires after 60 seconds. `{{phpSourceDirectory}}/CachedClock.php` owns the cache access and prefixes keys with CACHE_NAMESPACE (default `app`).
+{{#if (eq phpCache "symfony-cache")}}
+{{#if (eq phpWebFramework "symfony")}}It uses Symfony's `cache.app` pool, configured by FrameworkBundle under `var/cache/`.{{else}}It uses a Symfony Cache `FilesystemAdapter` in `{{#if (eq phpWebFramework "laravel")}}storage/framework/cache/app{{else}}var/cache/app{{/if}}`.{{/if}}
+{{else if (eq phpCache "laminas-cache")}}
+It uses the Laminas Cache filesystem adapter in `{{#if (eq phpWebFramework "laravel")}}storage/framework/cache/app{{else}}var/cache/app{{/if}}` through its PSR-16 decorator.
+{{else if (eq phpCache "predis")}}
+It stores the value in Redis through Predis with a 60-second expiry. Set REDIS_URL (default `tcp://127.0.0.1:6379`) to a running Redis server before `composer run dev`, `composer run proof:http` or the cache test; without Redis the route fails and the cache test is skipped.
+{{else}}
+It uses Laravel's `file` cache store in `storage/framework/cache/data`.
+{{/if}}
+{{#if (ne phpCache "predis")}}
+A filesystem cache is local to one machine; use a shared store before running several instances.
+{{/if}}
+
+{{/if}}
 {{#if (ne phpAuth "none")}}
 ## Authentication
 

@@ -13,7 +13,7 @@ final class Environment
         if (!is_file($file)) return;
         $values = parse_ini_file($file, false, INI_SCANNER_RAW);
         if ($values === false) throw new RuntimeException('Cannot parse .env.');
-        foreach ([{{#if (eq phpWebFramework "symfony")}}'APP_ENV', 'APP_DEBUG', {{/if}}'HOST', 'PORT', 'CORS_ORIGIN'{{#if (and (ne phpOrm "none") (ne phpWebFramework "laravel"))}}, 'DATABASE_PATH'{{/if}}{{#if (ne phpAuth "none")}}, 'JWT_SECRET', 'JWT_ISSUER', 'JWT_AUDIENCE'{{/if}}] as $key) {
+        foreach ([{{#if (eq phpWebFramework "symfony")}}'APP_ENV', 'APP_DEBUG', {{/if}}'HOST', 'PORT', 'CORS_ORIGIN'{{#if (and (ne phpOrm "none") (ne phpWebFramework "laravel"))}}, 'DATABASE_PATH'{{/if}}{{#if (ne phpAuth "none")}}, 'JWT_SECRET', 'JWT_ISSUER', 'JWT_AUDIENCE'{{/if}}{{#if (ne phpCache "none")}}, 'CACHE_NAMESPACE'{{/if}}{{#if (eq phpCache "predis")}}, 'REDIS_URL'{{/if}}] as $key) {
             if (getenv($key) === false && isset($values[$key]) && is_string($values[$key])) {
                 putenv($key . '=' . $values[$key]);
             }

@@ -1197,6 +1197,12 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         source: { kind: "category", category: "phpValidation" },
         configKey: "phpValidation",
       },
+      {
+        flag: "php-cache",
+        summary: "PHP cache library.",
+        source: { kind: "category", category: "phpCache" },
+        configKey: "phpCache",
+      },
     ],
   },
   {

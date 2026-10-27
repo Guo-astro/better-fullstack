@@ -1,11 +1,14 @@
 vendor/
 .env
 .phpunit.cache/
-{{#if (or (eq phpWebFramework "symfony") (and (eq phpWebFramework "slim") (ne phpOrm "none")))}}
+{{#if (or (eq phpWebFramework "symfony") (and (eq phpWebFramework "slim") (or (ne phpOrm "none") (ne phpCache "none"))))}}
 var/
 {{/if}}
 {{#if (and (eq phpWebFramework "laravel") (ne phpOrm "none"))}}
 database/*.sqlite
+{{/if}}
+{{#if (and (eq phpWebFramework "laravel") (or (eq phpCache "symfony-cache") (eq phpCache "laminas-cache")))}}
+storage/framework/cache/app/
 {{/if}}
 {{#if (eq phpTesting "codeception")}}
 tests/_output/

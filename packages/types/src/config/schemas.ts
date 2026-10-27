@@ -1076,6 +1076,10 @@ export const PhpValidationSchema = z
   .enum(["symfony-validator", "respect-validation", "laravel-validation", "none"])
   .describe("PHP validation library");
 
+export const PhpCacheSchema = z
+  .enum(["symfony-cache", "laminas-cache", "predis", "laravel-cache", "none"])
+  .describe("PHP cache library");
+
 export const ElixirWebFrameworkSchema = z
   .enum(["phoenix", "phoenix-live-view", "none"])
   .describe("Elixir web framework");
@@ -1469,6 +1473,7 @@ const STACK_CONFIG_FIELDS = {
   phpAuth: PhpAuthSchema.default("none"),
   phpTesting: PhpTestingSchema.default("phpunit"),
   phpValidation: PhpValidationSchema.default("none"),
+  phpCache: PhpCacheSchema.default("none"),
   elixirWebFramework: ElixirWebFrameworkSchema,
   elixirOrm: ElixirOrmSchema,
   elixirAuth: ElixirAuthSchema,
@@ -1764,6 +1769,7 @@ export const PHP_ORM_VALUES = PhpOrmSchema.options;
 export const PHP_AUTH_VALUES = PhpAuthSchema.options;
 export const PHP_TESTING_VALUES = PhpTestingSchema.options;
 export const PHP_VALIDATION_VALUES = PhpValidationSchema.options;
+export const PHP_CACHE_VALUES = PhpCacheSchema.options;
 export const ELIXIR_WEB_FRAMEWORK_VALUES = ElixirWebFrameworkSchema.options;
 export const ELIXIR_ORM_VALUES = ElixirOrmSchema.options;
 export const ELIXIR_AUTH_VALUES = ElixirAuthSchema.options;

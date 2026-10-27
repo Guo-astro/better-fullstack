@@ -561,6 +561,7 @@ export function buildCompatibilityInputFromConfig(
     phpAuth: asString(config.phpAuth),
     phpTesting: asString(config.phpTesting),
     phpValidation: asString(config.phpValidation),
+    phpCache: asString(config.phpCache),
     elixirWebFramework: asString(config.elixirWebFramework),
     elixirOrm: asString(config.elixirOrm),
     elixirAuth: asString(config.elixirAuth),

@@ -599,6 +599,7 @@
   "docsCliSummaryPhpPhpAuth": "PHP の認証。",
   "docsCliSummaryPhpPhpTesting": "PHP のテストランナー。",
   "docsCliSummaryPhpPhpValidation": "PHP の検証ライブラリ。",
+  "docsCliSummaryPhpPhpCache": "PHP のキャッシュライブラリ。",
   "docsCliSummaryElixirElixirWebFramework": "Elixir の Web フレームワーク。",
   "docsCliSummaryElixirElixirOrm": "Elixir の ORM / データベース。",
   "docsCliSummaryElixirElixirAuth": "Elixir の認証。",

@@ -62,6 +62,7 @@ import type {
   PhpAuth,
   PhpTesting,
   PhpValidation,
+  PhpCache,
   ElixirWebFramework,
   I18n,
   Database,
@@ -299,6 +300,7 @@ import {
   getPhpOrmChoice,
   getPhpTestingChoice,
   getPhpValidationChoice,
+  getPhpCacheChoice,
   getPhpWebFrameworkChoice,
 } from "@/prompts/ecosystems/php-ecosystem";
 import {
@@ -529,6 +531,7 @@ type PromptGroupResults = {
   phpAuth: PhpAuth;
   phpTesting: PhpTesting;
   phpValidation: PhpValidation;
+  phpCache: PhpCache;
   elixirWebFramework: ElixirWebFramework;
   elixirOrm: ElixirOrm;
   elixirAuth: ElixirAuth;
@@ -725,6 +728,7 @@ const CONFIG_PROMPT_ENTRY_KEY_MAP = {
   phpAuth: true,
   phpTesting: true,
   phpValidation: true,
+  phpCache: true,
   elixirWebFramework: true,
   elixirOrm: true,
   elixirAuth: true,
@@ -1965,6 +1969,10 @@ export async function gatherConfig(
       results.ecosystem === "php"
         ? getPhpValidationChoice(flags.phpValidation, results.phpWebFramework)
         : Promise.resolve("none" as const),
+    phpCache: ({ results }) =>
+      results.ecosystem === "php"
+        ? getPhpCacheChoice(flags.phpCache, results.phpWebFramework)
+        : Promise.resolve("none" as const),
     elixirWebFramework: ({ results }) => {
       if (results.ecosystem !== "elixir") return Promise.resolve("none" as ElixirWebFramework);
       return getElixirWebFrameworkChoice(flags.elixirWebFramework);
@@ -2248,6 +2256,7 @@ export async function gatherConfig(
     phpAuth: result.phpAuth,
     phpTesting: result.phpTesting,
     phpValidation: result.phpValidation,
+    phpCache: result.phpCache,
     elixirWebFramework: result.elixirWebFramework,
     elixirOrm: result.elixirOrm,
     elixirAuth: result.elixirAuth,

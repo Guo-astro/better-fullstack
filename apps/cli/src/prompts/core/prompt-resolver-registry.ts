@@ -89,6 +89,7 @@ import {
   resolvePhpOrmPrompt,
   resolvePhpTestingPrompt,
   resolvePhpValidationPrompt,
+  resolvePhpCachePrompt,
   resolvePhpWebFrameworkPrompt,
 } from "@/prompts/ecosystems/php-ecosystem";
 import {
@@ -240,6 +241,7 @@ import {
   PhpOrmSchema,
   PhpTestingSchema,
   PhpValidationSchema,
+  PhpCacheSchema,
   PhpWebFrameworkSchema,
   PYTHON_AI_VALUES,
   PYTHON_API_VALUES,
@@ -896,6 +898,20 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
     resolve: ({ value, phpWebFramework }: { value?: string; phpWebFramework?: string } = {}) =>
       resolvePhpValidationPrompt(
         value === undefined ? undefined : PhpValidationSchema.parse(value),
+        phpWebFramework === undefined ? undefined : PhpWebFrameworkSchema.parse(phpWebFramework),
+      ),
+  },
+  phpCache: {
+    schemaValues: PhpCacheSchema.options,
+    coverageContexts: [
+      {},
+      { phpWebFramework: "slim" },
+      { phpWebFramework: "laravel" },
+      { phpWebFramework: "symfony" },
+    ],
+    resolve: ({ value, phpWebFramework }: { value?: string; phpWebFramework?: string } = {}) =>
+      resolvePhpCachePrompt(
+        value === undefined ? undefined : PhpCacheSchema.parse(value),
         phpWebFramework === undefined ? undefined : PhpWebFrameworkSchema.parse(phpWebFramework),
       ),
   },

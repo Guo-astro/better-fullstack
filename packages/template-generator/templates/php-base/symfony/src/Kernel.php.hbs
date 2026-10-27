@@ -17,6 +17,9 @@ use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 {{/if}}
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+{{#if (eq phpCache "symfony-cache")}}
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+{{/if}}
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
@@ -61,6 +64,12 @@ final class Kernel extends BaseKernel
             ->load('App\\Security\\', __DIR__ . '/Security/'){{/if}};
 {{#if (ne phpAuth "none")}}
         $container->services()->set(TokenVerifier::class)->factory([TokenVerifier::class, 'fromEnvironment']);
+{{/if}}
+{{#if (eq phpCache "symfony-cache")}}
+        $container->parameters()->set('app.cache_namespace', 'app');
+        $container->services()->set(CachedClock::class)->args([service('cache.app'), '%env(default:app.cache_namespace:CACHE_NAMESPACE)%']);
+{{else if (ne phpCache "none")}}
+        $container->services()->set(CachedClock::class)->factory([CachedClock::class, 'fromEnvironment'])->args(['%kernel.project_dir%']);
 {{/if}}
 {{#if (eq phpAuth "symfony-security")}}
         $container->extension('security', [

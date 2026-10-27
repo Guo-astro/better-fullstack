@@ -1,6 +1,13 @@
 import { getPhpCapabilityIssue } from "@better-fullstack/types";
 
-import type { PhpAuth, PhpOrm, PhpTesting, PhpValidation, PhpWebFramework } from "@/types";
+import type {
+  PhpAuth,
+  PhpCache,
+  PhpOrm,
+  PhpTesting,
+  PhpValidation,
+  PhpWebFramework,
+} from "@/types";
 
 import { exitCancelled } from "@/presentation/errors";
 import { isCancel, navigableSelect } from "@/prompts/core/navigable";
@@ -62,6 +69,26 @@ const VALIDATION_OPTIONS: PromptOption<PhpValidation>[] = [
     hint: "Laravel validator rules (Laravel only)",
   },
   { value: "none", label: "None", hint: "Keep the hand-written payload checks" },
+];
+
+const CACHE_OPTIONS: PromptOption<PhpCache>[] = [
+  {
+    value: "symfony-cache",
+    label: "Symfony Cache",
+    hint: "Filesystem cache pool behind GET /api/cached-time",
+  },
+  {
+    value: "laminas-cache",
+    label: "Laminas Cache",
+    hint: "Laminas filesystem storage through PSR-16",
+  },
+  { value: "predis", label: "Predis", hint: "Redis-backed cache; needs a running Redis server" },
+  {
+    value: "laravel-cache",
+    label: "Laravel Cache",
+    hint: "Laravel file cache store (Laravel only)",
+  },
+  { value: "none", label: "None", hint: "No cache" },
 ];
 
 export function resolvePhpWebFrameworkPrompt(value?: PhpWebFramework) {
@@ -142,6 +169,24 @@ export async function getPhpValidationChoice(value?: PhpValidation, framework?: 
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
   const response = await navigableSelect<PhpValidation>({
     message: "Select PHP validation library",
+    options: resolution.options,
+    initialValue: resolution.initialValue,
+  });
+  return isCancel(response) ? exitCancelled("Operation cancelled") : response;
+}
+
+export function resolvePhpCachePrompt(value?: PhpCache, framework?: PhpWebFramework) {
+  const options = CACHE_OPTIONS.filter(
+    (option) => !getPhpCapabilityIssue(framework, "caching", option.value),
+  );
+  return createStaticSinglePromptResolution(options, "none", value);
+}
+
+export async function getPhpCacheChoice(value?: PhpCache, framework?: PhpWebFramework) {
+  const resolution = resolvePhpCachePrompt(value, framework);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
+  const response = await navigableSelect<PhpCache>({
+    message: "Select PHP cache",
     options: resolution.options,
     initialValue: resolution.initialValue,
   });

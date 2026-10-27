@@ -23,6 +23,7 @@ export async function processPhpBaseTemplate(
     phpAuth: config.phpAuth ?? "none",
     phpTesting: config.phpTesting ?? "phpunit",
     phpValidation: config.phpValidation ?? "none",
+    phpCache: config.phpCache ?? "none",
     phpPackageName,
     phpSourceDirectory,
   };

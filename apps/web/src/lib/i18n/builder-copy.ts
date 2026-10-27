@@ -693,6 +693,16 @@ const CATEGORY_NAMES: Record<string, LocalizedMap> = {
     "fr": "Validation PHP",
     "uk": "Валідація PHP",
   },
+  phpCache: {
+    "es": "Caché PHP",
+    "zh": "PHP 缓存",
+    "ja": "PHP キャッシュ",
+    "ko": "PHP 캐시",
+    "zh-Hant": "PHP 快取",
+    "de": "PHP-Cache",
+    "fr": "Cache PHP",
+    "uk": "Кеш PHP",
+  },
   phpAuth: {
     "es": "Auth PHP",
     "zh": "PHP 认证",

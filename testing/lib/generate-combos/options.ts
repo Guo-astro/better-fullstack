@@ -107,6 +107,7 @@ import {
   PHP_ORM_VALUES,
   PHP_TESTING_VALUES,
   PHP_VALIDATION_VALUES,
+  PHP_CACHE_VALUES,
   PHP_WEB_FRAMEWORK_VALUES,
   PYTHON_TESTING_VALUES,
   PYTHON_CACHING_VALUES,
@@ -677,6 +678,13 @@ function makePhpDraft(args: GeneratorArgs): CandidateDraft {
         0.4,
         "phpValidation",
       ),
+      phpCache: sampleScalar(
+        PHP_CACHE_VALUES.filter(
+          (value) => !getPhpCapabilityIssue(phpWebFramework, "caching", value),
+        ),
+        0.4,
+        "phpCache",
+      ),
       database: "none",
     },
   };
@@ -934,6 +942,7 @@ function createValidationBase(projectName: string, draft: CandidateDraft): Proje
     phpAuth: "none",
     phpTesting: "none",
     phpValidation: "none",
+    phpCache: "none",
     elixirWebFramework: "none",
     elixirOrm: "none",
     elixirAuth: "none",

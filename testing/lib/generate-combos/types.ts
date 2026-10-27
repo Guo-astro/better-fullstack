@@ -144,6 +144,7 @@ export const TEMPLATE_FINGERPRINT_KEYS = [
   "phpAuth",
   "phpTesting",
   "phpValidation",
+  "phpCache",
   "elixirWebFramework",
   "elixirOrm",
   "elixirAuth",

@@ -92,5 +92,8 @@ describe("PHP builder recipe", () => {
     expect(generateStackCommand({ ...stack, phpValidation: "respect-validation" })).toContain(
       "--php-validation respect-validation",
     );
+    expect(generateStackCommand({ ...stack, phpCache: "symfony-cache" })).toContain(
+      "--php-cache symfony-cache",
+    );
   });
 });

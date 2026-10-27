@@ -205,6 +205,7 @@ function normalizeGraphConfigForPersistence(
     normalized.phpAuth = "none";
     normalized.phpTesting = "none";
     normalized.phpValidation = "none";
+    normalized.phpCache = "none";
   }
   if (!selectedEcosystems.has("elixir")) {
     normalized.elixirWebFramework = "none";
@@ -535,6 +536,7 @@ export function buildBtsConfigForPersistence(
     phpAuth: persistedConfig.phpAuth,
     phpTesting: persistedConfig.phpTesting,
     phpValidation: persistedConfig.phpValidation,
+    phpCache: persistedConfig.phpCache,
     elixirWebFramework: persistedConfig.elixirWebFramework,
     elixirOrm: persistedConfig.elixirOrm,
     elixirAuth: persistedConfig.elixirAuth,
@@ -746,6 +748,7 @@ export function serializeBtsConfig(
     phpAuth: btsConfig.phpAuth,
     phpTesting: btsConfig.phpTesting,
     phpValidation: btsConfig.phpValidation,
+    phpCache: btsConfig.phpCache,
     elixirWebFramework: btsConfig.elixirWebFramework,
     elixirOrm: btsConfig.elixirOrm,
     elixirAuth: btsConfig.elixirAuth,

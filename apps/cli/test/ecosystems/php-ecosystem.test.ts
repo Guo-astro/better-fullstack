@@ -288,6 +288,51 @@ describe("PHP generation and lifecycle", () => {
     expect(result.tree).toBeUndefined();
   });
 
+  it.each([
+    ["slim", "symfony-cache", "symfony/cache"],
+    ["symfony", "laminas-cache", "laminas/laminas-cache"],
+    ["laravel", "predis", "predis/predis"],
+    ["laravel", "laravel-cache", "laravel/framework"],
+  ] as const)(
+    "generates %s with %s behind the cached-time route and replays it",
+    async (framework, cache, dependency) => {
+      const result = await createVirtual({
+        projectName: `php-${framework}-${cache}`,
+        ecosystem: "php",
+        phpWebFramework: framework,
+        phpCache: cache,
+      });
+      expect(result.success).toBe(true);
+      const tree = result.tree!;
+      const manifest = JSON.parse(getVirtualTreeFileContent(tree, "composer.json"));
+      expect(Object.keys(manifest.require)).toContain(dependency);
+      const source = framework === "laravel" ? "app" : "src";
+      expect(hasVirtualFile(tree.root, `${source}/CachedClock.php`)).toBe(true);
+      expect(hasVirtualFile(tree.root, "tests/CacheTest.php")).toBe(true);
+      expect(getVirtualTreeFileContent(tree, "bin/proof-http.php")).toContain("/api/cached-time");
+      expect(getVirtualTreeFileContent(tree, ".env.example").includes("REDIS_URL=")).toBe(
+        cache === "predis",
+      );
+      expect(generateReproducibleCommand(tree.config)).toContain(`--php-cache ${cache}`);
+      const saved = buildBtsConfigForPersistence(tree.config, {
+        version: "0.0.0",
+        createdAt: "2026-10-27T00:00:00.000Z",
+      });
+      expect(previewBtsConfigUpdate(saved, {}).phpCache).toBe(cache);
+    },
+  );
+
+  it("rejects Laravel Cache outside Laravel before emitting files", async () => {
+    const result = await createVirtual({
+      ecosystem: "php",
+      phpWebFramework: "symfony",
+      phpCache: "laravel-cache",
+    });
+    expect(result.success).toBe(false);
+    expect(result.error).toContain("Laravel Cache is generated for Laravel");
+    expect(result.tree).toBeUndefined();
+  });
+
   it("rejects Symfony Security outside Symfony before emitting files", async () => {
     const result = await createVirtual({
       ecosystem: "php",

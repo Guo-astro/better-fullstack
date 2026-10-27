@@ -2371,6 +2371,22 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://laravel.com/docs/13.x/validation",
     githubUrl: "https://github.com/illuminate/validation",
   },
+  "phpCache:symfony-cache": {
+    docsUrl: "https://symfony.com/doc/current/components/cache.html",
+    githubUrl: "https://github.com/symfony/cache",
+  },
+  "phpCache:laminas-cache": {
+    docsUrl: "https://docs.laminas.dev/laminas-cache/",
+    githubUrl: "https://github.com/laminas/laminas-cache",
+  },
+  "phpCache:predis": {
+    docsUrl: "https://github.com/predis/predis#readme",
+    githubUrl: "https://github.com/predis/predis",
+  },
+  "phpCache:laravel-cache": {
+    docsUrl: "https://laravel.com/docs/13.x/cache",
+    githubUrl: "https://github.com/illuminate/cache",
+  },
   "phpOrm:cycle": {
     docsUrl: "https://cycle-orm.dev/docs/intro-about/current/en",
     githubUrl: "https://github.com/cycle/orm",

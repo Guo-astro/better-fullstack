@@ -6298,6 +6298,44 @@ export const TECH_OPTIONS: Record<
       default: true,
     },
   ],
+  phpCache: [
+    {
+      id: "symfony-cache",
+      name: "Symfony Cache",
+      description: "Filesystem cache pool serving a cached timestamp on any PHP framework",
+      icon: "https://cdn.simpleicons.org/symfony/000000",
+      color: "from-gray-700 to-gray-900",
+    },
+    {
+      id: "laminas-cache",
+      name: "Laminas Cache",
+      description: "Laminas filesystem storage through PSR-16 on any PHP framework",
+      icon: "",
+      color: "from-emerald-500 to-green-700",
+    },
+    {
+      id: "predis",
+      name: "Predis",
+      description: "Redis-backed cache with key expiry; needs a running Redis server",
+      icon: "https://cdn.simpleicons.org/redis/FF4438",
+      color: "from-red-500 to-rose-700",
+    },
+    {
+      id: "laravel-cache",
+      name: "Laravel Cache",
+      description: "Laravel's file cache store on Laravel",
+      icon: "https://cdn.simpleicons.org/laravel/FF2D20",
+      color: "from-red-500 to-red-700",
+    },
+    {
+      id: "none",
+      name: "None",
+      description: "No cache",
+      icon: "",
+      color: "from-gray-500 to-gray-700",
+      default: true,
+    },
+  ],
   phpAuth: [
     {
       id: "firebase-jwt",

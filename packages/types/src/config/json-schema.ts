@@ -71,6 +71,7 @@ import {
   PhpAuthSchema,
   PhpTestingSchema,
   PhpValidationSchema,
+  PhpCacheSchema,
   ElixirWebFrameworkSchema,
   JavaAuthSchema,
   JavaBuildToolSchema,
@@ -291,6 +292,10 @@ export function getPhpValidationJsonSchema() {
   return z.toJSONSchema(PhpValidationSchema);
 }
 
+export function getPhpCacheJsonSchema() {
+  return z.toJSONSchema(PhpCacheSchema);
+}
+
 export function getElixirWebFrameworkJsonSchema() {
   return z.toJSONSchema(ElixirWebFrameworkSchema);
 }
@@ -431,6 +436,7 @@ export function getAllJsonSchemas() {
     phpAuth: getPhpAuthJsonSchema(),
     phpTesting: getPhpTestingJsonSchema(),
     phpValidation: getPhpValidationJsonSchema(),
+    phpCache: getPhpCacheJsonSchema(),
     elixirWebFramework: getElixirWebFrameworkJsonSchema(),
     elixirOrm: getElixirOrmJsonSchema(),
     elixirAuth: getElixirAuthJsonSchema(),

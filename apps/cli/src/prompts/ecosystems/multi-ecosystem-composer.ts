@@ -121,6 +121,7 @@ import {
   getPhpOrmChoice,
   getPhpTestingChoice,
   getPhpValidationChoice,
+  getPhpCacheChoice,
   getPhpWebFrameworkChoice,
 } from "@/prompts/ecosystems/php-ecosystem";
 import {
@@ -1511,12 +1512,24 @@ export async function gatherMultiEcosystemConfig(
       phpWebFramework === "none"
         ? "none"
         : promptValue(await getPhpValidationChoice(flags.phpValidation, phpWebFramework));
-    Object.assign(backendChoices, { phpWebFramework, phpOrm, phpAuth, phpTesting, phpValidation });
+    const phpCache =
+      phpWebFramework === "none"
+        ? "none"
+        : promptValue(await getPhpCacheChoice(flags.phpCache, phpWebFramework));
+    Object.assign(backendChoices, {
+      phpWebFramework,
+      phpOrm,
+      phpAuth,
+      phpTesting,
+      phpValidation,
+      phpCache,
+    });
     if (phpWebFramework !== "none") stackPartSpecs.push(`backend:php:${phpWebFramework}`);
     if (phpOrm !== "none") stackPartSpecs.push(`backend.orm:php:${phpOrm}`);
     if (phpAuth !== "none") stackPartSpecs.push(`backend.auth:php:${phpAuth}`);
     if (phpTesting !== "none") stackPartSpecs.push(`backend.testing:php:${phpTesting}`);
     if (phpValidation !== "none") stackPartSpecs.push(`backend.validation:php:${phpValidation}`);
+    if (phpCache !== "none") stackPartSpecs.push(`backend.caching:php:${phpCache}`);
   }
 
   if (backendEcosystem === "elixir") {
