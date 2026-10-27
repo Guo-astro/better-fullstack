@@ -796,5 +796,6 @@
   "docsCliSummaryCrystalCrystalAuth": "実験的な Crystal 認証。",
   "docsCliSummaryCrystalCrystalTesting": "実験的な Crystal テストツール。",
   "docsCliSummaryCrystalCrystalValidation": "実験的な Crystal 入力検証。",
-  "docsCliSummaryCrystalCrystalCache": "実験的な Crystal キャッシュストア。"
+  "docsCliSummaryCrystalCrystalCache": "実験的な Crystal キャッシュストア。",
+  "docsCliSummaryCrystalCrystalJobs": "実験的な Crystal バックグラウンドジョブ。"
 }

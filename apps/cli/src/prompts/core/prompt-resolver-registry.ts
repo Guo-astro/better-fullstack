@@ -25,7 +25,7 @@ import { resolveFormsPrompt } from "@/prompts/developer/forms";
 import { resolveTestingPrompt } from "@/prompts/developer/testing";
 import { resolveUILibraryPrompt } from "@/prompts/developer/ui-library";
 import { resolveValidationPrompt } from "@/prompts/developer/validation";
-import { resolveCrystalAuthPrompt, resolveCrystalTestingPrompt, resolveCrystalValidationPrompt, resolveCrystalCachePrompt, resolveCrystalOrmPrompt, resolveCrystalWebFrameworkPrompt } from "@/prompts/ecosystems/crystal-ecosystem";
+import { resolveCrystalAuthPrompt, resolveCrystalTestingPrompt, resolveCrystalValidationPrompt, resolveCrystalCachePrompt, resolveCrystalJobsPrompt, resolveCrystalOrmPrompt, resolveCrystalWebFrameworkPrompt } from "@/prompts/ecosystems/crystal-ecosystem";
 import {
   resolveDotnetApiPrompt,
   resolveDotnetAuthPrompt,
@@ -240,6 +240,7 @@ import {
   CRYSTAL_TESTING_VALUES,
   CRYSTAL_VALIDATION_VALUES,
   CRYSTAL_CACHE_VALUES,
+  CRYSTAL_JOBS_VALUES,
   GO_LOGGING_VALUES,
   GO_MIGRATIONS_VALUES,
   GO_ORM_VALUES,
@@ -769,6 +770,12 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
     schemaValues: CRYSTAL_CACHE_VALUES,
     resolve: ({ value, ...selection }: { value?: string } & CrystalSelection = {}) =>
       resolveCrystalCachePrompt(value, selection),
+    coverageContexts: [{ crystalWebFramework: "kemal" }],
+  },
+  crystalJobs: {
+    schemaValues: CRYSTAL_JOBS_VALUES,
+    resolve: ({ value, ...selection }: { value?: string } & CrystalSelection = {}) =>
+      resolveCrystalJobsPrompt(value, selection),
     coverageContexts: [{ crystalWebFramework: "kemal" }],
   },
   javaWebFramework: {

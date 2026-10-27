@@ -218,6 +218,7 @@ export async function createVirtual(
       crystalTesting: options.crystalTesting ?? (ecosystem === "crystal" ? "spec" : "none"),
       crystalValidation: options.crystalValidation ?? "none",
       crystalCache: options.crystalCache ?? "none",
+      crystalJobs: options.crystalJobs ?? "none",
       javaWebFramework:
         options.javaWebFramework || (options.ecosystem === "java" ? "spring-boot" : "none"),
       javaLanguage: options.javaLanguage || "java",

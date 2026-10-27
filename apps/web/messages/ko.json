@@ -796,5 +796,6 @@
   "docsCliSummaryCrystalCrystalAuth": "실험적인 Crystal 인증입니다.",
   "docsCliSummaryCrystalCrystalTesting": "실험적인 Crystal 테스트 도구입니다.",
   "docsCliSummaryCrystalCrystalValidation": "실험적인 Crystal 입력 검증입니다.",
-  "docsCliSummaryCrystalCrystalCache": "실험적인 Crystal 캐시 저장소입니다."
+  "docsCliSummaryCrystalCrystalCache": "실험적인 Crystal 캐시 저장소입니다.",
+  "docsCliSummaryCrystalCrystalJobs": "실험적인 Crystal 백그라운드 작업입니다."
 }

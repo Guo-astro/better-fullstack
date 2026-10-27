@@ -2599,6 +2599,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://github.com/crystal-cache/redis_cache_store#readme",
     githubUrl: "https://github.com/crystal-cache/redis_cache_store",
   },
+  "crystalJobs:sidekiq": {
+    docsUrl: "https://github.com/hugopl/sidekiq.cr/wiki",
+    githubUrl: "https://github.com/hugopl/sidekiq.cr",
+  },
+  "crystalJobs:mosquito": {
+    docsUrl: "https://mosquito-cr.github.io/manual/",
+    githubUrl: "https://github.com/mosquito-cr/mosquito",
+  },
+  "crystalJobs:tasker": {
+    docsUrl: "https://github.com/spider-gazelle/tasker#readme",
+    githubUrl: "https://github.com/spider-gazelle/tasker",
+  },
   "elixirOrm:ecto-sql": {
     docsUrl: "https://hexdocs.pm/ecto_sql/",
     githubUrl: "https://github.com/elixir-ecto/ecto_sql",

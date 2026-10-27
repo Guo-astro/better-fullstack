@@ -230,7 +230,7 @@ import { getShadcnOptions, type ShadcnOptions } from "@/prompts/developer/shadcn
 import { getTestingChoice } from "@/prompts/developer/testing";
 import { getUILibraryChoice } from "@/prompts/developer/ui-library";
 import { getValidationChoice } from "@/prompts/developer/validation";
-import { getCrystalAuthChoice, getCrystalTestingChoice, getCrystalValidationChoice, getCrystalCacheChoice, getCrystalOrmChoice, getCrystalWebFrameworkChoice } from "@/prompts/ecosystems/crystal-ecosystem";
+import { getCrystalAuthChoice, getCrystalTestingChoice, getCrystalValidationChoice, getCrystalCacheChoice, getCrystalJobsChoice, getCrystalOrmChoice, getCrystalWebFrameworkChoice } from "@/prompts/ecosystems/crystal-ecosystem";
 import {
   getDotnetApiChoice,
   getDotnetAuthChoice,
@@ -520,6 +520,7 @@ type PromptGroupResults = {
   crystalTesting: ProjectConfig["crystalTesting"];
   crystalValidation: ProjectConfig["crystalValidation"];
   crystalCache: ProjectConfig["crystalCache"];
+  crystalJobs: ProjectConfig["crystalJobs"];
   javaWebFramework: JavaWebFramework;
   javaLanguage: JavaLanguage;
   javaBuildTool: JavaBuildTool;
@@ -732,6 +733,7 @@ const CONFIG_PROMPT_ENTRY_KEY_MAP = {
   crystalTesting: true,
   crystalValidation: true,
   crystalCache: true,
+  crystalJobs: true,
   javaWebFramework: true,
   javaLanguage: true,
   javaBuildTool: true,
@@ -1104,7 +1106,7 @@ export async function gatherConfig(
           ecosystem,
         });
         if (issue) throw new Error(issue);
-        const { crystalWebFramework: _frameworkDefault, crystalAuth: _crystalAuthDefault, crystalTesting: _crystalTestingDefault, crystalValidation: _crystalValidationDefault, crystalCache: _crystalCacheDefault, crystalOrm: _crystalOrmDefault, ...nativeDefaults } =
+        const { crystalWebFramework: _frameworkDefault, crystalAuth: _crystalAuthDefault, crystalTesting: _crystalTestingDefault, crystalValidation: _crystalValidationDefault, crystalCache: _crystalCacheDefault, crystalJobs: _crystalJobsDefault, crystalOrm: _crystalOrmDefault, ...nativeDefaults } =
           CRYSTAL_PROJECT_DEFAULTS;
         Object.assign(flags, { ...nativeDefaults, ...flags });
       }
@@ -1838,6 +1840,10 @@ export async function gatherConfig(
       results.ecosystem === "crystal"
         ? getCrystalCacheChoice(flags.crystalCache, results)
         : Promise.resolve("none" as const),
+    crystalJobs: ({ results }) =>
+      results.ecosystem === "crystal"
+        ? getCrystalJobsChoice(flags.crystalJobs, results)
+        : Promise.resolve("none" as const),
     javaWebFramework: ({ results }) => {
       if (results.ecosystem !== "java") return Promise.resolve("none" as JavaWebFramework);
       return getJavaWebFrameworkChoice(flags.javaWebFramework);
@@ -2329,6 +2335,7 @@ export async function gatherConfig(
     crystalTesting: result.crystalTesting,
     crystalValidation: result.crystalValidation,
     crystalCache: result.crystalCache,
+    crystalJobs: result.crystalJobs,
     javaWebFramework: result.javaWebFramework,
     javaLanguage: result.javaLanguage,
     javaBuildTool: result.javaBuildTool,

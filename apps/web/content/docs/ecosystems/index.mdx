@@ -74,6 +74,8 @@ Validate greeting names with `--crystal-validation`. `athena-validator` applies 
 
 Cache a value with `--crystal-cache`. `memory` keeps entries in the server process, `file` writes them under `CACHE_DIR`, and `redis` stores them in Redis at `REDIS_URL`. Each one adds `GET /api/cached-time`, which returns the same timestamp until its 30-second entry expires, and a spec that proves the expiry. The cache options need an HTTP framework.
 
+Run background jobs with `--crystal-jobs`. `sidekiq` and `mosquito` queue jobs in Redis at `REDIS_URL` and build a separate `bin/worker`, while `tasker` schedules the job inside the server process, so queued work is lost on restart. Each one adds `POST /api/jobs`, which validates a name and returns 202 with a job id, and `GET /api/jobs?id=...`, which reports the job as queued or done. Sidekiq.cr cannot be combined with the Redis cache because they depend on different shards named `redis`.
+
 Append a relative directory to a binding, such as `backend:crystal:kemal:audit@services/audit%20api`. Directory segments accept ASCII letters, digits, spaces, dots, underscores, hyphens, `@`, `:`, and `%`. Encode special characters in the binding. Applications cannot share a destination or nest one destination inside another.
 
 TypeScript frontends and backends use `apps/web` and `apps/server`. React Native apps use `apps/native`. Custom directories for these applications are rejected because their templates require the default paths.

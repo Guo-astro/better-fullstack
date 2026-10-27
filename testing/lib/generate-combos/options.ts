@@ -10,6 +10,7 @@ import {
   CRYSTAL_TESTING_VALUES,
   CRYSTAL_VALIDATION_VALUES,
   CRYSTAL_CACHE_VALUES,
+  CRYSTAL_JOBS_VALUES,
   CRYSTAL_ORM_VALUES,
   CRYSTAL_WEB_FRAMEWORK_VALUES,
   type CrystalOptionCategory,
@@ -975,6 +976,7 @@ function createValidationBase(projectName: string, draft: CandidateDraft): Proje
     crystalTesting: "none",
     crystalValidation: "none",
     crystalCache: "none",
+    crystalJobs: "none",
     javaWebFramework: "none",
     javaBuildTool: "none",
     javaOrm: "none",
@@ -1142,6 +1144,7 @@ function createDraft(ecosystem: Ecosystem, args: GeneratorArgs): CandidateDraft 
       );
       const crystalOptions = <T extends string>(category: CrystalOptionCategory, values: readonly T[]) =>
         values.filter((value) => !getCrystalOptionIssue(category, value, { crystalWebFramework }));
+      const crystalCache = sampleScalar(crystalOptions("crystalCache", CRYSTAL_CACHE_VALUES), 0.5, "crystalCache");
       const crystalOrm = sampleScalar(crystalOptions("crystalOrm", CRYSTAL_ORM_VALUES), 0.5, "crystalOrm");
       return {
         ecosystem: "crystal",
@@ -1159,7 +1162,14 @@ function createDraft(ecosystem: Ecosystem, args: GeneratorArgs): CandidateDraft 
           ),
           crystalTesting: sampleScalar(crystalOptions("crystalTesting", CRYSTAL_TESTING_VALUES), 0.5, "crystalTesting"),
           crystalValidation: sampleScalar(crystalOptions("crystalValidation", CRYSTAL_VALIDATION_VALUES), 0.5, "crystalValidation"),
-          crystalCache: sampleScalar(crystalOptions("crystalCache", CRYSTAL_CACHE_VALUES), 0.5, "crystalCache"),
+          crystalCache,
+          crystalJobs: sampleScalar(
+            CRYSTAL_JOBS_VALUES.filter(
+              (value) => !getCrystalOptionIssue("crystalJobs", value, { crystalWebFramework, crystalCache }),
+            ),
+            0.5,
+            "crystalJobs",
+          ),
         },
       };
     }

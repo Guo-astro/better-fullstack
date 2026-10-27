@@ -7451,6 +7451,12 @@ export const TECH_OPTIONS: Record<
     { id: "redis", name: "Redis", description: "redis_cache_store sharing TTL entries through REDIS_URL", icon: "https://cdn.simpleicons.org/redis", color: "from-red-500 to-red-700", default: false },
     { id: "none", name: "None", description: "No cache", icon: "", color: "from-gray-400 to-gray-600", default: true },
   ],
+  crystalJobs: [
+    { id: "sidekiq", name: "Sidekiq.cr", description: "Redis-backed greeting job processed by a separate worker binary", icon: "https://cdn.simpleicons.org/redis", color: "from-red-500 to-red-700", default: false },
+    { id: "mosquito", name: "Mosquito", description: "Redis-backed queued job with retries processed by a separate worker binary", icon: "https://cdn.simpleicons.org/redis", color: "from-red-500 to-red-700", default: false },
+    { id: "tasker", name: "Tasker (in-process)", description: "Greeting job scheduled inside the server process; lost on restart", icon: "https://cdn.simpleicons.org/crystal", color: "from-slate-500 to-zinc-600", default: false },
+    { id: "none", name: "None", description: "No background jobs", icon: "", color: "from-gray-400 to-gray-600", default: true },
+  ],
   javaWebFramework: [
     {
       id: "ktor",

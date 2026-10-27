@@ -8,6 +8,9 @@ require "./token_auth"
 {{#if (ne crystalCache "none")}}
 require "./cached_clock"
 {{/if}}
+{{#if (ne crystalJobs "none")}}
+require "./greeting_jobs"
+{{/if}}
 {{#if (ne crystalOrm "none")}}
 require "./greeting_store"
 {{/if}}
@@ -56,6 +59,18 @@ class GreetingController < ATH::Controller
   @[ARTA::Get("/api/cached-time")]
   def cached_time : AHTTP::Response
     json_response CachedClock.fetch
+  end
+
+{{/if}}
+{{#if (ne crystalJobs "none")}}
+  @[ARTA::Post("/api/jobs")]
+  def enqueue_job(request : AHTTP::Request) : AHTTP::Response
+    json_response GreetingJobs.enqueue(request.body.try(&.gets_to_end) || "")
+  end
+
+  @[ARTA::Get("/api/jobs")]
+  def job_status(request : AHTTP::Request) : AHTTP::Response
+    json_response GreetingJobs.status(request.query_params["id"]?)
   end
 
 {{/if}}

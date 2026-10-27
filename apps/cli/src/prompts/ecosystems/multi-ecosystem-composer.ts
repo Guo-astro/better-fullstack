@@ -46,7 +46,7 @@ import { getAstroIntegrationChoice } from "@/prompts/developer/astro-integration
 import { getCSSFrameworkChoice } from "@/prompts/developer/css-framework";
 import { getShadcnOptions, type ShadcnOptions } from "@/prompts/developer/shadcn-options";
 import { getUILibraryChoice } from "@/prompts/developer/ui-library";
-import { getCrystalAuthChoice, getCrystalTestingChoice, getCrystalValidationChoice, getCrystalCacheChoice, getCrystalOrmChoice, getCrystalWebFrameworkChoice } from "@/prompts/ecosystems/crystal-ecosystem";
+import { getCrystalAuthChoice, getCrystalTestingChoice, getCrystalValidationChoice, getCrystalCacheChoice, getCrystalJobsChoice, getCrystalOrmChoice, getCrystalWebFrameworkChoice } from "@/prompts/ecosystems/crystal-ecosystem";
 import {
   getDotnetApiChoice,
   getDotnetAuthChoice,
@@ -1296,6 +1296,10 @@ export async function gatherMultiEcosystemConfig(
       await getCrystalCacheChoice(flags.crystalCache, { crystalWebFramework: framework }),
     );
     if (crystalCache !== "none") stackPartSpecs.push(`backend.caching:crystal:${crystalCache}`);
+    const crystalJobs = promptValue(
+      await getCrystalJobsChoice(flags.crystalJobs, { crystalWebFramework: framework, crystalCache }),
+    );
+    if (crystalJobs !== "none") stackPartSpecs.push(`backend.jobQueue:crystal:${crystalJobs}`);
   }
 
   if (backendEcosystem === "java") {

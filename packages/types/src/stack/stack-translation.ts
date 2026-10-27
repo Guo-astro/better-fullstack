@@ -194,6 +194,7 @@ export const STACK_SELECTION_OPTION_CATEGORY_BY_KEY: Record<
   crystalTesting: "crystalTesting",
   crystalValidation: "crystalValidation",
   crystalCache: "crystalCache",
+  crystalJobs: "crystalJobs",
   javaWebFramework: "javaWebFramework",
   javaBuildTool: "javaBuildTool",
   javaOrm: "javaOrm",
@@ -419,6 +420,7 @@ export const STACK_SELECTION_URL_KEYS = {
   crystalTesting: "ctest",
   crystalValidation: "cval",
   crystalCache: "ccache",
+  crystalJobs: "cjobs",
   javaWebFramework: "jwf",
   javaBuildTool: "jbt",
   javaOrm: "jorm",
@@ -924,6 +926,7 @@ const CLI_SCALAR_CONFIG_FIELDS = [
   ["crystalTesting", "crystalTesting"],
   ["crystalValidation", "crystalValidation"],
   ["crystalCache", "crystalCache"],
+  ["crystalJobs", "crystalJobs"],
   ["javaWebFramework", "javaWebFramework"],
   ["javaBuildTool", "javaBuildTool"],
   ["javaOrm", "javaOrm"],
@@ -1096,6 +1099,7 @@ const CRYSTAL_CONFIG_KEYS = [
   "crystalTesting",
   "crystalValidation",
   "crystalCache",
+  "crystalJobs",
 ] as const satisfies readonly (keyof CliDefaultProjectConfigBase)[];
 
 const JAVA_CONFIG_KEYS = [
@@ -1357,6 +1361,7 @@ const GRAPH_SCOPED_PART_GROUPS: readonly ScopedPartGroup[] = [
       ["crystalTesting", "testing"],
       ["crystalValidation", "validation"],
       ["crystalCache", "caching"],
+      ["crystalJobs", "jobQueue"],
     ],
   },
   {
@@ -2259,6 +2264,7 @@ function buildProjectConfigBase(
     crystalTesting: stack.crystalTesting as ProjectConfig["crystalTesting"],
     crystalValidation: stack.crystalValidation as ProjectConfig["crystalValidation"],
     crystalCache: stack.crystalCache as ProjectConfig["crystalCache"],
+    crystalJobs: stack.crystalJobs as ProjectConfig["crystalJobs"],
     javaWebFramework: stack.javaWebFramework as ProjectConfig["javaWebFramework"],
     javaBuildTool: stack.javaBuildTool as ProjectConfig["javaBuildTool"],
     javaOrm: stack.javaOrm as ProjectConfig["javaOrm"],
@@ -2871,7 +2877,7 @@ export function generateStackSelectionCommand(selection: StackSelectionInput): s
     case "go":
       return generateGoCommand(selection, projectName);
     case "crystal":
-      return `${getBaseCommand(selection)} ${projectName} --ecosystem crystal --crystal-web-framework ${selection.crystalWebFramework} --crystal-orm ${selection.crystalOrm} --crystal-auth ${selection.crystalAuth} --crystal-testing ${selection.crystalTesting} --crystal-validation ${selection.crystalValidation} --crystal-cache ${selection.crystalCache} --package-manager ${selection.packageManager} --workspace-shape ${selection.workspaceShape} --version-channel ${selection.versionChannel} --addons none --examples none ${formatArrayFlag("ai-docs", selection.aiDocs)} ${selection.git === "false" ? "--no-git" : "--git"} ${selection.install === "false" ? "--no-install" : "--install"}`;
+      return `${getBaseCommand(selection)} ${projectName} --ecosystem crystal --crystal-web-framework ${selection.crystalWebFramework} --crystal-orm ${selection.crystalOrm} --crystal-auth ${selection.crystalAuth} --crystal-testing ${selection.crystalTesting} --crystal-validation ${selection.crystalValidation} --crystal-cache ${selection.crystalCache} --crystal-jobs ${selection.crystalJobs} --package-manager ${selection.packageManager} --workspace-shape ${selection.workspaceShape} --version-channel ${selection.versionChannel} --addons none --examples none ${formatArrayFlag("ai-docs", selection.aiDocs)} ${selection.git === "false" ? "--no-git" : "--git"} ${selection.install === "false" ? "--no-install" : "--install"}`;
     case "java":
       return generateJavaCommand(selection, projectName);
     case "dotnet":

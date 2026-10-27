@@ -51,6 +51,9 @@ end
 raise "invalid PORT diagnostic missing" unless invalid_output.to_s.includes?("PORT must be an integer")
 
 process = Process.new("./bin/server", env: server_env.merge({"PORT" => port.to_s}), output: Process::Redirect::Inherit, error: Process::Redirect::Inherit)
+{{#if (or (eq crystalJobs "sidekiq") (eq crystalJobs "mosquito"))}}
+worker = Process.new("./bin/worker", env: server_env, output: Process::Redirect::Inherit, error: Process::Redirect::Inherit)
+{{/if}}
 exited = Channel(Process::Status).new(1)
 spawn { exited.send(process.wait) }
 finished = false
@@ -121,6 +124,19 @@ begin
   raise "signed-out session accepted" unless client.get("/api/me", signed_out).status_code == 401
 {{/if}}
 {{/if}}
+{{#if (ne crystalJobs "none")}}
+  raise "invalid job accepted" unless client.post("/api/jobs", headers, %({"name":"  "})).status_code == 422
+  queued = client.post("/api/jobs", headers, %({"name":"Proof"}))
+  raise "job enqueue failed: #{queued.status_code}" unless queued.status_code == 202
+  job_id = JSON.parse(queued.body)["id"].as_s
+  job_deadline = Time.instant + 15.seconds
+  loop do
+    job = JSON.parse(client.get("/api/jobs?id=#{job_id}").body)
+    break if job["status"].as_s == "done" && job["message"].as_s == "Hello, Proof!"
+    raise "job did not finish" if Time.instant >= job_deadline
+    sleep 100.milliseconds
+  end
+{{/if}}
 {{#if (ne crystalCache "none")}}
   cached = client.get("/api/cached-time")
   raise "cached time failed: #{cached.status_code}" unless cached.status_code == 200 && JSON.parse(cached.body)["cached_at"].as_s?
@@ -144,8 +160,14 @@ begin
   rescue ex : Socket::Error
     raise "listener remained open: #{ex.message}"
   end
-  puts ({proof: "crystal-{{crystalWebFramework}}-http-v1", success: true, assertions: ["invalid-port", "health-json", "hello-json", "cors", "cors-allowlist", "content-type", "blank-name-422", "post-json", "malformed-json-400", "wrong-type-422", "body-limit-{{#if (eq crystalWebFramework "marten")}}400{{else}}413{{/if}}", "sigterm-exit", "port-released"{{#if (ne crystalOrm "none")}}, "{{crystalOrm}}-persisted-greeting"{{/if}}{{#if (ne crystalAuth "none")}}, "{{crystalAuth}}-current-user"{{/if}}{{#if (ne crystalCache "none")}}, "{{crystalCache}}-cached-time"{{/if}}]}).to_json
+  puts ({proof: "crystal-{{crystalWebFramework}}-http-v1", success: true, assertions: ["invalid-port", "health-json", "hello-json", "cors", "cors-allowlist", "content-type", "blank-name-422", "post-json", "malformed-json-400", "wrong-type-422", "body-limit-{{#if (eq crystalWebFramework "marten")}}400{{else}}413{{/if}}", "sigterm-exit", "port-released"{{#if (ne crystalOrm "none")}}, "{{crystalOrm}}-persisted-greeting"{{/if}}{{#if (ne crystalAuth "none")}}, "{{crystalAuth}}-current-user"{{/if}}{{#if (ne crystalCache "none")}}, "{{crystalCache}}-cached-time"{{/if}}{{#if (ne crystalJobs "none")}}, "{{crystalJobs}}-job-done"{{/if}}]}).to_json
 ensure
+{{#if (or (eq crystalJobs "sidekiq") (eq crystalJobs "mosquito"))}}
+  if worker.exists?
+    worker.signal(Signal::TERM)
+    worker.wait
+  end
+{{/if}}
   unless finished
     if process.exists?
       process.signal(Signal::KILL)

@@ -140,6 +140,7 @@ import type {
   CrystalTestingSchema,
   CrystalValidationSchema,
   CrystalCacheSchema,
+  CrystalJobsSchema,
   JavaLanguageSchema,
   JavaWebFrameworkSchema,
   JavaBuildToolSchema,
@@ -334,6 +335,7 @@ export type CrystalAuth = z.infer<typeof CrystalAuthSchema>;
 export type CrystalTesting = z.infer<typeof CrystalTestingSchema>;
 export type CrystalValidation = z.infer<typeof CrystalValidationSchema>;
 export type CrystalCache = z.infer<typeof CrystalCacheSchema>;
+export type CrystalJobs = z.infer<typeof CrystalJobsSchema>;
 export type JavaLanguage = z.infer<typeof JavaLanguageSchema>;
 export type JavaWebFramework = z.infer<typeof JavaWebFrameworkSchema>;
 export type JavaBuildTool = z.infer<typeof JavaBuildToolSchema>;

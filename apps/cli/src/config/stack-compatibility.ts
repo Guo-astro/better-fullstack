@@ -533,6 +533,7 @@ export function buildCompatibilityInputFromConfig(
     crystalTesting: asString(config.crystalTesting, "spec"),
     crystalValidation: asString(config.crystalValidation, "none"),
     crystalCache: asString(config.crystalCache, "none"),
+    crystalJobs: asString(config.crystalJobs, "none"),
     javaWebFramework: asString(config.javaWebFramework),
     javaBuildTool: asString(config.javaBuildTool),
     javaOrm: asString(config.javaOrm),

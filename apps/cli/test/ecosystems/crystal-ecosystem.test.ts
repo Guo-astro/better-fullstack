@@ -357,6 +357,39 @@ describe("Crystal create contract", () => {
     expect(generateReproducibleCommand(config)).toContain(`--crystal-cache ${cache}`);
   });
 
+  it.each([
+    ["kemal", "sidekiq", "github: hugopl/sidekiq.cr", true],
+    ["athena", "mosquito", "github: mosquito-cr/mosquito", true],
+    ["marten", "tasker", "github: spider-gazelle/tasker", false],
+  ] as const)("renders %s with %s background jobs", async (framework, jobs, dependency, worker) => {
+    const result = await createVirtual({
+      ecosystem: "crystal",
+      crystalWebFramework: framework,
+      crystalJobs: jobs,
+    });
+    expect(result.success).toBe(true);
+    if (!result.tree) throw new Error(result.error);
+    const root = result.tree.root;
+    expect(content(root, "shard.yml")).toContain(dependency);
+    expect(content(root, "shard.yml")?.includes("main: src/worker.cr")).toBe(worker);
+    expect(hasFile(root, "src/worker.cr")).toBe(worker);
+    expect(hasFile(root, "spec/greeting_jobs_spec.cr")).toBe(true);
+    expect(content(root, "scripts/http_proof.cr")).toContain('client.post("/api/jobs", headers');
+    const config = buildProjectConfig({ ecosystem: "crystal", crystalWebFramework: framework, crystalJobs: jobs });
+    expect(generateReproducibleCommand(config)).toContain(`--crystal-jobs ${jobs}`);
+  });
+
+  it("rejects Sidekiq.cr beside the Redis cache", async () => {
+    const result = await createVirtual({
+      ecosystem: "crystal",
+      crystalWebFramework: "kemal",
+      crystalCache: "redis",
+      crystalJobs: "sidekiq",
+    });
+    expect(result.success).toBe(false);
+    expect(result.error).toContain("Sidekiq.cr and the Redis cache depend on different shards named redis.");
+  });
+
   it("rejects Marten Schema without Marten", async () => {
     const result = await createVirtual({
       ecosystem: "crystal",

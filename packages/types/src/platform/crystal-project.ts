@@ -9,6 +9,7 @@ export const CRYSTAL_PROJECT_DEFAULTS = {
   crystalTesting: "spec",
   crystalValidation: "none",
   crystalCache: "none",
+  crystalJobs: "none",
   frontend: ["none"],
   backend: "none",
   runtime: "none",
@@ -90,6 +91,7 @@ type CrystalOptionRule = {
   label: string;
   frameworks: readonly string[];
   orms?: readonly string[];
+  excludedCaches?: { values: readonly string[]; reason: string };
 };
 
 export type CrystalSelection = {
@@ -99,6 +101,7 @@ export type CrystalSelection = {
   crystalTesting?: string;
   crystalValidation?: string;
   crystalCache?: string;
+  crystalJobs?: string;
 };
 
 const CRYSTAL_ORM_LABELS: Record<string, string> = { "marten-orm": "Marten ORM" };
@@ -140,6 +143,21 @@ export const CRYSTAL_OPTION_RULES = {
       redis: { label: "Redis cache", frameworks: CRYSTAL_HTTP_FRAMEWORKS },
     },
   },
+  crystalJobs: {
+    role: "jobQueue",
+    options: {
+      sidekiq: {
+        label: "Sidekiq.cr",
+        frameworks: CRYSTAL_HTTP_FRAMEWORKS,
+        excludedCaches: {
+          values: ["redis"],
+          reason: "Sidekiq.cr and the Redis cache depend on different shards named redis.",
+        },
+      },
+      mosquito: { label: "Mosquito", frameworks: CRYSTAL_HTTP_FRAMEWORKS },
+      tasker: { label: "Tasker", frameworks: CRYSTAL_HTTP_FRAMEWORKS },
+    },
+  },
 } as const satisfies Record<
   string,
   { role: StackPart["role"]; options: Record<string, CrystalOptionRule> }
@@ -168,6 +186,7 @@ export function getCrystalOptionIssue(
   if (rule.orms && !rule.orms.includes(selection.crystalOrm ?? "none")) {
     return `${rule.label} requires ${rule.orms.map((id) => CRYSTAL_ORM_LABELS[id] ?? id).join(" or ")}.`;
   }
+  if (rule.excludedCaches?.values.includes(selection.crystalCache ?? "none")) return rule.excludedCaches.reason;
   return null;
 }
 
@@ -183,12 +202,12 @@ function getCrystalOwnedPartIssue(
     const name = `${owner.toolId.charAt(0).toUpperCase()}${owner.toolId.slice(1)}`;
     return `Crystal ${name} does not support the owned '${part.toolId}' selection.`;
   }
-  const orm = parts.find(
-    (candidate) => candidate.ownerPartId === owner.id && candidate.role === "orm",
-  )?.toolId;
+  const ownedTool = (role: StackPart["role"]) =>
+    parts.find((candidate) => candidate.ownerPartId === owner.id && candidate.role === role)?.toolId;
   return getCrystalOptionIssue(category, part.toolId, {
     crystalWebFramework: owner.toolId,
-    crystalOrm: orm,
+    crystalOrm: ownedTool("orm"),
+    crystalCache: ownedTool("caching"),
   });
 }
 

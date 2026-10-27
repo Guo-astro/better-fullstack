@@ -796,5 +796,6 @@
   "docsCliSummaryCrystalCrystalAuth": "实验性 Crystal 身份验证。",
   "docsCliSummaryCrystalCrystalTesting": "实验性 Crystal 测试工具。",
   "docsCliSummaryCrystalCrystalValidation": "实验性 Crystal 输入验证。",
-  "docsCliSummaryCrystalCrystalCache": "实验性 Crystal 缓存存储。"
+  "docsCliSummaryCrystalCrystalCache": "实验性 Crystal 缓存存储。",
+  "docsCliSummaryCrystalCrystalJobs": "实验性 Crystal 后台任务。"
 }

@@ -796,5 +796,6 @@
   "docsCliSummaryCrystalCrystalAuth": "Експериментальна автентифікація Crystal.",
   "docsCliSummaryCrystalCrystalTesting": "Експериментальні інструменти тестування Crystal.",
   "docsCliSummaryCrystalCrystalValidation": "Експериментальна перевірка вхідних даних Crystal.",
-  "docsCliSummaryCrystalCrystalCache": "Експериментальне сховище кешу Crystal."
+  "docsCliSummaryCrystalCrystalCache": "Експериментальне сховище кешу Crystal.",
+  "docsCliSummaryCrystalCrystalJobs": "Експериментальні фонові завдання Crystal."
 }

@@ -9,6 +9,9 @@ require "./token_auth"
 {{#if (ne crystalCache "none")}}
 require "./cached_clock"
 {{/if}}
+{{#if (ne crystalJobs "none")}}
+require "./greeting_jobs"
+{{/if}}
 {{#if (eq crystalAuth "kemal-session")}}
 require "kemal-session"
 require "./auth_credentials"
@@ -136,6 +139,20 @@ end
 {{#if (ne crystalCache "none")}}
 get "/api/cached-time" do |env|
   result = CachedClock.fetch
+  env.response.status_code = result.status
+  result.body
+end
+
+{{/if}}
+{{#if (ne crystalJobs "none")}}
+post "/api/jobs" do |env|
+  result = GreetingJobs.enqueue(env.params.raw_body)
+  env.response.status_code = result.status
+  result.body
+end
+
+get "/api/jobs" do |env|
+  result = GreetingJobs.status(env.params.query["id"]?)
   env.response.status_code = result.status
   result.body
 end

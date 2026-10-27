@@ -126,6 +126,7 @@ import {
   CRYSTAL_TESTING_VALUES,
   CRYSTAL_VALIDATION_VALUES,
   CRYSTAL_CACHE_VALUES,
+  CRYSTAL_JOBS_VALUES,
   JAVA_WEB_FRAMEWORK_VALUES,
   JOB_QUEUE_VALUES,
   LOGGING_VALUES,
@@ -797,7 +798,7 @@ function isNativeEcosystemBackendServiceTool(
 
 // Backend-owned selections that round-trip through the legacy config projection.
 const LEGACY_EXTRA_CATEGORIES_BY_ECOSYSTEM = {
-  crystal: { testing: "crystalTesting", validation: "crystalValidation", caching: "crystalCache" },
+  crystal: { testing: "crystalTesting", validation: "crystalValidation", caching: "crystalCache", jobQueue: "crystalJobs" },
   rust: {
     caching: "rustCaching",
     cli: "rustCli",
@@ -1272,6 +1273,7 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ...defineTools(CRYSTAL_TESTING_VALUES, "testing", "crystal", "crystalTesting"),
   ...defineTools(CRYSTAL_VALIDATION_VALUES, "validation", "crystal", "crystalValidation"),
   ...defineTools(CRYSTAL_CACHE_VALUES, "caching", "crystal", "crystalCache"),
+  ...defineTools(CRYSTAL_JOBS_VALUES, "jobQueue", "crystal", "crystalJobs"),
   ...defineTools(JAVA_WEB_FRAMEWORK_VALUES, "backend", "java", "javaWebFramework"),
   ...defineTools(JAVA_LANGUAGE_VALUES, "language", "java", "javaLanguage"),
   ...defineTools(JAVA_BUILD_TOOL_VALUES, "buildTool", "java", "javaBuildTool"),

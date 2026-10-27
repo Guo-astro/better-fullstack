@@ -84,3 +84,18 @@ class CachedTimeHandler < ApiHandler
   end
 end
 {{/if}}
+{{#if (ne crystalJobs "none")}}
+
+class JobsHandler < ApiHandler
+  http_method_names :get, :post
+  protect_from_forgery false
+
+  def get
+    respond GreetingJobs.status(request.query_params["id"]?)
+  end
+
+  def post
+    respond GreetingJobs.enqueue(request.body)
+  end
+end
+{{/if}}

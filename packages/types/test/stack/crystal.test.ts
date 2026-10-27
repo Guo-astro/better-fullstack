@@ -317,6 +317,29 @@ describe("bounded Crystal HTTP recipe", () => {
     expect(parseStackSelectionFromSearch(encoded).crystalCache).toBe("redis");
   });
 
+  it("keeps Sidekiq.cr away from the Redis cache shard and round-trips jobs", () => {
+    const sidekiq = createCrystalStackSelection({ crystalJobs: "sidekiq", crystalCache: "memory" });
+    expect(analyzeStackCompatibility(sidekiq).adjustedStack).toBeNull();
+    const withRedisCache = analyzeStackCompatibility({ ...sidekiq, crystalCache: "redis" });
+    expect(withRedisCache.adjustedStack?.crystalCache).toBe("redis");
+    expect(withRedisCache.adjustedStack?.crystalJobs).toBe("none");
+    expect(getDisabledReason({ ...sidekiq, crystalCache: "redis" }, "crystalJobs", "sidekiq")).toBe(
+      "Sidekiq.cr and the Redis cache depend on different shards named redis.",
+    );
+    expect(getDisabledReason({ ...sidekiq, crystalCache: "redis" }, "crystalJobs", "mosquito")).toBeNull();
+    expect(
+      getCrystalSelectionIssue({
+        stackParts: parseStackPartSpecs([
+          "backend:crystal:kemal",
+          "backend.caching:crystal:redis",
+          "backend.jobQueue:crystal:sidekiq",
+        ]),
+      }),
+    ).toBe("Sidekiq.cr and the Redis cache depend on different shards named redis.");
+    const encoded = Object.fromEntries(createStackSelectionSearchParams(sidekiq));
+    expect(parseStackSelectionFromSearch(encoded).crystalJobs).toBe("sidekiq");
+  });
+
   it("keeps Crystal experimental without changing the versioned golden recipes", () => {
     expect(GOLDEN_RUNTIME_RECIPES).toHaveLength(8);
     const kemal = getCapabilityInventory().find(

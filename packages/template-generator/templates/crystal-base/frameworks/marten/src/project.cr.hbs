@@ -23,6 +23,9 @@ require "./token_auth"
 {{#if (ne crystalCache "none")}}
 require "./cached_clock"
 {{/if}}
+{{#if (ne crystalJobs "none")}}
+require "./greeting_jobs"
+{{/if}}
 {{#if (ne crystalOrm "none")}}
 require "./greeting_store"
 {{/if}}

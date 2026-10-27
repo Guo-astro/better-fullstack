@@ -707,6 +707,7 @@ export async function createProjectHandler(
               crystalTesting: "none",
               crystalValidation: "none",
               crystalCache: "none",
+              crystalJobs: "none",
               javaWebFramework: "none",
               javaBuildTool: "none",
               javaOrm: "none",

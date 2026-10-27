@@ -5,6 +5,9 @@ Marten.routes.draw do
 {{#if (ne crystalOrm "none")}}
   path "/api/greetings", GreetingsHandler, name: "greetings"
 {{/if}}
+{{#if (ne crystalJobs "none")}}
+  path "/api/jobs", JobsHandler, name: "jobs"
+{{/if}}
 {{#if (ne crystalCache "none")}}
   path "/api/cached-time", CachedTimeHandler, name: "cached_time"
 {{/if}}

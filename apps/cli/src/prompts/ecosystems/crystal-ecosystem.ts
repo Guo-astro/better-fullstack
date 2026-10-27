@@ -1,5 +1,5 @@
-import type { CrystalAuth, CrystalTesting, CrystalValidation, CrystalCache, CrystalOrm, CrystalSelection, CrystalWebFramework } from "@/types";
-import { CrystalAuthSchema, CrystalTestingSchema, CrystalValidationSchema, CrystalCacheSchema, CrystalOrmSchema, CrystalWebFrameworkSchema, getCrystalOptionIssue } from "@/types";
+import type { CrystalAuth, CrystalTesting, CrystalValidation, CrystalCache, CrystalJobs, CrystalOrm, CrystalSelection, CrystalWebFramework } from "@/types";
+import { CrystalAuthSchema, CrystalTestingSchema, CrystalValidationSchema, CrystalCacheSchema, CrystalJobsSchema, CrystalOrmSchema, CrystalWebFrameworkSchema, getCrystalOptionIssue } from "@/types";
 import { exitCancelled } from "@/presentation/errors";
 import { isCancel, navigableSelect } from "@/prompts/core/navigable";
 import { createStaticSinglePromptResolution } from "@/prompts/core/prompt-contract";
@@ -118,6 +118,25 @@ export async function getCrystalCacheChoice(value?: CrystalCache, selection: Cry
   const resolution = resolveCrystalCachePrompt(value, selection);
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
   const response = await navigableSelect<CrystalCache>({ message: "Select Crystal cache store", options: resolution.options, initialValue: resolution.initialValue });
+  if (isCancel(response)) return exitCancelled("Operation cancelled");
+  return response;
+}
+
+export function resolveCrystalJobsPrompt(value?: string, selection: CrystalSelection = {}) {
+  const selected = value === undefined ? undefined : CrystalJobsSchema.parse(value);
+  const options = [
+    { value: "sidekiq" as const, label: "Sidekiq.cr", hint: "Redis queue with a separate worker" },
+    { value: "mosquito" as const, label: "Mosquito", hint: "Redis queue with a separate worker" },
+    { value: "tasker" as const, label: "Tasker (in-process)", hint: "Scheduled in the server process, lost on restart" },
+    { value: "none" as const, label: "None" },
+  ].filter((option) => !getCrystalOptionIssue("crystalJobs", option.value, selection));
+  return createStaticSinglePromptResolution(options, "none", selected);
+}
+
+export async function getCrystalJobsChoice(value?: CrystalJobs, selection: CrystalSelection = {}) {
+  const resolution = resolveCrystalJobsPrompt(value, selection);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
+  const response = await navigableSelect<CrystalJobs>({ message: "Select Crystal background jobs", options: resolution.options, initialValue: resolution.initialValue });
   if (isCancel(response)) return exitCancelled("Operation cancelled");
   return response;
 }

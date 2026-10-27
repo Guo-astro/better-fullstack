@@ -797,5 +797,6 @@
   "docsCliSummaryCrystalCrystalAuth": "Experimental Crystal authentication.",
   "docsCliSummaryCrystalCrystalTesting": "Experimental Crystal test tooling.",
   "docsCliSummaryCrystalCrystalValidation": "Experimental Crystal input validation.",
-  "docsCliSummaryCrystalCrystalCache": "Experimental Crystal cache store."
+  "docsCliSummaryCrystalCrystalCache": "Experimental Crystal cache store.",
+  "docsCliSummaryCrystalCrystalJobs": "Experimental Crystal background jobs."
 }

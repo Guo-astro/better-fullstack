@@ -125,6 +125,7 @@ import {
   CRYSTAL_TESTING_VALUES,
   CRYSTAL_VALIDATION_VALUES,
   CRYSTAL_CACHE_VALUES,
+  CRYSTAL_JOBS_VALUES,
   JAVA_WEB_FRAMEWORK_VALUES,
   JOB_QUEUE_VALUES,
   LOGGING_VALUES,
@@ -522,6 +523,7 @@ export const CATEGORY_ORDER = [
     "crystalTesting",
     "crystalValidation",
     "crystalCache",
+    "crystalJobs",
     ...JAVA_CATEGORY_ORDER,
     ...DOTNET_CATEGORY_ORDER,
     ...RUBY_CATEGORY_ORDER,
@@ -543,7 +545,7 @@ export function getCategoryOrderForEcosystem(
     case "go":
       return GO_CATEGORY_ORDER;
     case "crystal":
-      return ["crystalWebFramework", "crystalOrm", "crystalAuth", "crystalTesting", "crystalValidation", "crystalCache", "aiDocs", "git", "install"];
+      return ["crystalWebFramework", "crystalOrm", "crystalAuth", "crystalTesting", "crystalValidation", "crystalCache", "crystalJobs", "aiDocs", "git", "install"];
     case "java":
       return JAVA_CATEGORY_ORDER;
     case "dotnet":
@@ -930,6 +932,10 @@ const CATEGORY_DEFINITIONS = {
   crystalCache: {
     values: CRYSTAL_CACHE_VALUES,
     displayName: "Crystal Cache",
+  },
+  crystalJobs: {
+    values: CRYSTAL_JOBS_VALUES,
+    displayName: "Crystal Background Jobs",
   },
   javaWebFramework: { values: JAVA_WEB_FRAMEWORK_VALUES, displayName: "Java Web Framework" },
   javaBuildTool: { values: JAVA_BUILD_TOOL_VALUES, displayName: "Java Build Tool" },
@@ -1757,6 +1763,7 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
   crystalTesting: { spec: "Crystal Spec", spectator: "Spectator", "spec-kemal": "spec-kemal", none: "None" },
   crystalValidation: { "athena-validator": "Athena Validator", "active-model": "ActiveModel", "marten-schema": "Marten Schema", none: "None" },
   crystalCache: { memory: "Memory store", file: "File store", redis: "Redis", none: "None" },
+  crystalJobs: { sidekiq: "Sidekiq.cr", mosquito: "Mosquito", tasker: "Tasker (in-process)", none: "None" },
   javaWebFramework: {
     "spring-boot": "Spring Boot",
     ktor: "Ktor",

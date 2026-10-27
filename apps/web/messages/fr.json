@@ -796,5 +796,6 @@
   "docsCliSummaryCrystalCrystalAuth": "Authentification expérimentale Crystal.",
   "docsCliSummaryCrystalCrystalTesting": "Outils de test expérimentaux pour Crystal.",
   "docsCliSummaryCrystalCrystalValidation": "Validation expérimentale des entrées Crystal.",
-  "docsCliSummaryCrystalCrystalCache": "Magasin de cache expérimental pour Crystal."
+  "docsCliSummaryCrystalCrystalCache": "Magasin de cache expérimental pour Crystal.",
+  "docsCliSummaryCrystalCrystalJobs": "Tâches d'arrière-plan expérimentales pour Crystal."
 }

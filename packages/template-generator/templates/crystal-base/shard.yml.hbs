@@ -5,6 +5,10 @@ license: MIT
 targets:
   server:
     main: src/server.cr
+{{#if (or (eq crystalJobs "sidekiq") (eq crystalJobs "mosquito"))}}
+  worker:
+    main: src/worker.cr
+{{/if}}
 {{#if (or (ne crystalWebFramework "none") (ne crystalValidation "none"))}}
 dependencies:
 {{/if}}
@@ -77,6 +81,21 @@ dependencies:
   redis_cache_store:
     github: crystal-cache/redis_cache_store
     version: 1.1.0
+{{/if}}
+{{#if (eq crystalJobs "sidekiq")}}
+  sidekiq:
+    github: hugopl/sidekiq.cr
+    version: 0.8.0
+{{/if}}
+{{#if (eq crystalJobs "mosquito")}}
+  mosquito:
+    github: mosquito-cr/mosquito
+    version: 2.0.0
+{{/if}}
+{{#if (eq crystalJobs "tasker")}}
+  tasker:
+    github: spider-gazelle/tasker
+    version: 3.1.0
 {{/if}}
 {{#if (eq crystalTesting "spectator")}}
 development_dependencies:

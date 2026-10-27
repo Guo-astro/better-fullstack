@@ -8,6 +8,9 @@ require "./token_auth"
 {{#if (ne crystalCache "none")}}
 require "./cached_clock"
 {{/if}}
+{{#if (ne crystalJobs "none")}}
+require "./greeting_jobs"
+{{/if}}
 {{#if (ne crystalOrm "none")}}
 require "./greeting_store"
 {{/if}}
@@ -110,6 +113,20 @@ end
 class Api::CachedTime::Show < ApiAction
   get "/api/cached-time" do
     respond CachedClock.fetch
+  end
+end
+
+{{/if}}
+{{#if (ne crystalJobs "none")}}
+class Api::Jobs::Create < ApiAction
+  post "/api/jobs" do
+    respond GreetingJobs.enqueue(params.body)
+  end
+end
+
+class Api::Jobs::Show < ApiAction
+  get "/api/jobs" do
+    respond GreetingJobs.status(params.get?(:id))
   end
 end
 

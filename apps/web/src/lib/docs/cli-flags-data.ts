@@ -2101,6 +2101,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "none",
         "multiple": false
+      },
+      {
+        "flag": "--crystal-jobs",
+        "summary": "Crystal background jobs.",
+        "values": [
+          "sidekiq",
+          "mosquito",
+          "tasker",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
       }
     ]
   },
@@ -3204,6 +3217,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "crystal:--crystal-testing": m.docsCliSummaryCrystalCrystalTesting,
   "crystal:--crystal-validation": m.docsCliSummaryCrystalCrystalValidation,
   "crystal:--crystal-cache": m.docsCliSummaryCrystalCrystalCache,
+  "crystal:--crystal-jobs": m.docsCliSummaryCrystalCrystalJobs,
   "java:--java-web-framework": m.docsCliSummaryJavaJavaWebFramework,
   "java:--java-language": m.docsCliSummaryJavaJavaLanguage,
   "java:--java-build-tool": m.docsCliSummaryJavaJavaBuildTool,
