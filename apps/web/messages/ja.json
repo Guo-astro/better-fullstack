@@ -623,6 +623,7 @@
   "docsCliSummaryElixirElixirClustering": "Elixir のクラスタリング。",
   "docsCliSummaryElixirElixirLogging": "Elixir のロギング。",
   "docsCliSummaryElixirElixirConfig": "Elixir の実行時設定。",
+  "docsCliSummaryElixirElixirMessageQueue": "Elixir のメッセージブローカークライアント。",
   "docsCliSummaryElixirElixirDeploy": "Elixir のデプロイ先。",
   "docsCliSummaryElixirElixirLibraries": "Elixir のライブラリ。",
   "docsSectionStart": "はじめる",

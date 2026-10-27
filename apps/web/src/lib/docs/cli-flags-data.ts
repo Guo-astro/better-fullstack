@@ -2884,6 +2884,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "multiple": false
       },
       {
+        "flag": "--elixir-message-queue",
+        "summary": "Elixir message broker client.",
+        "values": [
+          "amqp",
+          "gnat",
+          "brod",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
+      },
+      {
         "flag": "--elixir-config",
         "summary": "Elixir runtime configuration.",
         "values": [
@@ -3126,6 +3139,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "elixir:--elixir-documentation": m.docsCliSummaryElixirElixirDocumentation,
   "elixir:--elixir-clustering": m.docsCliSummaryElixirElixirClustering,
   "elixir:--elixir-logging": m.docsCliSummaryElixirElixirLogging,
+  "elixir:--elixir-message-queue": m.docsCliSummaryElixirElixirMessageQueue,
   "elixir:--elixir-config": m.docsCliSummaryElixirElixirConfig,
   "elixir:--elixir-deploy": m.docsCliSummaryElixirElixirDeploy,
   "elixir:--elixir-libraries": m.docsCliSummaryElixirElixirLibraries,

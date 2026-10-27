@@ -623,6 +623,7 @@
   "docsCliSummaryElixirElixirClustering": "Clusterbildung für Elixir.",
   "docsCliSummaryElixirElixirLogging": "Logging für Elixir.",
   "docsCliSummaryElixirElixirConfig": "Laufzeitkonfiguration für Elixir.",
+  "docsCliSummaryElixirElixirMessageQueue": "Message-Broker-Client für Elixir.",
   "docsCliSummaryElixirElixirDeploy": "Deployment-Ziel für Elixir.",
   "docsCliSummaryElixirElixirLibraries": "Elixir-Bibliotheken.",
   "docsSectionStart": "Start",

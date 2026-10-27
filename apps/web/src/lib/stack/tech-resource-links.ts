@@ -2736,6 +2736,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://hexdocs.pm/confex/",
     githubUrl: "https://github.com/Nebo15/confex",
   },
+  "elixirMessageQueue:amqp": {
+    docsUrl: "https://hexdocs.pm/amqp/",
+    githubUrl: "https://github.com/pma/amqp",
+  },
+  "elixirMessageQueue:gnat": {
+    docsUrl: "https://hexdocs.pm/gnat/",
+    githubUrl: "https://github.com/nats-io/nats.ex",
+  },
+  "elixirMessageQueue:brod": {
+    docsUrl: "https://hexdocs.pm/brod/",
+    githubUrl: "https://github.com/kafka4beam/brod",
+  },
   "elixirLibraries:ex_aws": {
     docsUrl: "https://hexdocs.pm/ex_aws/",
     githubUrl: "https://github.com/ex-aws/ex_aws",

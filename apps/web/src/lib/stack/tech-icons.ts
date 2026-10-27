@@ -211,6 +211,9 @@ export const ICON_REGISTRY: Record<string, IconConfig> = {
   dotenvy: { type: "si", slug: "dotenv", hex: "ECD53F" },
   skogsra: { type: "si", slug: "elixir", hex: "4B275F" },
   confex: { type: "si", slug: "elixir", hex: "4B275F" },
+  amqp: { type: "si", slug: "rabbitmq", hex: "FF6600" },
+  gnat: { type: "si", slug: "natsdotio", hex: "27AAE1" },
+  brod: { type: "si", slug: "apachekafka", hex: "231F20" },
   "mix-release": { type: "si", slug: "elixir", hex: "4B275F" },
   gigalixir: { type: "si", slug: "elixir", hex: "4B275F" },
 

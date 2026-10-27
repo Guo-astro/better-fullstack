@@ -7139,6 +7139,40 @@ export const TECH_OPTIONS: Record<
       default: true,
     },
   ],
+  elixirMessageQueue: [
+    {
+      id: "amqp",
+      name: "AMQP (RabbitMQ)",
+      description: "Publish and consume RabbitMQ queues",
+      icon: "",
+      color: "from-orange-500 to-amber-600",
+      isNew: true,
+    },
+    {
+      id: "gnat",
+      name: "Gnat (NATS)",
+      description: "Publish and subscribe to NATS subjects",
+      icon: "",
+      color: "from-teal-500 to-cyan-600",
+      isNew: true,
+    },
+    {
+      id: "brod",
+      name: "brod (Kafka)",
+      description: "Produce and fetch Kafka records",
+      icon: "",
+      color: "from-zinc-600 to-slate-800",
+      isNew: true,
+    },
+    {
+      id: "none",
+      name: "No Message Broker",
+      description: "Skip the broker client",
+      icon: "",
+      color: "from-gray-400 to-gray-600",
+      default: true,
+    },
+  ],
   elixirDeploy: [
     {
       id: "docker",

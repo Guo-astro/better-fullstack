@@ -33,6 +33,9 @@ This project was created with [Better Fullstack](https://github.com/Marve10s/Bet
 {{#if (ne elixirConfig "none")}}
 - Runtime config: {{elixirConfig}}
 {{/if}}
+{{#if (ne elixirMessageQueue "none")}}
+- Message broker: {{elixirMessageQueue}}
+{{/if}}
 
 ## Setup
 
@@ -184,6 +187,46 @@ with `{{elixirModuleName}}.Settings.config()`.
 ```sh
 APP_MAX_CONNECTIONS=25 mix run -e 'IO.inspect({{elixirModuleName}}.Settings.{{#if (eq elixirConfig "skogsra")}}max_connections!(){{else if (eq elixirConfig "confex")}}config(){{else}}max_connections(){{/if}})'
 ```
+{{/if}}
+
+{{#if (ne elixirMessageQueue "none")}}
+## Message broker
+
+{{#if (eq elixirMessageQueue "amqp")}}
+`{{elixirModuleName}}.MessageQueue` publishes to and reads from the durable RabbitMQ queue
+`{{elixirAppName}}.greetings` at `RABBITMQ_URL` (default `amqp://guest:guest@localhost:5672`).
+
+```sh
+docker run -d --name rabbitmq -p 5672:5672 rabbitmq:4-alpine
+```
+{{/if}}
+{{#if (eq elixirMessageQueue "gnat")}}
+`{{elixirModuleName}}.MessageQueue` publishes to and subscribes on the NATS subject
+`{{elixirAppName}}.greetings` at `NATS_URL` (default `nats://localhost:4222`).
+
+```sh
+docker run -d --name nats -p 4222:4222 nats:2-alpine
+```
+{{/if}}
+{{#if (eq elixirMessageQueue "brod")}}
+`{{elixirModuleName}}.MessageQueue` creates the Kafka topic `{{elixirAppName}}.greetings` when it is
+missing, produces to partition 0, and fetches the record back. Set `KAFKA_BROKERS` to a
+comma-separated `host:port` list (default `localhost:9092`). brod compiles a small NIF, so a C
+compiler is required.
+
+```sh
+docker run -d --name kafka -p 9092:9092 apache/kafka:latest
+```
+{{/if}}
+
+With the broker running:
+
+```sh
+mix run -e 'IO.inspect({{elixirModuleName}}.MessageQueue.round_trip("hello"))'
+mix test --include message_queue
+```
+
+Plain `mix test` skips the broker test.
 {{/if}}
 
 {{#if (eq elixirObservability "prom_ex")}}

@@ -1061,4 +1061,43 @@ describe("Elixir library expansion", () => {
       expect(getVirtualTreeFileContent(tree, ".env.example")).toContain("APP_MAX_CONNECTIONS=10");
     },
   );
+
+  it.each([
+    [
+      "amqp",
+      '{:amqp, "~> 4.3"}',
+      "AMQP.Queue.declare(channel, @queue, durable: true)",
+      "RABBITMQ_URL=",
+    ],
+    ["gnat", '{:gnat, "~> 1.18"}', "Gnat.sub(gnat, self(), @subject)", "NATS_URL="],
+    ["brod", '{:brod, "~> 4.7"}', ":brod.produce_sync_offset(@client, @topic, 0", "KAFKA_BROKERS="],
+  ] as const)(
+    "round-trips a message through %s behind a tagged broker test",
+    async (elixirMessageQueue, dependency, snippet, envLine) => {
+      const result = await createVirtual({
+        ...base,
+        projectName: "elixir-mq",
+        elixirWebFramework: "none",
+        elixirRealtime: "none",
+        elixirOrm: "none",
+        elixirAuth: "none",
+        elixirApi: "none",
+        elixirHttpServer: "none",
+        elixirI18n: "none",
+        elixirMessageQueue,
+      });
+
+      expect(result.success).toBe(true);
+      const tree = result.tree!;
+      expect(getVirtualTreeFileContent(tree, "mix.exs")).toContain(dependency);
+      expect(getVirtualTreeFileContent(tree, "lib/elixir_mq/message_queue.ex")).toContain(snippet);
+      expect(getVirtualTreeFileContent(tree, "test/elixir_mq/message_queue_test.exs")).toContain(
+        "@moduletag :message_queue",
+      );
+      expect(getVirtualTreeFileContent(tree, "test/test_helper.exs")).toContain(
+        "ExUnit.start(exclude: [:message_queue])",
+      );
+      expect(getVirtualTreeFileContent(tree, ".env.example")).toContain(envLine);
+    },
+  );
 });

@@ -1045,6 +1045,7 @@ const GRAPH_BACKEND_ADVANCED_CATEGORY_ORDER_BY_ECOSYSTEM = {
     "elixirClustering",
     "elixirLogging",
     "elixirConfig",
+    "elixirMessageQueue",
     "elixirDeploy",
     "elixirLibraries",
   ],

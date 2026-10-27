@@ -48,6 +48,7 @@ export async function processElixirBaseTemplate(
   const hasWallaby = hasPhoenix && config.elixirTesting === "wallaby";
   const hasLogging = config.elixirLogging !== "none";
   const hasSettings = config.elixirConfig !== "none";
+  const hasMessageQueue = config.elixirMessageQueue !== "none";
 
   renderTemplateTree(vfs, templates, {
     prefix,
@@ -101,6 +102,8 @@ export async function processElixirBaseTemplate(
       if (!hasJiffy && /\/json(_test)?\.exs?(\.hbs)?$/.test(templatePath)) return true;
       if (!hasLogging && templatePath.includes("/logging_test.exs")) return true;
       if (!hasSettings && /\/settings(_test)?\.exs?(\.hbs)?$/.test(templatePath)) return true;
+      if (!hasMessageQueue && /\/message_queue(_test)?\.exs?(\.hbs)?$/.test(templatePath))
+        return true;
       return false;
     },
     outputPath: (relativePath) =>

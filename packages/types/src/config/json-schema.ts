@@ -58,6 +58,7 @@ import {
   ElixirClusteringSchema,
   ElixirLoggingSchema,
   ElixirConfigSchema,
+  ElixirMessageQueueSchema,
   ElixirRealtimeSchema,
   ElixirTestingSchema,
   ElixirValidationSchema,
@@ -387,6 +388,10 @@ export function getElixirConfigJsonSchema() {
   return z.toJSONSchema(ElixirConfigSchema);
 }
 
+export function getElixirMessageQueueJsonSchema() {
+  return z.toJSONSchema(ElixirMessageQueueSchema);
+}
+
 export function getElixirDeployJsonSchema() {
   return z.toJSONSchema(ElixirDeploySchema);
 }
@@ -471,6 +476,7 @@ export function getAllJsonSchemas() {
     elixirClustering: getElixirClusteringJsonSchema(),
     elixirLogging: getElixirLoggingJsonSchema(),
     elixirConfig: getElixirConfigJsonSchema(),
+    elixirMessageQueue: getElixirMessageQueueJsonSchema(),
     elixirDeploy: getElixirDeployJsonSchema(),
     createInput: getCreateInputJsonSchema(),
     projectConfig: getProjectConfigJsonSchema(),

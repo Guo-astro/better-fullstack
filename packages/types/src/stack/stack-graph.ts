@@ -195,6 +195,7 @@ import {
   ELIXIR_CLUSTERING_VALUES,
   ELIXIR_LOGGING_VALUES,
   ELIXIR_CONFIG_VALUES,
+  ELIXIR_MESSAGE_QUEUE_VALUES,
   StackPartRoleSchema,
   STATE_MANAGEMENT_VALUES,
   TESTING_VALUES,
@@ -859,6 +860,7 @@ const LEGACY_EXTRA_CATEGORIES_BY_ECOSYSTEM = {
     config: "elixirClustering",
     logging: "elixirLogging",
     runtimeConfig: "elixirConfig",
+    messageQueue: "elixirMessageQueue",
     deploy: "elixirDeploy",
   },
 } as const satisfies Record<
@@ -1341,6 +1343,7 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ...defineTools(ELIXIR_CLUSTERING_VALUES, "config", "elixir", "elixirClustering"),
   ...defineTools(ELIXIR_LOGGING_VALUES, "logging", "elixir", "elixirLogging"),
   ...defineTools(ELIXIR_CONFIG_VALUES, "runtimeConfig", "elixir", "elixirConfig"),
+  ...defineTools(ELIXIR_MESSAGE_QUEUE_VALUES, "messageQueue", "elixir", "elixirMessageQueue"),
   ...defineTools(ELIXIR_DEPLOY_VALUES, "deploy", "elixir", "elixirDeploy"),
   {
     toolId: "convex",

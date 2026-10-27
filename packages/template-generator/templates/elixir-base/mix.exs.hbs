@@ -241,6 +241,15 @@ defmodule {{elixirModuleName}}.MixProject do
 {{#if (eq elixirConfig "confex")}}
       {:confex, "~> 3.5"},
 {{/if}}
+{{#if (eq elixirMessageQueue "amqp")}}
+      {:amqp, "~> 4.3"},
+{{/if}}
+{{#if (eq elixirMessageQueue "gnat")}}
+      {:gnat, "~> 1.18"},
+{{/if}}
+{{#if (eq elixirMessageQueue "brod")}}
+      {:brod, "~> 4.7"},
+{{/if}}
 {{#if (includes elixirLibraries "ex_aws")}}
       {:ex_aws, "~> 2.7"},
       {:ex_aws_s3, "~> 2.5"},

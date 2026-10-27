@@ -1344,6 +1344,12 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         configKey: "elixirLogging",
       },
       {
+        flag: "elixir-message-queue",
+        summary: "Elixir message broker client.",
+        source: { kind: "category", category: "elixirMessageQueue" },
+        configKey: "elixirMessageQueue",
+      },
+      {
         flag: "elixir-config",
         summary: "Elixir runtime configuration.",
         source: { kind: "category", category: "elixirConfig" },

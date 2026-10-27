@@ -42,6 +42,7 @@ import {
   ELIXIR_CLUSTERING_VALUES,
   ELIXIR_LOGGING_VALUES,
   ELIXIR_CONFIG_VALUES,
+  ELIXIR_MESSAGE_QUEUE_VALUES,
   ELIXIR_REALTIME_VALUES,
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
@@ -472,6 +473,7 @@ export const ELIXIR_CATEGORY_ORDER = [
   "elixirClustering",
   "elixirLogging",
   "elixirConfig",
+  "elixirMessageQueue",
   "elixirDeploy",
   "elixirLibraries",
   "aiDocs",
@@ -977,6 +979,7 @@ const CATEGORY_DEFINITIONS = {
   elixirClustering: { values: ELIXIR_CLUSTERING_VALUES, displayName: "Elixir Clustering" },
   elixirLogging: { values: ELIXIR_LOGGING_VALUES, displayName: "Elixir Logging" },
   elixirConfig: { values: ELIXIR_CONFIG_VALUES, displayName: "Elixir Config" },
+  elixirMessageQueue: { values: ELIXIR_MESSAGE_QUEUE_VALUES, displayName: "Elixir Message Queue" },
   elixirDeploy: { values: ELIXIR_DEPLOY_VALUES, displayName: "Elixir Deploy" },
   elixirLibraries: {
     values: ELIXIR_LIBRARIES_VALUES,
@@ -2018,6 +2021,11 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
     dotenvy: "Dotenvy",
     skogsra: "Skogsra",
     confex: "Confex",
+  },
+  elixirMessageQueue: {
+    amqp: "AMQP (RabbitMQ)",
+    gnat: "Gnat (NATS)",
+    brod: "brod (Kafka)",
   },
   elixirDeploy: {
     docker: "Docker",

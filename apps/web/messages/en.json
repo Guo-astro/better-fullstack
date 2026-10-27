@@ -639,6 +639,7 @@
   "docsCliSummaryElixirElixirClustering": "Elixir clustering.",
   "docsCliSummaryElixirElixirLogging": "Elixir logging.",
   "docsCliSummaryElixirElixirConfig": "Elixir runtime configuration.",
+  "docsCliSummaryElixirElixirMessageQueue": "Elixir message broker client.",
   "docsCliSummaryElixirElixirDeploy": "Elixir deploy target.",
   "docsCliSummaryElixirElixirLibraries": "Elixir libraries.",
   "docsSectionStart": "Start",

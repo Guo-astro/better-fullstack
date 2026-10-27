@@ -624,6 +624,7 @@
   "docsCliSummaryElixirElixirClustering": "Кластеризація в Elixir.",
   "docsCliSummaryElixirElixirLogging": "Логування в Elixir.",
   "docsCliSummaryElixirElixirConfig": "Конфігурація під час виконання в Elixir.",
+  "docsCliSummaryElixirElixirMessageQueue": "Клієнт брокера повідомлень для Elixir.",
   "docsCliSummaryElixirElixirDeploy": "Цільове середовище розгортання Elixir.",
   "docsCliSummaryElixirElixirLibraries": "Бібліотеки Elixir.",
   "docsSectionStart": "Початок",
