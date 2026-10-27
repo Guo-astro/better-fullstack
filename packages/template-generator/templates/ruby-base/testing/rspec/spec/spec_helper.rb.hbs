@@ -1,4 +1,14 @@
 ENV["RACK_ENV"] = "test"
+{{#if (or (ne rubyOrm "none") (eq rubyAuth "rodauth"))}}
+
+require "tmpdir"
+ENV["DATABASE_PATH"] = File.join(Dir.mktmpdir, "test.sqlite3")
+{{/if}}
+{{#if (eq rubyJobQueue "resque")}}
+
+require "securerandom"
+ENV["JOBS_QUEUE"] = "test-#{SecureRandom.hex(4)}"
+{{/if}}
 {{#if (ne rubyOrm "none")}}
 
 require_relative "../db"

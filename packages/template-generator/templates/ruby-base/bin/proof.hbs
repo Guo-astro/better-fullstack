@@ -17,6 +17,13 @@ environment = { "HOST" => "127.0.0.1", "PORT" => port.to_s, "RACK_ENV" => "produ
 database = Tempfile.new(["proof", ".sqlite3"])
 environment["DATABASE_PATH"] = database.path
 {{/if}}
+{{#if (ne rubyLogging "none")}}
+request_log = Tempfile.new(["requests", ".log"])
+environment.merge!("LOG_PATH" => request_log.path, "LOG_LEVEL" => "info")
+{{/if}}
+{{#if (eq rubyJobQueue "resque")}}
+environment["JOBS_QUEUE"] = "proof-#{SecureRandom.hex(4)}"
+{{/if}}
 {{#if (ne rubyHttpClient "none")}}
 environment["UPSTREAM_URL"] = "http://127.0.0.1:#{port}"
 {{/if}}
@@ -67,6 +74,11 @@ begin
   ["http://localhost:5173", "http://localhost:8080"].each do |origin|
     response = http.get("/health", "Origin" => origin)
     raise "Frontend origin rejected" unless response.code == "200" && response["access-control-allow-origin"] == origin
+{{#if (or (eq rubyAuth "rodauth") (eq rubyAuth "omniauth"))}}
+    raise "Frontend credentials were not allowed" unless response["access-control-allow-credentials"] == "true"
+    response = http.options("/api/me", "Origin" => origin, "Access-Control-Request-Method" => "GET")
+    raise "Credentialed preflight rejected" unless response.code == "204" && response["access-control-allow-origin"] == origin && response["access-control-allow-credentials"] == "true"
+{{/if}}
     response = http.post("/api/greetings", JSON.generate(name: "Ruby"), "Content-Type" => "application/json", "Origin" => origin)
     raise "Frontend POST rejected" unless response.code == "200" && JSON.parse(response.body) == { "greeting" => "Hello, Ruby!" }
     response = http.post("/api/greetings", JSON.generate(name: "a" * 16_384), "Content-Type" => "application/json", "Origin" => origin)
@@ -103,6 +115,9 @@ begin
     sleep 0.2
   end
   raise "Job result was wrong" unless job == { "id" => job_id, "status" => "done", "greeting" => "Hello, Ruby!" }
+{{#if (eq rubyJobQueue "resque")}}
+  system(environment, RbConfig.ruby, "-r", "./jobs", "-e", "Resque.remove_queue(BetterFullstack::Jobs::QUEUE)", chdir: root, out: log, err: log)
+{{/if}}
 {{/if}}
 {{#if (or (eq rubyEmail "mail") (eq rubyEmail "action-mailer"))}}
   require_relative "../support/smtp_capture"
@@ -160,7 +175,7 @@ begin
 {{/if}}
 {{#if (ne rubyLogging "none")}}
   deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + 5
-  until File.read(log.path).match?({{#if (or (eq rubyLogging "logger") (eq rubyLogging "lograge"))}}/method=POST path=\/api\/greetings .*status=200/{{else}}/"path":"\/api\/greetings","status":200/{{/if}})
+  until File.read(request_log.path).match?({{#if (or (eq rubyLogging "logger") (eq rubyLogging "lograge"))}}/method=POST path=\/api\/greetings .*status=200/{{else}}/"path":"\/api\/greetings","status":200/{{/if}})
     raise "Request was not logged" if Process.clock_gettime(Process::CLOCK_MONOTONIC) >= deadline
     sleep 0.1
   end
@@ -200,6 +215,9 @@ ensure
     end
   end
   log.close!
+{{#if (ne rubyLogging "none")}}
+  request_log.close!
+{{/if}}
 {{#if (or (ne rubyOrm "none") (eq rubyAuth "rodauth"))}}
   database.close!
 {{/if}}

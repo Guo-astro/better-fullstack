@@ -125,6 +125,7 @@ RSpec.describe BetterFullstack::App do
 {{/if}}
 {{#if (eq rubyJobQueue "resque")}}
       Resque::Worker.new(BetterFullstack::Jobs::QUEUE).work(0)
+      Resque.remove_queue(BetterFullstack::Jobs::QUEUE)
 {{/if}}
 {{#if (eq rubyJobQueue "solid-queue")}}
       worker = SolidQueue::Worker.new(queues: "*", threads: 1, polling_interval: 0.05)

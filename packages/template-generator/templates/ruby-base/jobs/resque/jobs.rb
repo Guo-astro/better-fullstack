@@ -4,7 +4,7 @@ require "securerandom"
 
 module BetterFullstack
   module Jobs
-    QUEUE = "default"
+    QUEUE = ENV.fetch("JOBS_QUEUE", "default")
     RESULT_TTL_SECONDS = 3600
 
     Resque.redis = ENV.fetch("JOBS_REDIS_URL", "redis://127.0.0.1:6379/1")

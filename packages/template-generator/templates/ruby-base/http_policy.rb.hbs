@@ -23,6 +23,9 @@ module BetterFullstack
       if origin
         headers["access-control-allow-origin"] = origin
         headers["vary"] = "Origin"
+{{#if (or (eq rubyAuth "rodauth") (eq rubyAuth "omniauth"))}}
+        headers["access-control-allow-credentials"] = "true"
+{{/if}}
       end
       [status, headers, body]
     end
