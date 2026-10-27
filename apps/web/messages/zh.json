@@ -594,6 +594,7 @@
   "docsCliSummaryRubyRubyTesting": "Ruby 测试框架。",
   "docsCliSummaryRubyRubyValidation": "Ruby 请求验证。",
   "docsCliSummaryRubyRubyCache": "Ruby 缓存存储。",
+  "docsCliSummaryRubyRubyJobQueue": "Ruby 后台任务队列。",
   "docsCliSummaryPhpPhpWebFramework": "PHP HTTP 框架。",
   "docsCliSummaryPhpPhpOrm": "PHP ORM / 数据库层。",
   "docsCliSummaryPhpPhpAuth": "PHP 认证。",

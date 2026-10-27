@@ -117,6 +117,7 @@ import {
   resolveRubyTestingPrompt,
   resolveRubyValidationPrompt,
   resolveRubyCachePrompt,
+  resolveRubyJobQueuePrompt,
   resolveRubyWebFrameworkPrompt,
 } from "@/prompts/ecosystems/ruby-ecosystem";
 import {
@@ -194,11 +195,13 @@ import {
   RUBY_TESTING_VALUES,
   RUBY_VALIDATION_VALUES,
   RUBY_CACHE_VALUES,
+  RUBY_JOB_QUEUE_VALUES,
   RubyAuthSchema,
   RubyOrmSchema,
   RubyTestingSchema,
   RubyValidationSchema,
   RubyCacheSchema,
+  RubyJobQueueSchema,
   RubyWebFrameworkSchema,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   EMAIL_VALUES,
@@ -856,6 +859,20 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
     resolve: ({ value }: { value?: string } = {}) =>
       resolveRubyCachePrompt(value === undefined ? undefined : RubyCacheSchema.parse(value)),
     coverageContexts: [{}],
+  },
+  rubyJobQueue: {
+    schemaValues: RUBY_JOB_QUEUE_VALUES,
+    coverageContexts: [{}, { rubyWebFramework: "rails", rubyOrm: "active-record" }],
+    resolve: ({
+      value,
+      rubyWebFramework,
+      rubyOrm,
+    }: { value?: string; rubyWebFramework?: string; rubyOrm?: string } = {}) =>
+      resolveRubyJobQueuePrompt(
+        value === undefined ? undefined : RubyJobQueueSchema.parse(value),
+        rubyWebFramework === undefined ? undefined : RubyWebFrameworkSchema.parse(rubyWebFramework),
+        rubyOrm === undefined ? undefined : RubyOrmSchema.parse(rubyOrm),
+      ),
   },
   phpWebFramework: {
     schemaValues: PhpWebFrameworkSchema.options,

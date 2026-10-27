@@ -18,6 +18,9 @@ require "minitest/autorun"
 {{/if}}
 require "rack/test"
 require_relative "../app"
+{{#if (eq rubyJobQueue "sidekiq")}}
+require "sidekiq/testing"
+{{/if}}
 
 class AppTest < {{#if (eq rubyTesting "test-unit")}}Test::Unit::TestCase{{else}}Minitest::Test{{/if}}
   include Rack::Test::Methods
@@ -92,6 +95,41 @@ class AppTest < {{#if (eq rubyTesting "test-unit")}}Test::Unit::TestCase{{else}}
     BetterFullstack::Cache.fetch(key, ttl: 1) { "first" }
     sleep 2.1
     assert_equal ["second", false], BetterFullstack::Cache.fetch(key, ttl: 1) { "second" }
+  end
+
+{{/if}}
+{{#if (ne rubyJobQueue "none")}}
+  def run_queued_jobs
+{{#if (eq rubyJobQueue "sidekiq")}}
+    BetterFullstack::Jobs::GreetingJob.drain
+{{/if}}
+{{#if (eq rubyJobQueue "resque")}}
+    Resque::Worker.new(BetterFullstack::Jobs::QUEUE).work(0)
+{{/if}}
+{{#if (eq rubyJobQueue "solid-queue")}}
+    worker = SolidQueue::Worker.new(queues: "*", threads: 1, polling_interval: 0.05)
+    worker.start
+    deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + 10
+    sleep 0.05 while SolidQueue::Job.where(finished_at: nil).exists? && Process.clock_gettime(Process::CLOCK_MONOTONIC) < deadline
+    worker.stop
+{{/if}}
+  end
+
+  def test_jobs_run_on_the_queue
+    {{#if (eq rubyTesting "test-unit")}}omit{{else}}skip{{/if}} "Start the job queue backend to run job tests" unless BetterFullstack::Jobs.available?
+    post "/api/jobs", JSON.generate(name: "Ruby"), "CONTENT_TYPE" => "application/json"
+    assert_equal 202, last_response.status
+    id = JSON.parse(last_response.body).fetch("id")
+    get "/api/jobs/#{id}"
+    assert_equal "queued", JSON.parse(last_response.body).fetch("status")
+    run_queued_jobs
+    get "/api/jobs/#{id}"
+    assert_equal({ "id" => id, "status" => "done", "greeting" => "Hello, Ruby!" }, JSON.parse(last_response.body))
+  end
+
+  def test_invalid_jobs_are_not_enqueued
+    post "/api/jobs", JSON.generate(name: " "), "CONTENT_TYPE" => "application/json"
+    assert_equal 422, last_response.status
   end
 
 {{/if}}

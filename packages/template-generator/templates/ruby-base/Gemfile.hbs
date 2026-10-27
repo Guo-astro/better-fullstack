@@ -58,6 +58,15 @@ gem "dalli", "5.2.2"
 {{#if (eq rubyCache "memory")}}
 gem "activesupport", "8.1.4"
 {{/if}}
+{{#if (eq rubyJobQueue "sidekiq")}}
+gem "sidekiq", "8.1.7"
+{{/if}}
+{{#if (eq rubyJobQueue "resque")}}
+gem "resque", "3.2.0"
+{{/if}}
+{{#if (eq rubyJobQueue "solid-queue")}}
+gem "solid_queue", "1.7.0"
+{{/if}}
 gem "puma", "7.1.0"
 gem "rackup", "2.3.1"
 gem "rake", "13.3.1"

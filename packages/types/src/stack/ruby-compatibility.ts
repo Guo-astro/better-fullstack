@@ -3,11 +3,11 @@ import type { ProjectConfig, StackPart } from "@/config/types";
 import { getToolingCapability, isToolingOverlayOnly } from "@/capabilities/tooling-capabilities";
 
 export const RUBY_RECIPE_EXTENSION_REASON =
-  "The experimental Ruby recipe provides Sinatra, Rails, Roda, or Grape JSON HTTP, an optional SQLite ORM selected with rubyOrm, optional authentication selected with rubyAuth, Minitest, RSpec, or Test::Unit request tests selected with rubyTesting, request validation selected with rubyValidation, and a Redis, Memcached, or in-process cache selected with rubyCache. Shared database, authentication, deployment, and other service adapters are not generated.";
+  "The experimental Ruby recipe provides Sinatra, Rails, Roda, or Grape JSON HTTP, an optional SQLite ORM selected with rubyOrm, optional authentication selected with rubyAuth, Minitest, RSpec, or Test::Unit request tests selected with rubyTesting, request validation selected with rubyValidation, a Redis, Memcached, or in-process cache selected with rubyCache, and Sidekiq, Resque, or Solid Queue background jobs selected with rubyJobQueue. Shared database, authentication, deployment, and other service adapters are not generated.";
 export const RUBY_RECIPE_FRAMEWORK_REASON =
   "The Ruby HTTP recipe requires a web framework. Use rubyWebFramework=sinatra, rails, roda, or grape, or remove the Ruby backend.";
 
-export const RUBY_OWNED_ROLES = ["orm", "auth", "testing", "validation", "caching"] as const satisfies readonly StackPart["role"][];
+export const RUBY_OWNED_ROLES = ["orm", "auth", "testing", "validation", "caching", "jobQueue"] as const satisfies readonly StackPart["role"][];
 
 export const RUBY_OPTION_CATEGORIES = [
   "rubyOrm",
@@ -15,10 +15,72 @@ export const RUBY_OPTION_CATEGORIES = [
   "rubyTesting",
   "rubyValidation",
   "rubyCache",
+  "rubyJobQueue",
 ] as const satisfies readonly (keyof ProjectConfig)[];
 
 export function isRubyOwnedRole(role: StackPart["role"]): boolean {
   return RUBY_OWNED_ROLES.some((entry) => entry === role);
+}
+
+type RubyOptionCategory = (typeof RUBY_OPTION_CATEGORIES)[number];
+type RubyOptionRule = { label: string; frameworks: readonly string[]; orms?: readonly string[] };
+
+const RUBY_FRAMEWORK_LABELS: Record<string, string> = {
+  sinatra: "Sinatra",
+  rails: "Rails",
+  roda: "Roda",
+  grape: "Grape",
+};
+const RUBY_ORM_LABELS: Record<string, string> = {
+  "active-record": "Active Record",
+  sequel: "Sequel",
+  rom: "ROM",
+};
+
+export const RUBY_OPTION_RULES: Partial<
+  Record<RubyOptionCategory, { role: StackPart["role"]; options: Record<string, RubyOptionRule> }>
+> = {
+  rubyJobQueue: {
+    role: "jobQueue",
+    options: {
+      "solid-queue": { label: "Solid Queue", frameworks: ["rails"], orms: ["active-record"] },
+    },
+  },
+};
+
+export function getRubyOptionIssue(
+  category: string,
+  optionId: string | undefined,
+  framework: string | undefined,
+  orm: string | undefined,
+): string | null {
+  const options: Record<string, RubyOptionRule> | undefined =
+    RUBY_OPTION_RULES[category as RubyOptionCategory]?.options;
+  const rule = optionId ? options?.[optionId] : undefined;
+  if (!rule) return null;
+  if (!rule.frameworks.includes(framework ?? "none")) {
+    const frameworks = rule.frameworks.map((id) => RUBY_FRAMEWORK_LABELS[id] ?? id).join(" or ");
+    return `${rule.label} requires Ruby ${frameworks}.`;
+  }
+  if (rule.orms && !rule.orms.includes(orm ?? "none")) {
+    const orms = rule.orms.map((id) => RUBY_ORM_LABELS[id] ?? id).join(" or ");
+    return `${rule.label} requires the ${orms} ORM.`;
+  }
+  return null;
+}
+
+function getRubyOwnedPartIssue(
+  parts: readonly StackPart[],
+  backend: Pick<StackPart, "id" | "toolId">,
+): string | null {
+  const owned = parts.filter((part) => part.ownerPartId === backend.id && part.ecosystem === "ruby");
+  const orm = owned.find((part) => part.role === "orm")?.toolId;
+  for (const [category, { role }] of Object.entries(RUBY_OPTION_RULES)) {
+    const part = owned.find((entry) => entry.role === role);
+    const issue = getRubyOptionIssue(category, part?.toolId, backend.toolId, orm);
+    if (issue) return issue;
+  }
+  return null;
 }
 
 export const RUBY_UNSUPPORTED_CONFIG_KEYS = [
@@ -101,6 +163,10 @@ export function getRubyRecipeIssue(config: Partial<ProjectConfig>): string | nul
     );
     const rubyIds = new Set(rubyBackends.map((part) => part.id));
     if (rubyBackends.some((part) => part.toolId === "none")) return RUBY_RECIPE_FRAMEWORK_REASON;
+    for (const backend of rubyBackends) {
+      const issue = getRubyOwnedPartIssue(config.stackParts, backend);
+      if (issue) return issue;
+    }
     if (
       config.stackParts.some(
         (part) =>
@@ -146,6 +212,10 @@ export function getRubyRecipeIssue(config: Partial<ProjectConfig>): string | nul
     )
       return RUBY_RECIPE_EXTENSION_REASON;
   }
+  for (const category of RUBY_OPTION_CATEGORIES) {
+    const issue = getRubyOptionIssue(category, config[category], config.rubyWebFramework, config.rubyOrm);
+    if (issue) return issue;
+  }
   return null;
 }
 
@@ -161,6 +231,7 @@ export function createRubyProjectConfigDefaults(): Partial<ProjectConfig> {
       ["rubyTesting", "minitest"],
       ["rubyValidation", "none"],
       ["rubyCache", "none"],
+      ["rubyJobQueue", "none"],
     ]),
   );
 }

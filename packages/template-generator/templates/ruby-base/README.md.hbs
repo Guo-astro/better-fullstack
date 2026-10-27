@@ -35,6 +35,9 @@ bundle exec ruby bin/server
 {{#if (ne rubyCache "none")}}
 - GET `/api/cache` returns `{"value":{"computed_at":"..."},"cached":false}` on a miss and the same value with `"cached":true` until the 30-second TTL expires{{#if (ne rubyCache "memory")}}, or 503 `cache_unavailable` when the cache server is unreachable{{/if}}.
 {{/if}}
+{{#if (ne rubyJobQueue "none")}}
+- POST `/api/jobs` accepts the greeting body, enqueues a job, and returns 202 with `{"id":"...","status":"queued"}`. GET `/api/jobs/:id` returns `queued` until a worker runs it, then `{"id":"...","status":"done","greeting":"Hello, Ruby!"}`.
+{{/if}}
 - Blank, non-string, unknown-field, and over-80-character names return 422. Malformed JSON returns 400, non-JSON content returns 415, and bodies over 16 KiB return 413.
 
 The server binds to `127.0.0.1:{{rubyPort}}`. `HOST`, `PORT`, `RACK_ENV`, and `ALLOWED_ORIGIN` are process environment variables. `.env.example` documents values and is not loaded automatically. CORS permits the generated frontend origins `{{rubyWebOrigin}}` by default. Set ALLOWED_ORIGIN to a comma-separated list of trusted frontend origins to override them. Host authorization accepts localhost and loopback addresses. Configure explicit trusted hosts before public hosting.
@@ -69,6 +72,12 @@ The server binds to `127.0.0.1:{{rubyPort}}`. `HOST`, `PORT`, `RACK_ENV`, and `A
 ## Cache
 
 `cache.rb` wraps {{#if (eq rubyCache "redis")}}a redis-rb client for `REDIS_URL` (default `redis://127.0.0.1:6379/0`) that stores JSON values with an `EX` expiry{{/if}}{{#if (eq rubyCache "memcached")}}a Dalli client for `MEMCACHED_SERVERS` (default `127.0.0.1:11211`, Memcached 1.6+) that stores JSON values with a TTL{{/if}}{{#if (eq rubyCache "memory")}}an Active Support `MemoryStore` capped at 8 MiB. Entries live in one process, so Puma workers do not share them{{/if}}. `Cache.fetch(key, ttl:)` returns the value and whether it came from the cache. {{#if (eq rubyCache "memory")}}No server is needed.{{else}}Start the server before `bundle exec rake test` and `bin/proof`; the cache tests skip when it is unreachable, and the proof fails.{{/if}}
+
+{{/if}}
+{{#if (ne rubyJobQueue "none")}}
+## Background jobs
+
+`jobs.rb` defines `GreetingJob` and the `Jobs` service the routes call. Run the worker in its own process with `bundle exec ruby bin/worker`. {{#if (eq rubyJobQueue "sidekiq")}}Sidekiq stores jobs and results in Redis at `JOBS_REDIS_URL` (default `redis://127.0.0.1:6379/1`). Use a Redis instance without an eviction policy for jobs. Tests use `Sidekiq::Testing` to drain the queued job in-process.{{/if}}{{#if (eq rubyJobQueue "resque")}}Resque stores jobs and results in Redis at `JOBS_REDIS_URL` (default `redis://127.0.0.1:6379/1`); `bin/worker` polls the `default` queue. Use a Redis instance without an eviction policy for jobs. Tests run a Resque worker until the queue is empty.{{/if}}{{#if (eq rubyJobQueue "solid-queue")}}Solid Queue stores jobs in the SQLite database through Active Job; `bundle exec rake db:migrate` creates its tables and the `job_results` table. `bin/worker` starts the Solid Queue supervisor with its default worker and dispatcher. Tests start an in-process Solid Queue worker.{{/if}} Job tests skip when the backend is unreachable, and `bin/proof` starts `bin/worker` and waits for the job result.
 
 {{/if}}
 Use Ctrl-C to stop the foreground server. Add future routes in `app.rb`{{#if (eq rubyTesting "rspec")}} and behavior specs in `spec/app_spec.rb`{{/if}}{{#if (or (eq rubyTesting "minitest") (eq rubyTesting "test-unit"))}} and behavior tests in `test/app_test.rb`{{/if}}. Keep Gemfile ownership inside this service when composed with other languages.

@@ -26,6 +26,10 @@ export const RubyCacheSchema = z
   .enum(["redis", "memcached", "memory", "none"])
   .describe("Ruby cache store");
 
+export const RubyJobQueueSchema = z
+  .enum(["sidekiq", "resque", "solid-queue", "none"])
+  .describe("Ruby background job queue");
+
 export const EcosystemSchema = z
   .enum([
     "typescript",
@@ -1473,6 +1477,7 @@ const STACK_CONFIG_FIELDS = {
   rubyTesting: RubyTestingSchema.optional(),
   rubyValidation: RubyValidationSchema.optional(),
   rubyCache: RubyCacheSchema.optional(),
+  rubyJobQueue: RubyJobQueueSchema.optional(),
   phpWebFramework: PhpWebFrameworkSchema.default("none"),
   phpOrm: PhpOrmSchema.default("none"),
   phpAuth: PhpAuthSchema.default("none"),
@@ -1814,3 +1819,4 @@ export const RUBY_AUTH_VALUES = RubyAuthSchema.options;
 export const RUBY_TESTING_VALUES = RubyTestingSchema.options;
 export const RUBY_VALIDATION_VALUES = RubyValidationSchema.options;
 export const RUBY_CACHE_VALUES = RubyCacheSchema.options;
+export const RUBY_JOB_QUEUE_VALUES = RubyJobQueueSchema.options;

@@ -594,6 +594,7 @@
   "docsCliSummaryRubyRubyTesting": "Ruby のテストフレームワーク。",
   "docsCliSummaryRubyRubyValidation": "Ruby のリクエスト検証。",
   "docsCliSummaryRubyRubyCache": "Ruby のキャッシュストア。",
+  "docsCliSummaryRubyRubyJobQueue": "Ruby のバックグラウンドジョブキュー。",
   "docsCliSummaryPhpPhpWebFramework": "PHP の HTTP フレームワーク。",
   "docsCliSummaryPhpPhpOrm": "PHP の ORM / データベース層。",
   "docsCliSummaryPhpPhpAuth": "PHP の認証。",

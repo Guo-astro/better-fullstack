@@ -1,9 +1,12 @@
+import { getRubyOptionIssue } from "@better-fullstack/types";
+
 import type {
   RubyAuth,
   RubyOrm,
   RubyTesting,
   RubyValidation,
   RubyCache,
+  RubyJobQueue,
   RubyWebFramework,
 } from "@/types";
 
@@ -149,6 +152,44 @@ export async function getRubyCacheChoice(value?: RubyCache) {
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
   const response = await navigableSelect<RubyCache>({
     message: "Select Ruby cache store",
+    options: resolution.options,
+    initialValue: resolution.initialValue,
+  });
+  if (isCancel(response)) return exitCancelled("Operation cancelled");
+  return response;
+}
+
+const JOB_QUEUE_OPTIONS: PromptOption<RubyJobQueue>[] = [
+  { value: "sidekiq", label: "Sidekiq", hint: "Redis-backed jobs run by a Sidekiq process" },
+  { value: "resque", label: "Resque", hint: "Redis-backed jobs run by a Resque worker" },
+  {
+    value: "solid-queue",
+    label: "Solid Queue",
+    hint: "Database-backed Active Job queue (Rails + Active Record)",
+  },
+  { value: "none", label: "None", hint: "No background jobs" },
+];
+
+export function resolveRubyJobQueuePrompt(
+  value?: RubyJobQueue,
+  framework?: RubyWebFramework,
+  orm?: RubyOrm,
+) {
+  const options = JOB_QUEUE_OPTIONS.filter(
+    (option) => !getRubyOptionIssue("rubyJobQueue", option.value, framework, orm),
+  );
+  return createStaticSinglePromptResolution(options, "none", value);
+}
+
+export async function getRubyJobQueueChoice(
+  value?: RubyJobQueue,
+  framework?: RubyWebFramework,
+  orm?: RubyOrm,
+) {
+  const resolution = resolveRubyJobQueuePrompt(value, framework, orm);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
+  const response = await navigableSelect<RubyJobQueue>({
+    message: "Select Ruby background job queue",
     options: resolution.options,
     initialValue: resolution.initialValue,
   });

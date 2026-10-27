@@ -1159,6 +1159,12 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         source: { kind: "category", category: "rubyCache" },
         configKey: "rubyCache",
       },
+      {
+        flag: "ruby-job-queue",
+        summary: "Ruby background job queue.",
+        source: { kind: "category", category: "rubyJobQueue" },
+        configKey: "rubyJobQueue",
+      },
     ],
   },
   {

@@ -419,6 +419,44 @@ describe("Ruby language integration", () => {
     expect(generateReproducibleCommand({ ...config(), rubyCache: cache })).toContain(`--ruby-cache ${cache}`);
   });
 
+  it.each([
+    { jobs: "sidekiq", framework: "sinatra", orm: "none", backend: "include Sidekiq::Job", gem: 'gem "sidekiq", "8.1.7"' },
+    { jobs: "resque", framework: "grape", orm: "sequel", backend: "Resque.enqueue(GreetingJob", gem: 'gem "resque", "3.2.0"' },
+    { jobs: "solid-queue", framework: "rails", orm: "active-record", backend: "class GreetingJob < ActiveJob::Base", gem: 'gem "solid_queue", "1.7.0"' },
+  ] as const)("runs greeting jobs through $jobs with a worker command", async ({ jobs, framework, orm, backend, gem }) => {
+    const result = await createVirtual({
+      ecosystem: "ruby",
+      rubyWebFramework: framework,
+      rubyOrm: orm,
+      rubyJobQueue: jobs,
+      aiDocs: ["agents-md"],
+    });
+    if (!result.success || !result.tree) throw new Error(result.error ?? "No Ruby project");
+    const paths = listVirtualTreeFilePaths(result.tree);
+    expect(paths.some((path) => path.startsWith("jobs/"))).toBe(false);
+    expect(content(result.tree, "jobs.rb")).toContain(backend);
+    expect(paths).toContain("bin/worker");
+    expect(content(result.tree, "app.rb")).toContain("Jobs.create(name)");
+    expect(content(result.tree, "bin/proof")).toContain('File.expand_path("worker", __dir__)');
+    expect(content(result.tree, "Gemfile")).toContain(gem);
+    expect(content(result.tree, "AGENTS.md")).toContain("bundle exec ruby bin/worker");
+    expect(paths.includes("db/migrate/20261027000100_create_solid_queue_tables.rb")).toBe(jobs === "solid-queue");
+    expect(
+      generateReproducibleCommand({ ...config(), rubyWebFramework: framework, rubyOrm: orm, rubyJobQueue: jobs }),
+    ).toContain(`--ruby-job-queue ${jobs}`);
+  });
+
+  it("rejects Solid Queue outside Rails with Active Record", async () => {
+    const result = await createVirtual({
+      ecosystem: "ruby",
+      rubyWebFramework: "sinatra",
+      rubyOrm: "active-record",
+      rubyJobQueue: "solid-queue",
+    });
+    expect(result.success).toBe(false);
+    expect(result.error).toBe("Solid Queue requires Ruby Rails.");
+  });
+
   it("keeps hand-written greeting validation when no Ruby validation library is selected", async () => {
     const result = await createVirtual({ ecosystem: "ruby", rubyWebFramework: "sinatra" });
     if (!result.success || !result.tree) throw new Error(result.error ?? "No Ruby project");

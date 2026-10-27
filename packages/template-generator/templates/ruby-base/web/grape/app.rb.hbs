@@ -6,6 +6,9 @@ require_relative "auth"
 {{#if (ne rubyCache "none")}}
 require_relative "cache"
 {{/if}}
+{{#if (ne rubyJobQueue "none")}}
+require_relative "jobs"
+{{/if}}
 require_relative "http_policy"
 {{#if (ne rubyOrm "none")}}
 require_relative "items"
@@ -38,6 +41,22 @@ module BetterFullstack
 
     get "/api/cache" do
       status_code, body = Cache.demo
+      status status_code
+      body
+    end
+{{/if}}
+{{#if (ne rubyJobQueue "none")}}
+
+    post "/api/jobs" do
+      name = NameInput.parse(request.media_type, env["rack.input"])
+      error!({ error: name.error }, name.status) if name.is_a?(NameInput::Invalid)
+      status_code, body = Jobs.create(name)
+      status status_code
+      body
+    end
+
+    get "/api/jobs/:id" do
+      status_code, body = Jobs.find(params[:id])
       status status_code
       body
     end

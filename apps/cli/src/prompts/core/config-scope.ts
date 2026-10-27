@@ -335,6 +335,7 @@ export const CONFIG_SCOPE_REGISTRY = {
       "rubyTesting",
       "rubyValidation",
       "rubyCache",
+      "rubyJobQueue",
     ],
     sections: [],
   },

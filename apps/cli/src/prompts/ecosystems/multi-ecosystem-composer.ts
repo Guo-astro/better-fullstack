@@ -154,6 +154,7 @@ import {
   getRubyTestingChoice,
   getRubyValidationChoice,
   getRubyCacheChoice,
+  getRubyJobQueueChoice,
   getRubyWebFrameworkChoice,
 } from "@/prompts/ecosystems/ruby-ecosystem";
 import {
@@ -1480,6 +1481,10 @@ export async function gatherMultiEcosystemConfig(
         : promptValue(await getRubyValidationChoice(flags.rubyValidation));
     const rubyCache =
       rubyWebFramework === "none" ? "none" : promptValue(await getRubyCacheChoice(flags.rubyCache));
+    const rubyJobQueue =
+      rubyWebFramework === "none"
+        ? "none"
+        : promptValue(await getRubyJobQueueChoice(flags.rubyJobQueue, rubyWebFramework, rubyOrm));
     Object.assign(backendChoices, {
       rubyWebFramework,
       rubyOrm,
@@ -1487,6 +1492,7 @@ export async function gatherMultiEcosystemConfig(
       rubyTesting,
       rubyValidation,
       rubyCache,
+      rubyJobQueue,
     });
     if (rubyWebFramework !== "none") stackPartSpecs.push(`backend:ruby:${rubyWebFramework}`);
     if (rubyOrm !== "none") stackPartSpecs.push(`backend.orm:ruby:${rubyOrm}`);
@@ -1495,6 +1501,7 @@ export async function gatherMultiEcosystemConfig(
     if (rubyValidation !== "none")
       stackPartSpecs.push(`backend.validation:ruby:${rubyValidation}`);
     if (rubyCache !== "none") stackPartSpecs.push(`backend.caching:ruby:${rubyCache}`);
+    if (rubyJobQueue !== "none") stackPartSpecs.push(`backend.jobQueue:ruby:${rubyJobQueue}`);
   }
 
   if (backendEcosystem === "php") {

@@ -50,6 +50,7 @@ import {
   type PhpCapabilityCategory,
 } from "@/stack/php-compatibility";
 import {
+  getRubyOptionIssue,
   RUBY_OPTION_CATEGORIES,
   RUBY_RECIPE_EXTENSION_REASON,
   RUBY_RECIPE_FRAMEWORK_REASON,
@@ -588,6 +589,7 @@ export type CompatibilityInput = {
   rubyTesting: string;
   rubyValidation: string;
   rubyCache: string;
+  rubyJobQueue: string;
   phpWebFramework: string;
   phpOrm: string;
   phpAuth: string;
@@ -2671,6 +2673,21 @@ export const analyzeStackCompatibility = (
     }
   }
 
+  if (nextStack.ecosystem === "ruby") {
+    for (const category of RUBY_OPTION_CATEGORIES) {
+      const issue = getRubyOptionIssue(
+        category,
+        nextStack[category],
+        nextStack.rubyWebFramework,
+        nextStack.rubyOrm,
+      );
+      if (!issue) continue;
+      nextStack[category] = "none";
+      changed = true;
+      changes.push({ category, message: `${getCategoryDisplayName(category)} set to 'None' (${issue})` });
+    }
+  }
+
   if (nextStack.ecosystem === "php") {
     for (const [category, { role, label }] of Object.entries(PHP_CAPABILITY_CATEGORIES)) {
       const key = category as PhpCapabilityCategory;
@@ -3021,6 +3038,13 @@ export const getDisabledReason = (
     return "Ruby options only apply when the Ruby ecosystem is selected";
   if (currentStack.ecosystem === "ruby") {
     if (category === "rubyWebFramework" && optionId === "none") return RUBY_RECIPE_FRAMEWORK_REASON;
+    const rubyIssue = getRubyOptionIssue(
+      category,
+      optionId,
+      currentStack.rubyWebFramework,
+      currentStack.rubyOrm,
+    );
+    if (rubyIssue) return rubyIssue;
     const key =
       category === "webFrontend" || category === "nativeFrontend"
         ? "frontend"

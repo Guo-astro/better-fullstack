@@ -1289,6 +1289,7 @@ export function generateReproducibleCommand(config: ProjectConfig) {
         `--ruby-testing ${config.rubyTesting ?? "minitest"}`,
         `--ruby-validation ${config.rubyValidation ?? "none"}`,
         `--ruby-cache ${config.rubyCache ?? "none"}`,
+        `--ruby-job-queue ${config.rubyJobQueue ?? "none"}`,
         "--database none",
         "--addons none",
         "--examples none",

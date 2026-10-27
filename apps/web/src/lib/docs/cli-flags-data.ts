@@ -2499,6 +2499,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "none",
         "multiple": false
+      },
+      {
+        "flag": "--ruby-job-queue",
+        "summary": "Ruby background job queue.",
+        "values": [
+          "sidekiq",
+          "resque",
+          "solid-queue",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
       }
     ]
   },
@@ -3072,6 +3085,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "ruby:--ruby-testing": m.docsCliSummaryRubyRubyTesting,
   "ruby:--ruby-validation": m.docsCliSummaryRubyRubyValidation,
   "ruby:--ruby-cache": m.docsCliSummaryRubyRubyCache,
+  "ruby:--ruby-job-queue": m.docsCliSummaryRubyRubyJobQueue,
   "php:--php-web-framework": m.docsCliSummaryPhpPhpWebFramework,
   "php:--php-orm": m.docsCliSummaryPhpPhpOrm,
   "php:--php-auth": m.docsCliSummaryPhpPhpAuth,

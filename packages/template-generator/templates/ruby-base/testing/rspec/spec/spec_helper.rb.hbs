@@ -12,6 +12,9 @@ BetterFullstack::Auth.migrate!
 
 require "rack/test"
 require_relative "../app"
+{{#if (eq rubyJobQueue "sidekiq")}}
+require "sidekiq/testing"
+{{/if}}
 
 RSpec.configure do |config|
   config.include Rack::Test::Methods

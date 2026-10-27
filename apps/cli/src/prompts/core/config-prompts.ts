@@ -58,6 +58,7 @@ import type {
   RubyTesting,
   RubyValidation,
   RubyCache,
+  RubyJobQueue,
   PhpWebFramework,
   PhpOrm,
   PhpAuth,
@@ -335,6 +336,7 @@ import {
   getRubyTestingChoice,
   getRubyValidationChoice,
   getRubyCacheChoice,
+  getRubyJobQueueChoice,
   getRubyWebFrameworkChoice,
 } from "@/prompts/ecosystems/ruby-ecosystem";
 import {
@@ -528,6 +530,7 @@ type PromptGroupResults = {
   rubyTesting: RubyTesting;
   rubyValidation: RubyValidation;
   rubyCache: RubyCache;
+  rubyJobQueue: RubyJobQueue;
   phpWebFramework: PhpWebFramework;
   phpOrm: PhpOrm;
   phpAuth: PhpAuth;
@@ -726,6 +729,7 @@ const CONFIG_PROMPT_ENTRY_KEY_MAP = {
   rubyTesting: true,
   rubyValidation: true,
   rubyCache: true,
+  rubyJobQueue: true,
   phpWebFramework: true,
   phpOrm: true,
   phpAuth: true,
@@ -971,7 +975,8 @@ function scopedPrompt<K extends PromptGroupKey>(
         key === "rubyAuth" ||
         key === "rubyTesting" ||
         key === "rubyValidation" ||
-        key === "rubyCache") &&
+        key === "rubyCache" ||
+        key === "rubyJobQueue") &&
       opts.results.ecosystem !== "ruby"
     )
       return Promise.resolve("none" as PromptGroupResults[K]);
@@ -985,6 +990,7 @@ function scopedPrompt<K extends PromptGroupKey>(
         "rubyTesting",
         "rubyValidation",
         "rubyCache",
+        "rubyJobQueue",
         "aiDocs",
         "git",
         "install",
@@ -1953,6 +1959,10 @@ export async function gatherConfig(
       results.ecosystem === "ruby"
         ? getRubyCacheChoice(flags.rubyCache)
         : Promise.resolve("none" as const),
+    rubyJobQueue: ({ results }) =>
+      results.ecosystem === "ruby"
+        ? getRubyJobQueueChoice(flags.rubyJobQueue, results.rubyWebFramework, results.rubyOrm)
+        : Promise.resolve("none" as const),
     phpWebFramework: ({ results }) =>
       results.ecosystem === "php"
         ? getPhpWebFrameworkChoice(flags.phpWebFramework)
@@ -2259,6 +2269,7 @@ export async function gatherConfig(
     rubyTesting: result.rubyTesting,
     rubyValidation: result.rubyValidation,
     rubyCache: result.rubyCache,
+    rubyJobQueue: result.rubyJobQueue,
     phpWebFramework: result.phpWebFramework,
     phpOrm: result.phpOrm,
     phpAuth: result.phpAuth,

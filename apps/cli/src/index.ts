@@ -249,6 +249,7 @@ export async function createVirtual(
       rubyTesting: options.rubyTesting ?? (options.ecosystem === "ruby" ? "minitest" : "none"),
       rubyValidation: options.rubyValidation ?? "none",
       rubyCache: options.rubyCache ?? "none",
+      rubyJobQueue: options.rubyJobQueue ?? "none",
       phpWebFramework: options.phpWebFramework ?? (options.ecosystem === "php" ? "slim" : "none"),
       phpOrm: options.phpOrm ?? "none",
       phpAuth: options.phpAuth ?? "none",

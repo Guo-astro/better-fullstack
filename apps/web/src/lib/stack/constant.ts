@@ -6106,6 +6106,40 @@ export const TECH_OPTIONS: Record<
       default: true,
     },
   ],
+  rubyJobQueue: [
+    {
+      id: "sidekiq",
+      name: "Sidekiq",
+      description: "Redis-backed jobs run by a separate Sidekiq process",
+      icon: "https://cdn.simpleicons.org/ruby/CC342D",
+      color: "from-red-600 to-rose-800",
+      isNew: true,
+    },
+    {
+      id: "resque",
+      name: "Resque",
+      description: "Redis-backed jobs run by a Resque worker process",
+      icon: "https://cdn.simpleicons.org/redis/DC382D",
+      color: "from-orange-500 to-red-700",
+      isNew: true,
+    },
+    {
+      id: "solid-queue",
+      name: "Solid Queue",
+      description: "Database-backed Active Job queue for Rails with Active Record",
+      icon: "https://cdn.simpleicons.org/rubyonrails/D30001",
+      color: "from-rose-500 to-red-700",
+      isNew: true,
+    },
+    {
+      id: "none",
+      name: "No background jobs",
+      description: "Skip the job queue",
+      icon: "",
+      color: "from-gray-400 to-gray-600",
+      default: true,
+    },
+  ],
   rubyAuth: [
     {
       id: "jwt",

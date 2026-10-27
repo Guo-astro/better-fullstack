@@ -743,6 +743,16 @@ const CATEGORY_NAMES: Record<string, LocalizedMap> = {
     "fr": "Cache Ruby",
     "uk": "Кеш Ruby",
   },
+  rubyJobQueue: {
+    "es": "Trabajos en segundo plano Ruby",
+    "zh": "Ruby 后台任务",
+    "ja": "Ruby バックグラウンドジョブ",
+    "ko": "Ruby 백그라운드 작업",
+    "zh-Hant": "Ruby 背景工作",
+    "de": "Ruby-Hintergrundjobs",
+    "fr": "Tâches en arrière-plan Ruby",
+    "uk": "Фонові завдання Ruby",
+  },
   rubyAuth: {
     "es": "Auth Ruby",
     "zh": "Ruby 认证",

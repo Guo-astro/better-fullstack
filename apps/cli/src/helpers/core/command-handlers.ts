@@ -730,6 +730,7 @@ export async function createProjectHandler(
               rubyTesting: "none",
               rubyValidation: "none",
               rubyCache: "none",
+              rubyJobQueue: "none",
               phpWebFramework: "none",
               phpOrm: "none",
               phpAuth: "none",

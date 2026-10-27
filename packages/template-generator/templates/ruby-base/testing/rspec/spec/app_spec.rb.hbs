@@ -76,6 +76,43 @@ RSpec.describe BetterFullstack::App do
     end
   end
 {{/if}}
+{{#if (ne rubyJobQueue "none")}}
+
+  describe "background jobs" do
+    def run_queued_jobs
+{{#if (eq rubyJobQueue "sidekiq")}}
+      BetterFullstack::Jobs::GreetingJob.drain
+{{/if}}
+{{#if (eq rubyJobQueue "resque")}}
+      Resque::Worker.new(BetterFullstack::Jobs::QUEUE).work(0)
+{{/if}}
+{{#if (eq rubyJobQueue "solid-queue")}}
+      worker = SolidQueue::Worker.new(queues: "*", threads: 1, polling_interval: 0.05)
+      worker.start
+      deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + 10
+      sleep 0.05 while SolidQueue::Job.where(finished_at: nil).exists? && Process.clock_gettime(Process::CLOCK_MONOTONIC) < deadline
+      worker.stop
+{{/if}}
+    end
+
+    it "runs an enqueued job on the queue" do
+      skip "Start the job queue backend to run job specs" unless BetterFullstack::Jobs.available?
+      post "/api/jobs", JSON.generate(name: "Ruby"), "CONTENT_TYPE" => "application/json"
+      expect(last_response.status).to eq(202)
+      id = body.fetch("id")
+      get "/api/jobs/#{id}"
+      expect(body.fetch("status")).to eq("queued")
+      run_queued_jobs
+      get "/api/jobs/#{id}"
+      expect(body).to eq("id" => id, "status" => "done", "greeting" => "Hello, Ruby!")
+    end
+
+    it "does not enqueue invalid jobs" do
+      post "/api/jobs", JSON.generate(name: " "), "CONTENT_TYPE" => "application/json"
+      expect(last_response.status).to eq(422)
+    end
+  end
+{{/if}}
 {{#if (ne rubyOrm "none")}}
 
   describe "items" do

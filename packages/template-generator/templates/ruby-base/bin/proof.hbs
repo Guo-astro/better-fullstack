@@ -27,6 +27,9 @@ environment["SESSION_SECRET"] = SecureRandom.hex(64)
 environment.merge!("OIDC_ISSUER" => "https://issuer.example.com", "OIDC_CLIENT_ID" => "proof-client", "OIDC_CLIENT_SECRET" => "proof-secret", "OIDC_REDIRECT_URI" => "http://127.0.0.1:#{port}/auth/oidc/callback")
 {{/if}}
 pid = nil
+{{#if (ne rubyJobQueue "none")}}
+worker = nil
+{{/if}}
 
 begin
 {{#if (ne rubyOrm "none")}}
@@ -78,6 +81,22 @@ begin
   second = http.get("/api/cache")
   raise "Second read did not hit the cache" unless second.code == "200" && JSON.parse(second.body) == { "value" => JSON.parse(first.body).fetch("value"), "cached" => true }
 {{/if}}
+{{#if (ne rubyJobQueue "none")}}
+  worker = Process.spawn(environment, RbConfig.ruby, File.expand_path("worker", __dir__), chdir: root, out: log, err: log, pgroup: true)
+  response = http.post("/api/jobs", JSON.generate(name: "Ruby"), "Content-Type" => "application/json")
+  raise "Job was not enqueued; start the job queue backend: #{response.body}" unless response.code == "202"
+  job_id = JSON.parse(response.body).fetch("id")
+  deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + 30
+  job = nil
+  loop do
+    job = JSON.parse(http.get("/api/jobs/#{job_id}").body)
+    break if job["status"] == "done"
+    raise "Worker exited before running the job" if Process.waitpid(worker, Process::WNOHANG)
+    raise "Worker did not run the job in time" if Process.clock_gettime(Process::CLOCK_MONOTONIC) >= deadline
+    sleep 0.2
+  end
+  raise "Job result was wrong" unless job == { "id" => job_id, "status" => "done", "greeting" => "Hello, Ruby!" }
+{{/if}}
   response = http.post("/api/greetings", "", "Content-Type" => "application/json")
   raise "Empty JSON request was not rejected" unless response.code == "400" && JSON.parse(response.body).fetch("error") == "invalid_json"
 {{#if (ne rubyOrm "none")}}
@@ -114,12 +133,27 @@ begin
   response = http.post("/auth/oidc", "")
   raise "Sign-in without a CSRF token was not rejected" unless response.code == "302" && response["location"].include?("/auth/failure")
 {{/if}}
-  puts JSON.generate(health: "passed", parsed_response: "passed", invalid_request: "passed", frontend_origins: "passed", empty_json: "passed"{{#if (ne rubyOrm "none")}}, persistence: "passed"{{/if}}{{#if (ne rubyAuth "none")}}, authentication: "passed"{{/if}}{{#if (ne rubyCache "none")}}, cache: "passed"{{/if}})
+  puts JSON.generate(health: "passed", parsed_response: "passed", invalid_request: "passed", frontend_origins: "passed", empty_json: "passed"{{#if (ne rubyOrm "none")}}, persistence: "passed"{{/if}}{{#if (ne rubyAuth "none")}}, authentication: "passed"{{/if}}{{#if (ne rubyCache "none")}}, cache: "passed"{{/if}}{{#if (ne rubyJobQueue "none")}}, background_job: "passed"{{/if}})
 rescue StandardError => error
   log.rewind
   warn log.read
   raise error
 ensure
+{{#if (ne rubyJobQueue "none")}}
+  if worker
+    begin
+      Process.kill("TERM", -worker)
+      begin
+        Timeout.timeout(15) { Process.wait(worker) }
+      rescue Timeout::Error
+        Process.kill("KILL", -worker)
+        Process.wait(worker)
+        raise "Worker did not shut down after TERM"
+      end
+    rescue Errno::ESRCH, Errno::ECHILD
+    end
+  end
+{{/if}}
   if pid
     begin
       Process.kill("TERM", -pid)

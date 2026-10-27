@@ -6,7 +6,7 @@ import { getCapabilityInventory } from "@/capabilities/capability-inventory";
 import { getCliFlagReference } from "@/catalog/cli-flags";
 import { createCliDefaultProjectConfigBase } from "@/config/defaults";
 import { EcosystemSchema, CreateInputSchema, ProjectConfigSchema } from "@/config/schemas";
-import { getDisabledReason } from "@/stack/compatibility";
+import { analyzeStackCompatibility, getDisabledReason } from "@/stack/compatibility";
 import {
   createRubyProjectConfigDefaults,
   getRubyRecipeIssue,
@@ -279,6 +279,7 @@ describe("Ruby recipe contracts", () => {
   it.each([
     ["rubyValidation", "validation", "json-schemer", "none"],
     ["rubyCache", "caching", "redis", "none"],
+    ["rubyJobQueue", "jobQueue", "sidekiq", "none"],
   ] as const)(
     "projects %s as a Ruby-owned %s part",
     (category, role, tool, fallback) => {
@@ -298,6 +299,46 @@ describe("Ruby recipe contracts", () => {
       expect(generateStackSelectionCommand(restored)).toContain(`--${flag} ${tool}`);
     },
   );
+
+  it("allows Solid Queue only on Rails with Active Record", () => {
+    const rails = { ...rubySelection(), rubyWebFramework: "rails", rubyOrm: "active-record" };
+    expect(getDisabledReason(rails, "rubyJobQueue", "solid-queue")).toBeNull();
+    expect(getDisabledReason({ ...rails, rubyWebFramework: "sinatra" }, "rubyJobQueue", "solid-queue")).toBe(
+      "Solid Queue requires Ruby Rails.",
+    );
+    expect(getDisabledReason({ ...rails, rubyOrm: "sequel" }, "rubyJobQueue", "solid-queue")).toBe(
+      "Solid Queue requires the Active Record ORM.",
+    );
+    const adjusted = analyzeStackCompatibility({
+      ...rails,
+      rubyWebFramework: "roda",
+      rubyJobQueue: "solid-queue",
+    });
+    expect(adjusted.adjustedStack?.rubyJobQueue).toBe("none");
+    expect(
+      getRubyRecipeIssue({
+        ...createRubyProjectConfigDefaults(),
+        ecosystem: "ruby",
+        rubyWebFramework: "rails",
+        rubyOrm: "sequel",
+        rubyJobQueue: "solid-queue",
+      }),
+    ).toBe("Solid Queue requires the Active Record ORM.");
+    expect(
+      getRubyRecipeIssue({
+        stackParts: parseStackPartSpecs(["backend:ruby:grape", "backend.jobQueue:ruby:solid-queue"]),
+      }),
+    ).toBe("Solid Queue requires Ruby Rails.");
+    expect(
+      getRubyRecipeIssue({
+        stackParts: parseStackPartSpecs([
+          "backend:ruby:rails",
+          "backend.orm:ruby:active-record",
+          "backend.jobQueue:ruby:solid-queue",
+        ]),
+      }),
+    ).toBeNull();
+  });
 
   it("rejects selected databases when Ruby is the only backend, in either picker order", () => {
     const ruby = parseStackPartSpecs(["backend:ruby:sinatra:api"]);

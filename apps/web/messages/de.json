@@ -594,6 +594,7 @@
   "docsCliSummaryRubyRubyTesting": "Ruby-Testframework.",
   "docsCliSummaryRubyRubyValidation": "Ruby-Anfragevalidierung.",
   "docsCliSummaryRubyRubyCache": "Ruby-Cache-Speicher.",
+  "docsCliSummaryRubyRubyJobQueue": "Ruby-Hintergrundjob-Warteschlange.",
   "docsCliSummaryPhpPhpWebFramework": "PHP-HTTP-Framework.",
   "docsCliSummaryPhpPhpOrm": "PHP-ORM / Datenbankschicht.",
   "docsCliSummaryPhpPhpAuth": "PHP-Authentifizierung.",

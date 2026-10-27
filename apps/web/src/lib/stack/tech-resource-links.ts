@@ -2427,6 +2427,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://guides.rubyonrails.org/caching_with_rails.html#activesupport-cache-memorystore",
     githubUrl: "https://github.com/rails/rails/tree/main/activesupport",
   },
+  "rubyJobQueue:sidekiq": {
+    docsUrl: "https://github.com/sidekiq/sidekiq/wiki",
+    githubUrl: "https://github.com/sidekiq/sidekiq",
+  },
+  "rubyJobQueue:resque": {
+    docsUrl: "https://github.com/resque/resque#readme",
+    githubUrl: "https://github.com/resque/resque",
+  },
+  "rubyJobQueue:solid-queue": {
+    docsUrl: "https://github.com/rails/solid_queue#readme",
+    githubUrl: "https://github.com/rails/solid_queue",
+  },
   "rubyAuth:jwt": {
     docsUrl: "https://github.com/jwt/ruby-jwt#readme",
     githubUrl: "https://github.com/jwt/ruby-jwt",
