@@ -7310,6 +7310,40 @@ export const TECH_OPTIONS: Record<
       default: true,
     },
   ],
+  elixirTemplating: [
+    {
+      id: "eex",
+      name: "EEx",
+      description: "Built-in templates compiled into functions",
+      icon: "",
+      color: "from-purple-500 to-violet-700",
+      isNew: true,
+    },
+    {
+      id: "solid-liquid",
+      name: "Solid (Liquid)",
+      description: "Liquid templates rendered at runtime",
+      icon: "",
+      color: "from-sky-500 to-indigo-600",
+      isNew: true,
+    },
+    {
+      id: "bbmustache",
+      name: "bbmustache",
+      description: "Logic-less Mustache templates",
+      icon: "",
+      color: "from-stone-500 to-neutral-700",
+      isNew: true,
+    },
+    {
+      id: "none",
+      name: "No Text Templates",
+      description: "Skip the text templating module",
+      icon: "",
+      color: "from-gray-400 to-gray-600",
+      default: true,
+    },
+  ],
   elixirDeploy: [
     {
       id: "docker",

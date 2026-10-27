@@ -265,6 +265,9 @@ export function displayConfig(config: Partial<ProjectConfig>) {
     if (config.elixirMessageQueue && config.elixirMessageQueue !== "none") {
       configDisplay.push(`${pc.blue("Elixir Message Queue:")} ${String(config.elixirMessageQueue)}`);
     }
+    if (config.elixirTemplating && config.elixirTemplating !== "none") {
+      configDisplay.push(`${pc.blue("Elixir Templating:")} ${String(config.elixirTemplating)}`);
+    }
     if (config.elixirDeploy && config.elixirDeploy !== "none") {
       configDisplay.push(`${pc.blue("Elixir Deploy:")} ${String(config.elixirDeploy)}`);
     }

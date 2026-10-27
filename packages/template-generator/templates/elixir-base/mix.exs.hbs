@@ -250,6 +250,12 @@ defmodule {{elixirModuleName}}.MixProject do
 {{#if (eq elixirMessageQueue "brod")}}
       {:brod, "~> 4.7"},
 {{/if}}
+{{#if (eq elixirTemplating "solid-liquid")}}
+      {:solid, "~> 1.3"},
+{{/if}}
+{{#if (eq elixirTemplating "bbmustache")}}
+      {:bbmustache, "~> 1.12"},
+{{/if}}
 {{#if (includes elixirLibraries "ex_aws")}}
       {:ex_aws, "~> 2.7"},
       {:ex_aws_s3, "~> 2.5"},

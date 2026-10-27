@@ -43,6 +43,7 @@ import {
   ELIXIR_LOGGING_VALUES,
   ELIXIR_CONFIG_VALUES,
   ELIXIR_MESSAGE_QUEUE_VALUES,
+  ELIXIR_TEMPLATING_VALUES,
   ELIXIR_REALTIME_VALUES,
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
@@ -483,6 +484,7 @@ export const ELIXIR_CATEGORY_ORDER = [
   "elixirLogging",
   "elixirConfig",
   "elixirMessageQueue",
+  "elixirTemplating",
   "elixirDeploy",
   "elixirLibraries",
   "aiDocs",
@@ -1010,6 +1012,7 @@ const CATEGORY_DEFINITIONS = {
   elixirLogging: { values: ELIXIR_LOGGING_VALUES, displayName: "Elixir Logging" },
   elixirConfig: { values: ELIXIR_CONFIG_VALUES, displayName: "Elixir Config" },
   elixirMessageQueue: { values: ELIXIR_MESSAGE_QUEUE_VALUES, displayName: "Elixir Message Queue" },
+  elixirTemplating: { values: ELIXIR_TEMPLATING_VALUES, displayName: "Elixir Templating" },
   elixirDeploy: { values: ELIXIR_DEPLOY_VALUES, displayName: "Elixir Deploy" },
   elixirLibraries: {
     values: ELIXIR_LIBRARIES_VALUES,
@@ -2076,6 +2079,11 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
     amqp: "AMQP (RabbitMQ)",
     gnat: "Gnat (NATS)",
     brod: "brod (Kafka)",
+  },
+  elixirTemplating: {
+    eex: "EEx",
+    "solid-liquid": "Solid (Liquid)",
+    bbmustache: "bbmustache",
   },
   elixirDeploy: {
     docker: "Docker",

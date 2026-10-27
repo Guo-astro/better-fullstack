@@ -254,6 +254,7 @@ export const STACK_SELECTION_OPTION_CATEGORY_BY_KEY: Record<
   elixirLogging: "elixirLogging",
   elixirConfig: "elixirConfig",
   elixirMessageQueue: "elixirMessageQueue",
+  elixirTemplating: "elixirTemplating",
   elixirDeploy: "elixirDeploy",
   elixirLibraries: "elixirLibraries",
 };
@@ -477,6 +478,7 @@ export const STACK_SELECTION_URL_KEYS = {
   elixirLogging: "elog",
   elixirConfig: "econfig",
   elixirMessageQueue: "emq",
+  elixirTemplating: "etpl",
   elixirDeploy: "edeploy",
   elixirLibraries: "elib",
 } as const satisfies Record<StackSelectionKey, string>;
@@ -975,6 +977,7 @@ const CLI_SCALAR_CONFIG_FIELDS = [
   ["elixirLogging", "elixirLogging"],
   ["elixirConfig", "elixirConfig"],
   ["elixirMessageQueue", "elixirMessageQueue"],
+  ["elixirTemplating", "elixirTemplating"],
   ["elixirDeploy", "elixirDeploy"],
 ] as const satisfies readonly (readonly [keyof CLIInput, keyof ProjectConfig])[];
 
@@ -1142,6 +1145,7 @@ const ELIXIR_CONFIG_KEYS = [
   "elixirLogging",
   "elixirConfig",
   "elixirMessageQueue",
+  "elixirTemplating",
   "elixirDeploy",
   "elixirLibraries",
 ] as const satisfies readonly (keyof CliDefaultProjectConfigBase)[];
@@ -1373,6 +1377,7 @@ const GRAPH_SCOPED_PART_GROUPS: readonly ScopedPartGroup[] = [
       ["elixirLogging", "logging"],
       ["elixirConfig", "runtimeConfig"],
       ["elixirMessageQueue", "messageQueue"],
+      ["elixirTemplating", "templating"],
       ["elixirDeploy", "deploy"],
     ],
   },
@@ -2317,6 +2322,7 @@ function buildProjectConfigBase(
     elixirLogging: stack.elixirLogging as ProjectConfig["elixirLogging"],
     elixirConfig: stack.elixirConfig as ProjectConfig["elixirConfig"],
     elixirMessageQueue: stack.elixirMessageQueue as ProjectConfig["elixirMessageQueue"],
+    elixirTemplating: stack.elixirTemplating as ProjectConfig["elixirTemplating"],
     elixirDeploy: stack.elixirDeploy as ProjectConfig["elixirDeploy"],
     elixirLibraries: toUniqueNonNoneArray(
       stack.elixirLibraries,
@@ -2830,6 +2836,7 @@ function generateElixirCommand(selection: StackSelectionInput, projectName: stri
     `--elixir-logging ${selection.elixirLogging}`,
     `--elixir-config ${selection.elixirConfig}`,
     `--elixir-message-queue ${selection.elixirMessageQueue}`,
+    `--elixir-templating ${selection.elixirTemplating}`,
     `--elixir-deploy ${selection.elixirDeploy}`,
     formatArrayFlag("elixir-libraries", selection.elixirLibraries),
     formatArrayFlag("ai-docs", selection.aiDocs),

@@ -2836,6 +2836,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://hexdocs.pm/brod/",
     githubUrl: "https://github.com/kafka4beam/brod",
   },
+  "elixirTemplating:eex": {
+    docsUrl: "https://hexdocs.pm/eex/EEx.html",
+    githubUrl: "https://github.com/elixir-lang/elixir",
+  },
+  "elixirTemplating:solid-liquid": {
+    docsUrl: "https://hexdocs.pm/solid/",
+    githubUrl: "https://github.com/edgurgel/solid",
+  },
+  "elixirTemplating:bbmustache": {
+    docsUrl: "https://hexdocs.pm/bbmustache/",
+    githubUrl: "https://github.com/soranoba/bbmustache",
+  },
   "elixirLibraries:ex_aws": {
     docsUrl: "https://hexdocs.pm/ex_aws/",
     githubUrl: "https://github.com/ex-aws/ex_aws",

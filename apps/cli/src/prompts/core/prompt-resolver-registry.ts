@@ -59,6 +59,7 @@ import {
   resolveElixirLoggingPrompt,
   resolveElixirConfigPrompt,
   resolveElixirMessageQueuePrompt,
+  resolveElixirTemplatingPrompt,
   resolveElixirRealtimePrompt,
   resolveElixirTestingPrompt,
   resolveElixirValidationPrompt,
@@ -193,6 +194,7 @@ import {
   ELIXIR_LOGGING_VALUES,
   ELIXIR_CONFIG_VALUES,
   ELIXIR_MESSAGE_QUEUE_VALUES,
+  ELIXIR_TEMPLATING_VALUES,
   ELIXIR_REALTIME_VALUES,
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
@@ -1138,6 +1140,11 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
   elixirMessageQueue: {
     schemaValues: ELIXIR_MESSAGE_QUEUE_VALUES,
     resolve: ({ value }: { value?: string } = {}) => resolveElixirMessageQueuePrompt(value),
+    coverageContexts: [{}],
+  },
+  elixirTemplating: {
+    schemaValues: ELIXIR_TEMPLATING_VALUES,
+    resolve: ({ value }: { value?: string } = {}) => resolveElixirTemplatingPrompt(value),
     coverageContexts: [{}],
   },
   elixirDeploy: {

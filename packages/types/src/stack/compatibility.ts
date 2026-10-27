@@ -626,6 +626,7 @@ export type CompatibilityInput = {
   elixirLogging: string;
   elixirConfig: string;
   elixirMessageQueue: string;
+  elixirTemplating: string;
   elixirDeploy: string;
   elixirLibraries: string[];
 };
@@ -4617,6 +4618,7 @@ export const getDisabledReason = (
     "elixirLogging",
     "elixirConfig",
     "elixirMessageQueue",
+    "elixirTemplating",
     "elixirDeploy",
   ]);
 
@@ -4893,6 +4895,7 @@ const ELIXIR_GRAPH_DISABLED_REASON_ROLES: Partial<Record<CompatibilityCategory, 
   elixirLogging: "logging",
   elixirConfig: "runtimeConfig",
   elixirMessageQueue: "messageQueue",
+  elixirTemplating: "templating",
   elixirDeploy: "deploy",
 };
 

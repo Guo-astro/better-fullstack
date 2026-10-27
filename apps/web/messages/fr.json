@@ -628,6 +628,7 @@
   "docsCliSummaryElixirElixirLogging": "Journalisation Elixir.",
   "docsCliSummaryElixirElixirConfig": "Configuration d'exécution Elixir.",
   "docsCliSummaryElixirElixirMessageQueue": "Client de broker de messages Elixir.",
+  "docsCliSummaryElixirElixirTemplating": "Moteur de templates texte Elixir.",
   "docsCliSummaryElixirElixirDeploy": "Cible de déploiement Elixir.",
   "docsCliSummaryElixirElixirLibraries": "Bibliothèques Elixir.",
   "docsSectionStart": "Démarrer",

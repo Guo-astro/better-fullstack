@@ -36,6 +36,9 @@ This project was created with [Better Fullstack](https://github.com/Marve10s/Bet
 {{#if (ne elixirMessageQueue "none")}}
 - Message broker: {{elixirMessageQueue}}
 {{/if}}
+{{#if (ne elixirTemplating "none")}}
+- Templating: {{elixirTemplating}}
+{{/if}}
 
 ## Setup
 
@@ -227,6 +230,25 @@ mix test --include message_queue
 ```
 
 Plain `mix test` skips the broker test.
+{{/if}}
+
+{{#if (ne elixirTemplating "none")}}
+## Text templates
+
+{{#if (eq elixirTemplating "eex")}}
+`priv/templates/welcome.eex` is compiled into `{{elixirModuleName}}.Templates` with
+`EEx.function_from_file/4`; editing it triggers a recompile.
+{{/if}}
+{{#if (eq elixirTemplating "solid-liquid")}}
+`priv/templates/welcome.liquid` is a Liquid template parsed and rendered by Solid at runtime.
+{{/if}}
+{{#if (eq elixirTemplating "bbmustache")}}
+`priv/templates/welcome.mustache` is a Mustache template rendered by bbmustache at runtime.
+{{/if}}
+
+```sh
+mix run -e 'IO.write({{elixirModuleName}}.Templates.welcome("Ada", 2))'
+```
 {{/if}}
 
 {{#if (eq elixirObservability "prom_ex")}}

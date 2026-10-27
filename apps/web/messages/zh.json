@@ -628,6 +628,7 @@
   "docsCliSummaryElixirElixirLogging": "Elixir 日志。",
   "docsCliSummaryElixirElixirConfig": "Elixir 运行时配置。",
   "docsCliSummaryElixirElixirMessageQueue": "Elixir 消息代理客户端。",
+  "docsCliSummaryElixirElixirTemplating": "Elixir 文本模板引擎。",
   "docsCliSummaryElixirElixirDeploy": "Elixir 部署目标。",
   "docsCliSummaryElixirElixirLibraries": "Elixir 库。",
   "docsSectionStart": "开始",

@@ -1805,6 +1805,7 @@ function displayElixirInstructions(config: ProjectConfig & { depsInstalled: bool
     elixirLogging,
     elixirConfig,
     elixirMessageQueue,
+    elixirTemplating,
   } = config;
 
   let output = `${pc.bold("Project created successfully!")}\n\n`;
@@ -1833,6 +1834,7 @@ function displayElixirInstructions(config: ProjectConfig & { depsInstalled: bool
   }
   if (elixirLogging !== "none") output += `${pc.cyan("•")} Logging: ${elixirLogging}\n`;
   if (elixirConfig !== "none") output += `${pc.cyan("•")} Runtime config: ${elixirConfig}\n`;
+  if (elixirTemplating !== "none") output += `${pc.cyan("•")} Templating: ${elixirTemplating}\n`;
   if (elixirMessageQueue !== "none") {
     output += `${pc.yellow("NOTE:")} Start the ${elixirMessageQueue} broker, then run mix test --include message_queue\n`;
   }

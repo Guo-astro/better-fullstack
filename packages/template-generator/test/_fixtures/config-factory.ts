@@ -160,6 +160,7 @@ const DEFAULT_CONFIG = {
   elixirLogging: "none",
   elixirConfig: "none",
   elixirMessageQueue: "none",
+  elixirTemplating: "none",
   elixirDeploy: "none",
   elixirLibraries: [],
   aiDocs: [],

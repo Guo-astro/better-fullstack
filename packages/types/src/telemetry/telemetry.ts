@@ -430,6 +430,7 @@ export const TELEMETRY_PROJECT_CONFIG_KEYS = [
   "elixirLogging",
   "elixirConfig",
   "elixirMessageQueue",
+  "elixirTemplating",
   "elixirDeploy",
   "elixirLibraries",
   "aiDocs",

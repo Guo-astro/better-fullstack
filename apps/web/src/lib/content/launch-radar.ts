@@ -77,6 +77,7 @@ export const NEW_OPTION_IDS_BY_CATEGORY = {
   elixirLogging: ["logger-json", "logger-file-backend", "logster"],
   elixirConfig: ["dotenvy", "skogsra", "confex"],
   elixirMessageQueue: ["amqp", "gnat", "brod"],
+  elixirTemplating: ["eex", "solid-liquid", "bbmustache"],
   elixirLibraries: ["ex_aws", "floki", "rustler"],
   pythonWebFramework: ["aiohttp", "streamlit"],
   pythonOrm: ["pymongo"],
@@ -234,6 +235,7 @@ const ELIXIR_CATEGORIES = [
   "elixirLogging",
   "elixirConfig",
   "elixirMessageQueue",
+  "elixirTemplating",
   "elixirLibraries",
 ] as const;
 const DOTNET_CATEGORIES = ["dotnetLibraries"] as const;

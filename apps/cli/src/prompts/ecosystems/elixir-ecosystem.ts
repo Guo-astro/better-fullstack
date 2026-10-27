@@ -19,6 +19,7 @@ import type {
   ElixirLogging,
   ElixirConfig,
   ElixirMessageQueue,
+  ElixirTemplating,
   ElixirRealtime,
   ElixirTesting,
   ElixirValidation,
@@ -32,7 +33,12 @@ import {
   createStaticSinglePromptResolution,
   type PromptOption,
 } from "@/prompts/core/prompt-contract";
-import { ElixirConfigSchema, ElixirLoggingSchema, ElixirMessageQueueSchema } from "@/types";
+import {
+  ElixirConfigSchema,
+  ElixirLoggingSchema,
+  ElixirMessageQueueSchema,
+  ElixirTemplatingSchema,
+} from "@/types";
 
 function makeChoice<T extends string>(
   message: string,
@@ -253,6 +259,13 @@ const MESSAGE_QUEUE_OPTIONS: PromptOption<ElixirMessageQueue>[] = [
   { value: "none", label: "None", hint: "No message broker client" },
 ];
 
+const TEMPLATING_OPTIONS: PromptOption<ElixirTemplating>[] = [
+  { value: "eex", label: "EEx", hint: "Built-in templates compiled into functions" },
+  { value: "solid-liquid", label: "Solid", hint: "Liquid templates rendered at runtime" },
+  { value: "bbmustache", label: "bbmustache", hint: "Logic-less Mustache templates" },
+  { value: "none", label: "None", hint: "No text templating module" },
+];
+
 const DEPLOY_OPTIONS: PromptOption<ElixirDeploy>[] = [
   { value: "docker", label: "Docker", hint: "Dockerfile for Phoenix releases" },
   { value: "fly", label: "Fly.io", hint: "Fly.io release config" },
@@ -317,6 +330,12 @@ export const resolveElixirMessageQueuePrompt = (value?: string) =>
     "none",
     ElixirMessageQueueSchema.optional().parse(value),
   );
+export const resolveElixirTemplatingPrompt = (value?: string) =>
+  createStaticSinglePromptResolution(
+    TEMPLATING_OPTIONS,
+    "none",
+    ElixirTemplatingSchema.optional().parse(value),
+  );
 export const resolveElixirDeployPrompt = (value?: ElixirDeploy) =>
   createStaticSinglePromptResolution(DEPLOY_OPTIONS, "none", value);
 export const getElixirWebFrameworkChoice = (value?: ElixirWebFramework) =>
@@ -363,6 +382,8 @@ export const getElixirConfigChoice = (value?: ElixirConfig) =>
   makeChoice("Select Elixir runtime configuration", CONFIG_OPTIONS, "none", value);
 export const getElixirMessageQueueChoice = (value?: ElixirMessageQueue) =>
   makeChoice("Select Elixir message broker client", MESSAGE_QUEUE_OPTIONS, "none", value);
+export const getElixirTemplatingChoice = (value?: ElixirTemplating) =>
+  makeChoice("Select Elixir templating", TEMPLATING_OPTIONS, "none", value);
 export const getElixirDeployChoice = (value?: ElixirDeploy) =>
   makeChoice("Select Elixir deploy target", DEPLOY_OPTIONS, "none", value);
 

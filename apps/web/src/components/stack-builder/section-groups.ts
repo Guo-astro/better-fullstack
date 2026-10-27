@@ -292,6 +292,7 @@ const ELIXIR_SECTIONS: readonly BuilderSectionDef[] = [
     "elixirLogging",
     "elixirConfig",
     "elixirMessageQueue",
+    "elixirTemplating",
   ]),
   section("libraries", "Libraries & Utilities", [
     "elixirValidation",

@@ -220,6 +220,9 @@ export const ICON_REGISTRY: Record<string, IconConfig> = {
   amqp: { type: "si", slug: "rabbitmq", hex: "FF6600" },
   gnat: { type: "si", slug: "natsdotio", hex: "27AAE1" },
   brod: { type: "si", slug: "apachekafka", hex: "231F20" },
+  eex: { type: "si", slug: "elixir", hex: "4B275F" },
+  "solid-liquid": { type: "si", slug: "elixir", hex: "4B275F" },
+  bbmustache: { type: "si", slug: "erlang", hex: "A90533" },
   "mix-release": { type: "si", slug: "elixir", hex: "4B275F" },
   gigalixir: { type: "si", slug: "elixir", hex: "4B275F" },
 

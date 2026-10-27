@@ -82,6 +82,7 @@ import {
   getElixirLoggingChoice,
   getElixirConfigChoice,
   getElixirMessageQueueChoice,
+  getElixirTemplatingChoice,
   getElixirRealtimeChoice,
   getElixirTestingChoice,
   getElixirValidationChoice,
@@ -1725,6 +1726,12 @@ export async function gatherMultiEcosystemConfig(
         : await scopedPromptValue("elixir", "elixirMessageQueue", configScope, backendSections, () =>
             getElixirMessageQueueChoice(flags.elixirMessageQueue),
           );
+    const elixirTemplating =
+      elixirWebFramework === "none"
+        ? "none"
+        : await scopedPromptValue("elixir", "elixirTemplating", configScope, backendSections, () =>
+            getElixirTemplatingChoice(flags.elixirTemplating),
+          );
     const elixirDeploy =
       elixirWebFramework === "none"
         ? "none"
@@ -1760,6 +1767,7 @@ export async function gatherMultiEcosystemConfig(
       elixirLogging,
       elixirConfig,
       elixirMessageQueue,
+      elixirTemplating,
       elixirDeploy,
       elixirLibraries,
     });
@@ -1800,6 +1808,9 @@ export async function gatherMultiEcosystemConfig(
     }
     if (elixirMessageQueue !== "none") {
       stackPartSpecs.push(`backend.messageQueue:elixir:${elixirMessageQueue}`);
+    }
+    if (elixirTemplating !== "none") {
+      stackPartSpecs.push(`backend.templating:elixir:${elixirTemplating}`);
     }
     if (elixirDeploy !== "none") stackPartSpecs.push(`backend.deploy:elixir:${elixirDeploy}`);
     for (const library of elixirLibraries) {

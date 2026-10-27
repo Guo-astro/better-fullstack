@@ -49,6 +49,13 @@ export async function processElixirBaseTemplate(
   const hasLogging = config.elixirLogging !== "none";
   const hasSettings = config.elixirConfig !== "none";
   const hasMessageQueue = config.elixirMessageQueue !== "none";
+  const hasTemplates = config.elixirTemplating !== "none";
+  const templateExtension = {
+    eex: ".eex",
+    "solid-liquid": ".liquid",
+    bbmustache: ".mustache",
+    none: "",
+  }[config.elixirTemplating];
 
   renderTemplateTree(vfs, templates, {
     prefix,
@@ -103,6 +110,12 @@ export async function processElixirBaseTemplate(
       if (!hasLogging && templatePath.includes("/logging_test.exs")) return true;
       if (!hasSettings && /\/settings(_test)?\.exs?(\.hbs)?$/.test(templatePath)) return true;
       if (!hasMessageQueue && /\/message_queue(_test)?\.exs?(\.hbs)?$/.test(templatePath))
+        return true;
+      if (!hasTemplates && /\/templates(_test)?\.exs?(\.hbs)?$/.test(templatePath)) return true;
+      if (
+        templatePath.includes("priv/templates/welcome.") &&
+        !templatePath.endsWith(`welcome${templateExtension}`)
+      )
         return true;
       return false;
     },

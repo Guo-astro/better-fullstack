@@ -628,6 +628,7 @@
   "docsCliSummaryElixirElixirLogging": "Registro de logs en Elixir.",
   "docsCliSummaryElixirElixirConfig": "Configuración en tiempo de ejecución para Elixir.",
   "docsCliSummaryElixirElixirMessageQueue": "Cliente de broker de mensajes para Elixir.",
+  "docsCliSummaryElixirElixirTemplating": "Motor de plantillas de texto para Elixir.",
   "docsCliSummaryElixirElixirDeploy": "Destino de despliegue Elixir.",
   "docsCliSummaryElixirElixirLibraries": "Bibliotecas Elixir.",
   "docsSectionStart": "Empezar",

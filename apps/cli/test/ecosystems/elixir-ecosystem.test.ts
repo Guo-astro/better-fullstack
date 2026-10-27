@@ -1028,7 +1028,7 @@ describe("Elixir library expansion", () => {
       "skogsra",
       '{:skogsra, "~> 2.5"}',
       "lib/elixir_config/settings.ex",
-      "app_env :max_connections",
+      "app_env(:max_connections",
     ],
     [
       "confex",
@@ -1098,6 +1098,47 @@ describe("Elixir library expansion", () => {
         "ExUnit.start(exclude: [:message_queue])",
       );
       expect(getVirtualTreeFileContent(tree, ".env.example")).toContain(envLine);
+    },
+  );
+
+  it.each([
+    ["eex", "priv/templates/welcome.eex", "EEx.function_from_file", null],
+    ["solid-liquid", "priv/templates/welcome.liquid", "Solid.render", '{:solid, "~> 1.3"}'],
+    [
+      "bbmustache",
+      "priv/templates/welcome.mustache",
+      ":bbmustache.render",
+      '{:bbmustache, "~> 1.12"}',
+    ],
+  ] as const)(
+    "renders the welcome template with %s",
+    async (elixirTemplating, templateFile, renderCall, dependency) => {
+      const result = await createVirtual({
+        ...base,
+        projectName: "elixir-templates",
+        elixirWebFramework: "none",
+        elixirRealtime: "none",
+        elixirOrm: "none",
+        elixirAuth: "none",
+        elixirApi: "none",
+        elixirHttpServer: "none",
+        elixirI18n: "none",
+        elixirTemplating,
+      });
+
+      expect(result.success).toBe(true);
+      const tree = result.tree!;
+      const templateFiles = listVirtualTreeFilePaths(tree).filter((path) =>
+        path.startsWith("priv/templates/"),
+      );
+      expect(templateFiles).toEqual([templateFile]);
+      expect(getVirtualTreeFileContent(tree, "lib/elixir_templates/templates.ex")).toContain(
+        renderCall,
+      );
+      expect(hasVirtualFile(tree.root, "test/elixir_templates/templates_test.exs")).toBe(true);
+      const mix = getVirtualTreeFileContent(tree, "mix.exs") ?? "";
+      if (dependency) expect(mix).toContain(dependency);
+      expect(mix.includes("{:solid,") || mix.includes("{:bbmustache,")).toBe(dependency !== null);
     },
   );
 });
