@@ -593,6 +593,7 @@
   "docsCliSummaryRubyRubyAuth": "Ruby 인증.",
   "docsCliSummaryRubyRubyTesting": "Ruby 테스트 프레임워크.",
   "docsCliSummaryRubyRubyValidation": "Ruby 요청 검증.",
+  "docsCliSummaryRubyRubyCache": "Ruby 캐시 저장소.",
   "docsCliSummaryPhpPhpWebFramework": "PHP HTTP 프레임워크.",
   "docsCliSummaryPhpPhpOrm": "PHP ORM / 데이터베이스 계층.",
   "docsCliSummaryPhpPhpAuth": "PHP 인증.",

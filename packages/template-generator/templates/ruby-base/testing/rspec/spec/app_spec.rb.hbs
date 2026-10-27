@@ -51,6 +51,31 @@ RSpec.describe BetterFullstack::App do
       expect(body).to eq("error" => error)
     end
   end
+{{#if (ne rubyCache "none")}}
+
+  describe "cache" do
+    before do
+      skip "Start the cache server to run cache specs" unless BetterFullstack::Cache.available?
+    end
+
+    it "serves the second read from the cache" do
+      BetterFullstack::Cache.delete(BetterFullstack::Cache::KEY)
+      get "/api/cache"
+      first = body
+      get "/api/cache"
+      expect([first.fetch("cached"), body.fetch("cached")]).to eq([false, true])
+      expect(body.fetch("value")).to eq(first.fetch("value"))
+    end
+
+    it "expires entries after their TTL" do
+      key = "better-fullstack:expiry-test"
+      BetterFullstack::Cache.delete(key)
+      BetterFullstack::Cache.fetch(key, ttl: 1) { "first" }
+      sleep 2.1
+      expect(BetterFullstack::Cache.fetch(key, ttl: 1) { "second" }).to eq(["second", false])
+    end
+  end
+{{/if}}
 {{#if (ne rubyOrm "none")}}
 
   describe "items" do

@@ -555,6 +555,7 @@ export function buildCompatibilityInputFromConfig(
     rubyAuth: asString(config.rubyAuth),
     rubyTesting: asString(config.rubyTesting),
     rubyValidation: asString(config.rubyValidation),
+    rubyCache: asString(config.rubyCache),
     phpWebFramework: asString(config.phpWebFramework),
     phpOrm: asString(config.phpOrm),
     phpAuth: asString(config.phpAuth),

@@ -113,6 +113,8 @@ export const ICON_REGISTRY: Record<string, IconConfig> = {
   "dry-validation": { type: "si", slug: "ruby", hex: "CC342D" },
   "active-model": { type: "si", slug: "rubyonrails", hex: "D30001" },
   "json-schemer": { type: "si", slug: "json", hex: "000000" },
+  memcached: { type: "si", slug: "ruby", hex: "CC342D" },
+  memory: { type: "si", slug: "rubyonrails", hex: "D30001" },
   php: { type: "si", slug: "php", hex: "777BB4" },
   slim: { type: "si", slug: "php", hex: "777BB4" },
   laravel: { type: "si", slug: "laravel", hex: "FF2D20" },

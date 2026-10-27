@@ -392,6 +392,7 @@ export const TELEMETRY_PROJECT_CONFIG_KEYS = [
   "rubyAuth",
   "rubyTesting",
   "rubyValidation",
+  "rubyCache",
   "phpWebFramework",
   "phpOrm",
   "phpAuth",

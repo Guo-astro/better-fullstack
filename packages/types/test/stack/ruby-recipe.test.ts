@@ -276,7 +276,10 @@ describe("Ruby recipe contracts", () => {
     expect(generateStackSelectionCommand(restored)).toContain("--ruby-testing test-unit");
   });
 
-  it.each([["rubyValidation", "validation", "json-schemer", "none"]] as const)(
+  it.each([
+    ["rubyValidation", "validation", "json-schemer", "none"],
+    ["rubyCache", "caching", "redis", "none"],
+  ] as const)(
     "projects %s as a Ruby-owned %s part",
     (category, role, tool, fallback) => {
       expect(createRubyProjectConfigDefaults()[category]).toBe(fallback);

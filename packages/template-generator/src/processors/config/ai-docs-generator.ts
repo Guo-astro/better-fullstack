@@ -317,6 +317,8 @@ function generateTechStackSection(config: ProjectConfig): string {
     if (config.rubyAuth && config.rubyAuth !== "none") lines.push(`- Auth: ${getOptionMetadata("rubyAuth", config.rubyAuth)?.label ?? config.rubyAuth}`);
     const validation = rubyOptionLabel(config, "rubyValidation");
     if (validation) lines.push(`- Validation: ${validation} in name_contract.rb`);
+    const cache = rubyOptionLabel(config, "rubyCache");
+    if (cache) lines.push(`- Cache: ${cache} in cache.rb behind GET /api/cache`);
   }
 
   if (config.ecosystem === "rust") {
@@ -527,7 +529,7 @@ function rubyTestingLabel(config: ProjectConfig) {
   return testing === "none" ? undefined : getOptionMetadata("rubyTesting", testing)?.label;
 }
 
-function rubyOptionLabel(config: ProjectConfig, category: "rubyValidation") {
+function rubyOptionLabel(config: ProjectConfig, category: "rubyValidation" | "rubyCache") {
   const value = config[category];
   return value && value !== "none" ? getOptionMetadata(category, value)?.label : undefined;
 }
@@ -734,6 +736,8 @@ function generateCursorRules(config: ProjectConfig): string {
     rules.push(rubyAuthGuidance(config) ?? "No auth adapter is generated.");
     const validation = rubyOptionLabel(config, "rubyValidation");
     if (validation) rules.push(`Request payload rules live in name_contract.rb and use ${validation}. Keep the 422 error codes name_must_be_a_string and name_length_must_be_1_to_80 stable; the tests assert them.`);
+    const cache = rubyOptionLabel(config, "rubyCache");
+    if (cache) rules.push(`Caching uses ${cache} through Cache.fetch(key, ttl:) in cache.rb. Always pass a TTL, keep cached values JSON-serializable, and return 503 instead of failing the request when the cache server is down.`);
   } else if (config.ecosystem === "go") {
     rules.push(`You are working on a Go project.`);
     if (config.goWebFramework !== "none") rules.push(`Web framework: ${config.goWebFramework}`);

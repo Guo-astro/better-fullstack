@@ -2399,6 +2399,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://github.com/davishmcclurg/json_schemer#readme",
     githubUrl: "https://github.com/davishmcclurg/json_schemer",
   },
+  "rubyCache:redis": {
+    docsUrl: "https://redis.io/docs/latest/develop/clients/ruby/",
+    githubUrl: "https://github.com/redis/redis-rb",
+  },
+  "rubyCache:memcached": {
+    docsUrl: "https://github.com/petergoldstein/dalli#readme",
+    githubUrl: "https://github.com/petergoldstein/dalli",
+  },
+  "rubyCache:memory": {
+    docsUrl: "https://guides.rubyonrails.org/caching_with_rails.html#activesupport-cache-memorystore",
+    githubUrl: "https://github.com/rails/rails/tree/main/activesupport",
+  },
   "rubyAuth:jwt": {
     docsUrl: "https://github.com/jwt/ruby-jwt#readme",
     githubUrl: "https://github.com/jwt/ruby-jwt",

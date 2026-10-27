@@ -1153,6 +1153,12 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         source: { kind: "category", category: "rubyValidation" },
         configKey: "rubyValidation",
       },
+      {
+        flag: "ruby-cache",
+        summary: "Ruby cache store.",
+        source: { kind: "category", category: "rubyCache" },
+        configKey: "rubyCache",
+      },
     ],
   },
   {

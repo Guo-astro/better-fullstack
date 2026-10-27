@@ -32,6 +32,9 @@ bundle exec ruby bin/server
 {{#if (ne rubyAuth "none")}}
 - GET `/api/me` returns `{"user":{"id":"..."}}` for an authenticated request and 401 otherwise.
 {{/if}}
+{{#if (ne rubyCache "none")}}
+- GET `/api/cache` returns `{"value":{"computed_at":"..."},"cached":false}` on a miss and the same value with `"cached":true` until the 30-second TTL expires{{#if (ne rubyCache "memory")}}, or 503 `cache_unavailable` when the cache server is unreachable{{/if}}.
+{{/if}}
 - Blank, non-string, unknown-field, and over-80-character names return 422. Malformed JSON returns 400, non-JSON content returns 415, and bodies over 16 KiB return 413.
 
 The server binds to `127.0.0.1:{{rubyPort}}`. `HOST`, `PORT`, `RACK_ENV`, and `ALLOWED_ORIGIN` are process environment variables. `.env.example` documents values and is not loaded automatically. CORS permits the generated frontend origins `{{rubyWebOrigin}}` by default. Set ALLOWED_ORIGIN to a comma-separated list of trusted frontend origins to override them. Host authorization accepts localhost and loopback addresses. Configure explicit trusted hosts before public hosting.
@@ -60,6 +63,12 @@ The server binds to `127.0.0.1:{{rubyPort}}`. `HOST`, `PORT`, `RACK_ENV`, and `A
 ## Authentication
 
 `auth.rb` mounts Rodauth in JSON-only mode with `POST /create-account`, `POST /login`, and `POST /logout` (JSON bodies with `login` and `password`). Accounts and bcrypt password hashes live in the `accounts` table of the SQLite database; `db/auth_migrations` is applied by `bundle exec rake db:migrate`. A signed cookie session keyed by `SESSION_SECRET` (64+ characters, required when `RACK_ENV=production`) carries the login.
+
+{{/if}}
+{{#if (ne rubyCache "none")}}
+## Cache
+
+`cache.rb` wraps {{#if (eq rubyCache "redis")}}a redis-rb client for `REDIS_URL` (default `redis://127.0.0.1:6379/0`) that stores JSON values with an `EX` expiry{{/if}}{{#if (eq rubyCache "memcached")}}a Dalli client for `MEMCACHED_SERVERS` (default `127.0.0.1:11211`, Memcached 1.6+) that stores JSON values with a TTL{{/if}}{{#if (eq rubyCache "memory")}}an Active Support `MemoryStore` capped at 8 MiB. Entries live in one process, so Puma workers do not share them{{/if}}. `Cache.fetch(key, ttl:)` returns the value and whether it came from the cache. {{#if (eq rubyCache "memory")}}No server is needed.{{else}}Start the server before `bundle exec rake test` and `bin/proof`; the cache tests skip when it is unreachable, and the proof fails.{{/if}}
 
 {{/if}}
 Use Ctrl-C to stop the foreground server. Add future routes in `app.rb`{{#if (eq rubyTesting "rspec")}} and behavior specs in `spec/app_spec.rb`{{/if}}{{#if (or (eq rubyTesting "minitest") (eq rubyTesting "test-unit"))}} and behavior tests in `test/app_test.rb`{{/if}}. Keep Gemfile ownership inside this service when composed with other languages.

@@ -22,6 +22,10 @@ export const RubyValidationSchema = z
   .enum(["dry-validation", "active-model", "json-schemer", "none"])
   .describe("Ruby request validation");
 
+export const RubyCacheSchema = z
+  .enum(["redis", "memcached", "memory", "none"])
+  .describe("Ruby cache store");
+
 export const EcosystemSchema = z
   .enum([
     "typescript",
@@ -1459,6 +1463,7 @@ const STACK_CONFIG_FIELDS = {
   rubyAuth: RubyAuthSchema.optional(),
   rubyTesting: RubyTestingSchema.optional(),
   rubyValidation: RubyValidationSchema.optional(),
+  rubyCache: RubyCacheSchema.optional(),
   phpWebFramework: PhpWebFrameworkSchema.default("none"),
   phpOrm: PhpOrmSchema.default("none"),
   phpAuth: PhpAuthSchema.default("none"),
@@ -1795,3 +1800,4 @@ export const RUBY_ORM_VALUES = RubyOrmSchema.options;
 export const RUBY_AUTH_VALUES = RubyAuthSchema.options;
 export const RUBY_TESTING_VALUES = RubyTestingSchema.options;
 export const RUBY_VALIDATION_VALUES = RubyValidationSchema.options;
+export const RUBY_CACHE_VALUES = RubyCacheSchema.options;

@@ -723,6 +723,16 @@ const CATEGORY_NAMES: Record<string, LocalizedMap> = {
     "fr": "Validation Ruby",
     "uk": "Валідація Ruby",
   },
+  rubyCache: {
+    "es": "Caché Ruby",
+    "zh": "Ruby 缓存",
+    "ja": "Ruby キャッシュ",
+    "ko": "Ruby 캐시",
+    "zh-Hant": "Ruby 快取",
+    "de": "Ruby-Cache",
+    "fr": "Cache Ruby",
+    "uk": "Кеш Ruby",
+  },
   rubyAuth: {
     "es": "Auth Ruby",
     "zh": "Ruby 认证",

@@ -114,6 +114,7 @@ import {
   resolveRubyOrmPrompt,
   resolveRubyTestingPrompt,
   resolveRubyValidationPrompt,
+  resolveRubyCachePrompt,
   resolveRubyWebFrameworkPrompt,
 } from "@/prompts/ecosystems/ruby-ecosystem";
 import {
@@ -189,10 +190,12 @@ import {
   RUBY_AUTH_VALUES,
   RUBY_TESTING_VALUES,
   RUBY_VALIDATION_VALUES,
+  RUBY_CACHE_VALUES,
   RubyAuthSchema,
   RubyOrmSchema,
   RubyTestingSchema,
   RubyValidationSchema,
+  RubyCacheSchema,
   RubyWebFrameworkSchema,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   EMAIL_VALUES,
@@ -842,6 +845,12 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
       resolveRubyValidationPrompt(
         value === undefined ? undefined : RubyValidationSchema.parse(value),
       ),
+    coverageContexts: [{}],
+  },
+  rubyCache: {
+    schemaValues: RUBY_CACHE_VALUES,
+    resolve: ({ value }: { value?: string } = {}) =>
+      resolveRubyCachePrompt(value === undefined ? undefined : RubyCacheSchema.parse(value)),
     coverageContexts: [{}],
   },
   phpWebFramework: {

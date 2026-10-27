@@ -138,6 +138,7 @@ export const TEMPLATE_FINGERPRINT_KEYS = [
   "rubyAuth",
   "rubyTesting",
   "rubyValidation",
+  "rubyCache",
   "phpWebFramework",
   "phpOrm",
   "phpAuth",

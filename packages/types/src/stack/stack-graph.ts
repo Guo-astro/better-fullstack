@@ -69,6 +69,7 @@ import {
   RUBY_AUTH_VALUES,
   RUBY_TESTING_VALUES,
   RUBY_VALIDATION_VALUES,
+  RUBY_CACHE_VALUES,
   PHP_WEB_FRAMEWORK_VALUES,
   PHP_ORM_VALUES,
   PHP_AUTH_VALUES,
@@ -743,6 +744,9 @@ function isNativeEcosystemBackendServiceTool(
     if (part.ecosystem === "python") {
       return (PYTHON_CACHING_VALUES as readonly string[]).includes(part.toolId);
     }
+    if (part.ecosystem === "ruby") {
+      return (RUBY_CACHE_VALUES as readonly string[]).includes(part.toolId);
+    }
   }
 
   if (part.role === "observability") {
@@ -818,7 +822,7 @@ const LEGACY_EXTRA_CATEGORIES_BY_ECOSYSTEM = {
     deploy: "dotnetDeploy",
     validation: "dotnetValidation",
   },
-  ruby: { testing: "rubyTesting", validation: "rubyValidation" },
+  ruby: { testing: "rubyTesting", validation: "rubyValidation", caching: "rubyCache" },
   php: { testing: "phpTesting", validation: "phpValidation" },
   elixir: {
     realtime: "elixirRealtime",
@@ -1262,6 +1266,7 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ...defineTools(RUBY_AUTH_VALUES, "auth", "ruby", "rubyAuth"),
   ...defineTools(RUBY_TESTING_VALUES, "testing", "ruby", "rubyTesting"),
   ...defineTools(RUBY_VALIDATION_VALUES, "validation", "ruby", "rubyValidation"),
+  ...defineTools(RUBY_CACHE_VALUES, "caching", "ruby", "rubyCache"),
   ...defineTools(PHP_WEB_FRAMEWORK_VALUES, "backend", "php", "phpWebFramework").map(
     (definition) => ({
       ...definition,

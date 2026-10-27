@@ -2486,6 +2486,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "none",
         "multiple": false
+      },
+      {
+        "flag": "--ruby-cache",
+        "summary": "Ruby cache store.",
+        "values": [
+          "redis",
+          "memcached",
+          "memory",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
       }
     ]
   },
@@ -3031,6 +3044,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "ruby:--ruby-auth": m.docsCliSummaryRubyRubyAuth,
   "ruby:--ruby-testing": m.docsCliSummaryRubyRubyTesting,
   "ruby:--ruby-validation": m.docsCliSummaryRubyRubyValidation,
+  "ruby:--ruby-cache": m.docsCliSummaryRubyRubyCache,
   "php:--php-web-framework": m.docsCliSummaryPhpPhpWebFramework,
   "php:--php-orm": m.docsCliSummaryPhpPhpOrm,
   "php:--php-auth": m.docsCliSummaryPhpPhpAuth,

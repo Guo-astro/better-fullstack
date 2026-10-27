@@ -3,6 +3,9 @@ require "roda"
 {{#if (ne rubyAuth "none")}}
 require_relative "auth"
 {{/if}}
+{{#if (ne rubyCache "none")}}
+require_relative "cache"
+{{/if}}
 require_relative "http_policy"
 {{#if (ne rubyOrm "none")}}
 require_relative "items"
@@ -43,6 +46,14 @@ module BetterFullstack
         end
         { greeting: "Hello, #{name}!" }
       end
+{{#if (ne rubyCache "none")}}
+
+      r.get "api/cache" do
+        status, body = Cache.demo
+        response.status = status
+        body
+      end
+{{/if}}
 {{#if (ne rubyAuth "none")}}
 
       r.get "api/me" do

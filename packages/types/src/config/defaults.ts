@@ -150,6 +150,7 @@ export const CLI_DEFAULT_PROJECT_CONFIG = {
   rubyAuth: "none",
   rubyTesting: "minitest",
   rubyValidation: "none",
+  rubyCache: "none",
   phpWebFramework: "slim",
   phpOrm: "none",
   phpAuth: "none",

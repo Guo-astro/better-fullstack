@@ -112,6 +112,7 @@ export const OPTION_DISPLAY_ORDER: Readonly<Record<string, readonly string[]>> =
   rubyAuth: ["jwt", "omniauth", "rodauth", "none"],
   rubyTesting: ["minitest", "rspec", "test-unit", "none"],
   rubyValidation: ["dry-validation", "active-model", "json-schemer", "none"],
+  rubyCache: ["redis", "memcached", "memory", "none"],
   elixirQuality: ["credo", "dialyxir", "excoveralls", "sobelow", "mix_audit", "none"],
   elixirTesting: ["ex_unit", "ex_machina", "wallaby", "mox", "bypass", "stream_data", "none"],
   elixirValidation: ["nimble-options", "ecto-changesets", "peri", "tarams", "none"],

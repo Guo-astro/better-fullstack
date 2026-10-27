@@ -609,6 +609,7 @@
   "docsCliSummaryRubyRubyAuth": "Ruby authentication.",
   "docsCliSummaryRubyRubyTesting": "Ruby test framework.",
   "docsCliSummaryRubyRubyValidation": "Ruby request validation.",
+  "docsCliSummaryRubyRubyCache": "Ruby cache store.",
   "docsCliSummaryPhpPhpWebFramework": "PHP HTTP framework.",
   "docsCliSummaryPhpPhpOrm": "PHP ORM / database layer.",
   "docsCliSummaryPhpPhpAuth": "PHP authentication.",

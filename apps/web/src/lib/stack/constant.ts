@@ -6072,6 +6072,40 @@ export const TECH_OPTIONS: Record<
       default: true,
     },
   ],
+  rubyCache: [
+    {
+      id: "redis",
+      name: "Redis",
+      description: "redis-rb client storing JSON values with a TTL at REDIS_URL",
+      icon: "https://cdn.simpleicons.org/redis/DC382D",
+      color: "from-red-500 to-red-700",
+      isNew: true,
+    },
+    {
+      id: "memcached",
+      name: "Memcached (Dalli)",
+      description: "Dalli client storing JSON values with a TTL in Memcached",
+      icon: "https://cdn.simpleicons.org/ruby/CC342D",
+      color: "from-sky-500 to-blue-700",
+      isNew: true,
+    },
+    {
+      id: "memory",
+      name: "Active Support MemoryStore",
+      description: "Per-process cache with TTLs and no server",
+      icon: "https://cdn.simpleicons.org/rubyonrails/D30001",
+      color: "from-rose-500 to-red-700",
+      isNew: true,
+    },
+    {
+      id: "none",
+      name: "No cache",
+      description: "Skip the cache layer",
+      icon: "",
+      color: "from-gray-400 to-gray-600",
+      default: true,
+    },
+  ],
   rubyAuth: [
     {
       id: "jwt",

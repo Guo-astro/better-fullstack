@@ -3,6 +3,9 @@ require "json"
 {{#if (ne rubyAuth "none")}}
 require_relative "auth"
 {{/if}}
+{{#if (ne rubyCache "none")}}
+require_relative "cache"
+{{/if}}
 require_relative "http_policy"
 {{#if (ne rubyOrm "none")}}
 require_relative "items"
@@ -31,6 +34,14 @@ module BetterFullstack
       status 200
       { greeting: "Hello, #{name}!" }
     end
+{{#if (ne rubyCache "none")}}
+
+    get "/api/cache" do
+      status_code, body = Cache.demo
+      status status_code
+      body
+    end
+{{/if}}
 {{#if (ne rubyOrm "none")}}
 
     get "/api/items" do

@@ -4,6 +4,9 @@ require "securerandom"
 {{#if (ne rubyAuth "none")}}
 require_relative "auth"
 {{/if}}
+{{#if (ne rubyCache "none")}}
+require_relative "cache"
+{{/if}}
 require_relative "http_policy"
 {{#if (ne rubyOrm "none")}}
 require_relative "items"
@@ -42,6 +45,13 @@ module BetterFullstack
 
       render json: { greeting: "Hello, #{name}!" }
     end
+{{#if (ne rubyCache "none")}}
+
+    def cached_value
+      status_code, body = Cache.demo
+      render json: body, status: status_code
+    end
+{{/if}}
 {{#if (ne rubyOrm "none")}}
 
     def items
@@ -74,6 +84,9 @@ module BetterFullstack
   Application.routes.draw do
     get "health", to: "better_fullstack/api#health"
     post "api/greetings", to: "better_fullstack/api#greeting"
+{{#if (ne rubyCache "none")}}
+    get "api/cache", to: "better_fullstack/api#cached_value"
+{{/if}}
 {{#if (ne rubyOrm "none")}}
     get "api/items", to: "better_fullstack/api#items"
     post "api/items", to: "better_fullstack/api#create_item"

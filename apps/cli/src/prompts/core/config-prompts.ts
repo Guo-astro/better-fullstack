@@ -56,6 +56,7 @@ import type {
   RubyAuth,
   RubyTesting,
   RubyValidation,
+  RubyCache,
   PhpWebFramework,
   PhpOrm,
   PhpAuth,
@@ -329,6 +330,7 @@ import {
   getRubyOrmChoice,
   getRubyTestingChoice,
   getRubyValidationChoice,
+  getRubyCacheChoice,
   getRubyWebFrameworkChoice,
 } from "@/prompts/ecosystems/ruby-ecosystem";
 import {
@@ -521,6 +523,7 @@ type PromptGroupResults = {
   rubyAuth: RubyAuth;
   rubyTesting: RubyTesting;
   rubyValidation: RubyValidation;
+  rubyCache: RubyCache;
   phpWebFramework: PhpWebFramework;
   phpOrm: PhpOrm;
   phpAuth: PhpAuth;
@@ -716,6 +719,7 @@ const CONFIG_PROMPT_ENTRY_KEY_MAP = {
   rubyAuth: true,
   rubyTesting: true,
   rubyValidation: true,
+  rubyCache: true,
   phpWebFramework: true,
   phpOrm: true,
   phpAuth: true,
@@ -958,7 +962,8 @@ function scopedPrompt<K extends PromptGroupKey>(
         key === "rubyOrm" ||
         key === "rubyAuth" ||
         key === "rubyTesting" ||
-        key === "rubyValidation") &&
+        key === "rubyValidation" ||
+        key === "rubyCache") &&
       opts.results.ecosystem !== "ruby"
     )
       return Promise.resolve("none" as PromptGroupResults[K]);
@@ -971,6 +976,7 @@ function scopedPrompt<K extends PromptGroupKey>(
         "rubyAuth",
         "rubyTesting",
         "rubyValidation",
+        "rubyCache",
         "aiDocs",
         "git",
         "install",
@@ -1935,6 +1941,10 @@ export async function gatherConfig(
       results.ecosystem === "ruby"
         ? getRubyValidationChoice(flags.rubyValidation)
         : Promise.resolve("none" as const),
+    rubyCache: ({ results }) =>
+      results.ecosystem === "ruby"
+        ? getRubyCacheChoice(flags.rubyCache)
+        : Promise.resolve("none" as const),
     phpWebFramework: ({ results }) =>
       results.ecosystem === "php"
         ? getPhpWebFrameworkChoice(flags.phpWebFramework)
@@ -2232,6 +2242,7 @@ export async function gatherConfig(
     rubyAuth: result.rubyAuth,
     rubyTesting: result.rubyTesting,
     rubyValidation: result.rubyValidation,
+    rubyCache: result.rubyCache,
     phpWebFramework: result.phpWebFramework,
     phpOrm: result.phpOrm,
     phpAuth: result.phpAuth,

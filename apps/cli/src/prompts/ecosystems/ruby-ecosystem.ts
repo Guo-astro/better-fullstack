@@ -3,6 +3,7 @@ import type {
   RubyOrm,
   RubyTesting,
   RubyValidation,
+  RubyCache,
   RubyWebFramework,
 } from "@/types";
 
@@ -126,6 +127,28 @@ export async function getRubyValidationChoice(value?: RubyValidation) {
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
   const response = await navigableSelect<RubyValidation>({
     message: "Select Ruby request validation",
+    options: resolution.options,
+    initialValue: resolution.initialValue,
+  });
+  if (isCancel(response)) return exitCancelled("Operation cancelled");
+  return response;
+}
+
+const CACHE_OPTIONS: PromptOption<RubyCache>[] = [
+  { value: "redis", label: "Redis", hint: "redis-rb client with TTL keys at REDIS_URL" },
+  { value: "memcached", label: "Memcached (Dalli)", hint: "Dalli client for MEMCACHED_SERVERS" },
+  { value: "memory", label: "Active Support MemoryStore", hint: "Per-process cache, no server" },
+  { value: "none", label: "None", hint: "No cache" },
+];
+
+export const resolveRubyCachePrompt = (value?: RubyCache) =>
+  createStaticSinglePromptResolution(CACHE_OPTIONS, "none", value);
+
+export async function getRubyCacheChoice(value?: RubyCache) {
+  const resolution = resolveRubyCachePrompt(value);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
+  const response = await navigableSelect<RubyCache>({
+    message: "Select Ruby cache store",
     options: resolution.options,
     initialValue: resolution.initialValue,
   });

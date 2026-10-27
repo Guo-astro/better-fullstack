@@ -400,6 +400,25 @@ describe("Ruby language integration", () => {
     );
   });
 
+  it.each([
+    { cache: "redis", client: "Redis.new(", gem: 'gem "redis", "6.0.0"', env: "REDIS_URL=" },
+    { cache: "memcached", client: "Dalli::Client.new(", gem: 'gem "dalli", "5.2.2"', env: "MEMCACHED_SERVERS=" },
+    { cache: "memory", client: "ActiveSupport::Cache::MemoryStore.new", gem: 'gem "activesupport", "8.1.4"', env: undefined },
+  ] as const)("serves GET /api/cache from $cache on every framework", async ({ cache, client, gem, env }) => {
+    for (const rubyWebFramework of ["sinatra", "rails", "roda", "grape"] as const) {
+      const result = await createVirtual({ ecosystem: "ruby", rubyWebFramework, rubyCache: cache });
+      if (!result.success || !result.tree) throw new Error(result.error ?? "No Ruby project");
+      expect(listVirtualTreeFilePaths(result.tree).some((path) => path.startsWith("cache/"))).toBe(false);
+      expect(content(result.tree, "cache.rb")).toContain(client);
+      expect(content(result.tree, "app.rb")).toContain("Cache.demo");
+      expect(content(result.tree, "test/app_test.rb")).toContain('get "/api/cache"');
+      expect(content(result.tree, "bin/proof")).toContain('http.get("/api/cache")');
+      expect(content(result.tree, "Gemfile")).toContain(gem);
+      if (env) expect(content(result.tree, ".env.example")).toContain(env);
+    }
+    expect(generateReproducibleCommand({ ...config(), rubyCache: cache })).toContain(`--ruby-cache ${cache}`);
+  });
+
   it("keeps hand-written greeting validation when no Ruby validation library is selected", async () => {
     const result = await createVirtual({ ecosystem: "ruby", rubyWebFramework: "sinatra" });
     if (!result.success || !result.tree) throw new Error(result.error ?? "No Ruby project");

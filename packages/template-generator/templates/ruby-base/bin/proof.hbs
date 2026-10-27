@@ -72,6 +72,12 @@ begin
   raise "Valid request failed" unless response.code == "200" && JSON.parse(response.body) == { "greeting" => "Hello, Ruby!" }
   response = http.post("/api/greetings", JSON.generate(name: " "), "Content-Type" => "application/json")
   raise "Invalid request was accepted" unless response.code == "422" && JSON.parse(response.body).fetch("error") == "name_length_must_be_1_to_80"
+{{#if (ne rubyCache "none")}}
+  first = http.get("/api/cache")
+  raise "Cache read failed; start the cache server: #{first.body}" unless first.code == "200"
+  second = http.get("/api/cache")
+  raise "Second read did not hit the cache" unless second.code == "200" && JSON.parse(second.body) == { "value" => JSON.parse(first.body).fetch("value"), "cached" => true }
+{{/if}}
   response = http.post("/api/greetings", "", "Content-Type" => "application/json")
   raise "Empty JSON request was not rejected" unless response.code == "400" && JSON.parse(response.body).fetch("error") == "invalid_json"
 {{#if (ne rubyOrm "none")}}
@@ -108,7 +114,7 @@ begin
   response = http.post("/auth/oidc", "")
   raise "Sign-in without a CSRF token was not rejected" unless response.code == "302" && response["location"].include?("/auth/failure")
 {{/if}}
-  puts JSON.generate(health: "passed", parsed_response: "passed", invalid_request: "passed", frontend_origins: "passed", empty_json: "passed"{{#if (ne rubyOrm "none")}}, persistence: "passed"{{/if}}{{#if (ne rubyAuth "none")}}, authentication: "passed"{{/if}})
+  puts JSON.generate(health: "passed", parsed_response: "passed", invalid_request: "passed", frontend_origins: "passed", empty_json: "passed"{{#if (ne rubyOrm "none")}}, persistence: "passed"{{/if}}{{#if (ne rubyAuth "none")}}, authentication: "passed"{{/if}}{{#if (ne rubyCache "none")}}, cache: "passed"{{/if}})
 rescue StandardError => error
   log.rewind
   warn log.read

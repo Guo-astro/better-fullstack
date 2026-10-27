@@ -318,7 +318,7 @@ export const SECTIONS_BY_ECOSYSTEM: Record<Ecosystem, readonly BuilderSectionDef
   dotnet: DOTNET_SECTIONS,
   ruby: [
     section("frameworkBuild", "Framework & Build", ["rubyWebFramework"]),
-    section("data", "Data & Storage", ["rubyOrm"]),
+    section("data", "Data & Storage", ["rubyOrm", "rubyCache"]),
     section("auth", "Authentication", ["rubyAuth"]),
     section("libraries", "Libraries & Utilities", ["rubyValidation"]),
     section("qualityTesting", "Quality & Testing", ["rubyTesting"]),

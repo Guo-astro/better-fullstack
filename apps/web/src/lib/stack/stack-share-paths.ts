@@ -67,6 +67,7 @@ export function createDefaultMultiEcosystemShareStack(): StackState {
     rubyAuth: "none",
     rubyTesting: "none",
     rubyValidation: "none",
+    rubyCache: "none",
     elixirWebFramework: "none",
     elixirOrm: "none",
     elixirApi: "none",
