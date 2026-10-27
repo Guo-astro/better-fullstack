@@ -19,6 +19,7 @@ export async function processCrystalBaseTemplate(vfs: VirtualFileSystem, templat
     ...(config.crystalOrm === "none" ? [] : [`orm/${config.crystalOrm}`]),
     ...(config.crystalAuth === "none" ? [] : [`auth/${config.crystalAuth}`]),
     ...(["spectator", "spec-kemal"].includes(config.crystalTesting) ? [`testing/${config.crystalTesting}`] : []),
+    ...(config.crystalValidation === "none" ? [] : [`validation/${config.crystalValidation}`]),
     ...(["jwt", "kemal-session"].includes(config.crystalAuth) ? ["auth/credentials"] : []),
     ...((config.crystalOrm !== "none" || config.crystalAuth === "jwt") && !frameworkDirectories.includes("request")
       ? ["frameworks/request"]
@@ -31,7 +32,7 @@ export async function processCrystalBaseTemplate(vfs: VirtualFileSystem, templat
     context,
     skip: (templatePath) =>
       skipSpec(templatePath) ||
-      ["frameworks/", "orm/", "auth/", "testing/"].some((directory) => templatePath.startsWith(`crystal-base/${directory}`)),
+      ["frameworks/", "orm/", "auth/", "testing/", "validation/"].some((directory) => templatePath.startsWith(`crystal-base/${directory}`)),
   });
   for (const directory of directories) {
     renderTemplateTree(vfs, templates, { prefix: `crystal-base/${directory}/`, targetPath, context, skip: skipSpec });

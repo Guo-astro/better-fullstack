@@ -7271,6 +7271,12 @@ export const TECH_OPTIONS: Record<
     { id: "spec-kemal", name: "spec-kemal", description: "In-memory HTTP specs for Kemal routes", icon: "https://cdn.simpleicons.org/crystal", color: "from-slate-500 to-zinc-600", default: false },
     { id: "none", name: "None", description: "No specs", icon: "", color: "from-gray-400 to-gray-600", default: false },
   ],
+  crystalValidation: [
+    { id: "athena-validator", name: "Athena Validator", description: "Annotation constraints that validate greeting names with any framework", icon: "https://cdn.simpleicons.org/crystal", color: "from-slate-500 to-zinc-600", default: false },
+    { id: "active-model", name: "ActiveModel", description: "Spider-Gazelle model attributes with presence and length validations", icon: "https://cdn.simpleicons.org/crystal", color: "from-slate-500 to-zinc-600", default: false },
+    { id: "marten-schema", name: "Marten Schema", description: "Marten schema fields that strip and bound greeting names", icon: "https://cdn.simpleicons.org/crystal", color: "from-slate-500 to-zinc-600", default: false },
+    { id: "none", name: "None", description: "Hand-written greeting checks", icon: "", color: "from-gray-400 to-gray-600", default: true },
+  ],
   javaWebFramework: [
     {
       id: "ktor",

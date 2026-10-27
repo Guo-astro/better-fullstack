@@ -225,7 +225,7 @@ import { getShadcnOptions, type ShadcnOptions } from "@/prompts/developer/shadcn
 import { getTestingChoice } from "@/prompts/developer/testing";
 import { getUILibraryChoice } from "@/prompts/developer/ui-library";
 import { getValidationChoice } from "@/prompts/developer/validation";
-import { getCrystalAuthChoice, getCrystalTestingChoice, getCrystalOrmChoice, getCrystalWebFrameworkChoice } from "@/prompts/ecosystems/crystal-ecosystem";
+import { getCrystalAuthChoice, getCrystalTestingChoice, getCrystalValidationChoice, getCrystalOrmChoice, getCrystalWebFrameworkChoice } from "@/prompts/ecosystems/crystal-ecosystem";
 import {
   getDotnetApiChoice,
   getDotnetAuthChoice,
@@ -508,6 +508,7 @@ type PromptGroupResults = {
   crystalOrm: ProjectConfig["crystalOrm"];
   crystalAuth: ProjectConfig["crystalAuth"];
   crystalTesting: ProjectConfig["crystalTesting"];
+  crystalValidation: ProjectConfig["crystalValidation"];
   javaWebFramework: JavaWebFramework;
   javaLanguage: JavaLanguage;
   javaBuildTool: JavaBuildTool;
@@ -713,6 +714,7 @@ const CONFIG_PROMPT_ENTRY_KEY_MAP = {
   crystalOrm: true,
   crystalAuth: true,
   crystalTesting: true,
+  crystalValidation: true,
   javaWebFramework: true,
   javaLanguage: true,
   javaBuildTool: true,
@@ -1078,7 +1080,7 @@ export async function gatherConfig(
           ecosystem,
         });
         if (issue) throw new Error(issue);
-        const { crystalWebFramework: _frameworkDefault, crystalAuth: _crystalAuthDefault, crystalTesting: _crystalTestingDefault, crystalOrm: _crystalOrmDefault, ...nativeDefaults } =
+        const { crystalWebFramework: _frameworkDefault, crystalAuth: _crystalAuthDefault, crystalTesting: _crystalTestingDefault, crystalValidation: _crystalValidationDefault, crystalOrm: _crystalOrmDefault, ...nativeDefaults } =
           CRYSTAL_PROJECT_DEFAULTS;
         Object.assign(flags, { ...nativeDefaults, ...flags });
       }
@@ -1804,6 +1806,10 @@ export async function gatherConfig(
       results.ecosystem === "crystal"
         ? getCrystalTestingChoice(flags.crystalTesting, results)
         : Promise.resolve("none" as const),
+    crystalValidation: ({ results }) =>
+      results.ecosystem === "crystal"
+        ? getCrystalValidationChoice(flags.crystalValidation, results)
+        : Promise.resolve("none" as const),
     javaWebFramework: ({ results }) => {
       if (results.ecosystem !== "java") return Promise.resolve("none" as JavaWebFramework);
       return getJavaWebFrameworkChoice(flags.javaWebFramework);
@@ -2273,6 +2279,7 @@ export async function gatherConfig(
     crystalOrm: result.crystalOrm,
     crystalAuth: result.crystalAuth,
     crystalTesting: result.crystalTesting,
+    crystalValidation: result.crystalValidation,
     javaWebFramework: result.javaWebFramework,
     javaLanguage: result.javaLanguage,
     javaBuildTool: result.javaBuildTool,

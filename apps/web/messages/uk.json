@@ -789,5 +789,6 @@
   "docsCliSummaryCrystalCrystalWebFramework": "Експериментальний HTTP-фреймворк Crystal.",
   "docsCliSummaryCrystalCrystalOrm": "Експериментальний шар бази даних Crystal.",
   "docsCliSummaryCrystalCrystalAuth": "Експериментальна автентифікація Crystal.",
-  "docsCliSummaryCrystalCrystalTesting": "Експериментальні інструменти тестування Crystal."
+  "docsCliSummaryCrystalCrystalTesting": "Експериментальні інструменти тестування Crystal.",
+  "docsCliSummaryCrystalCrystalValidation": "Експериментальна перевірка вхідних даних Crystal."
 }

@@ -60,6 +60,7 @@ export function createDefaultMultiEcosystemShareStack(): StackState {
     crystalOrm: "none",
     crystalAuth: "none",
     crystalTesting: "none",
+    crystalValidation: "none",
     javaWebFramework: "none",
     javaOrm: "none",
     javaAuth: "none",

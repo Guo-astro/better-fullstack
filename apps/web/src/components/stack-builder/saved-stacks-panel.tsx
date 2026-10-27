@@ -45,7 +45,7 @@ const HIGHLIGHT_KEYS_BY_ECOSYSTEM: Record<string, readonly (keyof StackState)[]>
   rust: ["rustWebFramework", "rustFrontend", "rustOrm", "rustApi", "rustCli"],
   python: ["pythonWebFramework", "pythonOrm", "pythonAi", "pythonApi", "pythonTaskQueue"],
   go: ["goWebFramework", "goOrm", "goApi", "goCli"],
-  crystal: ["crystalWebFramework", "crystalOrm", "crystalAuth", "crystalTesting"],
+  crystal: ["crystalWebFramework", "crystalOrm", "crystalAuth", "crystalTesting", "crystalValidation"],
   java: [
     "javaWebFramework",
     "javaBuildTool",

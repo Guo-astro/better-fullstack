@@ -8,6 +8,7 @@ import type {
 import {
   CRYSTAL_AUTH_VALUES,
   CRYSTAL_TESTING_VALUES,
+  CRYSTAL_VALIDATION_VALUES,
   CRYSTAL_ORM_VALUES,
   CRYSTAL_WEB_FRAMEWORK_VALUES,
   type CrystalOptionCategory,
@@ -943,6 +944,7 @@ function createValidationBase(projectName: string, draft: CandidateDraft): Proje
     crystalOrm: "none",
     crystalAuth: "none",
     crystalTesting: "none",
+    crystalValidation: "none",
     javaWebFramework: "none",
     javaBuildTool: "none",
     javaOrm: "none",
@@ -1121,6 +1123,7 @@ function createDraft(ecosystem: Ecosystem, args: GeneratorArgs): CandidateDraft 
             "crystalAuth",
           ),
           crystalTesting: sampleScalar(crystalOptions("crystalTesting", CRYSTAL_TESTING_VALUES), 0.5, "crystalTesting"),
+          crystalValidation: sampleScalar(crystalOptions("crystalValidation", CRYSTAL_VALIDATION_VALUES), 0.5, "crystalValidation"),
         },
       };
     }

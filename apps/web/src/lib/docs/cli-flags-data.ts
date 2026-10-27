@@ -2075,6 +2075,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "spec",
         "multiple": false
+      },
+      {
+        "flag": "--crystal-validation",
+        "summary": "Crystal input validation.",
+        "values": [
+          "athena-validator",
+          "active-model",
+          "marten-schema",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
       }
     ]
   },
@@ -3110,6 +3123,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "crystal:--crystal-orm": m.docsCliSummaryCrystalCrystalOrm,
   "crystal:--crystal-auth": m.docsCliSummaryCrystalCrystalAuth,
   "crystal:--crystal-testing": m.docsCliSummaryCrystalCrystalTesting,
+  "crystal:--crystal-validation": m.docsCliSummaryCrystalCrystalValidation,
   "java:--java-web-framework": m.docsCliSummaryJavaJavaWebFramework,
   "java:--java-language": m.docsCliSummaryJavaJavaLanguage,
   "java:--java-build-tool": m.docsCliSummaryJavaJavaBuildTool,

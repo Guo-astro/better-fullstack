@@ -1,5 +1,5 @@
-import type { CrystalAuth, CrystalTesting, CrystalOrm, CrystalSelection, CrystalWebFramework } from "@/types";
-import { CrystalAuthSchema, CrystalTestingSchema, CrystalOrmSchema, CrystalWebFrameworkSchema, getCrystalOptionIssue } from "@/types";
+import type { CrystalAuth, CrystalTesting, CrystalValidation, CrystalOrm, CrystalSelection, CrystalWebFramework } from "@/types";
+import { CrystalAuthSchema, CrystalTestingSchema, CrystalValidationSchema, CrystalOrmSchema, CrystalWebFrameworkSchema, getCrystalOptionIssue } from "@/types";
 import { exitCancelled } from "@/presentation/errors";
 import { isCancel, navigableSelect } from "@/prompts/core/navigable";
 import { createStaticSinglePromptResolution } from "@/prompts/core/prompt-contract";
@@ -80,6 +80,25 @@ export async function getCrystalTestingChoice(value?: CrystalTesting, selection:
   const resolution = resolveCrystalTestingPrompt(value, selection);
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "spec";
   const response = await navigableSelect<CrystalTesting>({ message: "Select Crystal test tooling", options: resolution.options, initialValue: resolution.initialValue });
+  if (isCancel(response)) return exitCancelled("Operation cancelled");
+  return response;
+}
+
+export function resolveCrystalValidationPrompt(value?: string, selection: CrystalSelection = {}) {
+  const selected = value === undefined ? undefined : CrystalValidationSchema.parse(value);
+  const options = [
+    { value: "athena-validator" as const, label: "Athena Validator", hint: "Annotation constraints with any framework" },
+    { value: "active-model" as const, label: "ActiveModel", hint: "Spider-Gazelle model validations" },
+    { value: "marten-schema" as const, label: "Marten Schema", hint: "Marten schema fields" },
+    { value: "none" as const, label: "None", hint: "Hand-written checks" },
+  ].filter((option) => !getCrystalOptionIssue("crystalValidation", option.value, selection));
+  return createStaticSinglePromptResolution(options, "none", selected);
+}
+
+export async function getCrystalValidationChoice(value?: CrystalValidation, selection: CrystalSelection = {}) {
+  const resolution = resolveCrystalValidationPrompt(value, selection);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
+  const response = await navigableSelect<CrystalValidation>({ message: "Select Crystal input validation", options: resolution.options, initialValue: resolution.initialValue });
   if (isCancel(response)) return exitCancelled("Operation cancelled");
   return response;
 }

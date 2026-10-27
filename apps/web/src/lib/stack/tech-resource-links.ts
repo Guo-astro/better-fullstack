@@ -2523,6 +2523,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://github.com/kemalcr/spec-kemal#readme",
     githubUrl: "https://github.com/kemalcr/spec-kemal",
   },
+  "crystalValidation:athena-validator": {
+    docsUrl: "https://athenaframework.org/Validator/",
+    githubUrl: "https://github.com/athena-framework/validator",
+  },
+  "crystalValidation:active-model": {
+    docsUrl: "https://github.com/spider-gazelle/active-model#readme",
+    githubUrl: "https://github.com/spider-gazelle/active-model",
+  },
+  "crystalValidation:marten-schema": {
+    docsUrl: "https://martenframework.com/docs/schemas",
+    githubUrl: "https://github.com/martenframework/marten",
+  },
   "elixirOrm:ecto-sql": {
     docsUrl: "https://hexdocs.pm/ecto_sql/",
     githubUrl: "https://github.com/elixir-ecto/ecto_sql",

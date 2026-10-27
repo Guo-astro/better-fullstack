@@ -789,5 +789,6 @@
   "docsCliSummaryCrystalCrystalWebFramework": "實驗性 Crystal HTTP 框架。",
   "docsCliSummaryCrystalCrystalOrm": "實驗性 Crystal 資料庫層。",
   "docsCliSummaryCrystalCrystalAuth": "實驗性 Crystal 身分驗證。",
-  "docsCliSummaryCrystalCrystalTesting": "實驗性 Crystal 測試工具。"
+  "docsCliSummaryCrystalCrystalTesting": "實驗性 Crystal 測試工具。",
+  "docsCliSummaryCrystalCrystalValidation": "實驗性 Crystal 輸入驗證。"
 }

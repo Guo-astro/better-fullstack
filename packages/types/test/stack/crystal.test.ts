@@ -289,6 +289,22 @@ describe("bounded Crystal HTTP recipe", () => {
     expect(parseStackSelectionFromSearch(encoded).crystalTesting).toBe("spec-kemal");
   });
 
+  it("keeps Marten Schema on Marten and round-trips validation through the URL", () => {
+    const martenSchema = createCrystalStackSelection({
+      crystalWebFramework: "marten",
+      crystalValidation: "marten-schema",
+    });
+    expect(analyzeStackCompatibility(martenSchema).adjustedStack).toBeNull();
+    const kemal = analyzeStackCompatibility({ ...martenSchema, crystalWebFramework: "kemal" });
+    expect(kemal.adjustedStack?.crystalValidation).toBe("none");
+    expect(getDisabledReason({ ...martenSchema, crystalWebFramework: "lucky" }, "crystalValidation", "marten-schema")).toBe(
+      "Marten Schema requires Crystal Marten.",
+    );
+    expect(getDisabledReason({ ...martenSchema, crystalWebFramework: "lucky" }, "crystalValidation", "athena-validator")).toBeNull();
+    const encoded = Object.fromEntries(createStackSelectionSearchParams(martenSchema));
+    expect(parseStackSelectionFromSearch(encoded).crystalValidation).toBe("marten-schema");
+  });
+
   it("keeps Crystal experimental without changing the versioned golden recipes", () => {
     expect(GOLDEN_RUNTIME_RECIPES).toHaveLength(8);
     const kemal = getCapabilityInventory().find(

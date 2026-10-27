@@ -232,6 +232,7 @@ export const OPTION_DISPLAY_ORDER: Readonly<Record<string, readonly string[]>> =
   crystalOrm: ["crystal-db", "avram", "marten-orm", "none"],
   crystalAuth: ["jwt", "kemal-session", "marten-auth", "none"],
   crystalTesting: ["spec", "spectator", "spec-kemal", "none"],
+  crystalValidation: ["athena-validator", "active-model", "marten-schema", "none"],
   javaWebFramework: ["spring-boot", "quarkus", "ktor", "micronaut", "none"],
   jobQueue: [
     "bullmq",

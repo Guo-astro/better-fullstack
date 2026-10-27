@@ -19,13 +19,14 @@ const optionValue = (name: string, fallback: string) => {
 const orm = optionValue("--orm", "none");
 const auth = optionValue("--auth", "none");
 const testing = optionValue("--testing", "spec");
+const validation = optionValue("--validation", "none");
 const outputIndex = process.argv.indexOf("--output");
 const requestedOutput = outputIndex < 0 ? undefined : process.argv[outputIndex + 1];
 if (outputIndex >= 0 && (!requestedOutput || requestedOutput.startsWith("--"))) {
   throw new Error("--output requires a directory");
 }
 const outputDir = resolve(
-  requestedOutput ?? join(repoRoot, `testing/.smoke-output/crystal-runtime-proof-${framework}-${orm}-${auth}-${testing}`),
+  requestedOutput ?? join(repoRoot, `testing/.smoke-output/crystal-runtime-proof-${framework}-${orm}-${auth}-${testing}-${validation}`),
 );
 const git = (args: string[]) => {
   const result = Bun.spawnSync(["git", ...args], { cwd: repoRoot });
@@ -61,6 +62,8 @@ const flags = [
   auth,
   "--crystal-testing",
   testing,
+  "--crystal-validation",
+  validation,
   "--database",
   "none",
   "--addons",
@@ -98,7 +101,7 @@ const cliSha256 = createHash("sha256")
   .digest("hex");
 const receipt = {
   schemaVersion: 1,
-  recipe: ["crystal", framework, orm, auth, testing].filter((part) => !["none", "spec"].includes(part)).join("-"),
+  recipe: ["crystal", framework, orm, auth, testing, validation].filter((part) => !["none", "spec"].includes(part)).join("-"),
   maturity: "experimental",
   evidence: "unqualified-observation",
   revision,

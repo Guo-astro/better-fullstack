@@ -1279,7 +1279,7 @@ export function generateReproducibleCommand(config: ProjectConfig) {
       flags = getGoFlags(config);
       break;
     case "crystal":
-      flags = ["--ecosystem crystal", `--crystal-web-framework ${config.crystalWebFramework}`, `--crystal-orm ${config.crystalOrm}`, `--crystal-auth ${config.crystalAuth}`, `--crystal-testing ${config.crystalTesting}`, "--addons none", "--examples none"];
+      flags = ["--ecosystem crystal", `--crystal-web-framework ${config.crystalWebFramework}`, `--crystal-orm ${config.crystalOrm}`, `--crystal-auth ${config.crystalAuth}`, `--crystal-testing ${config.crystalTesting}`, `--crystal-validation ${config.crystalValidation}`, "--addons none", "--examples none"];
       appendCommonFlags(flags, config);
       break;
     case "java":

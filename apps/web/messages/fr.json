@@ -789,5 +789,6 @@
   "docsCliSummaryCrystalCrystalWebFramework": "Framework HTTP expérimental Crystal.",
   "docsCliSummaryCrystalCrystalOrm": "Couche de base de données expérimentale Crystal.",
   "docsCliSummaryCrystalCrystalAuth": "Authentification expérimentale Crystal.",
-  "docsCliSummaryCrystalCrystalTesting": "Outils de test expérimentaux pour Crystal."
+  "docsCliSummaryCrystalCrystalTesting": "Outils de test expérimentaux pour Crystal.",
+  "docsCliSummaryCrystalCrystalValidation": "Validation expérimentale des entrées Crystal."
 }

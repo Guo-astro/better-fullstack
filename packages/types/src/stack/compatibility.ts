@@ -564,6 +564,7 @@ export type CompatibilityInput = {
   crystalOrm: string;
   crystalAuth: string;
   crystalTesting: string;
+  crystalValidation: string;
   javaWebFramework: string;
   javaBuildTool: string;
   javaOrm: string;
@@ -3017,6 +3018,7 @@ export const getDisabledReason = (
       "crystalOrm",
       "crystalAuth",
       "crystalTesting",
+      "crystalValidation",
       "aiDocs",
       "git",
       "install",

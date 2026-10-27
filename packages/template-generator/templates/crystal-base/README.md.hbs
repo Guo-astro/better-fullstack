@@ -80,6 +80,18 @@ kemal-session 1.6.0 stores the signed-in username in a server-side session. Sign
 Marten Auth 0.2.1 stores users in the `accounts_user` table with bcrypt password hashes and signs them in through Marten sessions. `crystal run manage.cr -- seed` creates or updates the user named by `AUTH_USERNAME` (default `demo@example.com`) with `AUTH_PASSWORD`. `POST /api/auth/logout` clears the session. Session cookies are HttpOnly and Secure unless `SESSION_SECURE=false`. Marten's default store keeps the session in a signed cookie, so a copied cookie stays valid until it expires; set `MARTEN_SECRET_KEY` so sessions survive restarts.
 
 {{/if}}
+{{#if (eq crystalValidation "athena-validator")}}
+Athena Validator 0.6.0 checks greeting names in `src/greeting_input.cr` with `NotBlank` and `Length(..80)` constraints. A violation raises `ArgumentError`, which the routes return as 422 with the constraint message.
+
+{{/if}}
+{{#if (eq crystalValidation "active-model")}}
+Spider-Gazelle ActiveModel 4.7.1 checks greeting names in `src/greeting_input.cr` with `presence` and `length` validations. A failure raises `ArgumentError`, which the routes return as 422 with the first error. ActiveModel pulls in `crystal-db` and the `sanitize` shard, which tracks its default branch; `shard.lock` pins the resolved commit.
+
+{{/if}}
+{{#if (eq crystalValidation "marten-schema")}}
+A Marten schema in `src/greeting_input.cr` strips greeting names and requires 1 to 80 characters. A failure raises `ArgumentError`, which the handlers return as 422 with Marten's translated message.
+
+{{/if}}
 {{#if (eq crystalTesting "spectator")}}
 Spectator 0.12.4 runs `spec/greeting_spectator_spec.cr` in the same `crystal spec` run as the built-in Spec files, and a failure in either fails the run. Use `Spectator.describe` with `let`, `subject`, `sample`, doubles, and mocks for new specs.
 

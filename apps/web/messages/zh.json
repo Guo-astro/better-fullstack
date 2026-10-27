@@ -789,5 +789,6 @@
   "docsCliSummaryCrystalCrystalWebFramework": "实验性 Crystal HTTP 框架。",
   "docsCliSummaryCrystalCrystalOrm": "实验性 Crystal 数据库层。",
   "docsCliSummaryCrystalCrystalAuth": "实验性 Crystal 身份验证。",
-  "docsCliSummaryCrystalCrystalTesting": "实验性 Crystal 测试工具。"
+  "docsCliSummaryCrystalCrystalTesting": "实验性 Crystal 测试工具。",
+  "docsCliSummaryCrystalCrystalValidation": "实验性 Crystal 输入验证。"
 }

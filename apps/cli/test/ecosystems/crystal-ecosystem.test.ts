@@ -315,6 +315,37 @@ describe("Crystal create contract", () => {
     expect(generateReproducibleCommand(config)).toContain(`--crystal-testing ${testing}`);
   });
 
+  it.each([
+    ["kemal", "athena-validator", "github: athena-framework/validator", "@[Assert::NotBlank]"],
+    ["lucky", "active-model", "github: spider-gazelle/active-model", "validates :name"],
+    ["marten", "marten-schema", "github: martenframework/marten", "< Marten::Schema"],
+  ] as const)("renders %s greetings validated by %s", async (framework, validation, dependency, rule) => {
+    const result = await createVirtual({
+      ecosystem: "crystal",
+      crystalWebFramework: framework,
+      crystalValidation: validation,
+    });
+    expect(result.success).toBe(true);
+    if (!result.tree) throw new Error(result.error);
+    const root = result.tree.root;
+    expect(content(root, "shard.yml")).toContain(dependency);
+    expect(content(root, "src/greeting_input.cr")).toContain(rule);
+    expect(content(root, "src/greeting.cr")).toContain("GreetingInput.validate!(value.strip)");
+    expect(hasFile(root, "spec/greeting_input_spec.cr")).toBe(true);
+    const config = buildProjectConfig({ ecosystem: "crystal", crystalWebFramework: framework, crystalValidation: validation });
+    expect(generateReproducibleCommand(config)).toContain(`--crystal-validation ${validation}`);
+  });
+
+  it("rejects Marten Schema without Marten", async () => {
+    const result = await createVirtual({
+      ecosystem: "crystal",
+      crystalWebFramework: "kemal",
+      crystalValidation: "marten-schema",
+    });
+    expect(result.success).toBe(false);
+    expect(result.error).toContain("Marten Schema requires Crystal Marten.");
+  });
+
   it("rejects spec-kemal without Kemal", async () => {
     const result = await createVirtual({
       ecosystem: "crystal",

@@ -789,5 +789,6 @@
   "docsCliSummaryCrystalCrystalWebFramework": "Experimentelles Crystal-HTTP-Framework.",
   "docsCliSummaryCrystalCrystalOrm": "Experimentelle Crystal-Datenbankschicht.",
   "docsCliSummaryCrystalCrystalAuth": "Experimentelle Crystal-Authentifizierung.",
-  "docsCliSummaryCrystalCrystalTesting": "Experimentelle Crystal-Testwerkzeuge."
+  "docsCliSummaryCrystalCrystalTesting": "Experimentelle Crystal-Testwerkzeuge.",
+  "docsCliSummaryCrystalCrystalValidation": "Experimentelle Crystal-Eingabevalidierung."
 }

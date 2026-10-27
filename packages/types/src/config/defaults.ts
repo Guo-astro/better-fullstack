@@ -126,6 +126,7 @@ export const CLI_DEFAULT_PROJECT_CONFIG = {
   crystalOrm: "none",
   crystalAuth: "none",
   crystalTesting: "spec",
+  crystalValidation: "none",
   javaWebFramework: "spring-boot",
   javaBuildTool: "maven",
   javaOrm: "none",

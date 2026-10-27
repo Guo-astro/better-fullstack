@@ -70,6 +70,8 @@ Add sign-in with `--crystal-auth`. `jwt` issues HS256 bearer tokens with any fra
 
 Choose test tooling with `--crystal-testing`. `spec` keeps Crystal's built-in Spec files, `spectator` adds a Spectator spec that runs in the same `crystal spec` run, and `spec-kemal` adds in-memory HTTP specs for Kemal routes. `spec-kemal` works only with Kemal. `none` generates no specs.
 
+Validate greeting names with `--crystal-validation`. `athena-validator` applies `NotBlank` and `Length` constraints, `active-model` uses Spider-Gazelle ActiveModel presence and length validations, and `marten-schema` uses a Marten schema field. Each one replaces the hand-written name check, so invalid names still return 422 with the library's message. `marten-schema` works only with Marten.
+
 Append a relative directory to a binding, such as `backend:crystal:kemal:audit@services/audit%20api`. Directory segments accept ASCII letters, digits, spaces, dots, underscores, hyphens, `@`, `:`, and `%`. Encode special characters in the binding. Applications cannot share a destination or nest one destination inside another.
 
 TypeScript frontends and backends use `apps/web` and `apps/server`. React Native apps use `apps/native`. Custom directories for these applications are rejected because their templates require the default paths.

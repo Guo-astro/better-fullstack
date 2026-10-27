@@ -7,6 +7,7 @@ export const CRYSTAL_PROJECT_DEFAULTS = {
   crystalOrm: "none",
   crystalAuth: "none",
   crystalTesting: "spec",
+  crystalValidation: "none",
   frontend: ["none"],
   backend: "none",
   runtime: "none",
@@ -95,6 +96,7 @@ export type CrystalSelection = {
   crystalOrm?: string;
   crystalAuth?: string;
   crystalTesting?: string;
+  crystalValidation?: string;
 };
 
 const CRYSTAL_ORM_LABELS: Record<string, string> = { "marten-orm": "Marten ORM" };
@@ -120,6 +122,12 @@ export const CRYSTAL_OPTION_RULES = {
     role: "testing",
     options: {
       "spec-kemal": { label: "spec-kemal", frameworks: ["kemal"] },
+    },
+  },
+  crystalValidation: {
+    role: "validation",
+    options: {
+      "marten-schema": { label: "Marten Schema", frameworks: ["marten"] },
     },
   },
 } as const satisfies Record<
