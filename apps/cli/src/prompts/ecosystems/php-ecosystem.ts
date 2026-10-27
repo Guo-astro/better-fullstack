@@ -3,6 +3,7 @@ import { getPhpCapabilityIssue } from "@better-fullstack/types";
 import type {
   PhpAuth,
   PhpCache,
+  PhpEmail,
   PhpJobQueue,
   PhpOrm,
   PhpTesting,
@@ -109,6 +110,21 @@ const JOB_QUEUE_OPTIONS: PromptOption<PhpJobQueue>[] = [
     hint: "Database queue and queue:work (Laravel only)",
   },
   { value: "none", label: "None", hint: "No background jobs" },
+];
+
+const EMAIL_OPTIONS: PromptOption<PhpEmail>[] = [
+  {
+    value: "symfony-mailer",
+    label: "Symfony Mailer",
+    hint: "SMTP or provider DSN with a mail:send command",
+  },
+  { value: "phpmailer", label: "PHPMailer", hint: "SMTP mailer with a mail:send command" },
+  {
+    value: "laravel-mail",
+    label: "Laravel Mail",
+    hint: "Laravel mailer and Artisan mail:send (Laravel only)",
+  },
+  { value: "none", label: "None", hint: "No email" },
 ];
 
 export function resolvePhpWebFrameworkPrompt(value?: PhpWebFramework) {
@@ -225,6 +241,24 @@ export async function getPhpJobQueueChoice(value?: PhpJobQueue, framework?: PhpW
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
   const response = await navigableSelect<PhpJobQueue>({
     message: "Select PHP background job queue",
+    options: resolution.options,
+    initialValue: resolution.initialValue,
+  });
+  return isCancel(response) ? exitCancelled("Operation cancelled") : response;
+}
+
+export function resolvePhpEmailPrompt(value?: PhpEmail, framework?: PhpWebFramework) {
+  const options = EMAIL_OPTIONS.filter(
+    (option) => !getPhpCapabilityIssue(framework, "email", option.value),
+  );
+  return createStaticSinglePromptResolution(options, "none", value);
+}
+
+export async function getPhpEmailChoice(value?: PhpEmail, framework?: PhpWebFramework) {
+  const resolution = resolvePhpEmailPrompt(value, framework);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
+  const response = await navigableSelect<PhpEmail>({
+    message: "Select PHP email library",
     options: resolution.options,
     initialValue: resolution.initialValue,
   });

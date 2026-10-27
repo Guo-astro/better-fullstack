@@ -600,6 +600,7 @@ export type CompatibilityInput = {
   phpValidation: string;
   phpCache: string;
   phpJobQueue: string;
+  phpEmail: string;
   elixirWebFramework: string;
   elixirOrm: string;
   elixirAuth: string;

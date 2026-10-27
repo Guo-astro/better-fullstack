@@ -2650,6 +2650,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "none",
         "multiple": false
+      },
+      {
+        "flag": "--php-email",
+        "summary": "PHP email library.",
+        "values": [
+          "symfony-mailer",
+          "phpmailer",
+          "laravel-mail",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
       }
     ]
   },
@@ -3161,6 +3174,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "php:--php-validation": m.docsCliSummaryPhpPhpValidation,
   "php:--php-cache": m.docsCliSummaryPhpPhpCache,
   "php:--php-job-queue": m.docsCliSummaryPhpPhpJobQueue,
+  "php:--php-email": m.docsCliSummaryPhpPhpEmail,
   "elixir:--elixir-web-framework": m.docsCliSummaryElixirElixirWebFramework,
   "elixir:--elixir-orm": m.docsCliSummaryElixirElixirOrm,
   "elixir:--elixir-auth": m.docsCliSummaryElixirElixirAuth,

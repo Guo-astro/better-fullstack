@@ -162,6 +162,7 @@ export const CLI_DEFAULT_PROJECT_CONFIG = {
   phpValidation: "none",
   phpCache: "none",
   phpJobQueue: "none",
+  phpEmail: "none",
   elixirWebFramework: "phoenix",
   elixirOrm: "ecto-sql",
   elixirAuth: "none",

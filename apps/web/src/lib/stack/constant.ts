@@ -6435,6 +6435,37 @@ export const TECH_OPTIONS: Record<
       default: true,
     },
   ],
+  phpEmail: [
+    {
+      id: "symfony-mailer",
+      name: "Symfony Mailer",
+      description: "Send a welcome email over SMTP or a provider DSN on any PHP framework",
+      icon: "https://cdn.simpleicons.org/symfony/000000",
+      color: "from-gray-700 to-gray-900",
+    },
+    {
+      id: "phpmailer",
+      name: "PHPMailer",
+      description: "Send a welcome email over SMTP on any PHP framework",
+      icon: "",
+      color: "from-blue-500 to-indigo-700",
+    },
+    {
+      id: "laravel-mail",
+      name: "Laravel Mail",
+      description: "Laravel mailer with an Artisan mail:send command on Laravel",
+      icon: "https://cdn.simpleicons.org/laravel/FF2D20",
+      color: "from-red-500 to-red-700",
+    },
+    {
+      id: "none",
+      name: "None",
+      description: "No email",
+      icon: "",
+      color: "from-gray-500 to-gray-700",
+      default: true,
+    },
+  ],
   phpAuth: [
     {
       id: "firebase-jwt",

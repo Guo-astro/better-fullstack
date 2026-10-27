@@ -25,6 +25,42 @@ function requestProof(string $url, string $method = 'GET', ?string $body = null,
     return [(int) $match[1], json_decode($response, true, 32, JSON_THROW_ON_ERROR), $headers];
 }
 
+{{#if (ne phpEmail "none")}}
+function receiveProofMail($server): string
+{
+    $client = @stream_socket_accept($server, 10);
+    requireProof(is_resource($client), 'The mailer did not connect to the SMTP sink.');
+    stream_set_timeout($client, 10);
+    fwrite($client, "220 proof ESMTP\r\n");
+    $message = '';
+    $inData = false;
+    while (($line = fgets($client)) !== false) {
+        if ($inData) {
+            if ($line === ".\r\n") {
+                $inData = false;
+                fwrite($client, "250 queued\r\n");
+            } else {
+                $message .= $line;
+            }
+            continue;
+        }
+        $command = strtoupper(substr(trim($line), 0, 4));
+        if ($command === 'QUIT') {
+            fwrite($client, "221 bye\r\n");
+            break;
+        }
+        fwrite($client, match ($command) {
+            'EHLO' => "250-proof\r\n250 8BITMIME\r\n",
+            'DATA' => "354 end with .\r\n",
+            default => "250 ok\r\n",
+        });
+        $inData = $command === 'DATA';
+    }
+    fclose($client);
+    return $message;
+}
+
+{{/if}}
 $root = dirname(__DIR__);
 requireProof(is_file($root . '/composer.lock') && is_file($root . '/vendor/autoload.php'), 'Run composer install before HTTP proof.');
 $socket = stream_socket_server('tcp://127.0.0.1:0', $socketError, $socketMessage);
@@ -128,6 +164,25 @@ try {
     [$status] = requestProof('http://' . $address . '/api/jobs/' . str_repeat('0', 32));
     requireProof($status === 404, 'Unknown job was found.');
 {{/if}}
+{{#if (ne phpEmail "none")}}
+    $smtp = stream_socket_server('tcp://127.0.0.1:0');
+    requireProof(is_resource($smtp), 'Cannot open the SMTP sink.');
+    $smtpPort = (int) substr(strrchr((string) stream_socket_get_name($smtp, false), ':'), 1);
+{{#if (eq phpEmail "symfony-mailer")}}
+    $mailEnv = ['MAILER_DSN' => 'smtp://127.0.0.1:' . $smtpPort];
+{{else if (eq phpEmail "phpmailer")}}
+    $mailEnv = ['MAIL_HOST' => '127.0.0.1', 'MAIL_PORT' => (string) $smtpPort];
+{{else}}
+    $mailEnv = ['MAIL_MAILER' => 'smtp', 'MAIL_HOST' => '127.0.0.1', 'MAIL_PORT' => (string) $smtpPort];
+{{/if}}
+    $sender = proc_open([PHP_BINARY, {{#if (eq phpEmail "laravel-mail")}}'artisan', 'mail:send'{{else}}'bin/send-mail.php'{{/if}}, 'proof@example.com'], [0 => ['pipe', 'r'], 1 => ['file', $log, 'a'], 2 => ['file', $log, 'a']], $senderPipes, $root, array_merge($serverEnv, $mailEnv));
+    requireProof(is_resource($sender), 'Cannot start the mail command.');
+    fclose($senderPipes[0]);
+    $mail = receiveProofMail($smtp);
+    fclose($smtp);
+    requireProof(proc_close($sender) === 0, 'Mail command failed.');
+    requireProof(str_contains($mail, 'proof@example.com') && str_contains($mail, 'Subject: Welcome to'), 'Delivered email mismatch.');
+{{/if}}
 {{#if (ne phpCache "none")}}
     [$status, $first] = requestProof('http://' . $address . '/api/cached-time');
     requireProof($status === 200 && $first['cached'] === false && is_string($first['value']), 'Cache miss mismatch{{#if (eq phpCache "predis")}}; set REDIS_URL to a running Redis server{{/if}}.');
@@ -162,4 +217,4 @@ try {
 {{/if}}
 }
 if ($failure !== null) exit(1);
-echo json_encode(['php' => PHP_VERSION, 'assertions' => ['health', 'parsed-greeting', 'validation-rejection', 'malformed-json', 'oversized-body', 'missing-route', {{#if (ne phpOrm "none")}}'orm-persistence', {{/if}}{{#if (ne phpAuth "none")}}'bearer-auth', {{/if}}{{#if (ne phpCache "none")}}'cache', {{/if}}{{#if (ne phpJobQueue "none")}}'background-job', {{/if}}'cors', 'cors-allowlist', 'shutdown'], 'success' => true], JSON_THROW_ON_ERROR) . "\n";
+echo json_encode(['php' => PHP_VERSION, 'assertions' => ['health', 'parsed-greeting', 'validation-rejection', 'malformed-json', 'oversized-body', 'missing-route', {{#if (ne phpOrm "none")}}'orm-persistence', {{/if}}{{#if (ne phpAuth "none")}}'bearer-auth', {{/if}}{{#if (ne phpCache "none")}}'cache', {{/if}}{{#if (ne phpJobQueue "none")}}'background-job', {{/if}}{{#if (ne phpEmail "none")}}'smtp-email', {{/if}}'cors', 'cors-allowlist', 'shutdown'], 'success' => true], JSON_THROW_ON_ERROR) . "\n";

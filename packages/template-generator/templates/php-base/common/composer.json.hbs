@@ -51,6 +51,9 @@
     "laminas/laminas-cache": "~4.3.0",
     "laminas/laminas-cache-storage-adapter-filesystem": "~3.2.0",
 {{/if}}
+{{#if (eq phpEmail "phpmailer")}}
+    "phpmailer/phpmailer": "~7.1.1",
+{{/if}}
 {{#if (eq phpCache "predis")}}
     "predis/predis": "~3.7.0",
 {{/if}}
@@ -59,6 +62,9 @@
 {{/if}}
 {{#if (or (eq phpCache "symfony-cache") (and (eq phpOrm "doctrine") (eq phpWebFramework "slim")))}}
     "symfony/cache": "~8.1.9",
+{{/if}}
+{{#if (eq phpEmail "symfony-mailer")}}
+    "symfony/mailer": "~8.1.7",
 {{/if}}
 {{#if (eq phpJobQueue "symfony-messenger")}}
     "symfony/doctrine-messenger": "~8.1.9",
@@ -124,6 +130,11 @@
 {{/if}}
 {{#if (ne phpAuth "none")}}
     "token:issue": "@php bin/issue-token.php",
+{{/if}}
+{{#if (eq phpEmail "laravel-mail")}}
+    "mail:send": "@php artisan mail:send",
+{{else if (ne phpEmail "none")}}
+    "mail:send": "@php bin/send-mail.php",
 {{/if}}
 {{#if (eq phpJobQueue "laravel-queue")}}
     "queue:work": [

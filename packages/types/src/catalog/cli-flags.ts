@@ -1221,6 +1221,12 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         source: { kind: "category", category: "phpJobQueue" },
         configKey: "phpJobQueue",
       },
+      {
+        flag: "php-email",
+        summary: "PHP email library.",
+        source: { kind: "category", category: "phpEmail" },
+        configKey: "phpEmail",
+      },
     ],
   },
   {

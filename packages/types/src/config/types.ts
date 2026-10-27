@@ -166,6 +166,7 @@ import type {
   PhpValidationSchema,
   PhpCacheSchema,
   PhpJobQueueSchema,
+  PhpEmailSchema,
   ElixirWebFrameworkSchema,
   ElixirOrmSchema,
   ElixirAuthSchema,
@@ -355,6 +356,7 @@ export type PhpTesting = z.infer<typeof PhpTestingSchema>;
 export type PhpValidation = z.infer<typeof PhpValidationSchema>;
 export type PhpCache = z.infer<typeof PhpCacheSchema>;
 export type PhpJobQueue = z.infer<typeof PhpJobQueueSchema>;
+export type PhpEmail = z.infer<typeof PhpEmailSchema>;
 export type ElixirWebFramework = z.infer<typeof ElixirWebFrameworkSchema>;
 export type ElixirOrm = z.infer<typeof ElixirOrmSchema>;
 export type ElixirAuth = z.infer<typeof ElixirAuthSchema>;

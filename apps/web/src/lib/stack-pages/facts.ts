@@ -87,6 +87,7 @@ const CORE_KEYS_BY_ECOSYSTEM: Record<string, StackSelectionKey[]> = {
     "phpValidation",
     "phpCache",
     "phpJobQueue",
+    "phpEmail",
   ],
   elixir: [
     "elixirWebFramework",
@@ -160,6 +161,7 @@ const ROLE_LABELS: Partial<Record<OptionCategory, string>> = {
   phpValidation: "Validation",
   phpCache: "Caching",
   phpJobQueue: "Background jobs",
+  phpEmail: "Email",
   elixirWebFramework: "Backend",
   elixirOrm: "ORM",
   elixirAuth: "Authentication",

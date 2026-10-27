@@ -68,6 +68,7 @@ import type {
   PhpValidation,
   PhpCache,
   PhpJobQueue,
+  PhpEmail,
   ElixirWebFramework,
   I18n,
   Database,
@@ -309,6 +310,7 @@ import {
   getPhpValidationChoice,
   getPhpCacheChoice,
   getPhpJobQueueChoice,
+  getPhpEmailChoice,
   getPhpWebFrameworkChoice,
 } from "@/prompts/ecosystems/php-ecosystem";
 import {
@@ -547,6 +549,7 @@ type PromptGroupResults = {
   phpValidation: PhpValidation;
   phpCache: PhpCache;
   phpJobQueue: PhpJobQueue;
+  phpEmail: PhpEmail;
   elixirWebFramework: ElixirWebFramework;
   elixirOrm: ElixirOrm;
   elixirAuth: ElixirAuth;
@@ -751,6 +754,7 @@ const CONFIG_PROMPT_ENTRY_KEY_MAP = {
   phpValidation: true,
   phpCache: true,
   phpJobQueue: true,
+  phpEmail: true,
   elixirWebFramework: true,
   elixirOrm: true,
   elixirAuth: true,
@@ -2021,6 +2025,10 @@ export async function gatherConfig(
       results.ecosystem === "php"
         ? getPhpJobQueueChoice(flags.phpJobQueue, results.phpWebFramework)
         : Promise.resolve("none" as const),
+    phpEmail: ({ results }) =>
+      results.ecosystem === "php"
+        ? getPhpEmailChoice(flags.phpEmail, results.phpWebFramework)
+        : Promise.resolve("none" as const),
     elixirWebFramework: ({ results }) => {
       if (results.ecosystem !== "elixir") return Promise.resolve("none" as ElixirWebFramework);
       return getElixirWebFrameworkChoice(flags.elixirWebFramework);
@@ -2318,6 +2326,7 @@ export async function gatherConfig(
     phpValidation: result.phpValidation,
     phpCache: result.phpCache,
     phpJobQueue: result.phpJobQueue,
+    phpEmail: result.phpEmail,
     elixirWebFramework: result.elixirWebFramework,
     elixirOrm: result.elixirOrm,
     elixirAuth: result.elixirAuth,

@@ -2399,6 +2399,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://laravel.com/docs/13.x/queues",
     githubUrl: "https://github.com/illuminate/queue",
   },
+  "phpEmail:symfony-mailer": {
+    docsUrl: "https://symfony.com/doc/current/mailer.html",
+    githubUrl: "https://github.com/symfony/mailer",
+  },
+  "phpEmail:phpmailer": {
+    docsUrl: "https://github.com/PHPMailer/PHPMailer#readme",
+    githubUrl: "https://github.com/PHPMailer/PHPMailer",
+  },
+  "phpEmail:laravel-mail": {
+    docsUrl: "https://laravel.com/docs/13.x/mail",
+    githubUrl: "https://github.com/illuminate/mail",
+  },
   "phpOrm:cycle": {
     docsUrl: "https://cycle-orm.dev/docs/intro-about/current/en",
     githubUrl: "https://github.com/cycle/orm",

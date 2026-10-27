@@ -228,6 +228,7 @@ export const STACK_SELECTION_OPTION_CATEGORY_BY_KEY: Record<
   phpValidation: "phpValidation",
   phpCache: "phpCache",
   phpJobQueue: "phpJobQueue",
+  phpEmail: "phpEmail",
   elixirWebFramework: "elixirWebFramework",
   elixirOrm: "elixirOrm",
   elixirAuth: "elixirAuth",
@@ -447,6 +448,7 @@ export const STACK_SELECTION_URL_KEYS = {
   phpValidation: "phval",
   phpCache: "phcache",
   phpJobQueue: "phjobs",
+  phpEmail: "phmail",
   elixirWebFramework: "ewf",
   elixirOrm: "eorm",
   elixirAuth: "eauth",
@@ -941,6 +943,7 @@ const CLI_SCALAR_CONFIG_FIELDS = [
   ["phpValidation", "phpValidation"],
   ["phpCache", "phpCache"],
   ["phpJobQueue", "phpJobQueue"],
+  ["phpEmail", "phpEmail"],
   ["elixirWebFramework", "elixirWebFramework"],
   ["elixirOrm", "elixirOrm"],
   ["elixirAuth", "elixirAuth"],
@@ -2057,6 +2060,7 @@ function getCliGraphStackParts(input: CLIInput): StackPart[] {
   addScopedBackendPart("php", "validation", input.phpValidation);
   addScopedBackendPart("php", "caching", input.phpCache);
   addScopedBackendPart("php", "jobQueue", input.phpJobQueue);
+  addScopedBackendPart("php", "email", input.phpEmail);
   addScopedBackendPart("ruby", "orm", input.rubyOrm);
   addScopedBackendPart("ruby", "auth", input.rubyAuth);
   addScopedBackendPart("elixir", "orm", input.elixirOrm);
@@ -2273,6 +2277,7 @@ function buildProjectConfigBase(
     phpValidation: stack.phpValidation as ProjectConfig["phpValidation"],
     phpCache: stack.phpCache as ProjectConfig["phpCache"],
     phpJobQueue: stack.phpJobQueue as ProjectConfig["phpJobQueue"],
+    phpEmail: stack.phpEmail as ProjectConfig["phpEmail"],
     elixirWebFramework: stack.elixirWebFramework as ProjectConfig["elixirWebFramework"],
     elixirOrm: stack.elixirOrm as ProjectConfig["elixirOrm"],
     elixirAuth: stack.elixirAuth as ProjectConfig["elixirAuth"],
@@ -2389,6 +2394,7 @@ export function isCliDefaultStackSelection(
           "phpValidation",
           "phpCache",
           "phpJobQueue",
+          "phpEmail",
           ...ELIXIR_CONFIG_KEYS,
           ...(selection.ecosystem === "typescript" ? REACT_NATIVE_CONFIG_KEYS : []),
         ])
@@ -2850,6 +2856,7 @@ export function generateStackSelectionCommand(selection: StackSelectionInput): s
         `--php-validation ${selection.phpValidation}`,
         `--php-cache ${selection.phpCache}`,
         `--php-job-queue ${selection.phpJobQueue}`,
+        `--php-email ${selection.phpEmail}`,
         `--database ${selection.database}`,
       ];
       if (selection.versionChannel !== "stable")

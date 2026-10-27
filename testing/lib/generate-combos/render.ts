@@ -113,6 +113,7 @@ export function formatNameFromFingerprint(fingerprint: TemplateFingerprint): str
       typeof fingerprint.phpValidation === "string" ? fingerprint.phpValidation : undefined,
       typeof fingerprint.phpCache === "string" ? fingerprint.phpCache : undefined,
       typeof fingerprint.phpJobQueue === "string" ? fingerprint.phpJobQueue : undefined,
+      typeof fingerprint.phpEmail === "string" ? fingerprint.phpEmail : undefined,
     ],
     elixir: [
       typeof fingerprint.elixirWebFramework === "string"
@@ -405,6 +406,7 @@ export function buildCommand(name: string, config: ProjectConfig): string {
       orderedFlags.push(["php-validation", config.phpValidation]);
       orderedFlags.push(["php-cache", config.phpCache]);
       orderedFlags.push(["php-job-queue", config.phpJobQueue]);
+      orderedFlags.push(["php-email", config.phpEmail]);
       break;
     case "elixir":
       orderedFlags.push(...elixirFlags);

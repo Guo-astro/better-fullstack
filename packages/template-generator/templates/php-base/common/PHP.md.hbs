@@ -100,6 +100,20 @@ Laravel's database queue stores `app/Jobs/ProcessJob.php` jobs in the `jobs` tab
 Run `composer run queue:work` in a second terminal beside `composer run dev`; add `--stop-when-empty` after `--` to exit once the queue is drained. Jobs stay queued until a worker runs.
 
 {{/if}}
+{{#if (ne phpEmail "none")}}
+## Email
+
+`composer run mail:send -- you@example.com` sends a plain-text welcome email from `{{phpSourceDirectory}}/WelcomeMailer.php`. No HTTP route sends email, so the service cannot be used as an open relay.
+{{#if (eq phpEmail "symfony-mailer")}}
+Symfony Mailer sends through MAILER_DSN (default `smtp://127.0.0.1:1025`) from MAIL_FROM_ADDRESS. Point MAILER_DSN at your provider, for example `smtp://user:pass@smtp.example.com:587`.
+{{else if (eq phpEmail "phpmailer")}}
+PHPMailer sends over SMTP to MAIL_HOST and MAIL_PORT (default `127.0.0.1:1025`) from MAIL_FROM_ADDRESS. Set MAIL_USERNAME and MAIL_PASSWORD to authenticate and MAIL_ENCRYPTION to `tls` or `ssl` for your provider.
+{{else}}
+Laravel Mail sends with the MAIL_MAILER mailer (`smtp` to MAIL_HOST and MAIL_PORT, default `127.0.0.1:1025`) from MAIL_FROM_ADDRESS; `routes/console.php` defines the `mail:send` Artisan command.
+{{/if}}
+A local SMTP catcher such as Mailpit listens on port 1025. `composer run proof:http` delivers one message to a temporary in-process SMTP listener and checks the recipient and subject; it does not contact a real provider.
+
+{{/if}}
 {{#if (ne phpAuth "none")}}
 ## Authentication
 

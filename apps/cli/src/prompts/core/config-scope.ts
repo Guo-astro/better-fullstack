@@ -349,6 +349,7 @@ export const CONFIG_SCOPE_REGISTRY = {
       "phpValidation",
       "phpCache",
       "phpJobQueue",
+      "phpEmail",
     ],
     sections: [],
   },

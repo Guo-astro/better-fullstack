@@ -375,6 +375,52 @@ describe("PHP generation and lifecycle", () => {
     expect(result.tree).toBeUndefined();
   });
 
+  it.each([
+    ["slim", "symfony-mailer", "symfony/mailer", "@php bin/send-mail.php", "tests/MailTest.php"],
+    ["symfony", "phpmailer", "phpmailer/phpmailer", "@php bin/send-mail.php", "tests/MailTest.php"],
+    [
+      "laravel",
+      "laravel-mail",
+      "laravel/framework",
+      "@php artisan mail:send",
+      "tests/LaravelMailTest.php",
+    ],
+  ] as const)(
+    "generates %s with %s behind a mail:send command and replays it",
+    async (framework, email, dependency, command, test) => {
+      const result = await createVirtual({
+        projectName: `php-${framework}-${email}`,
+        ecosystem: "php",
+        phpWebFramework: framework,
+        phpEmail: email,
+      });
+      expect(result.success).toBe(true);
+      const tree = result.tree!;
+      const manifest = JSON.parse(getVirtualTreeFileContent(tree, "composer.json"));
+      expect(Object.keys(manifest.require)).toContain(dependency);
+      expect(manifest.scripts["mail:send"]).toBe(command);
+      expect(hasVirtualFile(tree.root, test)).toBe(true);
+      expect(getVirtualTreeFileContent(tree, "bin/proof-http.php")).toContain("receiveProofMail");
+      expect(generateReproducibleCommand(tree.config)).toContain(`--php-email ${email}`);
+      const saved = buildBtsConfigForPersistence(tree.config, {
+        version: "0.0.0",
+        createdAt: "2026-10-27T00:00:00.000Z",
+      });
+      expect(previewBtsConfigUpdate(saved, {}).phpEmail).toBe(email);
+    },
+  );
+
+  it("rejects Laravel Mail outside Laravel before emitting files", async () => {
+    const result = await createVirtual({
+      ecosystem: "php",
+      phpWebFramework: "symfony",
+      phpEmail: "laravel-mail",
+    });
+    expect(result.success).toBe(false);
+    expect(result.error).toContain("Laravel Mail is generated for Laravel");
+    expect(result.tree).toBeUndefined();
+  });
+
   it("rejects Symfony Security outside Symfony before emitting files", async () => {
     const result = await createVirtual({
       ecosystem: "php",

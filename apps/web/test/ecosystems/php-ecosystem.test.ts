@@ -98,5 +98,8 @@ describe("PHP builder recipe", () => {
     expect(generateStackCommand({ ...stack, phpJobQueue: "enqueue-fs" })).toContain(
       "--php-job-queue enqueue-fs",
     );
+    expect(generateStackCommand({ ...stack, phpEmail: "phpmailer" })).toContain(
+      "--php-email phpmailer",
+    );
   });
 });

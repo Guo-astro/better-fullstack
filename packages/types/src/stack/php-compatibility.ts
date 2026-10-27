@@ -6,7 +6,7 @@ export const PHP_RECIPE_REASONS = {
   database:
     "The PHP recipe does not generate database or migration integration. Use --database none.",
   capability:
-    "The PHP recipe provides REST, Composer, ORM, auth, test runner, validation, cache and background job choices; additional backend capabilities are not implemented.",
+    "The PHP recipe provides REST, Composer, ORM, auth, test runner, validation, cache, background job and email choices; additional backend capabilities are not implemented.",
   owner: "PHP capabilities must belong to a PHP backend.",
 } as const;
 
@@ -73,6 +73,11 @@ const PHP_CAPABILITY_FRAMEWORKS: Record<string, Record<string, readonly string[]
     "enqueue-fs": ["slim", "laravel", "symfony"],
     "laravel-queue": ["laravel"],
   },
+  email: {
+    "symfony-mailer": ["slim", "laravel", "symfony"],
+    phpmailer: ["slim", "laravel", "symfony"],
+    "laravel-mail": ["laravel"],
+  },
 };
 
 export const PHP_CAPABILITY_CATEGORIES = {
@@ -81,6 +86,7 @@ export const PHP_CAPABILITY_CATEGORIES = {
   phpValidation: { role: "validation", label: "PHP validation" },
   phpCache: { role: "caching", label: "PHP cache" },
   phpJobQueue: { role: "jobQueue", label: "PHP background jobs" },
+  phpEmail: { role: "email", label: "PHP email" },
 } as const;
 
 export type PhpCapabilityCategory = keyof typeof PHP_CAPABILITY_CATEGORIES;
@@ -97,6 +103,7 @@ const PHP_CAPABILITY_LABELS: Record<string, string> = {
   "laravel-validation": "Laravel Validation",
   "laravel-cache": "Laravel Cache",
   "laravel-queue": "Laravel Queue",
+  "laravel-mail": "Laravel Mail",
 };
 
 export function isPhpCapabilityRole(role: string): boolean {

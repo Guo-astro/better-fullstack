@@ -191,7 +191,7 @@ describe("PHP graph and transport contract", () => {
     );
     const command = generateStackSelectionCommand(selection);
     expect(command).toContain(
-      "--ecosystem php --php-web-framework slim --php-orm none --php-auth none --php-testing phpunit --php-validation none --php-cache none --php-job-queue none --database none",
+      "--ecosystem php --php-web-framework slim --php-orm none --php-auth none --php-testing phpunit --php-validation none --php-cache none --php-job-queue none --php-email none --database none",
     );
     expect(command).toContain("--no-install");
     const withOrm = { ...selection, phpWebFramework: "symfony", phpOrm: "doctrine" };
@@ -367,5 +367,21 @@ describe("PHP graph and transport contract", () => {
     const selection = parseStackSelectionFromUrlRecord({ eco: "php", phjobs: "symfony-messenger" });
     expect(selection.phpJobQueue).toBe("symfony-messenger");
     expect(generateStackSelectionCommand(selection)).toContain("--php-job-queue symfony-messenger");
+  });
+
+  it("projects PHP email as an owned part and keeps Laravel Mail on Laravel", () => {
+    const parts = legacyProjectConfigToStackParts({ ...native, phpEmail: "phpmailer" });
+    expect(parts).toContainEqual(
+      expect.objectContaining({ role: "email", ecosystem: "php", toolId: "phpmailer" }),
+    );
+    expect(validateStackParts(parts).issues).toEqual([]);
+    expect(stackPartsToLegacyProjectConfigPartial(parts)).toMatchObject({ phpEmail: "phpmailer" });
+    const issue = getPhpRecipeIssue({ ...native, phpEmail: "laravel-mail" });
+    expect(issue).toContain("Laravel Mail is generated for Laravel");
+    const mismatched = parseStackPartSpecs(["backend:php:slim", "backend.email:php:laravel-mail"]);
+    expect(validateStackParts(mismatched).issues.map((entry) => entry.message)).toContain(issue);
+    const selection = parseStackSelectionFromUrlRecord({ eco: "php", phmail: "symfony-mailer" });
+    expect(selection.phpEmail).toBe("symfony-mailer");
+    expect(generateStackSelectionCommand(selection)).toContain("--php-email symfony-mailer");
   });
 });

@@ -329,7 +329,7 @@ export const SECTIONS_BY_ECOSYSTEM: Record<Ecosystem, readonly BuilderSectionDef
   php: [
     section("backend", "PHP HTTP application", ["phpWebFramework"]),
     section("data", "Data & Storage", ["phpOrm", "phpCache"]),
-    section("services", "Auth & Services", ["phpAuth", "phpJobQueue"]),
+    section("services", "Auth & Services", ["phpAuth", "phpJobQueue", "phpEmail"]),
     section("qualityTesting", "Quality & Testing", ["phpTesting", "phpValidation"]),
     section("deployScaffold", "Scaffold", ["aiDocs", "git", "install"]),
   ],

@@ -619,6 +619,7 @@
   "docsCliSummaryPhpPhpValidation": "PHP validation library.",
   "docsCliSummaryPhpPhpCache": "PHP cache library.",
   "docsCliSummaryPhpPhpJobQueue": "PHP background job queue.",
+  "docsCliSummaryPhpPhpEmail": "PHP email library.",
   "docsCliSummaryElixirElixirWebFramework": "Elixir web framework.",
   "docsCliSummaryElixirElixirOrm": "Elixir ORM / database.",
   "docsCliSummaryElixirElixirAuth": "Elixir auth.",

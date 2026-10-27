@@ -11,7 +11,7 @@ use Illuminate\Http\Middleware\HandleCors;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
-    ->withRouting(api: __DIR__ . '/../routes/api.php', apiPrefix: '')
+    ->withRouting(api: __DIR__ . '/../routes/api.php', {{#if (eq phpEmail "laravel-mail")}}commands: __DIR__ . '/../routes/console.php', {{/if}}apiPrefix: '')
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->replace(HandleCors::class, ApplyCorsPolicy::class);
     })

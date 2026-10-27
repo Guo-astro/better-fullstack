@@ -260,6 +260,7 @@ export async function createVirtual(
       phpValidation: options.phpValidation ?? "none",
       phpCache: options.phpCache ?? "none",
       phpJobQueue: options.phpJobQueue ?? "none",
+      phpEmail: options.phpEmail ?? "none",
       elixirWebFramework:
         options.elixirWebFramework || (options.ecosystem === "elixir" ? "phoenix" : "none"),
       elixirOrm: options.elixirOrm || (options.ecosystem === "elixir" ? "ecto-sql" : "none"),

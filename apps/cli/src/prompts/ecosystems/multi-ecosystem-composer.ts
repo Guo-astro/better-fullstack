@@ -125,6 +125,7 @@ import {
   getPhpValidationChoice,
   getPhpCacheChoice,
   getPhpJobQueueChoice,
+  getPhpEmailChoice,
   getPhpWebFrameworkChoice,
 } from "@/prompts/ecosystems/php-ecosystem";
 import {
@@ -1547,6 +1548,10 @@ export async function gatherMultiEcosystemConfig(
       phpWebFramework === "none"
         ? "none"
         : promptValue(await getPhpJobQueueChoice(flags.phpJobQueue, phpWebFramework));
+    const phpEmail =
+      phpWebFramework === "none"
+        ? "none"
+        : promptValue(await getPhpEmailChoice(flags.phpEmail, phpWebFramework));
     Object.assign(backendChoices, {
       phpWebFramework,
       phpOrm,
@@ -1555,6 +1560,7 @@ export async function gatherMultiEcosystemConfig(
       phpValidation,
       phpCache,
       phpJobQueue,
+      phpEmail,
     });
     if (phpWebFramework !== "none") stackPartSpecs.push(`backend:php:${phpWebFramework}`);
     if (phpOrm !== "none") stackPartSpecs.push(`backend.orm:php:${phpOrm}`);
@@ -1563,6 +1569,7 @@ export async function gatherMultiEcosystemConfig(
     if (phpValidation !== "none") stackPartSpecs.push(`backend.validation:php:${phpValidation}`);
     if (phpCache !== "none") stackPartSpecs.push(`backend.caching:php:${phpCache}`);
     if (phpJobQueue !== "none") stackPartSpecs.push(`backend.jobQueue:php:${phpJobQueue}`);
+    if (phpEmail !== "none") stackPartSpecs.push(`backend.email:php:${phpEmail}`);
   }
 
   if (backendEcosystem === "elixir") {

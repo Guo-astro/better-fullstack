@@ -79,6 +79,7 @@ import {
   PHP_VALIDATION_VALUES,
   PHP_CACHE_VALUES,
   PHP_JOB_QUEUE_VALUES,
+  PHP_EMAIL_VALUES,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   EFFECT_VALUES,
   EMAIL_VALUES,
@@ -740,6 +741,10 @@ function isNativeEcosystemBackendServiceTool(
     return (RUBY_EMAIL_VALUES as readonly string[]).includes(part.toolId);
   }
 
+  if (part.role === "email" && part.ecosystem === "php") {
+    return (PHP_EMAIL_VALUES as readonly string[]).includes(part.toolId);
+  }
+
   if (part.role === "caching") {
     if (part.ecosystem === "elixir") {
       return (ELIXIR_CACHING_VALUES as readonly string[]).includes(part.toolId);
@@ -849,6 +854,7 @@ const LEGACY_EXTRA_CATEGORIES_BY_ECOSYSTEM = {
     validation: "phpValidation",
     caching: "phpCache",
     jobQueue: "phpJobQueue",
+    email: "phpEmail",
   },
   elixir: {
     realtime: "elixirRealtime",
@@ -1318,6 +1324,7 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ...defineTools(PHP_VALIDATION_VALUES, "validation", "php", "phpValidation"),
   ...defineTools(PHP_CACHE_VALUES, "caching", "php", "phpCache"),
   ...defineTools(PHP_JOB_QUEUE_VALUES, "jobQueue", "php", "phpJobQueue"),
+  ...defineTools(PHP_EMAIL_VALUES, "email", "php", "phpEmail"),
   ...defineTools(["composer"], "packageManager", "php").map((definition) => ({
     ...definition,
     selectable: false,
