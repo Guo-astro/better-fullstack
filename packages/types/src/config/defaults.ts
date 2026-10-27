@@ -166,6 +166,7 @@ export const CLI_DEFAULT_PROJECT_CONFIG = {
   phpJobQueue: "none",
   phpEmail: "none",
   phpLogging: "none",
+  phpHttpClient: "none",
   elixirWebFramework: "phoenix",
   elixirOrm: "ecto-sql",
   elixirAuth: "none",

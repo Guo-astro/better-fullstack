@@ -81,6 +81,7 @@ import {
   PhpJobQueueSchema,
   PhpEmailSchema,
   PhpLoggingSchema,
+  PhpHttpClientSchema,
   ElixirWebFrameworkSchema,
   JavaAuthSchema,
   JavaBuildToolSchema,
@@ -317,6 +318,10 @@ export function getPhpLoggingJsonSchema() {
   return z.toJSONSchema(PhpLoggingSchema);
 }
 
+export function getPhpHttpClientJsonSchema() {
+  return z.toJSONSchema(PhpHttpClientSchema);
+}
+
 export function getElixirWebFrameworkJsonSchema() {
   return z.toJSONSchema(ElixirWebFrameworkSchema);
 }
@@ -476,6 +481,7 @@ export function getAllJsonSchemas() {
     phpJobQueue: getPhpJobQueueJsonSchema(),
     phpEmail: getPhpEmailJsonSchema(),
     phpLogging: getPhpLoggingJsonSchema(),
+    phpHttpClient: getPhpHttpClientJsonSchema(),
     elixirWebFramework: getElixirWebFrameworkJsonSchema(),
     elixirOrm: getElixirOrmJsonSchema(),
     elixirAuth: getElixirAuthJsonSchema(),

@@ -170,6 +170,7 @@ import type {
   PhpJobQueueSchema,
   PhpEmailSchema,
   PhpLoggingSchema,
+  PhpHttpClientSchema,
   ElixirWebFrameworkSchema,
   ElixirOrmSchema,
   ElixirAuthSchema,
@@ -363,6 +364,7 @@ export type PhpCache = z.infer<typeof PhpCacheSchema>;
 export type PhpJobQueue = z.infer<typeof PhpJobQueueSchema>;
 export type PhpEmail = z.infer<typeof PhpEmailSchema>;
 export type PhpLogging = z.infer<typeof PhpLoggingSchema>;
+export type PhpHttpClient = z.infer<typeof PhpHttpClientSchema>;
 export type ElixirWebFramework = z.infer<typeof ElixirWebFrameworkSchema>;
 export type ElixirOrm = z.infer<typeof ElixirOrmSchema>;
 export type ElixirAuth = z.infer<typeof ElixirAuthSchema>;

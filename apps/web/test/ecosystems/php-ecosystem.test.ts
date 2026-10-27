@@ -104,5 +104,8 @@ describe("PHP builder recipe", () => {
     expect(generateStackCommand({ ...stack, phpLogging: "monolog" })).toContain(
       "--php-logging monolog",
     );
+    expect(generateStackCommand({ ...stack, phpHttpClient: "guzzle" })).toContain(
+      "--php-http-client guzzle",
+    );
   });
 });

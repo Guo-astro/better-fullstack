@@ -12,6 +12,9 @@ use App\JobQueue;
 {{#if (ne phpAuth "none")}}
 use App\Http\Middleware\RequireBearerToken;
 {{/if}}
+{{#if (ne phpHttpClient "none")}}
+use App\UpstreamClient;
+{{/if}}
 {{#if (eq phpOrm "eloquent")}}
 use App\Models\Note;
 use App\NoteInput;
@@ -73,5 +76,12 @@ Route::post('/api/jobs', fn () => response()->json(['id' => JobQueue::fromEnviro
 Route::get('/api/jobs/{id}', function (string $id) {
     $status = JobQueue::fromEnvironment(base_path())->status($id);
     return $status === null ? response()->json(['error' => 'not_found'], 404) : response()->json($status);
+});
+{{/if}}
+{{#if (ne phpHttpClient "none")}}
+
+Route::get('/api/upstream', function () {
+    [$status, $body] = UpstreamClient::fromEnvironment()->fetch();
+    return response()->json($body, $status);
 });
 {{/if}}

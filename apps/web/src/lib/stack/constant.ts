@@ -6538,6 +6538,37 @@ export const TECH_OPTIONS: Record<
       default: true,
     },
   ],
+  phpHttpClient: [
+    {
+      id: "guzzle",
+      name: "Guzzle",
+      description: "Guzzle client for GET /api/upstream with a timeout on any PHP framework",
+      icon: "",
+      color: "from-orange-500 to-amber-700",
+    },
+    {
+      id: "symfony-http-client",
+      name: "Symfony HttpClient",
+      description: "Symfony's HTTP client behind GET /api/upstream on any PHP framework",
+      icon: "https://cdn.simpleicons.org/symfony/000000",
+      color: "from-gray-700 to-gray-900",
+    },
+    {
+      id: "httplug-curl",
+      name: "PHP-HTTP cURL client",
+      description: "PSR-18 cURL client with Nyholm PSR-7 factories on any PHP framework",
+      icon: "https://cdn.simpleicons.org/php/777BB4",
+      color: "from-indigo-500 to-indigo-700",
+    },
+    {
+      id: "none",
+      name: "None",
+      description: "No outbound HTTP client",
+      icon: "",
+      color: "from-gray-500 to-gray-700",
+      default: true,
+    },
+  ],
   phpAuth: [
     {
       id: "firebase-jwt",

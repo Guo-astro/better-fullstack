@@ -140,6 +140,7 @@ export function makeBaseConfig(name: string, ecosystem: Ecosystem): ProjectConfi
     phpJobQueue: "none",
     phpEmail: "none",
     phpLogging: "none",
+    phpHttpClient: "none",
     elixirWebFramework: "none",
     elixirOrm: "none",
     elixirAuth: "none",

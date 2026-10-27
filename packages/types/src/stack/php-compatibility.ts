@@ -6,7 +6,7 @@ export const PHP_RECIPE_REASONS = {
   database:
     "The PHP recipe does not generate database or migration integration. Use --database none.",
   capability:
-    "The PHP recipe provides REST, Composer, ORM, auth, test runner, validation, cache, background job, email and logging choices; additional backend capabilities are not implemented.",
+    "The PHP recipe provides REST, Composer, ORM, auth, test runner, validation, cache, background job, email, logging and HTTP client choices; additional backend capabilities are not implemented.",
   owner: "PHP capabilities must belong to a PHP backend.",
 } as const;
 
@@ -83,6 +83,11 @@ const PHP_CAPABILITY_FRAMEWORKS: Record<string, Record<string, readonly string[]
     "laravel-log": ["laravel"],
     "symfony-monolog": ["symfony"],
   },
+  httpClient: {
+    guzzle: ["slim", "laravel", "symfony"],
+    "symfony-http-client": ["slim", "laravel", "symfony"],
+    "httplug-curl": ["slim", "laravel", "symfony"],
+  },
 };
 
 export const PHP_CAPABILITY_CATEGORIES = {
@@ -93,6 +98,7 @@ export const PHP_CAPABILITY_CATEGORIES = {
   phpJobQueue: { role: "jobQueue", label: "PHP background jobs" },
   phpEmail: { role: "email", label: "PHP email" },
   phpLogging: { role: "logging", label: "PHP logging" },
+  phpHttpClient: { role: "httpClient", label: "PHP HTTP client" },
 } as const;
 
 export type PhpCapabilityCategory = keyof typeof PHP_CAPABILITY_CATEGORIES;

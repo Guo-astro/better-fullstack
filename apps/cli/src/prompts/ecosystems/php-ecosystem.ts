@@ -4,6 +4,7 @@ import type {
   PhpAuth,
   PhpCache,
   PhpEmail,
+  PhpHttpClient,
   PhpJobQueue,
   PhpLogging,
   PhpOrm,
@@ -141,6 +142,25 @@ const LOGGING_OPTIONS: PromptOption<PhpLogging>[] = [
     hint: "JSON stream handler and autowired logger (Symfony only)",
   },
   { value: "none", label: "None", hint: "No application logging" },
+];
+
+const HTTP_CLIENT_OPTIONS: PromptOption<PhpHttpClient>[] = [
+  {
+    value: "guzzle",
+    label: "Guzzle",
+    hint: "GET /api/upstream proxies UPSTREAM_URL with a timeout",
+  },
+  {
+    value: "symfony-http-client",
+    label: "Symfony HttpClient",
+    hint: "Symfony's client for GET /api/upstream",
+  },
+  {
+    value: "httplug-curl",
+    label: "PHP-HTTP cURL client",
+    hint: "PSR-18 cURL client with Nyholm PSR-7 factories",
+  },
+  { value: "none", label: "None", hint: "No outbound HTTP client" },
 ];
 
 export function resolvePhpWebFrameworkPrompt(value?: PhpWebFramework) {
@@ -293,6 +313,24 @@ export async function getPhpLoggingChoice(value?: PhpLogging, framework?: PhpWeb
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
   const response = await navigableSelect<PhpLogging>({
     message: "Select PHP logging",
+    options: resolution.options,
+    initialValue: resolution.initialValue,
+  });
+  return isCancel(response) ? exitCancelled("Operation cancelled") : response;
+}
+
+export function resolvePhpHttpClientPrompt(value?: PhpHttpClient, framework?: PhpWebFramework) {
+  const options = HTTP_CLIENT_OPTIONS.filter(
+    (option) => !getPhpCapabilityIssue(framework, "httpClient", option.value),
+  );
+  return createStaticSinglePromptResolution(options, "none", value);
+}
+
+export async function getPhpHttpClientChoice(value?: PhpHttpClient, framework?: PhpWebFramework) {
+  const resolution = resolvePhpHttpClientPrompt(value, framework);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
+  const response = await navigableSelect<PhpHttpClient>({
+    message: "Select PHP HTTP client",
     options: resolution.options,
     initialValue: resolution.initialValue,
   });

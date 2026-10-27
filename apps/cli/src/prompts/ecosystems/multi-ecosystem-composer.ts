@@ -128,6 +128,7 @@ import {
   getPhpJobQueueChoice,
   getPhpEmailChoice,
   getPhpLoggingChoice,
+  getPhpHttpClientChoice,
   getPhpWebFrameworkChoice,
 } from "@/prompts/ecosystems/php-ecosystem";
 import {
@@ -1569,6 +1570,10 @@ export async function gatherMultiEcosystemConfig(
       phpWebFramework === "none"
         ? "none"
         : promptValue(await getPhpLoggingChoice(flags.phpLogging, phpWebFramework));
+    const phpHttpClient =
+      phpWebFramework === "none"
+        ? "none"
+        : promptValue(await getPhpHttpClientChoice(flags.phpHttpClient, phpWebFramework));
     Object.assign(backendChoices, {
       phpWebFramework,
       phpOrm,
@@ -1579,6 +1584,7 @@ export async function gatherMultiEcosystemConfig(
       phpJobQueue,
       phpEmail,
       phpLogging,
+      phpHttpClient,
     });
     if (phpWebFramework !== "none") stackPartSpecs.push(`backend:php:${phpWebFramework}`);
     if (phpOrm !== "none") stackPartSpecs.push(`backend.orm:php:${phpOrm}`);
@@ -1589,6 +1595,7 @@ export async function gatherMultiEcosystemConfig(
     if (phpJobQueue !== "none") stackPartSpecs.push(`backend.jobQueue:php:${phpJobQueue}`);
     if (phpEmail !== "none") stackPartSpecs.push(`backend.email:php:${phpEmail}`);
     if (phpLogging !== "none") stackPartSpecs.push(`backend.logging:php:${phpLogging}`);
+    if (phpHttpClient !== "none") stackPartSpecs.push(`backend.httpClient:php:${phpHttpClient}`);
   }
 
   if (backendEcosystem === "elixir") {

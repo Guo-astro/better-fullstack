@@ -1331,6 +1331,7 @@ export function generateReproducibleCommand(config: ProjectConfig) {
         `--php-job-queue ${config.phpJobQueue ?? "none"}`,
         `--php-email ${config.phpEmail ?? "none"}`,
         `--php-logging ${config.phpLogging ?? "none"}`,
+        `--php-http-client ${config.phpHttpClient ?? "none"}`,
         "--database none",
       ];
       appendCommonFlags(flags, config);

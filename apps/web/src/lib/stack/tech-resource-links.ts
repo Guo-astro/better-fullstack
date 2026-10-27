@@ -2423,6 +2423,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://symfony.com/doc/current/logging.html",
     githubUrl: "https://github.com/symfony/monolog-bundle",
   },
+  "phpHttpClient:guzzle": {
+    docsUrl: "https://docs.guzzlephp.org/",
+    githubUrl: "https://github.com/guzzle/guzzle",
+  },
+  "phpHttpClient:symfony-http-client": {
+    docsUrl: "https://symfony.com/doc/current/http_client.html",
+    githubUrl: "https://github.com/symfony/http-client",
+  },
+  "phpHttpClient:httplug-curl": {
+    docsUrl: "https://docs.php-http.org/en/latest/clients/curl-client.html",
+    githubUrl: "https://github.com/php-http/curl-client",
+  },
   "phpOrm:cycle": {
     docsUrl: "https://cycle-orm.dev/docs/intro-about/current/en",
     githubUrl: "https://github.com/cycle/orm",

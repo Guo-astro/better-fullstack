@@ -606,6 +606,7 @@
   "docsCliSummaryPhpPhpJobQueue": "PHP 백그라운드 작업 큐.",
   "docsCliSummaryPhpPhpEmail": "PHP 이메일 라이브러리.",
   "docsCliSummaryPhpPhpLogging": "PHP 로깅(프레임워크별).",
+  "docsCliSummaryPhpPhpHttpClient": "PHP HTTP 클라이언트.",
   "docsCliSummaryElixirElixirWebFramework": "Elixir 웹 프레임워크.",
   "docsCliSummaryElixirElixirOrm": "Elixir ORM / 데이터베이스.",
   "docsCliSummaryElixirElixirAuth": "Elixir 인증.",

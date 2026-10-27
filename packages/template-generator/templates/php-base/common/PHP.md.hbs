@@ -128,6 +128,13 @@ MonologBundle is registered in `src/Kernel.php` with a JSON stream handler, and 
 Logging is owned by the framework: Slim uses Monolog directly, Laravel uses its logging channels, and Symfony uses MonologBundle.
 
 {{/if}}
+{{#if (ne phpHttpClient "none")}}
+## Outbound HTTP
+
+`GET /api/upstream` fetches UPSTREAM_URL with a {{#if (eq phpHttpClient "guzzle")}}Guzzle{{else if (eq phpHttpClient "symfony-http-client")}}Symfony HttpClient{{else}}PHP-HTTP cURL (PSR-18){{/if}} client and a 5-second timeout, then returns `{"upstreamStatus":200,"data":{...}}` with the decoded JSON. It returns 503 when UPSTREAM_URL is unset or not an http(s) URL, 502 when the upstream is unreachable or times out, and 502 when the body is not JSON. `{{phpSourceDirectory}}/UpstreamClient.php` owns the request.{{#if (eq phpHttpClient "httplug-curl")}} Nyholm PSR-7 supplies the request and response factories, so Composer's discovery plugin is not needed.{{/if}}
+Only point UPSTREAM_URL at services you trust; the route forwards their JSON to callers. Tests and `composer run proof:http` start a local PHP fixture server as the upstream.
+
+{{/if}}
 {{#if (ne phpAuth "none")}}
 ## Authentication
 

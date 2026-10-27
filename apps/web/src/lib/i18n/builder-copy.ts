@@ -733,6 +733,16 @@ const CATEGORY_NAMES: Record<string, LocalizedMap> = {
     "fr": "Journalisation PHP",
     "uk": "Логування PHP",
   },
+  phpHttpClient: {
+    "es": "Cliente HTTP PHP",
+    "zh": "PHP HTTP 客户端",
+    "ja": "PHP HTTP クライアント",
+    "ko": "PHP HTTP 클라이언트",
+    "zh-Hant": "PHP HTTP 用戶端",
+    "de": "PHP-HTTP-Client",
+    "fr": "Client HTTP PHP",
+    "uk": "HTTP-клієнт PHP",
+  },
   phpAuth: {
     "es": "Auth PHP",
     "zh": "PHP 认证",

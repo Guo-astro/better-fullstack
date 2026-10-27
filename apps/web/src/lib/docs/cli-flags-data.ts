@@ -2703,6 +2703,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "none",
         "multiple": false
+      },
+      {
+        "flag": "--php-http-client",
+        "summary": "PHP HTTP client.",
+        "values": [
+          "guzzle",
+          "symfony-http-client",
+          "httplug-curl",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
       }
     ]
   },
@@ -3231,6 +3244,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "php:--php-job-queue": m.docsCliSummaryPhpPhpJobQueue,
   "php:--php-email": m.docsCliSummaryPhpPhpEmail,
   "php:--php-logging": m.docsCliSummaryPhpPhpLogging,
+  "php:--php-http-client": m.docsCliSummaryPhpPhpHttpClient,
   "elixir:--elixir-web-framework": m.docsCliSummaryElixirElixirWebFramework,
   "elixir:--elixir-orm": m.docsCliSummaryElixirElixirOrm,
   "elixir:--elixir-auth": m.docsCliSummaryElixirElixirAuth,

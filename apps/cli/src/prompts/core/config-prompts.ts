@@ -72,6 +72,7 @@ import type {
   PhpJobQueue,
   PhpEmail,
   PhpLogging,
+  PhpHttpClient,
   ElixirWebFramework,
   I18n,
   Database,
@@ -316,6 +317,7 @@ import {
   getPhpJobQueueChoice,
   getPhpEmailChoice,
   getPhpLoggingChoice,
+  getPhpHttpClientChoice,
   getPhpWebFrameworkChoice,
 } from "@/prompts/ecosystems/php-ecosystem";
 import {
@@ -559,6 +561,7 @@ type PromptGroupResults = {
   phpJobQueue: PhpJobQueue;
   phpEmail: PhpEmail;
   phpLogging: PhpLogging;
+  phpHttpClient: PhpHttpClient;
   elixirWebFramework: ElixirWebFramework;
   elixirOrm: ElixirOrm;
   elixirAuth: ElixirAuth;
@@ -768,6 +771,7 @@ const CONFIG_PROMPT_ENTRY_KEY_MAP = {
   phpJobQueue: true,
   phpEmail: true,
   phpLogging: true,
+  phpHttpClient: true,
   elixirWebFramework: true,
   elixirOrm: true,
   elixirAuth: true,
@@ -2057,6 +2061,10 @@ export async function gatherConfig(
       results.ecosystem === "php"
         ? getPhpLoggingChoice(flags.phpLogging, results.phpWebFramework)
         : Promise.resolve("none" as const),
+    phpHttpClient: ({ results }) =>
+      results.ecosystem === "php"
+        ? getPhpHttpClientChoice(flags.phpHttpClient, results.phpWebFramework)
+        : Promise.resolve("none" as const),
     elixirWebFramework: ({ results }) => {
       if (results.ecosystem !== "elixir") return Promise.resolve("none" as ElixirWebFramework);
       return getElixirWebFrameworkChoice(flags.elixirWebFramework);
@@ -2362,6 +2370,7 @@ export async function gatherConfig(
     phpJobQueue: result.phpJobQueue,
     phpEmail: result.phpEmail,
     phpLogging: result.phpLogging,
+    phpHttpClient: result.phpHttpClient,
     elixirWebFramework: result.elixirWebFramework,
     elixirOrm: result.elixirOrm,
     elixirAuth: result.elixirAuth,

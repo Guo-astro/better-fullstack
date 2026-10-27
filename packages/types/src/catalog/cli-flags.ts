@@ -1239,6 +1239,12 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         source: { kind: "category", category: "phpLogging" },
         configKey: "phpLogging",
       },
+      {
+        flag: "php-http-client",
+        summary: "PHP HTTP client.",
+        source: { kind: "category", category: "phpHttpClient" },
+        configKey: "phpHttpClient",
+      },
     ],
   },
   {

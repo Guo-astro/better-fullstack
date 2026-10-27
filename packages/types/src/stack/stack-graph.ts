@@ -82,6 +82,7 @@ import {
   PHP_JOB_QUEUE_VALUES,
   PHP_EMAIL_VALUES,
   PHP_LOGGING_VALUES,
+  PHP_HTTP_CLIENT_VALUES,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   EFFECT_VALUES,
   EMAIL_VALUES,
@@ -861,6 +862,7 @@ const LEGACY_EXTRA_CATEGORIES_BY_ECOSYSTEM = {
     jobQueue: "phpJobQueue",
     email: "phpEmail",
     logging: "phpLogging",
+    httpClient: "phpHttpClient",
   },
   elixir: {
     realtime: "elixirRealtime",
@@ -1335,6 +1337,7 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ...defineTools(PHP_JOB_QUEUE_VALUES, "jobQueue", "php", "phpJobQueue"),
   ...defineTools(PHP_EMAIL_VALUES, "email", "php", "phpEmail"),
   ...defineTools(PHP_LOGGING_VALUES, "logging", "php", "phpLogging"),
+  ...defineTools(PHP_HTTP_CLIENT_VALUES, "httpClient", "php", "phpHttpClient"),
   ...defineTools(["composer"], "packageManager", "php").map((definition) => ({
     ...definition,
     selectable: false,

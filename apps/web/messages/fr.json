@@ -606,6 +606,7 @@
   "docsCliSummaryPhpPhpJobQueue": "File de tâches en arrière-plan PHP.",
   "docsCliSummaryPhpPhpEmail": "Bibliothèque d'e-mail PHP.",
   "docsCliSummaryPhpPhpLogging": "Journalisation PHP (propre au framework).",
+  "docsCliSummaryPhpPhpHttpClient": "Client HTTP PHP.",
   "docsCliSummaryElixirElixirWebFramework": "Framework web Elixir.",
   "docsCliSummaryElixirElixirOrm": "ORM / base de données Elixir.",
   "docsCliSummaryElixirElixirAuth": "Authentification Elixir.",

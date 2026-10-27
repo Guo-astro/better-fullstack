@@ -606,6 +606,7 @@
   "docsCliSummaryPhpPhpJobQueue": "PHP 背景工作佇列。",
   "docsCliSummaryPhpPhpEmail": "PHP 郵件函式庫。",
   "docsCliSummaryPhpPhpLogging": "PHP 日誌（依框架區分）。",
+  "docsCliSummaryPhpPhpHttpClient": "PHP HTTP 用戶端。",
   "docsCliSummaryElixirElixirWebFramework": "Elixir Web 框架。",
   "docsCliSummaryElixirElixirOrm": "Elixir ORM / 資料庫。",
   "docsCliSummaryElixirElixirAuth": "Elixir 驗證。",

@@ -606,6 +606,7 @@
   "docsCliSummaryPhpPhpJobQueue": "Cola de trabajos en segundo plano de PHP.",
   "docsCliSummaryPhpPhpEmail": "Biblioteca de correo electrónico de PHP.",
   "docsCliSummaryPhpPhpLogging": "Registro de PHP (según el framework).",
+  "docsCliSummaryPhpPhpHttpClient": "Cliente HTTP de PHP.",
   "docsCliSummaryElixirElixirWebFramework": "Framework web Elixir.",
   "docsCliSummaryElixirElixirOrm": "ORM / base de datos Elixir.",
   "docsCliSummaryElixirElixirAuth": "Autenticación en Elixir.",

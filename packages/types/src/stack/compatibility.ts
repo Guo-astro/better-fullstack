@@ -604,6 +604,7 @@ export type CompatibilityInput = {
   phpJobQueue: string;
   phpEmail: string;
   phpLogging: string;
+  phpHttpClient: string;
   elixirWebFramework: string;
   elixirOrm: string;
   elixirAuth: string;

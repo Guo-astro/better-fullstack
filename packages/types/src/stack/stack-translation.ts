@@ -232,6 +232,7 @@ export const STACK_SELECTION_OPTION_CATEGORY_BY_KEY: Record<
   phpJobQueue: "phpJobQueue",
   phpEmail: "phpEmail",
   phpLogging: "phpLogging",
+  phpHttpClient: "phpHttpClient",
   elixirWebFramework: "elixirWebFramework",
   elixirOrm: "elixirOrm",
   elixirAuth: "elixirAuth",
@@ -456,6 +457,7 @@ export const STACK_SELECTION_URL_KEYS = {
   phpJobQueue: "phjobs",
   phpEmail: "phmail",
   phpLogging: "phlog",
+  phpHttpClient: "phhttp",
   elixirWebFramework: "ewf",
   elixirOrm: "eorm",
   elixirAuth: "eauth",
@@ -955,6 +957,7 @@ const CLI_SCALAR_CONFIG_FIELDS = [
   ["phpJobQueue", "phpJobQueue"],
   ["phpEmail", "phpEmail"],
   ["phpLogging", "phpLogging"],
+  ["phpHttpClient", "phpHttpClient"],
   ["elixirWebFramework", "elixirWebFramework"],
   ["elixirOrm", "elixirOrm"],
   ["elixirAuth", "elixirAuth"],
@@ -2079,6 +2082,7 @@ function getCliGraphStackParts(input: CLIInput): StackPart[] {
   addScopedBackendPart("php", "jobQueue", input.phpJobQueue);
   addScopedBackendPart("php", "email", input.phpEmail);
   addScopedBackendPart("php", "logging", input.phpLogging);
+  addScopedBackendPart("php", "httpClient", input.phpHttpClient);
   addScopedBackendPart("ruby", "orm", input.rubyOrm);
   addScopedBackendPart("ruby", "auth", input.rubyAuth);
   addScopedBackendPart("elixir", "orm", input.elixirOrm);
@@ -2299,6 +2303,7 @@ function buildProjectConfigBase(
     phpJobQueue: stack.phpJobQueue as ProjectConfig["phpJobQueue"],
     phpEmail: stack.phpEmail as ProjectConfig["phpEmail"],
     phpLogging: stack.phpLogging as ProjectConfig["phpLogging"],
+    phpHttpClient: stack.phpHttpClient as ProjectConfig["phpHttpClient"],
     elixirWebFramework: stack.elixirWebFramework as ProjectConfig["elixirWebFramework"],
     elixirOrm: stack.elixirOrm as ProjectConfig["elixirOrm"],
     elixirAuth: stack.elixirAuth as ProjectConfig["elixirAuth"],
@@ -2419,6 +2424,7 @@ export function isCliDefaultStackSelection(
           "phpJobQueue",
           "phpEmail",
           "phpLogging",
+          "phpHttpClient",
           ...ELIXIR_CONFIG_KEYS,
           ...(selection.ecosystem === "typescript" ? REACT_NATIVE_CONFIG_KEYS : []),
         ])
@@ -2884,6 +2890,7 @@ export function generateStackSelectionCommand(selection: StackSelectionInput): s
         `--php-job-queue ${selection.phpJobQueue}`,
         `--php-email ${selection.phpEmail}`,
         `--php-logging ${selection.phpLogging}`,
+        `--php-http-client ${selection.phpHttpClient}`,
         `--database ${selection.database}`,
       ];
       if (selection.versionChannel !== "stable")

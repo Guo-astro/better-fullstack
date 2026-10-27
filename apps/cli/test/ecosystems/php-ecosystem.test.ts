@@ -470,6 +470,37 @@ describe("PHP generation and lifecycle", () => {
     },
   );
 
+  it.each([
+    ["slim", "guzzle", "guzzlehttp/guzzle"],
+    ["laravel", "symfony-http-client", "symfony/http-client"],
+    ["symfony", "httplug-curl", "php-http/curl-client"],
+  ] as const)(
+    "generates %s with %s behind the upstream route and replays it",
+    async (framework, httpClient, dependency) => {
+      const result = await createVirtual({
+        projectName: `php-${framework}-${httpClient}`,
+        ecosystem: "php",
+        phpWebFramework: framework,
+        phpHttpClient: httpClient,
+      });
+      expect(result.success).toBe(true);
+      const tree = result.tree!;
+      const manifest = JSON.parse(getVirtualTreeFileContent(tree, "composer.json"));
+      expect(Object.keys(manifest.require)).toContain(dependency);
+      const source = framework === "laravel" ? "app" : "src";
+      expect(hasVirtualFile(tree.root, `${source}/UpstreamClient.php`)).toBe(true);
+      expect(hasVirtualFile(tree.root, "tests/UpstreamFixture.php")).toBe(true);
+      expect(getVirtualTreeFileContent(tree, ".env.example")).toContain("UPSTREAM_URL=");
+      expect(getVirtualTreeFileContent(tree, "bin/proof-http.php")).toContain("/api/upstream");
+      expect(generateReproducibleCommand(tree.config)).toContain(`--php-http-client ${httpClient}`);
+      const saved = buildBtsConfigForPersistence(tree.config, {
+        version: "0.0.0",
+        createdAt: "2026-10-27T00:00:00.000Z",
+      });
+      expect(previewBtsConfigUpdate(saved, {}).phpHttpClient).toBe(httpClient);
+    },
+  );
+
   it("rejects Symfony Security outside Symfony before emitting files", async () => {
     const result = await createVirtual({
       ecosystem: "php",

@@ -622,6 +622,7 @@
   "docsCliSummaryPhpPhpJobQueue": "PHP background job queue.",
   "docsCliSummaryPhpPhpEmail": "PHP email library.",
   "docsCliSummaryPhpPhpLogging": "PHP logging (framework-specific).",
+  "docsCliSummaryPhpPhpHttpClient": "PHP HTTP client.",
   "docsCliSummaryElixirElixirWebFramework": "Elixir web framework.",
   "docsCliSummaryElixirElixirOrm": "Elixir ORM / database.",
   "docsCliSummaryElixirElixirAuth": "Elixir auth.",

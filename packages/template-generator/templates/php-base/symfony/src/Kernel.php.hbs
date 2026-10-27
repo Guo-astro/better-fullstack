@@ -85,6 +85,9 @@ final class Kernel extends BaseKernel
 {{else if (ne phpCache "none")}}
         $container->services()->set(CachedClock::class)->factory([CachedClock::class, 'fromEnvironment'])->args(['%kernel.project_dir%']);
 {{/if}}
+{{#if (ne phpHttpClient "none")}}
+        $container->services()->set(UpstreamClient::class)->factory([UpstreamClient::class, 'fromEnvironment']);
+{{/if}}
 {{#if (ne phpJobQueue "none")}}
         $container->services()->set(JobQueue::class)->factory([JobQueue::class, 'fromEnvironment'])->args(['%kernel.project_dir%']);
 {{/if}}

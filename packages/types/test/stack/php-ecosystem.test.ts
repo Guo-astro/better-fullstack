@@ -191,7 +191,7 @@ describe("PHP graph and transport contract", () => {
     );
     const command = generateStackSelectionCommand(selection);
     expect(command).toContain(
-      "--ecosystem php --php-web-framework slim --php-orm none --php-auth none --php-testing phpunit --php-validation none --php-cache none --php-job-queue none --php-email none --php-logging none --database none",
+      "--ecosystem php --php-web-framework slim --php-orm none --php-auth none --php-testing phpunit --php-validation none --php-cache none --php-job-queue none --php-email none --php-logging none --php-http-client none --database none",
     );
     expect(command).toContain("--no-install");
     const withOrm = { ...selection, phpWebFramework: "symfony", phpOrm: "doctrine" };
@@ -413,5 +413,29 @@ describe("PHP graph and transport contract", () => {
     const selection = parseStackSelectionFromUrlRecord({ eco: "php", phlog: "monolog" });
     expect(selection.phpLogging).toBe("monolog");
     expect(generateStackSelectionCommand(selection)).toContain("--php-logging monolog");
+  });
+
+  it("projects a PHP HTTP client as an owned part on every framework", () => {
+    for (const framework of ["slim", "laravel", "symfony"] as const) {
+      const parts = legacyProjectConfigToStackParts({
+        ...native,
+        phpWebFramework: framework,
+        phpHttpClient: "symfony-http-client",
+      });
+      expect(parts).toContainEqual(
+        expect.objectContaining({
+          role: "httpClient",
+          ecosystem: "php",
+          toolId: "symfony-http-client",
+        }),
+      );
+      expect(validateStackParts(parts).issues).toEqual([]);
+      expect(stackPartsToLegacyProjectConfigPartial(parts)).toMatchObject({
+        phpHttpClient: "symfony-http-client",
+      });
+    }
+    const selection = parseStackSelectionFromUrlRecord({ eco: "php", phhttp: "guzzle" });
+    expect(selection.phpHttpClient).toBe("guzzle");
+    expect(generateStackSelectionCommand(selection)).toContain("--php-http-client guzzle");
   });
 });
