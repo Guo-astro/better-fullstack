@@ -143,6 +143,12 @@ const GETTING_STARTED_MD = `# Getting Started with Better-Fullstack MCP
    - observability: "sentry" (optional)
 2. Tell the user to run: cd my-java-app && ./mvnw test && ./mvnw spring-boot:run
 
+## Quick Start - PHP Project
+1. Call bfs_create_project with projectName, ecosystem: "php", phpWebFramework: "slim", "laravel" or "symfony", and database: "none". Optional phpOrm: "eloquent" (Slim or Laravel), "doctrine" (Slim or Symfony) or "cycle" (Slim) persists notes in SQLite. Optional phpAuth: "firebase-jwt" or "lcobucci-jwt" (any framework) or "symfony-security" (Symfony) protects GET /api/me with HS256 bearer tokens. phpTesting picks "phpunit" (default), "pest", "codeception" or "none". Optional phpValidation: "symfony-validator" or "respect-validation" (any framework) or "laravel-validation" (Laravel) validates the greeting payload with that library. Optional phpCache: "symfony-cache", "laminas-cache" or "predis" (any framework, Predis needs REDIS_URL) or "laravel-cache" (Laravel) serves GET /api/cached-time from that cache. Optional phpJobQueue: "symfony-messenger" or "enqueue-fs" (any framework) or "laravel-queue" (Laravel) adds POST /api/jobs and a composer run queue:work worker. Optional phpEmail: "symfony-mailer" or "phpmailer" (any framework) or "laravel-mail" (Laravel) adds a composer run mail:send command that sends over SMTP. Optional phpLogging follows the framework: "monolog" (Slim), "laravel-log" (Laravel) or "symfony-monolog" (Symfony) writes JSON greeting logs to stderr. Optional phpHttpClient: "guzzle", "symfony-http-client" or "httplug-curl" (any framework) adds GET /api/upstream fetching UPSTREAM_URL.
+2. Run composer install --no-interaction, composer run build, composer test and composer run proof:http from the generated service directory.
+3. Start local development with composer run dev. PHP.md describes the validated JSON route and extension boundaries.
+4. Treat this recipe as experimental until those native checks pass. With phpOrm, run composer run db:setup before composer run dev. With phpAuth, set JWT_SECRET; tokens come from your identity provider. Deployment adapters are not generated. For composition use backend:php:slim, backend:php:laravel or backend:php:symfony with a frontend Stack Part.
+
 ## Quick Start - Elixir Project
 1. Call bfs_create_project with:
    - projectName: "my-elixir-app"

@@ -2,9 +2,11 @@
 export * from "@/config/schemas";
 export * from "@/config/types";
 export * from "@/capabilities/capabilities";
+export * from "@/capabilities/browser-extensions";
 export * from "@/stack/compatibility";
 export * from "@/catalog/option-metadata";
 export * from "@/catalog/cli-flags";
+export * from "@/platform/crystal-project";
 export * from "@/platform/local-dev";
 export * from "@/platform/dotnet-project";
 export * from "@/config/defaults";
@@ -21,3 +23,10 @@ export * from "@/stack/starter-tracks";
 export * from "@/catalog/preset-ids";
 export * from "@/stack/presets";
 export * from "@/telemetry/telemetry";
+
+export * from "@/stack/ruby-compatibility";
+export {
+  getPhpCapabilityIssue,
+  getPhpRecipeIssue,
+  PHP_RECIPE_REASONS,
+} from "./stack/php-compatibility";

@@ -104,6 +104,22 @@ function componentEnvReferenceFor(frontend: string) {
 }
 
 describe("Cross-ecosystem graph generation", () => {
+  it("rejects overlapping custom service paths through createVirtual", async () => {
+    for (const destination of ["services/api", "services/api/jobs"]) {
+      const result = await createVirtual({
+        projectName: "overlapping-services",
+        stackParts: graphParts([
+          "backend:go:gin:api@services/api",
+          `backend:go:echo:worker@${destination}`,
+        ]),
+        addons: [],
+      });
+      expect(result.success).toBe(false);
+      expect(result.error).toContain("target paths overlap");
+      expect(result.tree).toBeUndefined();
+    }
+  });
+
   it("routes a TypeScript web app through Kong to its Python graph backend", async () => {
     const stackParts = graphParts([
       "frontend:typescript:react-vite",

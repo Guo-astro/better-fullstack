@@ -1,10 +1,12 @@
 import {
   getCategoryDisplayName,
+  getCrystalCommands,
   getLocalWebDevPort,
   getOptionMetadata,
   getStandaloneBackendEcosystem,
   hasJavaScriptWorkspaceRoot,
   isToolingOverlayOnly,
+  stackGraphToLegacyProjectConfigForEcosystem,
   toDotnetIdentifierSegment,
   type OptionCategory,
 } from "@better-fullstack/types";
@@ -76,6 +78,15 @@ export async function displayPostInstallInstructions(
     return;
   }
 
+  if (ecosystem === "crystal") {
+    const commands = getCrystalCommands(
+      config.stackParts?.length ? stackGraphToLegacyProjectConfigForEcosystem(config, "crystal") : config,
+    );
+    const steps = [`cd ${relativePath}`, depsInstalled ? undefined : "shards install", commands.migrate, commands.seed, commands.build, commands.test, commands.proof, commands.proof ? "HOST=127.0.0.1 PORT=3000 ./bin/server" : "./bin/server"];
+    consola.box(`Next steps\n\n${steps.filter(Boolean).join("\n")}\n\nExperimental recipe. Runtime proof has not been recorded.`);
+    return;
+  }
+
   // Handle Rust projects with different instructions
   if (ecosystem === "rust") {
     displayRustInstructions(config);
@@ -97,6 +108,23 @@ export async function displayPostInstallInstructions(
   // Handle Python projects with different instructions
   if (ecosystem === "python") {
     displayPythonInstructions(config);
+    return;
+  }
+
+  if (ecosystem === "ruby") {
+    const ruby = config.stackParts?.length
+      ? stackGraphToLegacyProjectConfigForEcosystem(config, "ruby")
+      : config;
+    consola.box(
+      `Next steps\n\ncd ${relativePath}\n${depsInstalled ? "" : "bundle install\n"}${(ruby.rubyOrm && ruby.rubyOrm !== "none") || ruby.rubyAuth === "rodauth" ? "bundle exec rake db:migrate\n" : ""}bundle exec rake build\n${ruby.rubyTesting === "none" ? "" : "bundle exec rake test\n"}bundle exec ruby bin/server\n\nHTTP: http://127.0.0.1:4567/health\nRuntime proof: bundle exec ruby bin/proof\n${ruby.rubyOrm && ruby.rubyOrm !== "none" ? `Database: ${ruby.rubyOrm} on SQLite (DATABASE_PATH).\n` : ""}${ruby.rubyAuth && ruby.rubyAuth !== "none" ? `Auth: ${ruby.rubyAuth}. Set its secrets from .env.example before production.\n` : ""}${ruby.rubyCache === "redis" ? "Cache: start Redis at REDIS_URL before tests and bin/proof.\n" : ruby.rubyCache === "memcached" ? "Cache: start Memcached at MEMCACHED_SERVERS before tests and bin/proof.\n" : ""}${ruby.rubyJobQueue && ruby.rubyJobQueue !== "none" ? `Jobs: ${ruby.rubyJobQueue}; run the worker with bundle exec ruby bin/worker${ruby.rubyJobQueue === "solid-queue" ? "" : " (Redis at JOBS_REDIS_URL)"}.\n` : ""}Experimental recipe.`,
+    );
+    return;
+  }
+
+  if (ecosystem === "php") {
+    consola.box(
+      `Next steps\n\ncd ${relativePath}\n${depsInstalled ? "" : "composer install --no-interaction\n"}composer run build\n${config.phpTesting === "none" ? "" : "composer test\n"}composer run proof:http\n${(config.phpOrm && config.phpOrm !== "none") || config.phpJobQueue === "laravel-queue" ? "composer run db:setup\n" : ""}composer run dev\n\n${config.phpAuth && config.phpAuth !== "none" ? "Set JWT_SECRET (32+ bytes) before calling GET /api/me.\n" : ""}${config.phpCache === "predis" ? "Set REDIS_URL to a running Redis server before calling GET /api/cached-time.\n" : ""}${config.phpJobQueue && config.phpJobQueue !== "none" ? "Run composer run queue:work beside composer run dev to process jobs.\n" : ""}${config.phpEmail && config.phpEmail !== "none" ? "Configure SMTP in .env, then run composer run mail:send -- you@example.com.\n" : ""}${config.phpHttpClient && config.phpHttpClient !== "none" ? "Set UPSTREAM_URL before calling GET /api/upstream.\n" : ""}Experimental PHP recipe. See PHP.md for routes, environment and the verification boundary.`,
+    );
     return;
   }
 
@@ -225,7 +253,7 @@ export async function displayPostInstallInstructions(
   const graphBackendPart = getGraphPart(config, "backend");
   const graphBackendNeedsSetup =
     Boolean(graphBackendUrl) &&
-    ["python", "go", "elixir"].includes(graphBackendPart?.ecosystem ?? "");
+    ["python", "go", "elixir", "php"].includes(graphBackendPart?.ecosystem ?? "");
   let output = graphSummary ? `${pc.bold("Generated:")} ${graphSummary}\n\n` : "";
   output += `${pc.bold("Next steps")}\n${pc.cyan("1.")} ${cdCmd}\n`;
   let stepCounter = 2;
@@ -1777,6 +1805,11 @@ function displayElixirInstructions(config: ProjectConfig & { depsInstalled: bool
     elixirJobs,
     elixirAuth,
     elixirDeploy,
+    elixirLogging,
+    elixirConfig,
+    elixirMessageQueue,
+    elixirTemplating,
+    elixirCli,
   } = config;
 
   let output = `${pc.bold("Project created successfully!")}\n\n`;
@@ -1800,6 +1833,16 @@ function displayElixirInstructions(config: ProjectConfig & { depsInstalled: bool
   output += `${pc.cyan("•")} Jobs: ${elixirJobs}\n`;
   output += `${pc.cyan("•")} Auth: ${elixirAuth}\n`;
   output += `${pc.cyan("•")} Deploy: ${elixirDeploy}\n`;
+  if (elixirJobs === "exq") {
+    output += `${pc.yellow("NOTE:")} Exq needs Redis at REDIS_URL (default redis://localhost:6379)\n`;
+  }
+  if (elixirLogging !== "none") output += `${pc.cyan("•")} Logging: ${elixirLogging}\n`;
+  if (elixirConfig !== "none") output += `${pc.cyan("•")} Runtime config: ${elixirConfig}\n`;
+  if (elixirTemplating !== "none") output += `${pc.cyan("•")} Templating: ${elixirTemplating}\n`;
+  if (elixirCli !== "none") output += `${pc.cyan("•")} CLI: ${elixirCli} (greet Mix task)\n`;
+  if (elixirMessageQueue !== "none") {
+    output += `${pc.yellow("NOTE:")} Start the ${elixirMessageQueue} broker, then run mix test --include message_queue\n`;
+  }
 
   output += `\n${pc.bold("Common Mix commands:")}\n`;
   output += `${pc.cyan("•")} Run: mix phx.server\n`;

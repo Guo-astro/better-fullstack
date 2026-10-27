@@ -16,6 +16,10 @@ import type {
   UILibrary,
 } from "@/config/types";
 
+import {
+  getBrowserExtensionSelectionIssue,
+  isBrowserExtension,
+} from "@/capabilities/browser-extensions";
 import { getAuthIncompatibility, normalizeCapabilitySelection } from "@/capabilities/capabilities";
 import {
   getCodeQualitySelectionIssue,
@@ -32,6 +36,26 @@ import {
   type OptionCategory,
 } from "@/catalog/option-metadata";
 import { ANALYTICS_VALUES } from "@/config/schemas";
+import {
+  CRYSTAL_OPTION_CATEGORIES,
+  getCrystalOptionIssue,
+  isCrystalOptionCategory,
+} from "@/platform/crystal-project";
+import {
+  getPhpCapabilityIssue,
+  isPhpCapabilityCategory,
+  PHP_CAPABILITY_CATEGORIES,
+  PHP_RECIPE_REASONS,
+  PHP_UNSUPPORTED_BACKEND_FIELDS,
+  type PhpCapabilityCategory,
+} from "@/stack/php-compatibility";
+import {
+  getRubyOptionIssue,
+  RUBY_OPTION_CATEGORIES,
+  RUBY_RECIPE_EXTENSION_REASON,
+  RUBY_RECIPE_FRAMEWORK_REASON,
+  RUBY_UNSUPPORTED_CONFIG_KEYS,
+} from "@/stack/ruby-compatibility";
 import {
   getDatabaseOrmIncompatibility,
   getDatabaseOrmRequirementIssue,
@@ -403,8 +427,11 @@ export type CompatibilityInput = {
     | "python"
     | "go"
     | "java"
+    | "php"
     | "elixir"
-    | "dotnet";
+    | "dotnet"
+    | "crystal"
+    | "ruby";
   projectName: string | null;
   webFrontend: string[];
   nativeFrontend: string[];
@@ -533,6 +560,13 @@ export type CompatibilityInput = {
   goProtoTooling: string;
   goDI: string;
   javaLanguage: string;
+  crystalWebFramework: string;
+  crystalOrm: string;
+  crystalAuth: string;
+  crystalTesting: string;
+  crystalValidation: string;
+  crystalCache: string;
+  crystalJobs: string;
   javaWebFramework: string;
   javaBuildTool: string;
   javaOrm: string;
@@ -553,6 +587,26 @@ export type CompatibilityInput = {
   dotnetCaching: string;
   dotnetDeploy: string;
   dotnetLibraries: string[];
+  rubyWebFramework: string;
+  rubyOrm: string;
+  rubyAuth: string;
+  rubyTesting: string;
+  rubyValidation: string;
+  rubyCache: string;
+  rubyJobQueue: string;
+  rubyEmail: string;
+  rubyLogging: string;
+  rubyHttpClient: string;
+  phpWebFramework: string;
+  phpOrm: string;
+  phpAuth: string;
+  phpTesting: string;
+  phpValidation: string;
+  phpCache: string;
+  phpJobQueue: string;
+  phpEmail: string;
+  phpLogging: string;
+  phpHttpClient: string;
   elixirWebFramework: string;
   elixirOrm: string;
   elixirAuth: string;
@@ -572,6 +626,11 @@ export type CompatibilityInput = {
   elixirApplicationFramework: string;
   elixirDocumentation: string;
   elixirClustering: string;
+  elixirLogging: string;
+  elixirConfig: string;
+  elixirMessageQueue: string;
+  elixirTemplating: string;
+  elixirCli: string;
   elixirDeploy: string;
   elixirLibraries: string[];
 };
@@ -704,7 +763,13 @@ function usesTanStackStartSolid(stack: Pick<CompatibilityInput, "webFrontend" | 
     stack.backend === "self-tanstack-start-solid"
   );
 }
-const SINGLE_APP_CONTAINER_ADDONS = new Set(["docker-compose", "devcontainer", "kong"]);
+const SINGLE_APP_CONTAINER_ADDONS = new Set([
+  "docker-compose",
+  "devcontainer",
+  "kong",
+  "wxt",
+  "plasmo",
+]);
 const FULLSTACK_SELF_BACKENDS = new Set([
   "self-next",
   "self-vinext",
@@ -791,10 +856,23 @@ const SQL_ORM_REPLACEMENT = { orm: "drizzle", label: "Drizzle" };
 const getReplacementOrm = (database: string) =>
   DATABASE_ORM_REPLACEMENTS[database] ?? SQL_ORM_REPLACEMENT;
 
+function analyzeCrystalStackCompatibility(stack: CompatibilityInput): CompatibilityAnalysisResult {
+  const nextStack = { ...stack };
+  const changes: CompatibilityAnalysisResult["changes"] = [];
+  for (const category of CRYSTAL_OPTION_CATEGORIES) {
+    const issue = getCrystalOptionIssue(category, nextStack[category], nextStack);
+    if (!issue) continue;
+    nextStack[category] = "none";
+    changes.push({ category, message: `${getCategoryDisplayName(category)} set to 'None' (${issue})` });
+  }
+  return { adjustedStack: changes.length > 0 ? nextStack : null, notes: {}, changes };
+}
+
 export const analyzeStackCompatibility = (
   stack: CompatibilityInput,
   options: { normalizeCodeQualityProfiles?: boolean } = {},
 ): CompatibilityAnalysisResult => {
+  if (stack.ecosystem === "crystal") return analyzeCrystalStackCompatibility(stack);
   // Skip all validation if YOLO mode is enabled
   if (stack.yolo === "true") {
     return {
@@ -2609,6 +2687,34 @@ export const analyzeStackCompatibility = (
     }
   }
 
+  if (nextStack.ecosystem === "ruby") {
+    for (const category of RUBY_OPTION_CATEGORIES) {
+      const issue = getRubyOptionIssue(
+        category,
+        nextStack[category],
+        nextStack.rubyWebFramework,
+        nextStack.rubyOrm,
+      );
+      if (!issue) continue;
+      nextStack[category] = "none";
+      changed = true;
+      changes.push({ category, message: `${getCategoryDisplayName(category)} set to 'None' (${issue})` });
+    }
+  }
+
+  if (nextStack.ecosystem === "php") {
+    for (const [category, { role, label }] of Object.entries(PHP_CAPABILITY_CATEGORIES)) {
+      const key = category as PhpCapabilityCategory;
+      if (!getPhpCapabilityIssue(nextStack.phpWebFramework, role, nextStack[key])) continue;
+      nextStack[key] = "none";
+      changed = true;
+      changes.push({
+        category: key,
+        message: `${label} set to 'None' (not generated for the selected framework)`,
+      });
+    }
+  }
+
   // ============================================
   // ELIXIR ECOSYSTEM CONSTRAINTS
   // ============================================
@@ -2622,12 +2728,19 @@ export const analyzeStackCompatibility = (
         "elixirObservability",
         "elixirI18n",
         "elixirHttpServer",
+        "elixirLogging",
       ];
 
       for (const key of dependentKeys) {
         const value = nextStack[key];
         const shouldClear =
-          key !== "elixirObservability" ? value !== "none" : value === "phoenix-telemetry";
+          key === "elixirObservability"
+            ? value === "phoenix-telemetry"
+            : key === "elixirI18n"
+              ? value === "gettext"
+              : key === "elixirLogging"
+                ? value === "logster"
+                : value !== "none";
 
         if (shouldClear) {
           nextStack[key] = "none" as never;
@@ -2650,6 +2763,14 @@ export const analyzeStackCompatibility = (
     }
 
     if (nextStack.elixirOrm === "none") {
+      if (["peri", "tarams"].includes(nextStack.elixirValidation)) {
+        nextStack.elixirValidation = "none";
+        changed = true;
+        changes.push({
+          category: "elixirValidation",
+          message: "Elixir validation set to 'None' (Peri and Tarams require Ecto)",
+        });
+      }
       if (nextStack.elixirJobs === "oban") {
         nextStack.elixirJobs = "none";
         changed = true;
@@ -2906,6 +3027,82 @@ export const getDisabledReason = (
   category: CompatibilityCategory,
   optionId: string,
 ): string | null => {
+  if (
+    currentStack.ecosystem === "crystal" &&
+    optionId !== "none" &&
+    ![
+      "crystalWebFramework",
+      "crystalOrm",
+      "crystalAuth",
+      "crystalTesting",
+      "crystalValidation",
+      "crystalCache",
+      "crystalJobs",
+      "aiDocs",
+      "git",
+      "install",
+      "workspaceShape",
+      "packageManager",
+      "versionChannel",
+    ].includes(category)
+  ) {
+    return "Crystal's bounded recipe supports its HTTP framework only. Use a mixed graph for independently owned tools.";
+  }
+  if (currentStack.ecosystem === "crystal" && isCrystalOptionCategory(category))
+    return getCrystalOptionIssue(category, optionId, currentStack);
+  if (
+    category === "crystalWebFramework" &&
+    optionId !== "none" &&
+    currentStack.ecosystem !== "crystal"
+  )
+    return "Crystal HTTP frameworks require the Crystal ecosystem or a Crystal backend part.";
+  if (
+    RUBY_OPTION_CATEGORIES.some((entry) => entry === category) &&
+    optionId !== "none" &&
+    currentStack.ecosystem !== "ruby"
+  )
+    return "Ruby options only apply when the Ruby ecosystem is selected";
+  if (currentStack.ecosystem === "ruby") {
+    if (category === "rubyWebFramework" && optionId === "none") return RUBY_RECIPE_FRAMEWORK_REASON;
+    const rubyIssue = getRubyOptionIssue(
+      category,
+      optionId,
+      currentStack.rubyWebFramework,
+      currentStack.rubyOrm,
+    );
+    if (rubyIssue) return rubyIssue;
+    const key =
+      category === "webFrontend" || category === "nativeFrontend"
+        ? "frontend"
+        : category === "backendLibraries"
+          ? "effect"
+          : category === "appPlatforms" ||
+              category === "codeQuality" ||
+              category === "documentation"
+            ? "addons"
+            : category;
+    if (optionId !== "none" && RUBY_UNSUPPORTED_CONFIG_KEYS.some((entry) => entry === key))
+      return RUBY_RECIPE_EXTENSION_REASON;
+  }
+
+  if (currentStack.ecosystem === "php") {
+    if (category === "phpWebFramework" && optionId === "none") return PHP_RECIPE_REASONS.framework;
+    if (isPhpCapabilityCategory(category)) {
+      const { role } = PHP_CAPABILITY_CATEGORIES[category];
+      const issue = getPhpCapabilityIssue(currentStack.phpWebFramework, role, optionId);
+      if (issue) return issue;
+    }
+    if (category === "database" && optionId !== "none") return PHP_RECIPE_REASONS.database;
+    if (PHP_UNSUPPORTED_BACKEND_FIELDS.some((field) => field === category) && optionId !== "none")
+      return PHP_RECIPE_REASONS.capability;
+  }
+  if (category === "appPlatforms" && isBrowserExtension(optionId)) {
+    const issue = getBrowserExtensionSelectionIssue(
+      [...currentStack.appPlatforms, optionId],
+      currentStack.workspaceShape,
+    );
+    if (issue) return issue;
+  }
   if (
     optionId !== "none" &&
     category === "kotlinMobileLibraries" &&
@@ -4431,6 +4628,11 @@ export const getDisabledReason = (
     "elixirApplicationFramework",
     "elixirDocumentation",
     "elixirClustering",
+    "elixirLogging",
+    "elixirConfig",
+    "elixirMessageQueue",
+    "elixirTemplating",
+    "elixirCli",
     "elixirDeploy",
   ]);
 
@@ -4447,6 +4649,24 @@ export const getDisabledReason = (
     currentStack.elixirWebFramework === "none"
   ) {
     return "Wallaby browser tests require Phoenix";
+  }
+
+  if (
+    category === "elixirLogging" &&
+    optionId === "logster" &&
+    currentStack.ecosystem === "elixir" &&
+    currentStack.elixirWebFramework === "none"
+  ) {
+    return "Logster request logging requires Phoenix";
+  }
+
+  if (
+    category === "elixirValidation" &&
+    ["peri", "tarams"].includes(optionId) &&
+    currentStack.ecosystem === "elixir" &&
+    currentStack.elixirOrm === "none"
+  ) {
+    return "Peri and Tarams require Ecto";
   }
 
   if (
@@ -4695,6 +4915,11 @@ const ELIXIR_GRAPH_DISABLED_REASON_ROLES: Partial<Record<CompatibilityCategory, 
   elixirApplicationFramework: "libraries",
   elixirDocumentation: "documentation",
   elixirClustering: "config",
+  elixirLogging: "logging",
+  elixirConfig: "runtimeConfig",
+  elixirMessageQueue: "messageQueue",
+  elixirTemplating: "templating",
+  elixirCli: "cli",
   elixirDeploy: "deploy",
 };
 
@@ -5522,6 +5747,7 @@ const ADDON_COMPATIBILITY: Record<Addons, readonly Frontend[]> = {
   fumadocs: [],
   opentui: [],
   wxt: [],
+  plasmo: [],
   msw: [],
   storybook: ["tanstack-router", "react-router", "react-vite", "next", "nuxt", "svelte", "solid"],
   axios: [
@@ -6104,7 +6330,17 @@ const ISSUE_CODE_BY_CATEGORY: Partial<Record<OptionCategory, string>> = {
   dotnetLibraries: "INCOMPATIBLE_DOTNET_LIBRARY",
 };
 
-const SERVER_ECOSYSTEMS = ["rust", "python", "go", "java", "dotnet", "elixir"] as const;
+const SERVER_ECOSYSTEMS = [
+  "rust",
+  "python",
+  "go",
+  "java",
+  "dotnet",
+  "elixir",
+  "php",
+  "ruby",
+  "crystal",
+] as const;
 
 const typeScriptCategories: ReadonlySet<OptionCategory> = new Set(
   getCategoryOrderForEcosystem("typescript"),

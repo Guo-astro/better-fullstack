@@ -159,6 +159,14 @@ function normalizeGraphConfigForPersistence(
     normalized.auth = projectConfig.auth;
   }
 
+  if (!selectedEcosystems.has("crystal")) normalized.crystalWebFramework = "none";
+  if (!selectedEcosystems.has("crystal")) normalized.crystalOrm = "none";
+  if (!selectedEcosystems.has("crystal")) normalized.crystalAuth = "none";
+  if (!selectedEcosystems.has("crystal")) normalized.crystalTesting = "none";
+  if (!selectedEcosystems.has("crystal")) normalized.crystalValidation = "none";
+  if (!selectedEcosystems.has("crystal")) normalized.crystalCache = "none";
+  if (!selectedEcosystems.has("crystal")) normalized.crystalJobs = "none";
+
   if (!selectedEcosystems.has("java")) {
     normalized.javaLanguage = "java";
     normalized.javaWebFramework = "none";
@@ -186,6 +194,31 @@ function normalizeGraphConfigForPersistence(
     normalized.dotnetLibraries = [];
   }
 
+  if (!selectedEcosystems.has("ruby")) {
+    normalized.rubyWebFramework = "none";
+    normalized.rubyOrm = "none";
+    normalized.rubyAuth = "none";
+    normalized.rubyTesting = "none";
+    normalized.rubyValidation = "none";
+    normalized.rubyCache = "none";
+    normalized.rubyJobQueue = "none";
+    normalized.rubyEmail = "none";
+    normalized.rubyLogging = "none";
+    normalized.rubyHttpClient = "none";
+  }
+
+  if (!selectedEcosystems.has("php")) {
+    normalized.phpWebFramework = "none";
+    normalized.phpOrm = "none";
+    normalized.phpAuth = "none";
+    normalized.phpTesting = "none";
+    normalized.phpValidation = "none";
+    normalized.phpCache = "none";
+    normalized.phpJobQueue = "none";
+    normalized.phpEmail = "none";
+    normalized.phpLogging = "none";
+    normalized.phpHttpClient = "none";
+  }
   if (!selectedEcosystems.has("elixir")) {
     normalized.elixirWebFramework = "none";
     normalized.elixirOrm = "none";
@@ -481,6 +514,13 @@ export function buildBtsConfigForPersistence(
     goProtoTooling: persistedConfig.goProtoTooling,
     goDI: persistedConfig.goDI,
     javaLanguage: persistedConfig.javaLanguage,
+    crystalWebFramework: persistedConfig.crystalWebFramework,
+    crystalOrm: persistedConfig.crystalOrm,
+    crystalAuth: persistedConfig.crystalAuth,
+    crystalTesting: persistedConfig.crystalTesting,
+    crystalValidation: persistedConfig.crystalValidation,
+    crystalCache: persistedConfig.crystalCache,
+    crystalJobs: persistedConfig.crystalJobs,
     javaWebFramework: persistedConfig.javaWebFramework,
     javaBuildTool: persistedConfig.javaBuildTool,
     javaOrm: persistedConfig.javaOrm,
@@ -501,6 +541,26 @@ export function buildBtsConfigForPersistence(
     dotnetCaching: persistedConfig.dotnetCaching,
     dotnetDeploy: persistedConfig.dotnetDeploy,
     dotnetLibraries: persistedConfig.dotnetLibraries,
+    rubyWebFramework: persistedConfig.rubyWebFramework,
+    rubyOrm: persistedConfig.rubyOrm,
+    rubyAuth: persistedConfig.rubyAuth,
+    rubyTesting: persistedConfig.rubyTesting,
+    rubyValidation: persistedConfig.rubyValidation,
+    rubyCache: persistedConfig.rubyCache,
+    rubyJobQueue: persistedConfig.rubyJobQueue,
+    rubyEmail: persistedConfig.rubyEmail,
+    rubyLogging: persistedConfig.rubyLogging,
+    rubyHttpClient: persistedConfig.rubyHttpClient,
+    phpWebFramework: persistedConfig.phpWebFramework,
+    phpOrm: persistedConfig.phpOrm,
+    phpAuth: persistedConfig.phpAuth,
+    phpTesting: persistedConfig.phpTesting,
+    phpValidation: persistedConfig.phpValidation,
+    phpCache: persistedConfig.phpCache,
+    phpJobQueue: persistedConfig.phpJobQueue,
+    phpEmail: persistedConfig.phpEmail,
+    phpLogging: persistedConfig.phpLogging,
+    phpHttpClient: persistedConfig.phpHttpClient,
     elixirWebFramework: persistedConfig.elixirWebFramework,
     elixirOrm: persistedConfig.elixirOrm,
     elixirAuth: persistedConfig.elixirAuth,
@@ -520,6 +580,11 @@ export function buildBtsConfigForPersistence(
     elixirApplicationFramework: persistedConfig.elixirApplicationFramework,
     elixirDocumentation: persistedConfig.elixirDocumentation,
     elixirClustering: persistedConfig.elixirClustering,
+    elixirLogging: persistedConfig.elixirLogging,
+    elixirConfig: persistedConfig.elixirConfig,
+    elixirMessageQueue: persistedConfig.elixirMessageQueue,
+    elixirTemplating: persistedConfig.elixirTemplating,
+    elixirCli: persistedConfig.elixirCli,
     elixirDeploy: persistedConfig.elixirDeploy,
     elixirLibraries: persistedConfig.elixirLibraries,
     aiDocs: persistedConfig.aiDocs,
@@ -677,6 +742,13 @@ export function serializeBtsConfig(
     goProtoTooling: btsConfig.goProtoTooling,
     goDI: btsConfig.goDI,
     javaLanguage: btsConfig.javaLanguage,
+    crystalWebFramework: btsConfig.crystalWebFramework,
+    crystalOrm: btsConfig.crystalOrm,
+    crystalAuth: btsConfig.crystalAuth,
+    crystalTesting: btsConfig.crystalTesting,
+    crystalValidation: btsConfig.crystalValidation,
+    crystalCache: btsConfig.crystalCache,
+    crystalJobs: btsConfig.crystalJobs,
     javaWebFramework: btsConfig.javaWebFramework,
     javaBuildTool: btsConfig.javaBuildTool,
     javaOrm: btsConfig.javaOrm,
@@ -697,6 +769,26 @@ export function serializeBtsConfig(
     dotnetCaching: btsConfig.dotnetCaching,
     dotnetDeploy: btsConfig.dotnetDeploy,
     dotnetLibraries: btsConfig.dotnetLibraries,
+    rubyWebFramework: btsConfig.rubyWebFramework,
+    rubyOrm: btsConfig.rubyOrm,
+    rubyAuth: btsConfig.rubyAuth,
+    rubyTesting: btsConfig.rubyTesting,
+    rubyValidation: btsConfig.rubyValidation,
+    rubyCache: btsConfig.rubyCache,
+    rubyJobQueue: btsConfig.rubyJobQueue,
+    rubyEmail: btsConfig.rubyEmail,
+    rubyLogging: btsConfig.rubyLogging,
+    rubyHttpClient: btsConfig.rubyHttpClient,
+    phpWebFramework: btsConfig.phpWebFramework,
+    phpOrm: btsConfig.phpOrm,
+    phpAuth: btsConfig.phpAuth,
+    phpTesting: btsConfig.phpTesting,
+    phpValidation: btsConfig.phpValidation,
+    phpCache: btsConfig.phpCache,
+    phpJobQueue: btsConfig.phpJobQueue,
+    phpEmail: btsConfig.phpEmail,
+    phpLogging: btsConfig.phpLogging,
+    phpHttpClient: btsConfig.phpHttpClient,
     elixirWebFramework: btsConfig.elixirWebFramework,
     elixirOrm: btsConfig.elixirOrm,
     elixirAuth: btsConfig.elixirAuth,
@@ -716,6 +808,11 @@ export function serializeBtsConfig(
     elixirApplicationFramework: btsConfig.elixirApplicationFramework,
     elixirDocumentation: btsConfig.elixirDocumentation,
     elixirClustering: btsConfig.elixirClustering,
+    elixirLogging: btsConfig.elixirLogging,
+    elixirConfig: btsConfig.elixirConfig,
+    elixirMessageQueue: btsConfig.elixirMessageQueue,
+    elixirTemplating: btsConfig.elixirTemplating,
+    elixirCli: btsConfig.elixirCli,
     elixirDeploy: btsConfig.elixirDeploy,
     elixirLibraries: btsConfig.elixirLibraries,
     aiDocs: btsConfig.aiDocs,

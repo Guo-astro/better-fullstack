@@ -41,6 +41,11 @@ import {
   ELIXIR_APPLICATION_FRAMEWORK_VALUES,
   ELIXIR_DOCUMENTATION_VALUES,
   ELIXIR_CLUSTERING_VALUES,
+  ELIXIR_LOGGING_VALUES,
+  ELIXIR_CONFIG_VALUES,
+  ELIXIR_MESSAGE_QUEUE_VALUES,
+  ELIXIR_TEMPLATING_VALUES,
+  ELIXIR_CLI_VALUES,
   ELIXIR_REALTIME_VALUES,
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
@@ -181,6 +186,69 @@ function getTypeScriptApiOptionsForFrontend(frontend: string) {
 }
 
 describe("stack graph", () => {
+  it("keeps JavaScript database packages at their supported workspace path", () => {
+    for (const [database, capabilities] of [
+      ["postgres", ["backend.orm:typescript:drizzle"]],
+      ["postgres", ["backend.orm:typescript:prisma"]],
+      ["redis", []],
+      ["edgedb", []],
+    ] as const) {
+      const specs = ["backend:typescript:hono", ...capabilities];
+      const parts = parseStackPartSpecs([...specs, `database:universal:${database}@services/data`]);
+      expect(validateStackParts(parts).issues).toContainEqual(
+        expect.objectContaining({
+          code: "UNSUPPORTED_TARGET_PATH",
+          message: expect.stringContaining("packages/db"),
+        }),
+      );
+      expect(
+        validateStackParts(
+          parseStackPartSpecs([...specs, `database:universal:${database}@packages/db`]),
+        ).issues,
+      ).toEqual([]);
+    }
+    const scoped = parseStackPartSpecs([
+      "backend:typescript:hono",
+      "backend.orm:typescript:drizzle",
+      "backend.database:universal:postgres",
+    ]).map((part) => (part.role === "database" ? { ...part, targetPath: "services/data" } : part));
+    expect(validateStackParts(scoped).issues).toContainEqual(
+      expect.objectContaining({ code: "UNSUPPORTED_TARGET_PATH" }),
+    );
+    expect(
+      validateStackParts(
+        parseStackPartSpecs([
+          "backend:go:gin",
+          "backend.orm:go:gorm",
+          "database:universal:postgres@data/native",
+        ]),
+      ).issues,
+    ).toEqual([]);
+  });
+
+  it("rejects custom JavaScript application directories from specs and saved parts", () => {
+    for (const [spec, defaultPath] of [
+      ["frontend:typescript:react-vite", "apps/web"],
+      ["backend:typescript:hono", "apps/server"],
+      ["mobile:react-native:native-bare", "apps/native"],
+    ]) {
+      for (const parts of [
+        parseStackPartSpecs([`${spec}@services/custom`]),
+        parseStackPartSpecs([spec]).map((part) => ({ ...part, targetPath: "services/custom" })),
+      ]) {
+        expect(validateStackParts(parts).issues).toContainEqual(
+          expect.objectContaining({
+            code: "UNSUPPORTED_TARGET_PATH",
+            message: expect.stringContaining(defaultPath),
+          }),
+        );
+      }
+      expect(validateStackParts(parseStackPartSpecs([`${spec}@${defaultPath}`])).issues).toEqual(
+        [],
+      );
+    }
+  });
+
   it("keeps JavaScript app paths fixed and named native paths distinct", () => {
     const parts = parseStackPartSpecs([
       "frontend:dotnet:blazor-webassembly:web",
@@ -232,6 +300,117 @@ describe("stack graph", () => {
       "admin.orm:go:sqlc",
     ]);
     expect(validateStackParts(stackParts).issues).toEqual([]);
+  });
+
+  it("keeps canonical and named native paths compact beside fixed JavaScript paths", () => {
+    const specs = [
+      "frontend:dotnet:blazor-webassembly:web",
+      "frontend:typescript:react-vite:site",
+      "backend:go:gin",
+      "backend:rust:axum",
+      "mobile:kotlin:jetpack-compose:native",
+      "mobile:react-native:native-bare:expo",
+      "backend.orm:go:gorm",
+      "backend.orm:rust:diesel",
+    ];
+    const parts = parseStackPartSpecs(specs);
+    const formatted = parts
+      .filter((part) => part.source !== "provided")
+      .map((part) => formatStackPartSpec(part, parts));
+
+    expect(parts.find((part) => part.id === "web")?.targetPath).toBe("apps/web-2");
+    expect(parts.find((part) => part.id === "native")?.targetPath).toBe("apps/native-2");
+    expect(parts.find((part) => part.id === "backend:go:gin")?.targetPath).toBe("services/go-gin");
+    expect(parts.find((part) => part.id === "backend:rust:axum")?.targetPath).toBe(
+      "services/rust-axum",
+    );
+    expect(formatted).toEqual(specs);
+    expect(parseStackPartSpecs(formatted)).toEqual(parts);
+  });
+
+  it("keeps collision suffixes compact when native service names overlap", () => {
+    const specs = ["backend:go:gin", "backend:rust:axum:go-gin", "backend:python:fastapi:go-gin-2"];
+    const parts = parseStackPartSpecs(specs);
+    const formatted = parts
+      .filter((part) => part.source !== "provided")
+      .map((part) => formatStackPartSpec(part, parts));
+
+    expect(parts.filter((part) => part.role === "backend").map((part) => part.targetPath)).toEqual([
+      "services/go-gin",
+      "services/go-gin-2",
+      "services/go-gin-2-2",
+    ]);
+    expect(formatted).toEqual(specs);
+    expect(parseStackPartSpecs(formatted)).toEqual(parts);
+  });
+
+  it("retains an explicit role default when repeated native services would rename it", () => {
+    const specs = [
+      "backend:crystal:kemal:reports@apps/server",
+      "backend:go:gin:worker",
+      "backend.orm:go:gorm",
+    ];
+    const parts = parseStackPartSpecs(specs);
+    const formatted = parts
+      .filter((part) => part.source !== "provided")
+      .map((part) => formatStackPartSpec(part, parts));
+
+    expect(parts.find((part) => part.id === "reports")?.targetPath).toBe("apps/server");
+    expect(parts.find((part) => part.id === "worker")?.targetPath).toBe("services/worker");
+    expect(parts.find((part) => part.toolId === "gorm")?.ownerPartId).toBe("worker");
+    expect(formatted).toEqual(specs);
+    expect(parseStackPartSpecs(formatted)).toEqual(parts);
+  });
+
+  it("retains only the custom path that reserves another native service's name", () => {
+    for (const services of [
+      ["backend:go:gin:api@services/worker", "backend:go:echo:worker"],
+      ["backend:go:echo:worker", "backend:go:gin:api@services/worker"],
+    ]) {
+      const specs = [...services, "api.orm:go:gorm", "worker.orm:go:sqlc"];
+      const parts = parseStackPartSpecs(specs);
+      const formatted = parts.map((part) => formatStackPartSpec(part, parts));
+
+      expect(parts.find((part) => part.id === "worker")?.targetPath).toBe("services/worker-2");
+      expect(formatted).toEqual(specs);
+      expect(parseStackPartSpecs(formatted)).toEqual(parts);
+    }
+  });
+
+  it("omits explicit paths that compact bindings already reconstruct", () => {
+    for (const [specs, compact] of [
+      [["backend:go:gin:api@apps/server"], ["backend:go:gin:api"]],
+      [
+        ["backend:go:gin:api@services/api", "backend:go:echo:admin@services/admin"],
+        ["backend:go:gin:api", "backend:go:echo:admin"],
+      ],
+    ]) {
+      const parts = parseStackPartSpecs(specs);
+      const formatted = parts.map((part) => formatStackPartSpec(part, parts));
+
+      expect(formatted).toEqual(compact);
+      expect(parseStackPartSpecs(formatted)).toEqual(parts);
+    }
+  });
+
+  it("round-trips encoded custom paths and named capability owners", () => {
+    const specs = [
+      "backend:go:gin:api@services/api%20v2%40blue%3A50%25/%252F",
+      "backend:go:echo:admin",
+      "api.orm:go:gorm",
+      "admin.orm:go:sqlc",
+    ];
+    const parts = parseStackPartSpecs(specs);
+    const formatted = parts.map((part) => formatStackPartSpec(part, parts));
+
+    expect(parts.find((part) => part.id === "api")?.targetPath).toBe(
+      "services/api v2@blue:50%/%2F",
+    );
+    expect(parts.find((part) => part.toolId === "gorm")?.ownerPartId).toBe("api");
+    expect(parts.find((part) => part.toolId === "sqlc")?.ownerPartId).toBe("admin");
+    expect(formatted).toEqual(specs);
+    expect(parseStackPartSpecs(formatted)).toEqual(parts);
+    expect(formatStackPartSpec(parts[0])).toBe(specs[0]);
   });
 
   it("requires stable IDs when the same primary service is repeated", () => {
@@ -2079,6 +2258,11 @@ describe("stack graph structural round-trip (phase 0)", () => {
           elixirApplicationFramework: ELIXIR_APPLICATION_FRAMEWORK_VALUES,
           elixirDocumentation: ELIXIR_DOCUMENTATION_VALUES,
           elixirClustering: ELIXIR_CLUSTERING_VALUES,
+          elixirLogging: ELIXIR_LOGGING_VALUES,
+          elixirConfig: ELIXIR_CONFIG_VALUES,
+          elixirMessageQueue: ELIXIR_MESSAGE_QUEUE_VALUES,
+          elixirTemplating: ELIXIR_TEMPLATING_VALUES,
+          elixirCli: ELIXIR_CLI_VALUES,
           elixirDeploy: ELIXIR_DEPLOY_VALUES,
         },
         arrays: {
@@ -2134,6 +2318,11 @@ describe("stack graph structural round-trip (phase 0)", () => {
       "elixirApplicationFramework",
       "elixirDocumentation",
       "elixirClustering",
+      "elixirLogging",
+      "elixirConfig",
+      "elixirMessageQueue",
+      "elixirTemplating",
+      "elixirCli",
       "elixirDeploy",
     ]);
 
@@ -2174,6 +2363,22 @@ describe("stack graph structural round-trip (phase 0)", () => {
         }
       }
     }
+  });
+
+  it.each(["peri", "tarams"] as const)("requires an owner's Ecto selection for %s", (validation) => {
+    const invalidParts = parseStackPartSpecs([
+      "backend:elixir:phoenix",
+      `backend.validation:elixir:${validation}`,
+    ]);
+    expect(validateStackParts(invalidParts).issues.map((issue) => issue.message)).toContain(
+      "Peri and Tarams require Ecto",
+    );
+    const validParts = parseStackPartSpecs([
+      "backend:elixir:phoenix",
+      "backend.orm:elixir:ecto",
+      `backend.validation:elixir:${validation}`,
+    ]);
+    expect(validateStackParts(validParts).issues).toEqual([]);
   });
 
   it("imports legacy ecosystem extras as backend-owned parts that validate cleanly", () => {

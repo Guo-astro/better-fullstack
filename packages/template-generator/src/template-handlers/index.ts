@@ -7,6 +7,7 @@ export { processBaseTemplate } from "@/template-handlers/core/base";
 export { processRustBaseTemplate } from "@/template-handlers/ecosystems/rust-base";
 export { processPythonBaseTemplate } from "@/template-handlers/ecosystems/python-base";
 export { processGoBaseTemplate } from "@/template-handlers/ecosystems/go-base";
+export { processCrystalBaseTemplate } from "@/template-handlers/ecosystems/crystal-base";
 export { processJavaBaseTemplate } from "@/template-handlers/ecosystems/java-base";
 export { processDotnetBaseTemplate } from "@/template-handlers/ecosystems/dotnet-base";
 export { processElixirBaseTemplate } from "@/template-handlers/ecosystems/elixir-base";
@@ -44,3 +45,6 @@ export { processSearchTemplates } from "@/template-handlers/features/search";
 export { processVectorDbTemplates } from "@/template-handlers/features/vector-db";
 export { processFileStorageTemplates } from "@/template-handlers/features/file-storage";
 export { processTestingTemplates } from "@/template-handlers/features/testing";
+
+export { processRubyBaseTemplate } from "./ecosystems/ruby-base";
+export { processPhpBaseTemplate } from "./ecosystems/php-base";

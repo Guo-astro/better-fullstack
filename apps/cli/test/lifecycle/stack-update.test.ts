@@ -305,6 +305,11 @@ const ELIXIR_BASE_CONFIG: Partial<ProjectConfig> = {
   elixirApplicationFramework: "none",
   elixirDocumentation: "none",
   elixirClustering: "none",
+  elixirLogging: "none",
+  elixirConfig: "none",
+  elixirMessageQueue: "none",
+  elixirTemplating: "none",
+  elixirCli: "none",
   elixirDeploy: "none",
   elixirLibraries: [],
 };
