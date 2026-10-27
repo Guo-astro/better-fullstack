@@ -5968,7 +5968,7 @@ export const TECH_OPTIONS: Record<
     {
       id: "sinatra",
       name: "Sinatra",
-      description: "Experimental JSON HTTP service with Bundler, Puma, and Minitest/Rack tests",
+      description: "Experimental JSON HTTP service with Bundler and Puma",
       icon: "https://cdn.simpleicons.org/ruby/CC342D",
       color: "from-red-500 to-red-700",
       default: true,
