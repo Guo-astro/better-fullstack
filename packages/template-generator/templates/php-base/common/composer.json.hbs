@@ -16,7 +16,7 @@
     "ext-mbstring": "*",
     "ext-openssl": "*",
 {{/if}}
-{{#if (ne phpOrm "none")}}
+{{#if (or (ne phpOrm "none") (eq phpJobQueue "symfony-messenger") (eq phpJobQueue "laravel-queue"))}}
     "ext-pdo_sqlite": "*",
 {{/if}}
 {{#if (eq phpOrm "cycle")}}
@@ -25,6 +25,9 @@
 {{/if}}
 {{#if (or (eq phpAuth "firebase-jwt") (eq phpAuth "symfony-security"))}}
     "firebase/php-jwt": "~7.2.1",
+{{/if}}
+{{#if (and (eq phpJobQueue "symfony-messenger") (not (and (eq phpOrm "doctrine") (ne phpWebFramework "symfony"))))}}
+    "doctrine/dbal": "~4.5.0",
 {{/if}}
 {{#if (eq phpOrm "doctrine")}}
 {{#if (eq phpWebFramework "symfony")}}
@@ -36,6 +39,9 @@
 {{/if}}
 {{#if (and (eq phpOrm "eloquent") (eq phpWebFramework "slim"))}}
     "illuminate/database": "~13.38.0",
+{{/if}}
+{{#if (eq phpJobQueue "enqueue-fs")}}
+    "enqueue/fs": "~0.10.27",
 {{/if}}
 {{#if (eq phpAuth "lcobucci-jwt")}}
     "lcobucci/clock": "~3.6.0",
@@ -53,6 +59,10 @@
 {{/if}}
 {{#if (or (eq phpCache "symfony-cache") (and (eq phpOrm "doctrine") (eq phpWebFramework "slim")))}}
     "symfony/cache": "~8.1.9",
+{{/if}}
+{{#if (eq phpJobQueue "symfony-messenger")}}
+    "symfony/doctrine-messenger": "~8.1.9",
+    "symfony/messenger": "~8.1.9",
 {{/if}}
 {{#if (eq phpValidation "symfony-validator")}}
     "symfony/validator": "~8.1.9",
@@ -115,7 +125,18 @@
 {{#if (ne phpAuth "none")}}
     "token:issue": "@php bin/issue-token.php",
 {{/if}}
-{{#if (ne phpOrm "none")}}
+{{#if (eq phpJobQueue "laravel-queue")}}
+    "queue:work": [
+      "Composer\\Config::disableProcessTimeout",
+      "@php artisan queue:work"
+    ],
+{{else if (ne phpJobQueue "none")}}
+    "queue:work": [
+      "Composer\\Config::disableProcessTimeout",
+      "@php bin/queue-work.php"
+    ],
+{{/if}}
+{{#if (or (ne phpOrm "none") (eq phpJobQueue "laravel-queue"))}}
 {{#if (eq phpWebFramework "laravel")}}
     "db:setup": "@php artisan migrate --force --no-interaction",
 {{else}}

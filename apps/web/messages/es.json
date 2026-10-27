@@ -601,6 +601,7 @@
   "docsCliSummaryPhpPhpTesting": "Ejecutor de pruebas de PHP.",
   "docsCliSummaryPhpPhpValidation": "Biblioteca de validación de PHP.",
   "docsCliSummaryPhpPhpCache": "Biblioteca de caché de PHP.",
+  "docsCliSummaryPhpPhpJobQueue": "Cola de trabajos en segundo plano de PHP.",
   "docsCliSummaryElixirElixirWebFramework": "Framework web Elixir.",
   "docsCliSummaryElixirElixirOrm": "ORM / base de datos Elixir.",
   "docsCliSummaryElixirElixirAuth": "Autenticación en Elixir.",

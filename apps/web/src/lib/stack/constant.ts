@@ -6370,6 +6370,37 @@ export const TECH_OPTIONS: Record<
       default: true,
     },
   ],
+  phpJobQueue: [
+    {
+      id: "symfony-messenger",
+      name: "Symfony Messenger",
+      description: "Doctrine transport on SQLite with a separate worker on any PHP framework",
+      icon: "https://cdn.simpleicons.org/symfony/000000",
+      color: "from-gray-700 to-gray-900",
+    },
+    {
+      id: "enqueue-fs",
+      name: "Enqueue (filesystem)",
+      description: "queue-interop filesystem transport with a separate worker on any PHP framework",
+      icon: "",
+      color: "from-sky-500 to-blue-700",
+    },
+    {
+      id: "laravel-queue",
+      name: "Laravel Queue",
+      description: "Laravel database queue processed by queue:work on Laravel",
+      icon: "https://cdn.simpleicons.org/laravel/FF2D20",
+      color: "from-red-500 to-red-700",
+    },
+    {
+      id: "none",
+      name: "None",
+      description: "No background jobs",
+      icon: "",
+      color: "from-gray-500 to-gray-700",
+      default: true,
+    },
+  ],
   phpAuth: [
     {
       id: "firebase-jwt",

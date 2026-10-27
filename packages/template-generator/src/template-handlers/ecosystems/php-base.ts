@@ -24,6 +24,7 @@ export async function processPhpBaseTemplate(
     phpTesting: config.phpTesting ?? "phpunit",
     phpValidation: config.phpValidation ?? "none",
     phpCache: config.phpCache ?? "none",
+    phpJobQueue: config.phpJobQueue ?? "none",
     phpPackageName,
     phpSourceDirectory,
   };

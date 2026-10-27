@@ -6,6 +6,9 @@ declare(strict_types=1);
 use App\CachedClock;
 {{/if}}
 use App\GreetingEndpoint;
+{{#if (ne phpJobQueue "none")}}
+use App\JobQueue;
+{{/if}}
 {{#if (ne phpAuth "none")}}
 use App\Http\Middleware\RequireBearerToken;
 {{/if}}
@@ -54,4 +57,13 @@ Route::get('/api/cached-time', fn () => response()->json((new CachedClock(Cache:
 {{else if (ne phpCache "none")}}
 
 Route::get('/api/cached-time', fn () => response()->json(CachedClock::fromEnvironment(base_path())->read()));
+{{/if}}
+{{#if (ne phpJobQueue "none")}}
+
+Route::post('/api/jobs', fn () => response()->json(['id' => JobQueue::fromEnvironment(base_path())->dispatch(), 'status' => 'queued'], 202));
+
+Route::get('/api/jobs/{id}', function (string $id) {
+    $status = JobQueue::fromEnvironment(base_path())->status($id);
+    return $status === null ? response()->json(['error' => 'not_found'], 404) : response()->json($status);
+});
 {{/if}}

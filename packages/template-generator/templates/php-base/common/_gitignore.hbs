@@ -1,11 +1,14 @@
 vendor/
 .env
 .phpunit.cache/
-{{#if (or (eq phpWebFramework "symfony") (and (eq phpWebFramework "slim") (or (ne phpOrm "none") (ne phpCache "none"))))}}
+{{#if (or (eq phpWebFramework "symfony") (and (eq phpWebFramework "slim") (or (ne phpOrm "none") (ne phpCache "none") (ne phpJobQueue "none"))))}}
 var/
 {{/if}}
-{{#if (and (eq phpWebFramework "laravel") (ne phpOrm "none"))}}
+{{#if (and (eq phpWebFramework "laravel") (or (ne phpOrm "none") (eq phpJobQueue "laravel-queue")))}}
 database/*.sqlite
+{{/if}}
+{{#if (and (eq phpWebFramework "laravel") (ne phpJobQueue "none"))}}
+storage/app/queue/
 {{/if}}
 {{#if (and (eq phpWebFramework "laravel") (or (eq phpCache "symfony-cache") (eq phpCache "laminas-cache")))}}
 storage/framework/cache/app/

@@ -2598,6 +2598,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "none",
         "multiple": false
+      },
+      {
+        "flag": "--php-job-queue",
+        "summary": "PHP background job queue.",
+        "values": [
+          "symfony-messenger",
+          "enqueue-fs",
+          "laravel-queue",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
       }
     ]
   },
@@ -3092,6 +3105,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "php:--php-testing": m.docsCliSummaryPhpPhpTesting,
   "php:--php-validation": m.docsCliSummaryPhpPhpValidation,
   "php:--php-cache": m.docsCliSummaryPhpPhpCache,
+  "php:--php-job-queue": m.docsCliSummaryPhpPhpJobQueue,
   "elixir:--elixir-web-framework": m.docsCliSummaryElixirElixirWebFramework,
   "elixir:--elixir-orm": m.docsCliSummaryElixirElixirOrm,
   "elixir:--elixir-auth": m.docsCliSummaryElixirElixirAuth,

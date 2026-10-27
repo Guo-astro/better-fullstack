@@ -602,6 +602,7 @@
   "docsCliSummaryPhpPhpTesting": "Засіб запуску тестів PHP.",
   "docsCliSummaryPhpPhpValidation": "Бібліотека валідації PHP.",
   "docsCliSummaryPhpPhpCache": "Бібліотека кешування PHP.",
+  "docsCliSummaryPhpPhpJobQueue": "Черга фонових завдань PHP.",
   "docsCliSummaryElixirElixirWebFramework": "Вебфреймворк Elixir.",
   "docsCliSummaryElixirElixirOrm": "ORM / база даних Elixir.",
   "docsCliSummaryElixirElixirAuth": "Автентифікація в Elixir.",

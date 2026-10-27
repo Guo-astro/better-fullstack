@@ -191,7 +191,7 @@ describe("PHP graph and transport contract", () => {
     );
     const command = generateStackSelectionCommand(selection);
     expect(command).toContain(
-      "--ecosystem php --php-web-framework slim --php-orm none --php-auth none --php-testing phpunit --php-validation none --php-cache none --database none",
+      "--ecosystem php --php-web-framework slim --php-orm none --php-auth none --php-testing phpunit --php-validation none --php-cache none --php-job-queue none --database none",
     );
     expect(command).toContain("--no-install");
     const withOrm = { ...selection, phpWebFramework: "symfony", phpOrm: "doctrine" };
@@ -344,5 +344,28 @@ describe("PHP graph and transport contract", () => {
     const selection = parseStackSelectionFromUrlRecord({ eco: "php", phcache: "laminas-cache" });
     expect(selection.phpCache).toBe("laminas-cache");
     expect(generateStackSelectionCommand(selection)).toContain("--php-cache laminas-cache");
+  });
+
+  it("projects PHP background jobs as an owned part and keeps Laravel Queue on Laravel", () => {
+    const parts = legacyProjectConfigToStackParts({ ...native, phpJobQueue: "enqueue-fs" });
+    expect(parts).toContainEqual(
+      expect.objectContaining({ role: "jobQueue", ecosystem: "php", toolId: "enqueue-fs" }),
+    );
+    expect(validateStackParts(parts).issues).toEqual([]);
+    expect(stackPartsToLegacyProjectConfigPartial(parts)).toMatchObject({
+      phpJobQueue: "enqueue-fs",
+    });
+    const issue = getPhpRecipeIssue({ ...native, phpJobQueue: "laravel-queue" });
+    expect(issue).toContain("Laravel Queue is generated for Laravel");
+    const mismatched = parseStackPartSpecs([
+      "backend:php:symfony",
+      "backend.jobQueue:php:laravel-queue",
+    ]);
+    expect(validateStackParts(mismatched).issues.map((entry) => entry.message)).toContain(
+      "Laravel Queue is generated for Laravel, not Symfony.",
+    );
+    const selection = parseStackSelectionFromUrlRecord({ eco: "php", phjobs: "symfony-messenger" });
+    expect(selection.phpJobQueue).toBe("symfony-messenger");
+    expect(generateStackSelectionCommand(selection)).toContain("--php-job-queue symfony-messenger");
   });
 });

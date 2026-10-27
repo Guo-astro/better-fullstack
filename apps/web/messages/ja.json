@@ -601,6 +601,7 @@
   "docsCliSummaryPhpPhpTesting": "PHP のテストランナー。",
   "docsCliSummaryPhpPhpValidation": "PHP の検証ライブラリ。",
   "docsCliSummaryPhpPhpCache": "PHP のキャッシュライブラリ。",
+  "docsCliSummaryPhpPhpJobQueue": "PHP のバックグラウンドジョブキュー。",
   "docsCliSummaryElixirElixirWebFramework": "Elixir の Web フレームワーク。",
   "docsCliSummaryElixirElixirOrm": "Elixir の ORM / データベース。",
   "docsCliSummaryElixirElixirAuth": "Elixir の認証。",

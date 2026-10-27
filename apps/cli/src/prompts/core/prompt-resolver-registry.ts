@@ -91,6 +91,7 @@ import {
   resolvePhpTestingPrompt,
   resolvePhpValidationPrompt,
   resolvePhpCachePrompt,
+  resolvePhpJobQueuePrompt,
   resolvePhpWebFrameworkPrompt,
 } from "@/prompts/ecosystems/php-ecosystem";
 import {
@@ -247,6 +248,7 @@ import {
   PhpTestingSchema,
   PhpValidationSchema,
   PhpCacheSchema,
+  PhpJobQueueSchema,
   PhpWebFrameworkSchema,
   PYTHON_AI_VALUES,
   PYTHON_API_VALUES,
@@ -931,6 +933,20 @@ export const PROMPT_RESOLVER_REGISTRY: ResolverRegistry = {
     resolve: ({ value, phpWebFramework }: { value?: string; phpWebFramework?: string } = {}) =>
       resolvePhpCachePrompt(
         value === undefined ? undefined : PhpCacheSchema.parse(value),
+        phpWebFramework === undefined ? undefined : PhpWebFrameworkSchema.parse(phpWebFramework),
+      ),
+  },
+  phpJobQueue: {
+    schemaValues: PhpJobQueueSchema.options,
+    coverageContexts: [
+      {},
+      { phpWebFramework: "slim" },
+      { phpWebFramework: "laravel" },
+      { phpWebFramework: "symfony" },
+    ],
+    resolve: ({ value, phpWebFramework }: { value?: string; phpWebFramework?: string } = {}) =>
+      resolvePhpJobQueuePrompt(
+        value === undefined ? undefined : PhpJobQueueSchema.parse(value),
         phpWebFramework === undefined ? undefined : PhpWebFrameworkSchema.parse(phpWebFramework),
       ),
   },

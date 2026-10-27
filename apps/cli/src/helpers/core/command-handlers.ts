@@ -737,6 +737,7 @@ export async function createProjectHandler(
               phpTesting: "none",
               phpValidation: "none",
               phpCache: "none",
+              phpJobQueue: "none",
               elixirWebFramework: "none",
               elixirOrm: "none",
               elixirAuth: "none",

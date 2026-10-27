@@ -95,5 +95,8 @@ describe("PHP builder recipe", () => {
     expect(generateStackCommand({ ...stack, phpCache: "symfony-cache" })).toContain(
       "--php-cache symfony-cache",
     );
+    expect(generateStackCommand({ ...stack, phpJobQueue: "enqueue-fs" })).toContain(
+      "--php-job-queue enqueue-fs",
+    );
   });
 });

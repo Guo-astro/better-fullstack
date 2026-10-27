@@ -7,6 +7,9 @@ use App\Application;
 use App\CachedClock;
 {{/if}}
 use App\Environment;
+{{#if (ne phpJobQueue "none")}}
+use App\JobQueue;
+{{/if}}
 {{#if (ne phpOrm "none")}}
 use App\Notes;
 {{/if}}
@@ -26,5 +29,8 @@ Application::create(
 {{/if}}
 {{#if (ne phpCache "none")}}
     clock: CachedClock::fromEnvironment(dirname(__DIR__)),
+{{/if}}
+{{#if (ne phpJobQueue "none")}}
+    jobs: JobQueue::fromEnvironment(dirname(__DIR__)),
 {{/if}}
 )->run();

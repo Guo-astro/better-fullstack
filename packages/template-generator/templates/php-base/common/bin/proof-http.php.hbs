@@ -34,7 +34,7 @@ fclose($socket);
 requireProof(is_string($address), 'Cannot read local address.');
 $log = tempnam(sys_get_temp_dir(), 'bfs-php-http-');
 requireProof(is_string($log), 'Cannot create server log.');
-{{#if (ne phpOrm "none")}}
+{{#if (or (ne phpOrm "none") (eq phpJobQueue "laravel-queue"))}}
 $database = tempnam(sys_get_temp_dir(), 'bfs-php-db-');
 requireProof(is_string($database), 'Cannot create proof database.');
 {{#if (eq phpWebFramework "laravel")}}
@@ -49,6 +49,10 @@ fclose($setupPipes[0]);
 requireProof(proc_close($setup) === 0, 'Database setup failed: ' . file_get_contents($log));
 {{else}}
 $serverEnv = array_merge(getenv(), ['CORS_ORIGIN' => 'http://localhost:5173,http://localhost:8080']);
+{{/if}}
+{{#if (ne phpJobQueue "none")}}
+$queuePath = sys_get_temp_dir() . '/bfs-php-queue-' . bin2hex(random_bytes(6));
+$serverEnv['QUEUE_PATH'] = $queuePath;
 {{/if}}
 {{#if (ne phpCache "none")}}
 $serverEnv['CACHE_NAMESPACE'] = 'proof' . bin2hex(random_bytes(6));
@@ -110,6 +114,20 @@ try {
     [$status, $body] = requestProof('http://' . $address . '/api/notes', 'POST', '{"title":""}');
     requireProof($status === 422, 'Invalid note accepted.');
 {{/if}}
+{{#if (ne phpJobQueue "none")}}
+    [$status, $job] = requestProof('http://' . $address . '/api/jobs', 'POST');
+    requireProof($status === 202 && $job['status'] === 'queued' && is_string($job['id']), 'Job was not queued.');
+    [$status, $body] = requestProof('http://' . $address . '/api/jobs/' . $job['id']);
+    requireProof($status === 200 && $body === ['id' => $job['id'], 'status' => 'queued'], 'Queued job status mismatch.');
+    $worker = proc_open([PHP_BINARY, {{#if (eq phpJobQueue "laravel-queue")}}'artisan', 'queue:work'{{else}}'bin/queue-work.php'{{/if}}, '--stop-when-empty'], [0 => ['pipe', 'r'], 1 => ['file', $log, 'a'], 2 => ['file', $log, 'a']], $workerPipes, $root, $serverEnv);
+    requireProof(is_resource($worker), 'Cannot start the queue worker.');
+    fclose($workerPipes[0]);
+    requireProof(proc_close($worker) === 0, 'Queue worker failed.');
+    [$status, $body] = requestProof('http://' . $address . '/api/jobs/' . $job['id']);
+    requireProof($status === 200 && $body['status'] === 'done', 'Worker did not process the job.');
+    [$status] = requestProof('http://' . $address . '/api/jobs/' . str_repeat('0', 32));
+    requireProof($status === 404, 'Unknown job was found.');
+{{/if}}
 {{#if (ne phpCache "none")}}
     [$status, $first] = requestProof('http://' . $address . '/api/cached-time');
     requireProof($status === 200 && $first['cached'] === false && is_string($first['value']), 'Cache miss mismatch{{#if (eq phpCache "predis")}}; set REDIS_URL to a running Redis server{{/if}}.');
@@ -131,9 +149,17 @@ try {
     }
     if ($failure !== null) fwrite(STDERR, $failure . "\n" . file_get_contents($log));
     unlink($log);
-{{#if (ne phpOrm "none")}}
+{{#if (or (ne phpOrm "none") (eq phpJobQueue "laravel-queue"))}}
     unlink($database);
+{{/if}}
+{{#if (ne phpJobQueue "none")}}
+    if (is_dir($queuePath)) {
+        foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($queuePath, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST) as $entry) {
+            $entry->isDir() ? rmdir($entry->getPathname()) : unlink($entry->getPathname());
+        }
+        rmdir($queuePath);
+    }
 {{/if}}
 }
 if ($failure !== null) exit(1);
-echo json_encode(['php' => PHP_VERSION, 'assertions' => ['health', 'parsed-greeting', 'validation-rejection', 'malformed-json', 'oversized-body', 'missing-route', {{#if (ne phpOrm "none")}}'orm-persistence', {{/if}}{{#if (ne phpAuth "none")}}'bearer-auth', {{/if}}{{#if (ne phpCache "none")}}'cache', {{/if}}'cors', 'cors-allowlist', 'shutdown'], 'success' => true], JSON_THROW_ON_ERROR) . "\n";
+echo json_encode(['php' => PHP_VERSION, 'assertions' => ['health', 'parsed-greeting', 'validation-rejection', 'malformed-json', 'oversized-body', 'missing-route', {{#if (ne phpOrm "none")}}'orm-persistence', {{/if}}{{#if (ne phpAuth "none")}}'bearer-auth', {{/if}}{{#if (ne phpCache "none")}}'cache', {{/if}}{{#if (ne phpJobQueue "none")}}'background-job', {{/if}}'cors', 'cors-allowlist', 'shutdown'], 'success' => true], JSON_THROW_ON_ERROR) . "\n";

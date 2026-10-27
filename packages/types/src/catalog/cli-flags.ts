@@ -1209,6 +1209,12 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         source: { kind: "category", category: "phpCache" },
         configKey: "phpCache",
       },
+      {
+        flag: "php-job-queue",
+        summary: "PHP background job queue.",
+        source: { kind: "category", category: "phpJobQueue" },
+        configKey: "phpJobQueue",
+      },
     ],
   },
   {

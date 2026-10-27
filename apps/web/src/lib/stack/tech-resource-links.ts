@@ -2387,6 +2387,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://laravel.com/docs/13.x/cache",
     githubUrl: "https://github.com/illuminate/cache",
   },
+  "phpJobQueue:symfony-messenger": {
+    docsUrl: "https://symfony.com/doc/current/messenger.html",
+    githubUrl: "https://github.com/symfony/messenger",
+  },
+  "phpJobQueue:enqueue-fs": {
+    docsUrl: "https://php-enqueue.github.io/transport/filesystem/",
+    githubUrl: "https://github.com/php-enqueue/fs",
+  },
+  "phpJobQueue:laravel-queue": {
+    docsUrl: "https://laravel.com/docs/13.x/queues",
+    githubUrl: "https://github.com/illuminate/queue",
+  },
   "phpOrm:cycle": {
     docsUrl: "https://cycle-orm.dev/docs/intro-about/current/en",
     githubUrl: "https://github.com/cycle/orm",

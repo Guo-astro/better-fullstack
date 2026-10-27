@@ -340,7 +340,15 @@ export const CONFIG_SCOPE_REGISTRY = {
     sections: [],
   },
   php: {
-    core: ["phpWebFramework", "phpOrm", "phpAuth", "phpTesting", "phpValidation", "phpCache"],
+    core: [
+      "phpWebFramework",
+      "phpOrm",
+      "phpAuth",
+      "phpTesting",
+      "phpValidation",
+      "phpCache",
+      "phpJobQueue",
+    ],
     sections: [],
   },
   elixir: {

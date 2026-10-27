@@ -333,6 +333,48 @@ describe("PHP generation and lifecycle", () => {
     expect(result.tree).toBeUndefined();
   });
 
+  it.each([
+    ["slim", "symfony-messenger", "symfony/messenger", "@php bin/queue-work.php"],
+    ["symfony", "enqueue-fs", "enqueue/fs", "@php bin/queue-work.php"],
+    ["laravel", "laravel-queue", "laravel/framework", "@php artisan queue:work"],
+  ] as const)(
+    "generates %s with %s and a separate queue worker and replays it",
+    async (framework, jobQueue, dependency, worker) => {
+      const result = await createVirtual({
+        projectName: `php-${framework}-${jobQueue}`,
+        ecosystem: "php",
+        phpWebFramework: framework,
+        phpJobQueue: jobQueue,
+      });
+      expect(result.success).toBe(true);
+      const tree = result.tree!;
+      const manifest = JSON.parse(getVirtualTreeFileContent(tree, "composer.json"));
+      expect(Object.keys(manifest.require)).toContain(dependency);
+      expect(manifest.scripts["queue:work"]).toContain(worker);
+      expect(hasVirtualFile(tree.root, "tests/JobsTest.php")).toBe(true);
+      expect(hasVirtualFile(tree.root, "bin/queue-work.php")).toBe(jobQueue !== "laravel-queue");
+      expect(manifest.scripts["db:setup"] !== undefined).toBe(jobQueue === "laravel-queue");
+      expect(getVirtualTreeFileContent(tree, "bin/proof-http.php")).toContain("--stop-when-empty");
+      expect(generateReproducibleCommand(tree.config)).toContain(`--php-job-queue ${jobQueue}`);
+      const saved = buildBtsConfigForPersistence(tree.config, {
+        version: "0.0.0",
+        createdAt: "2026-10-27T00:00:00.000Z",
+      });
+      expect(previewBtsConfigUpdate(saved, {}).phpJobQueue).toBe(jobQueue);
+    },
+  );
+
+  it("rejects Laravel Queue outside Laravel before emitting files", async () => {
+    const result = await createVirtual({
+      ecosystem: "php",
+      phpWebFramework: "slim",
+      phpJobQueue: "laravel-queue",
+    });
+    expect(result.success).toBe(false);
+    expect(result.error).toContain("Laravel Queue is generated for Laravel");
+    expect(result.tree).toBeUndefined();
+  });
+
   it("rejects Symfony Security outside Symfony before emitting files", async () => {
     const result = await createVirtual({
       ecosystem: "php",

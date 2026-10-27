@@ -703,6 +703,16 @@ const CATEGORY_NAMES: Record<string, LocalizedMap> = {
     "fr": "Cache PHP",
     "uk": "Кеш PHP",
   },
+  phpJobQueue: {
+    "es": "Trabajos en segundo plano PHP",
+    "zh": "PHP 后台任务",
+    "ja": "PHP バックグラウンドジョブ",
+    "ko": "PHP 백그라운드 작업",
+    "zh-Hant": "PHP 背景工作",
+    "de": "PHP-Hintergrundjobs",
+    "fr": "Tâches en arrière-plan PHP",
+    "uk": "Фонові завдання PHP",
+  },
   phpAuth: {
     "es": "Auth PHP",
     "zh": "PHP 认证",

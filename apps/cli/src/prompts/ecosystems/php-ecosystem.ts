@@ -3,6 +3,7 @@ import { getPhpCapabilityIssue } from "@better-fullstack/types";
 import type {
   PhpAuth,
   PhpCache,
+  PhpJobQueue,
   PhpOrm,
   PhpTesting,
   PhpValidation,
@@ -89,6 +90,25 @@ const CACHE_OPTIONS: PromptOption<PhpCache>[] = [
     hint: "Laravel file cache store (Laravel only)",
   },
   { value: "none", label: "None", hint: "No cache" },
+];
+
+const JOB_QUEUE_OPTIONS: PromptOption<PhpJobQueue>[] = [
+  {
+    value: "symfony-messenger",
+    label: "Symfony Messenger",
+    hint: "Doctrine transport on SQLite with a worker command",
+  },
+  {
+    value: "enqueue-fs",
+    label: "Enqueue (filesystem)",
+    hint: "queue-interop filesystem transport with a worker command",
+  },
+  {
+    value: "laravel-queue",
+    label: "Laravel Queue",
+    hint: "Database queue and queue:work (Laravel only)",
+  },
+  { value: "none", label: "None", hint: "No background jobs" },
 ];
 
 export function resolvePhpWebFrameworkPrompt(value?: PhpWebFramework) {
@@ -187,6 +207,24 @@ export async function getPhpCacheChoice(value?: PhpCache, framework?: PhpWebFram
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
   const response = await navigableSelect<PhpCache>({
     message: "Select PHP cache",
+    options: resolution.options,
+    initialValue: resolution.initialValue,
+  });
+  return isCancel(response) ? exitCancelled("Operation cancelled") : response;
+}
+
+export function resolvePhpJobQueuePrompt(value?: PhpJobQueue, framework?: PhpWebFramework) {
+  const options = JOB_QUEUE_OPTIONS.filter(
+    (option) => !getPhpCapabilityIssue(framework, "jobQueue", option.value),
+  );
+  return createStaticSinglePromptResolution(options, "none", value);
+}
+
+export async function getPhpJobQueueChoice(value?: PhpJobQueue, framework?: PhpWebFramework) {
+  const resolution = resolvePhpJobQueuePrompt(value, framework);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
+  const response = await navigableSelect<PhpJobQueue>({
+    message: "Select PHP background job queue",
     options: resolution.options,
     initialValue: resolution.initialValue,
   });

@@ -77,6 +77,7 @@ import {
   PHP_TESTING_VALUES,
   PHP_VALIDATION_VALUES,
   PHP_CACHE_VALUES,
+  PHP_JOB_QUEUE_VALUES,
   ELIXIR_WEB_FRAMEWORK_VALUES,
   EFFECT_VALUES,
   EMAIL_VALUES,
@@ -835,7 +836,12 @@ const LEGACY_EXTRA_CATEGORIES_BY_ECOSYSTEM = {
     caching: "rubyCache",
     jobQueue: "rubyJobQueue",
   },
-  php: { testing: "phpTesting", validation: "phpValidation", caching: "phpCache" },
+  php: {
+    testing: "phpTesting",
+    validation: "phpValidation",
+    caching: "phpCache",
+    jobQueue: "phpJobQueue",
+  },
   elixir: {
     realtime: "elixirRealtime",
     jobQueue: "elixirJobs",
@@ -1299,6 +1305,7 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ...defineTools(PHP_TESTING_VALUES, "testing", "php", "phpTesting"),
   ...defineTools(PHP_VALIDATION_VALUES, "validation", "php", "phpValidation"),
   ...defineTools(PHP_CACHE_VALUES, "caching", "php", "phpCache"),
+  ...defineTools(PHP_JOB_QUEUE_VALUES, "jobQueue", "php", "phpJobQueue"),
   ...defineTools(["composer"], "packageManager", "php").map((definition) => ({
     ...definition,
     selectable: false,
