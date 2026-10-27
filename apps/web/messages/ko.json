@@ -620,6 +620,7 @@
   "docsCliSummaryElixirElixirDocumentation": "Elixir 문서화.",
   "docsCliSummaryElixirElixirClustering": "Elixir 클러스터링.",
   "docsCliSummaryElixirElixirLogging": "Elixir 로깅.",
+  "docsCliSummaryElixirElixirConfig": "Elixir 런타임 설정.",
   "docsCliSummaryElixirElixirDeploy": "Elixir 배포 대상.",
   "docsCliSummaryElixirElixirLibraries": "Elixir 라이브러리.",
   "docsSectionStart": "시작",

@@ -16,6 +16,16 @@ if config_env() == :dev and File.exists?(".env") do
     end
   end)
 end
+{{#if (eq elixirConfig "dotenvy")}}
+import Dotenvy
+
+source!([".env", System.get_env()])
+
+config :{{elixirAppName}}, :settings,
+  greeting: env!("APP_GREETING", :string, "Hello"),
+  max_connections: env!("APP_MAX_CONNECTIONS", :integer, 10)
+
+{{/if}}
 {{#if (eq elixirClustering "libcluster")}}
 cluster_hosts =
   System.get_env("CLUSTER_HOSTS", "")

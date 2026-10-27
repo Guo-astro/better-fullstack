@@ -323,6 +323,7 @@ export function buildCommand(name: string, config: ProjectConfig): string {
     ["elixir-documentation", config.elixirDocumentation],
     ["elixir-clustering", config.elixirClustering],
     ["elixir-logging", config.elixirLogging],
+    ["elixir-config", config.elixirConfig],
     ["elixir-deploy", config.elixirDeploy],
     ["elixir-libraries", withExplicitNone(config.elixirLibraries)],
   ];

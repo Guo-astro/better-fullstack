@@ -34,6 +34,12 @@ config :{{elixirAppName}},
        live_view: [signing_salt: "change-me"]
 {{/if}}
 
+{{#if (eq elixirConfig "confex")}}
+config :{{elixirAppName}}, {{elixirModuleName}}.Settings,
+  greeting: {:system, "APP_GREETING", "Hello"},
+  max_connections: {:system, :integer, "APP_MAX_CONNECTIONS", 10}
+
+{{/if}}
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]

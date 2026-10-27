@@ -182,6 +182,7 @@ import type {
   ElixirDocumentationSchema,
   ElixirClusteringSchema,
   ElixirLoggingSchema,
+  ElixirConfigSchema,
   ElixirDeploySchema,
   AiDocsSchema,
   ShadcnBaseSchema,
@@ -366,6 +367,7 @@ export type ElixirApplicationFramework = z.infer<typeof ElixirApplicationFramewo
 export type ElixirDocumentation = z.infer<typeof ElixirDocumentationSchema>;
 export type ElixirClustering = z.infer<typeof ElixirClusteringSchema>;
 export type ElixirLogging = z.infer<typeof ElixirLoggingSchema>;
+export type ElixirConfig = z.infer<typeof ElixirConfigSchema>;
 export type ElixirDeploy = z.infer<typeof ElixirDeploySchema>;
 export type AiDocs = z.infer<typeof AiDocsSchema>;
 export type ShadcnBase = z.infer<typeof ShadcnBaseSchema>;

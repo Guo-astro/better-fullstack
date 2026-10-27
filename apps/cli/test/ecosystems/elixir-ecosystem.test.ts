@@ -1016,4 +1016,49 @@ describe("Elixir library expansion", () => {
       ),
     ).toThrow("Logster request logging requires Phoenix");
   });
+
+  it.each([
+    [
+      "dotenvy",
+      '{:dotenvy, "~> 1.2"}',
+      "config/runtime.exs",
+      'env!("APP_MAX_CONNECTIONS", :integer, 10)',
+    ],
+    [
+      "skogsra",
+      '{:skogsra, "~> 2.5"}',
+      "lib/elixir_config/settings.ex",
+      "app_env :max_connections",
+    ],
+    [
+      "confex",
+      '{:confex, "~> 3.5"}',
+      "config/config.exs",
+      '{:system, :integer, "APP_MAX_CONNECTIONS", 10}',
+    ],
+  ] as const)(
+    "reads typed settings through %s",
+    async (elixirConfig, dependency, path, snippet) => {
+      const result = await createVirtual({
+        ...base,
+        projectName: "elixir-config",
+        elixirWebFramework: "none",
+        elixirRealtime: "none",
+        elixirOrm: "none",
+        elixirAuth: "none",
+        elixirApi: "none",
+        elixirHttpServer: "none",
+        elixirI18n: "none",
+        elixirConfig,
+      });
+
+      expect(result.success).toBe(true);
+      const tree = result.tree!;
+      expect(getVirtualTreeFileContent(tree, "mix.exs")).toContain(dependency);
+      expect(getVirtualTreeFileContent(tree, path)).toContain(snippet);
+      expect(hasVirtualFile(tree.root, "lib/elixir_config/settings.ex")).toBe(true);
+      expect(hasVirtualFile(tree.root, "test/elixir_config/settings_test.exs")).toBe(true);
+      expect(getVirtualTreeFileContent(tree, ".env.example")).toContain("APP_MAX_CONNECTIONS=10");
+    },
+  );
 });

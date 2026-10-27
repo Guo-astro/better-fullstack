@@ -7040,6 +7040,40 @@ export const TECH_OPTIONS: Record<
       default: true,
     },
   ],
+  elixirConfig: [
+    {
+      id: "dotenvy",
+      name: "Dotenvy",
+      description: "Typed env vars and .env files in runtime.exs",
+      icon: "",
+      color: "from-lime-500 to-green-600",
+      isNew: true,
+    },
+    {
+      id: "skogsra",
+      name: "Skogsra",
+      description: "Typed settings module backed by OS env vars",
+      icon: "",
+      color: "from-green-600 to-emerald-700",
+      isNew: true,
+    },
+    {
+      id: "confex",
+      name: "Confex",
+      description: "{:system, ...} tuples resolved at runtime",
+      icon: "",
+      color: "from-cyan-500 to-sky-600",
+      isNew: true,
+    },
+    {
+      id: "none",
+      name: "Plain runtime.exs",
+      description: "Read env vars directly in config/runtime.exs",
+      icon: "",
+      color: "from-gray-400 to-gray-600",
+      default: true,
+    },
+  ],
   elixirDeploy: [
     {
       id: "docker",

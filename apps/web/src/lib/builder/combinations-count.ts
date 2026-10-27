@@ -151,6 +151,7 @@ const elixirSingleSelectCategories = [
   "elixirDocumentation",
   "elixirClustering",
   "elixirLogging",
+  "elixirConfig",
   "elixirDeploy",
   "packageManager",
   "git",

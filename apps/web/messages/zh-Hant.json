@@ -620,6 +620,7 @@
   "docsCliSummaryElixirElixirDocumentation": "Elixir 文件產生。",
   "docsCliSummaryElixirElixirClustering": "Elixir 叢集。",
   "docsCliSummaryElixirElixirLogging": "Elixir 日誌。",
+  "docsCliSummaryElixirElixirConfig": "Elixir 執行階段設定。",
   "docsCliSummaryElixirElixirDeploy": "Elixir 部署目標。",
   "docsCliSummaryElixirElixirLibraries": "Elixir 函式庫。",
   "docsSectionStart": "開始",

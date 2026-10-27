@@ -1332,6 +1332,12 @@ export const CLI_FLAG_GROUP_DEFINITIONS: readonly CliFlagGroupDefinition[] = [
         configKey: "elixirLogging",
       },
       {
+        flag: "elixir-config",
+        summary: "Elixir runtime configuration.",
+        source: { kind: "category", category: "elixirConfig" },
+        configKey: "elixirConfig",
+      },
+      {
         flag: "elixir-deploy",
         summary: "Elixir deploy target.",
         source: { kind: "category", category: "elixirDeploy" },

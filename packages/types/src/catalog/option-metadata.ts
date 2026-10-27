@@ -41,6 +41,7 @@ import {
   ELIXIR_DOCUMENTATION_VALUES,
   ELIXIR_CLUSTERING_VALUES,
   ELIXIR_LOGGING_VALUES,
+  ELIXIR_CONFIG_VALUES,
   ELIXIR_REALTIME_VALUES,
   ELIXIR_TESTING_VALUES,
   ELIXIR_VALIDATION_VALUES,
@@ -467,6 +468,7 @@ export const ELIXIR_CATEGORY_ORDER = [
   "elixirDocumentation",
   "elixirClustering",
   "elixirLogging",
+  "elixirConfig",
   "elixirDeploy",
   "elixirLibraries",
   "aiDocs",
@@ -968,6 +970,7 @@ const CATEGORY_DEFINITIONS = {
   elixirDocumentation: { values: ELIXIR_DOCUMENTATION_VALUES, displayName: "Elixir Documentation" },
   elixirClustering: { values: ELIXIR_CLUSTERING_VALUES, displayName: "Elixir Clustering" },
   elixirLogging: { values: ELIXIR_LOGGING_VALUES, displayName: "Elixir Logging" },
+  elixirConfig: { values: ELIXIR_CONFIG_VALUES, displayName: "Elixir Config" },
   elixirDeploy: { values: ELIXIR_DEPLOY_VALUES, displayName: "Elixir Deploy" },
   elixirLibraries: {
     values: ELIXIR_LIBRARIES_VALUES,
@@ -1998,6 +2001,11 @@ const EXACT_LABEL_OVERRIDES: Partial<Record<OptionCategory, Partial<Record<strin
     "logger-json": "LoggerJSON",
     "logger-file-backend": "LoggerFileBackend",
     logster: "Logster",
+  },
+  elixirConfig: {
+    dotenvy: "Dotenvy",
+    skogsra: "Skogsra",
+    confex: "Confex",
   },
   elixirDeploy: {
     docker: "Docker",

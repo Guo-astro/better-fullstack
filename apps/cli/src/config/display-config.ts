@@ -256,6 +256,9 @@ export function displayConfig(config: Partial<ProjectConfig>) {
     if (config.elixirLogging && config.elixirLogging !== "none") {
       configDisplay.push(`${pc.blue("Elixir Logging:")} ${String(config.elixirLogging)}`);
     }
+    if (config.elixirConfig && config.elixirConfig !== "none") {
+      configDisplay.push(`${pc.blue("Elixir Config:")} ${String(config.elixirConfig)}`);
+    }
     if (config.elixirDeploy && config.elixirDeploy !== "none") {
       configDisplay.push(`${pc.blue("Elixir Deploy:")} ${String(config.elixirDeploy)}`);
     }

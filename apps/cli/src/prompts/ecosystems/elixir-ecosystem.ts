@@ -17,6 +17,7 @@ import type {
   ElixirDocumentation,
   ElixirClustering,
   ElixirLogging,
+  ElixirConfig,
   ElixirRealtime,
   ElixirTesting,
   ElixirValidation,
@@ -30,7 +31,7 @@ import {
   createStaticSinglePromptResolution,
   type PromptOption,
 } from "@/prompts/core/prompt-contract";
-import { ElixirLoggingSchema } from "@/types";
+import { ElixirConfigSchema, ElixirLoggingSchema } from "@/types";
 
 function makeChoice<T extends string>(
   message: string,
@@ -237,6 +238,13 @@ const LOGGING_OPTIONS: PromptOption<ElixirLogging>[] = [
   { value: "none", label: "None", hint: "Default console Logger" },
 ];
 
+const CONFIG_OPTIONS: PromptOption<ElixirConfig>[] = [
+  { value: "dotenvy", label: "Dotenvy", hint: "Typed env vars and .env files in runtime.exs" },
+  { value: "skogsra", label: "Skogsra", hint: "Typed settings module backed by OS env vars" },
+  { value: "confex", label: "Confex", hint: "{:system, ...} tuples resolved at runtime" },
+  { value: "none", label: "None", hint: "Plain config/runtime.exs" },
+];
+
 const DEPLOY_OPTIONS: PromptOption<ElixirDeploy>[] = [
   { value: "docker", label: "Docker", hint: "Dockerfile for Phoenix releases" },
   { value: "fly", label: "Fly.io", hint: "Fly.io release config" },
@@ -289,6 +297,12 @@ export const resolveElixirLoggingPrompt = (value?: string) =>
     "none",
     ElixirLoggingSchema.optional().parse(value),
   );
+export const resolveElixirConfigPrompt = (value?: string) =>
+  createStaticSinglePromptResolution(
+    CONFIG_OPTIONS,
+    "none",
+    ElixirConfigSchema.optional().parse(value),
+  );
 export const resolveElixirDeployPrompt = (value?: ElixirDeploy) =>
   createStaticSinglePromptResolution(DEPLOY_OPTIONS, "none", value);
 export const getElixirWebFrameworkChoice = (value?: ElixirWebFramework) =>
@@ -331,6 +345,8 @@ export const getElixirClusteringChoice = (value?: ElixirClustering) =>
   makeChoice("Select Elixir clustering", CLUSTERING_OPTIONS, "none", value);
 export const getElixirLoggingChoice = (value?: ElixirLogging) =>
   makeChoice("Select Elixir logging", LOGGING_OPTIONS, "none", value);
+export const getElixirConfigChoice = (value?: ElixirConfig) =>
+  makeChoice("Select Elixir runtime configuration", CONFIG_OPTIONS, "none", value);
 export const getElixirDeployChoice = (value?: ElixirDeploy) =>
   makeChoice("Select Elixir deploy target", DEPLOY_OPTIONS, "none", value);
 

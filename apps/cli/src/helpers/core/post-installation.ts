@@ -1800,6 +1800,7 @@ function displayElixirInstructions(config: ProjectConfig & { depsInstalled: bool
     elixirAuth,
     elixirDeploy,
     elixirLogging,
+    elixirConfig,
   } = config;
 
   let output = `${pc.bold("Project created successfully!")}\n\n`;
@@ -1827,6 +1828,7 @@ function displayElixirInstructions(config: ProjectConfig & { depsInstalled: bool
     output += `${pc.yellow("NOTE:")} Exq needs Redis at REDIS_URL (default redis://localhost:6379)\n`;
   }
   if (elixirLogging !== "none") output += `${pc.cyan("•")} Logging: ${elixirLogging}\n`;
+  if (elixirConfig !== "none") output += `${pc.cyan("•")} Runtime config: ${elixirConfig}\n`;
 
   output += `\n${pc.bold("Common Mix commands:")}\n`;
   output += `${pc.cyan("•")} Run: mix phx.server\n`;

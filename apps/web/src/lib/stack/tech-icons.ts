@@ -205,6 +205,9 @@ export const ICON_REGISTRY: Record<string, IconConfig> = {
   "logger-json": { type: "si", slug: "json", hex: "000000" },
   "logger-file-backend": { type: "si", slug: "elixir", hex: "4B275F" },
   logster: { type: "si", slug: "phoenixframework", hex: "FD4F00" },
+  dotenvy: { type: "si", slug: "dotenv", hex: "ECD53F" },
+  skogsra: { type: "si", slug: "elixir", hex: "4B275F" },
+  confex: { type: "si", slug: "elixir", hex: "4B275F" },
   "mix-release": { type: "si", slug: "elixir", hex: "4B275F" },
   gigalixir: { type: "si", slug: "elixir", hex: "4B275F" },
 

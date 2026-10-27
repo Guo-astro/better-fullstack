@@ -636,6 +636,7 @@
   "docsCliSummaryElixirElixirDocumentation": "Elixir documentation.",
   "docsCliSummaryElixirElixirClustering": "Elixir clustering.",
   "docsCliSummaryElixirElixirLogging": "Elixir logging.",
+  "docsCliSummaryElixirElixirConfig": "Elixir runtime configuration.",
   "docsCliSummaryElixirElixirDeploy": "Elixir deploy target.",
   "docsCliSummaryElixirElixirLibraries": "Elixir libraries.",
   "docsSectionStart": "Start",

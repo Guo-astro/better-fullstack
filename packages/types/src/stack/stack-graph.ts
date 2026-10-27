@@ -192,6 +192,7 @@ import {
   ELIXIR_DOCUMENTATION_VALUES,
   ELIXIR_CLUSTERING_VALUES,
   ELIXIR_LOGGING_VALUES,
+  ELIXIR_CONFIG_VALUES,
   StackPartRoleSchema,
   STATE_MANAGEMENT_VALUES,
   TESTING_VALUES,
@@ -652,6 +653,7 @@ const OWNER_ROLES_BY_SCOPED_ROLE = {
   server: ["backend"],
   packageManager: ["backend"],
   messageQueue: ["backend"],
+  runtimeConfig: ["backend"],
 } as Partial<Record<StackPartRole, readonly StackPrimaryRole[]>>;
 
 const FRESH_UNSUPPORTED_STATE_MANAGEMENT_TOOLS = new Set([
@@ -844,6 +846,7 @@ const LEGACY_EXTRA_CATEGORIES_BY_ECOSYSTEM = {
     documentation: "elixirDocumentation",
     config: "elixirClustering",
     logging: "elixirLogging",
+    runtimeConfig: "elixirConfig",
     deploy: "elixirDeploy",
   },
 } as const satisfies Record<
@@ -1323,6 +1326,7 @@ export const STACK_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   }),
   ...defineTools(ELIXIR_CLUSTERING_VALUES, "config", "elixir", "elixirClustering"),
   ...defineTools(ELIXIR_LOGGING_VALUES, "logging", "elixir", "elixirLogging"),
+  ...defineTools(ELIXIR_CONFIG_VALUES, "runtimeConfig", "elixir", "elixirConfig"),
   ...defineTools(ELIXIR_DEPLOY_VALUES, "deploy", "elixir", "elixirDeploy"),
   {
     toolId: "convex",

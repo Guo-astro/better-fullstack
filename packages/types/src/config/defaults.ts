@@ -177,6 +177,7 @@ export const CLI_DEFAULT_PROJECT_CONFIG = {
   elixirDocumentation: "none",
   elixirClustering: "none",
   elixirLogging: "none",
+  elixirConfig: "none",
   elixirDeploy: "none",
   elixirLibraries: [],
   // Ship both CLAUDE.md (Claude Code) and AGENTS.md (the cross-tool standard,

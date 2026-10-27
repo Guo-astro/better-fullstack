@@ -620,6 +620,7 @@
   "docsCliSummaryElixirElixirDocumentation": "Documentation Elixir.",
   "docsCliSummaryElixirElixirClustering": "Clustering Elixir.",
   "docsCliSummaryElixirElixirLogging": "Journalisation Elixir.",
+  "docsCliSummaryElixirElixirConfig": "Configuration d'exécution Elixir.",
   "docsCliSummaryElixirElixirDeploy": "Cible de déploiement Elixir.",
   "docsCliSummaryElixirElixirLibraries": "Bibliothèques Elixir.",
   "docsSectionStart": "Démarrer",

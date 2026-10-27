@@ -2700,6 +2700,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://hexdocs.pm/logster/1.1.1/",
     githubUrl: "https://github.com/navinpeiris/logster",
   },
+  "elixirConfig:dotenvy": {
+    docsUrl: "https://hexdocs.pm/dotenvy/",
+    githubUrl: "https://github.com/fireproofsocks/dotenvy",
+  },
+  "elixirConfig:skogsra": {
+    docsUrl: "https://hexdocs.pm/skogsra/",
+    githubUrl: "https://github.com/gmtprime/skogsra",
+  },
+  "elixirConfig:confex": {
+    docsUrl: "https://hexdocs.pm/confex/",
+    githubUrl: "https://github.com/Nebo15/confex",
+  },
   "elixirLibraries:ex_aws": {
     docsUrl: "https://hexdocs.pm/ex_aws/",
     githubUrl: "https://github.com/ex-aws/ex_aws",

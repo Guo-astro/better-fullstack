@@ -232,6 +232,15 @@ defmodule {{elixirModuleName}}.MixProject do
 {{#if (eq elixirLogging "logster")}}
       {:logster, "~> 1.1"},
 {{/if}}
+{{#if (eq elixirConfig "dotenvy")}}
+      {:dotenvy, "~> 1.2"},
+{{/if}}
+{{#if (eq elixirConfig "skogsra")}}
+      {:skogsra, "~> 2.5"},
+{{/if}}
+{{#if (eq elixirConfig "confex")}}
+      {:confex, "~> 3.5"},
+{{/if}}
 {{#if (includes elixirLibraries "ex_aws")}}
       {:ex_aws, "~> 2.7"},
       {:ex_aws_s3, "~> 2.5"},
