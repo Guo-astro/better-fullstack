@@ -361,7 +361,7 @@ async function verifyBuild(fixture: UpgradeFixtureCase, projectDir: string, cliP
     steps: result.steps.map((step) => ({
       skipped: step.skipped === true,
       step: step.step,
-      stderr: typeof step.stderr === "string" ? step.stderr.slice(0, 400) : undefined,
+      stderr: typeof step.stderr === "string" ? step.stderr.slice(-1200) : undefined,
       success: step.success,
     })),
     verified: true,
