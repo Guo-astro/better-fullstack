@@ -918,6 +918,10 @@ export const CrystalValidationSchema = z
   .enum(["athena-validator", "active-model", "marten-schema", "none"])
   .describe("Experimental Crystal input validation");
 
+export const CrystalCacheSchema = z
+  .enum(["memory", "file", "redis", "none"])
+  .describe("Experimental Crystal cache store");
+
 export const JavaLanguageSchema = z
   .enum(["java", "kotlin"])
   .describe("JVM language variant for the Java ecosystem (java or kotlin)");
@@ -1476,6 +1480,7 @@ const STACK_CONFIG_FIELDS = {
   crystalAuth: CrystalAuthSchema.default("none"),
   crystalTesting: CrystalTestingSchema.default("spec"),
   crystalValidation: CrystalValidationSchema.default("none"),
+  crystalCache: CrystalCacheSchema.default("none"),
   javaLanguage: JavaLanguageSchema.optional(),
   javaWebFramework: JavaWebFrameworkSchema,
   javaBuildTool: JavaBuildToolSchema,
@@ -1792,6 +1797,7 @@ export const CRYSTAL_ORM_VALUES = CrystalOrmSchema.options;
 export const CRYSTAL_AUTH_VALUES = CrystalAuthSchema.options;
 export const CRYSTAL_TESTING_VALUES = CrystalTestingSchema.options;
 export const CRYSTAL_VALIDATION_VALUES = CrystalValidationSchema.options;
+export const CRYSTAL_CACHE_VALUES = CrystalCacheSchema.options;
 export const JAVA_WEB_FRAMEWORK_VALUES = JavaWebFrameworkSchema.options;
 export const JAVA_BUILD_TOOL_VALUES = JavaBuildToolSchema.options;
 export const JAVA_ORM_VALUES = JavaOrmSchema.options;

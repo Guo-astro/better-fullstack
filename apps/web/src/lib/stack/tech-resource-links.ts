@@ -2559,6 +2559,18 @@ const CATEGORY_LINKS: LinkMap = {
     docsUrl: "https://martenframework.com/docs/schemas",
     githubUrl: "https://github.com/martenframework/marten",
   },
+  "crystalCache:memory": {
+    docsUrl: "https://github.com/crystal-cache/cache#readme",
+    githubUrl: "https://github.com/crystal-cache/cache",
+  },
+  "crystalCache:file": {
+    docsUrl: "https://github.com/crystal-cache/cache#readme",
+    githubUrl: "https://github.com/crystal-cache/cache",
+  },
+  "crystalCache:redis": {
+    docsUrl: "https://github.com/crystal-cache/redis_cache_store#readme",
+    githubUrl: "https://github.com/crystal-cache/redis_cache_store",
+  },
   "elixirOrm:ecto-sql": {
     docsUrl: "https://hexdocs.pm/ecto_sql/",
     githubUrl: "https://github.com/elixir-ecto/ecto_sql",

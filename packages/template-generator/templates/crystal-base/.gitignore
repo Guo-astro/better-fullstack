@@ -3,3 +3,4 @@
 /.shards/
 /.env
 *.sqlite3
+/tmp/

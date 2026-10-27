@@ -792,5 +792,6 @@
   "docsCliSummaryCrystalCrystalOrm": "실험적인 Crystal 데이터베이스 계층입니다.",
   "docsCliSummaryCrystalCrystalAuth": "실험적인 Crystal 인증입니다.",
   "docsCliSummaryCrystalCrystalTesting": "실험적인 Crystal 테스트 도구입니다.",
-  "docsCliSummaryCrystalCrystalValidation": "실험적인 Crystal 입력 검증입니다."
+  "docsCliSummaryCrystalCrystalValidation": "실험적인 Crystal 입력 검증입니다.",
+  "docsCliSummaryCrystalCrystalCache": "실험적인 Crystal 캐시 저장소입니다."
 }

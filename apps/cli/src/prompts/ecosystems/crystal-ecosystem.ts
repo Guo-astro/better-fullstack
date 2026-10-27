@@ -1,5 +1,5 @@
-import type { CrystalAuth, CrystalTesting, CrystalValidation, CrystalOrm, CrystalSelection, CrystalWebFramework } from "@/types";
-import { CrystalAuthSchema, CrystalTestingSchema, CrystalValidationSchema, CrystalOrmSchema, CrystalWebFrameworkSchema, getCrystalOptionIssue } from "@/types";
+import type { CrystalAuth, CrystalTesting, CrystalValidation, CrystalCache, CrystalOrm, CrystalSelection, CrystalWebFramework } from "@/types";
+import { CrystalAuthSchema, CrystalTestingSchema, CrystalValidationSchema, CrystalCacheSchema, CrystalOrmSchema, CrystalWebFrameworkSchema, getCrystalOptionIssue } from "@/types";
 import { exitCancelled } from "@/presentation/errors";
 import { isCancel, navigableSelect } from "@/prompts/core/navigable";
 import { createStaticSinglePromptResolution } from "@/prompts/core/prompt-contract";
@@ -99,6 +99,25 @@ export async function getCrystalValidationChoice(value?: CrystalValidation, sele
   const resolution = resolveCrystalValidationPrompt(value, selection);
   if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
   const response = await navigableSelect<CrystalValidation>({ message: "Select Crystal input validation", options: resolution.options, initialValue: resolution.initialValue });
+  if (isCancel(response)) return exitCancelled("Operation cancelled");
+  return response;
+}
+
+export function resolveCrystalCachePrompt(value?: string, selection: CrystalSelection = {}) {
+  const selected = value === undefined ? undefined : CrystalCacheSchema.parse(value);
+  const options = [
+    { value: "memory" as const, label: "Memory store", hint: "Process-local TTL cache" },
+    { value: "file" as const, label: "File store", hint: "TTL cache files under CACHE_DIR" },
+    { value: "redis" as const, label: "Redis", hint: "Shared TTL cache in Redis" },
+    { value: "none" as const, label: "None" },
+  ].filter((option) => !getCrystalOptionIssue("crystalCache", option.value, selection));
+  return createStaticSinglePromptResolution(options, "none", selected);
+}
+
+export async function getCrystalCacheChoice(value?: CrystalCache, selection: CrystalSelection = {}) {
+  const resolution = resolveCrystalCachePrompt(value, selection);
+  if (!resolution.shouldPrompt) return resolution.autoValue ?? "none";
+  const response = await navigableSelect<CrystalCache>({ message: "Select Crystal cache store", options: resolution.options, initialValue: resolution.initialValue });
   if (isCancel(response)) return exitCancelled("Operation cancelled");
   return response;
 }

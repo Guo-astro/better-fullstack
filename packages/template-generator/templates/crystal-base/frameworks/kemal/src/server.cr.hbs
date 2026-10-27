@@ -6,6 +6,9 @@ require "kemal"
 {{#if (eq crystalAuth "jwt")}}
 require "./token_auth"
 {{/if}}
+{{#if (ne crystalCache "none")}}
+require "./cached_clock"
+{{/if}}
 {{#if (eq crystalAuth "kemal-session")}}
 require "kemal-session"
 require "./auth_credentials"
@@ -127,6 +130,14 @@ post "/api/auth/logout" do |env|
   env.session.destroy
   env.response.status_code = 204
   nil
+end
+
+{{/if}}
+{{#if (ne crystalCache "none")}}
+get "/api/cached-time" do |env|
+  result = CachedClock.fetch
+  env.response.status_code = result.status
+  result.body
 end
 
 {{/if}}

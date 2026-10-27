@@ -792,5 +792,6 @@
   "docsCliSummaryCrystalCrystalOrm": "Experimentelle Crystal-Datenbankschicht.",
   "docsCliSummaryCrystalCrystalAuth": "Experimentelle Crystal-Authentifizierung.",
   "docsCliSummaryCrystalCrystalTesting": "Experimentelle Crystal-Testwerkzeuge.",
-  "docsCliSummaryCrystalCrystalValidation": "Experimentelle Crystal-Eingabevalidierung."
+  "docsCliSummaryCrystalCrystalValidation": "Experimentelle Crystal-Eingabevalidierung.",
+  "docsCliSummaryCrystalCrystalCache": "Experimenteller Crystal-Cache-Speicher."
 }

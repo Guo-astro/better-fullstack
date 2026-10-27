@@ -8,6 +8,7 @@ export const CRYSTAL_PROJECT_DEFAULTS = {
   crystalAuth: "none",
   crystalTesting: "spec",
   crystalValidation: "none",
+  crystalCache: "none",
   frontend: ["none"],
   backend: "none",
   runtime: "none",
@@ -97,6 +98,7 @@ export type CrystalSelection = {
   crystalAuth?: string;
   crystalTesting?: string;
   crystalValidation?: string;
+  crystalCache?: string;
 };
 
 const CRYSTAL_ORM_LABELS: Record<string, string> = { "marten-orm": "Marten ORM" };
@@ -128,6 +130,14 @@ export const CRYSTAL_OPTION_RULES = {
     role: "validation",
     options: {
       "marten-schema": { label: "Marten Schema", frameworks: ["marten"] },
+    },
+  },
+  crystalCache: {
+    role: "caching",
+    options: {
+      memory: { label: "Memory cache", frameworks: CRYSTAL_HTTP_FRAMEWORKS },
+      file: { label: "File cache", frameworks: CRYSTAL_HTTP_FRAMEWORKS },
+      redis: { label: "Redis cache", frameworks: CRYSTAL_HTTP_FRAMEWORKS },
     },
   },
 } as const satisfies Record<

@@ -793,5 +793,6 @@
   "docsCliSummaryCrystalCrystalOrm": "Experimental Crystal database layer.",
   "docsCliSummaryCrystalCrystalAuth": "Experimental Crystal authentication.",
   "docsCliSummaryCrystalCrystalTesting": "Experimental Crystal test tooling.",
-  "docsCliSummaryCrystalCrystalValidation": "Experimental Crystal input validation."
+  "docsCliSummaryCrystalCrystalValidation": "Experimental Crystal input validation.",
+  "docsCliSummaryCrystalCrystalCache": "Experimental Crystal cache store."
 }

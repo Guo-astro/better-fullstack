@@ -20,6 +20,9 @@ require "./session_auth"
 {{#if (eq crystalAuth "jwt")}}
 require "./token_auth"
 {{/if}}
+{{#if (ne crystalCache "none")}}
+require "./cached_clock"
+{{/if}}
 {{#if (ne crystalOrm "none")}}
 require "./greeting_store"
 {{/if}}

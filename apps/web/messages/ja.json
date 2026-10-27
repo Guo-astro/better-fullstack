@@ -792,5 +792,6 @@
   "docsCliSummaryCrystalCrystalOrm": "実験的な Crystal データベース層。",
   "docsCliSummaryCrystalCrystalAuth": "実験的な Crystal 認証。",
   "docsCliSummaryCrystalCrystalTesting": "実験的な Crystal テストツール。",
-  "docsCliSummaryCrystalCrystalValidation": "実験的な Crystal 入力検証。"
+  "docsCliSummaryCrystalCrystalValidation": "実験的な Crystal 入力検証。",
+  "docsCliSummaryCrystalCrystalCache": "実験的な Crystal キャッシュストア。"
 }

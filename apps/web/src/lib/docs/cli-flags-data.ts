@@ -2088,6 +2088,19 @@ export const CLI_FLAG_GROUPS: CliFlagGroup[] = [
         "valueHint": null,
         "defaultValue": "none",
         "multiple": false
+      },
+      {
+        "flag": "--crystal-cache",
+        "summary": "Crystal cache store.",
+        "values": [
+          "memory",
+          "file",
+          "redis",
+          "none"
+        ],
+        "valueHint": null,
+        "defaultValue": "none",
+        "multiple": false
       }
     ]
   },
@@ -3150,6 +3163,7 @@ export const CLI_FLAG_SUMMARY_MESSAGES: Record<string, () => string> = {
   "crystal:--crystal-auth": m.docsCliSummaryCrystalCrystalAuth,
   "crystal:--crystal-testing": m.docsCliSummaryCrystalCrystalTesting,
   "crystal:--crystal-validation": m.docsCliSummaryCrystalCrystalValidation,
+  "crystal:--crystal-cache": m.docsCliSummaryCrystalCrystalCache,
   "java:--java-web-framework": m.docsCliSummaryJavaJavaWebFramework,
   "java:--java-language": m.docsCliSummaryJavaJavaLanguage,
   "java:--java-build-tool": m.docsCliSummaryJavaJavaBuildTool,

@@ -305,6 +305,18 @@ describe("bounded Crystal HTTP recipe", () => {
     expect(parseStackSelectionFromSearch(encoded).crystalValidation).toBe("marten-schema");
   });
 
+  it("requires an HTTP framework for the cached route and round-trips the cache store", () => {
+    const redis = createCrystalStackSelection({ crystalWebFramework: "athena", crystalCache: "redis" });
+    expect(analyzeStackCompatibility(redis).adjustedStack).toBeNull();
+    const withoutFramework = analyzeStackCompatibility({ ...redis, crystalWebFramework: "none" });
+    expect(withoutFramework.adjustedStack?.crystalCache).toBe("none");
+    expect(getDisabledReason({ ...redis, crystalWebFramework: "none" }, "crystalCache", "memory")).toBe(
+      "Memory cache requires Crystal Kemal or Lucky or Athena or Marten.",
+    );
+    const encoded = Object.fromEntries(createStackSelectionSearchParams(redis));
+    expect(parseStackSelectionFromSearch(encoded).crystalCache).toBe("redis");
+  });
+
   it("keeps Crystal experimental without changing the versioned golden recipes", () => {
     expect(GOLDEN_RUNTIME_RECIPES).toHaveLength(8);
     const kemal = getCapabilityInventory().find(

@@ -280,7 +280,7 @@ export const CONFIG_SCOPE_REGISTRY = {
       },
     ],
   },
-  crystal: { core: ["crystalWebFramework", "crystalOrm", "crystalAuth", "crystalTesting", "crystalValidation"], sections: [] },
+  crystal: { core: ["crystalWebFramework", "crystalOrm", "crystalAuth", "crystalTesting", "crystalValidation", "crystalCache"], sections: [] },
   java: {
     core: [
       "javaWebFramework",

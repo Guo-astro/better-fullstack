@@ -7339,6 +7339,12 @@ export const TECH_OPTIONS: Record<
     { id: "marten-schema", name: "Marten Schema", description: "Marten schema fields that strip and bound greeting names", icon: "https://cdn.simpleicons.org/crystal", color: "from-slate-500 to-zinc-600", default: false },
     { id: "none", name: "None", description: "Hand-written greeting checks", icon: "", color: "from-gray-400 to-gray-600", default: true },
   ],
+  crystalCache: [
+    { id: "memory", name: "Memory store", description: "crystal-cache MemoryStore serving a TTL-cached timestamp per process", icon: "https://cdn.simpleicons.org/crystal", color: "from-slate-500 to-zinc-600", default: false },
+    { id: "file", name: "File store", description: "crystal-cache FileStore keeping TTL entries under CACHE_DIR across restarts", icon: "https://cdn.simpleicons.org/crystal", color: "from-slate-500 to-zinc-600", default: false },
+    { id: "redis", name: "Redis", description: "redis_cache_store sharing TTL entries through REDIS_URL", icon: "https://cdn.simpleicons.org/redis", color: "from-red-500 to-red-700", default: false },
+    { id: "none", name: "None", description: "No cache", icon: "", color: "from-gray-400 to-gray-600", default: true },
+  ],
   javaWebFramework: [
     {
       id: "ktor",

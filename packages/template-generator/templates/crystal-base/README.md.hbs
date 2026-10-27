@@ -92,6 +92,10 @@ Spider-Gazelle ActiveModel 4.7.1 checks greeting names in `src/greeting_input.cr
 A Marten schema in `src/greeting_input.cr` strips greeting names and requires 1 to 80 characters. A failure raises `ArgumentError`, which the handlers return as 422 with Marten's translated message.
 
 {{/if}}
+{{#if (ne crystalCache "none")}}
+`GET /api/cached-time` returns `{"cached_at":"..."}` and keeps the same timestamp until its 30-second entry expires.{{#if (eq crystalCache "memory")}} crystal-cache 1.1.0's MemoryStore keeps entries inside one server process, so they reset on restart and are not shared between processes.{{/if}}{{#if (eq crystalCache "file")}} crystal-cache 1.1.0's FileStore writes entries under `CACHE_DIR`, which defaults to `tmp/cache`, so they survive restarts on the same machine.{{/if}}{{#if (eq crystalCache "redis")}} redis_cache_store 1.1.0 keeps entries in Redis at `REDIS_URL`, which defaults to `redis://localhost:6379`, namespaced by `{{shardName}}`. The route returns 503 while Redis is unreachable, and `crystal spec` needs a running Redis.{{/if}}
+
+{{/if}}
 {{#if (eq crystalTesting "spectator")}}
 Spectator 0.12.4 runs `spec/greeting_spectator_spec.cr` in the same `crystal spec` run as the built-in Spec files, and a failure in either fails the run. Use `Spectator.describe` with `let`, `subject`, `sample`, doubles, and mocks for new specs.
 

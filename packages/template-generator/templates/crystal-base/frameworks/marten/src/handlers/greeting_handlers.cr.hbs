@@ -74,3 +74,13 @@ class LogoutHandler < ApiHandler
   end
 end
 {{/if}}
+{{#if (ne crystalCache "none")}}
+
+class CachedTimeHandler < ApiHandler
+  http_method_names :get
+
+  def get
+    respond CachedClock.fetch
+  end
+end
+{{/if}}

@@ -46,6 +46,7 @@ export function displayConfig(config: Partial<ProjectConfig>) {
   if (config.ecosystem === "crystal") configDisplay.push(`${pc.blue("Crystal auth:")} ${config.crystalAuth ?? "none"}`);
   if (config.ecosystem === "crystal") configDisplay.push(`${pc.blue("Crystal testing:")} ${config.crystalTesting ?? "spec"}`);
   if (config.ecosystem === "crystal") configDisplay.push(`${pc.blue("Crystal validation:")} ${config.crystalValidation ?? "none"}`);
+  if (config.ecosystem === "crystal") configDisplay.push(`${pc.blue("Crystal cache:")} ${config.crystalCache ?? "none"}`);
 
   if (config.frontend !== undefined) {
     const frontend = Array.isArray(config.frontend) ? config.frontend : [config.frontend];

@@ -11,6 +11,9 @@ server_env["AUTH_PASSWORD"] = "proof-password"
 {{#if (ne crystalOrm "none")}}
 database_path = File.tempname("proof", ".sqlite3")
 {{/if}}
+{{#if (eq crystalCache "file")}}
+server_env["CACHE_DIR"] = File.tempname("proof-cache")
+{{/if}}
 {{#if (eq crystalOrm "crystal-db")}}
 server_env["DATABASE_URL"] = "sqlite3://#{database_path}"
 {{/if}}
@@ -118,6 +121,11 @@ begin
   raise "signed-out session accepted" unless client.get("/api/me", signed_out).status_code == 401
 {{/if}}
 {{/if}}
+{{#if (ne crystalCache "none")}}
+  cached = client.get("/api/cached-time")
+  raise "cached time failed: #{cached.status_code}" unless cached.status_code == 200 && JSON.parse(cached.body)["cached_at"].as_s?
+  raise "cached time changed before expiry" unless client.get("/api/cached-time").body == cached.body
+{{/if}}
   oversized = client.post("/api/echo", headers, %({"name":"#{"x" * 5000}"}))
   raise "oversized body accepted" unless oversized.status_code == {{#if (eq crystalWebFramework "marten")}}400{{else}}413{{/if}}
   client.close
@@ -136,7 +144,7 @@ begin
   rescue ex : Socket::Error
     raise "listener remained open: #{ex.message}"
   end
-  puts ({proof: "crystal-{{crystalWebFramework}}-http-v1", success: true, assertions: ["invalid-port", "health-json", "hello-json", "cors", "cors-allowlist", "content-type", "blank-name-422", "post-json", "malformed-json-400", "wrong-type-422", "body-limit-{{#if (eq crystalWebFramework "marten")}}400{{else}}413{{/if}}", "sigterm-exit", "port-released"{{#if (ne crystalOrm "none")}}, "{{crystalOrm}}-persisted-greeting"{{/if}}{{#if (ne crystalAuth "none")}}, "{{crystalAuth}}-current-user"{{/if}}]}).to_json
+  puts ({proof: "crystal-{{crystalWebFramework}}-http-v1", success: true, assertions: ["invalid-port", "health-json", "hello-json", "cors", "cors-allowlist", "content-type", "blank-name-422", "post-json", "malformed-json-400", "wrong-type-422", "body-limit-{{#if (eq crystalWebFramework "marten")}}400{{else}}413{{/if}}", "sigterm-exit", "port-released"{{#if (ne crystalOrm "none")}}, "{{crystalOrm}}-persisted-greeting"{{/if}}{{#if (ne crystalAuth "none")}}, "{{crystalAuth}}-current-user"{{/if}}{{#if (ne crystalCache "none")}}, "{{crystalCache}}-cached-time"{{/if}}]}).to_json
 ensure
   unless finished
     if process.exists?

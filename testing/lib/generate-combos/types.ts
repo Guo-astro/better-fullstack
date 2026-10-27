@@ -128,6 +128,7 @@ export const TEMPLATE_FINGERPRINT_KEYS = [
   "crystalAuth",
   "crystalTesting",
   "crystalValidation",
+  "crystalCache",
   "javaWebFramework",
   "javaBuildTool",
   "javaOrm",

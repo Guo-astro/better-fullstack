@@ -68,6 +68,16 @@ dependencies:
     github: spider-gazelle/active-model
     version: 4.7.1
 {{/if}}
+{{#if (or (eq crystalCache "memory") (eq crystalCache "file"))}}
+  cache:
+    github: crystal-cache/cache
+    version: 1.1.0
+{{/if}}
+{{#if (eq crystalCache "redis")}}
+  redis_cache_store:
+    github: crystal-cache/redis_cache_store
+    version: 1.1.0
+{{/if}}
 {{#if (eq crystalTesting "spectator")}}
 development_dependencies:
   spectator:

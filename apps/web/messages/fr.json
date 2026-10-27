@@ -792,5 +792,6 @@
   "docsCliSummaryCrystalCrystalOrm": "Couche de base de données expérimentale Crystal.",
   "docsCliSummaryCrystalCrystalAuth": "Authentification expérimentale Crystal.",
   "docsCliSummaryCrystalCrystalTesting": "Outils de test expérimentaux pour Crystal.",
-  "docsCliSummaryCrystalCrystalValidation": "Validation expérimentale des entrées Crystal."
+  "docsCliSummaryCrystalCrystalValidation": "Validation expérimentale des entrées Crystal.",
+  "docsCliSummaryCrystalCrystalCache": "Magasin de cache expérimental pour Crystal."
 }

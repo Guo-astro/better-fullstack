@@ -5,6 +5,9 @@ require "./http_guard"
 {{#if (eq crystalAuth "jwt")}}
 require "./token_auth"
 {{/if}}
+{{#if (ne crystalCache "none")}}
+require "./cached_clock"
+{{/if}}
 {{#if (ne crystalOrm "none")}}
 require "./greeting_store"
 {{/if}}
@@ -99,6 +102,14 @@ end
 class Api::Me::Show < ApiAction
   get "/api/me" do
     respond TokenAuth.current_user(request.headers["Authorization"]?)
+  end
+end
+
+{{/if}}
+{{#if (ne crystalCache "none")}}
+class Api::CachedTime::Show < ApiAction
+  get "/api/cached-time" do
+    respond CachedClock.fetch
   end
 end
 

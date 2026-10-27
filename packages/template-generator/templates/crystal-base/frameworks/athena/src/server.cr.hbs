@@ -5,6 +5,9 @@ require "./http_guard"
 {{#if (eq crystalAuth "jwt")}}
 require "./token_auth"
 {{/if}}
+{{#if (ne crystalCache "none")}}
+require "./cached_clock"
+{{/if}}
 {{#if (ne crystalOrm "none")}}
 require "./greeting_store"
 {{/if}}
@@ -46,6 +49,13 @@ class GreetingController < ATH::Controller
   @[ARTA::Get("/api/me")]
   def me(request : AHTTP::Request) : AHTTP::Response
     json_response TokenAuth.current_user(request.headers["Authorization"]?)
+  end
+
+{{/if}}
+{{#if (ne crystalCache "none")}}
+  @[ARTA::Get("/api/cached-time")]
+  def cached_time : AHTTP::Response
+    json_response CachedClock.fetch
   end
 
 {{/if}}

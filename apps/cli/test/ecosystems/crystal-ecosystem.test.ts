@@ -336,6 +336,27 @@ describe("Crystal create contract", () => {
     expect(generateReproducibleCommand(config)).toContain(`--crystal-validation ${validation}`);
   });
 
+  it.each([
+    ["kemal", "memory", "github: crystal-cache/cache", "Cache::MemoryStore(String)"],
+    ["lucky", "file", "github: crystal-cache/cache", "Cache::FileStore(String)"],
+    ["marten", "redis", "github: crystal-cache/redis_cache_store", "Cache::RedisCacheStore(String)"],
+  ] as const)("renders %s with a %s cached route", async (framework, cache, dependency, store) => {
+    const result = await createVirtual({
+      ecosystem: "crystal",
+      crystalWebFramework: framework,
+      crystalCache: cache,
+    });
+    expect(result.success).toBe(true);
+    if (!result.tree) throw new Error(result.error);
+    const root = result.tree.root;
+    expect(content(root, "shard.yml")).toContain(dependency);
+    expect(content(root, "src/cached_clock.cr")).toContain(store);
+    expect(hasFile(root, "spec/cached_clock_spec.cr")).toBe(true);
+    expect(content(root, "scripts/http_proof.cr")).toContain('client.get("/api/cached-time")');
+    const config = buildProjectConfig({ ecosystem: "crystal", crystalWebFramework: framework, crystalCache: cache });
+    expect(generateReproducibleCommand(config)).toContain(`--crystal-cache ${cache}`);
+  });
+
   it("rejects Marten Schema without Marten", async () => {
     const result = await createVirtual({
       ecosystem: "crystal",
