@@ -1,5 +1,14 @@
 require "spec"
+{{#if (or (eq crystalJobs "sidekiq") (eq crystalJobs "mosquito"))}}
+require "random/secure"
+
+ENV["JOBS_QUEUE"] = "bfs-spec-#{Random::Secure.hex(8)}"
+{{/if}}
 require "../src/greeting_jobs"
+{{#if (eq crystalJobs "mosquito")}}
+
+Mosquito.configure { |settings| settings.global_prefix = ENV["JOBS_QUEUE"] }
+{{/if}}
 
 describe GreetingJobs do
   it "rejects invalid names and missing ids before touching the queue" do

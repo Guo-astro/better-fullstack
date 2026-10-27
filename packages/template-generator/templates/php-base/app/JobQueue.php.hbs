@@ -73,7 +73,22 @@ final readonly class JobQueue
         if (preg_match('/^[a-f0-9]{32}$/', $id) !== 1 || !is_file($this->file($id))) {
             return null;
         }
-        return json_decode((string) file_get_contents($this->file($id)), true, 8, JSON_THROW_ON_ERROR);
+        $handle = fopen($this->file($id), 'r');
+        if ($handle === false) {
+            throw new RuntimeException('Cannot open the job status.');
+        }
+        try {
+            if (!flock($handle, LOCK_SH)) {
+                throw new RuntimeException('Cannot lock the job status.');
+            }
+            $contents = stream_get_contents($handle);
+            if ($contents === false) {
+                throw new RuntimeException('Cannot read the job status.');
+            }
+            return json_decode($contents, true, 8, JSON_THROW_ON_ERROR);
+        } finally {
+            fclose($handle);
+        }
     }
 
     public function process(string $id): void

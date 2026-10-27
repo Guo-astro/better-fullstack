@@ -154,6 +154,18 @@ try {
     [$status, $body] = requestProof('http://' . $address . '/missing');
     requireProof($status === 404 && $body['error'] === 'not_found', 'Missing route mismatch.');
 {{#if (ne phpAuth "none")}}
+    $preflight = stream_context_create(['http' => [
+        'method' => 'OPTIONS',
+        'header' => "Origin: http://localhost:5173\r\nAccess-Control-Request-Method: GET\r\nAccess-Control-Request-Headers: authorization\r\n",
+        'ignore_errors' => true,
+        'timeout' => 1,
+    ]]);
+    $preflightBody = file_get_contents('http://' . $address . '/api/me', false, $preflight);
+    $preflightHeaders = http_get_last_response_headers() ?? [];
+    requireProof($preflightBody === '' && preg_match('/^HTTP\/\S+ 204/', $preflightHeaders[0] ?? '') === 1, 'Bearer preflight failed.');
+    requireProof(in_array('access-control-allow-origin: http://localhost:5173', array_map('strtolower', $preflightHeaders), true), 'Bearer preflight origin mismatch.');
+    $allowedHeaders = array_values(array_filter($preflightHeaders, fn (string $header): bool => str_starts_with(strtolower($header), 'access-control-allow-headers:')));
+    requireProof(count($allowedHeaders) === 1 && in_array('authorization', array_map('trim', explode(',', strtolower(explode(':', $allowedHeaders[0], 2)[1]))), true), 'Bearer preflight did not allow Authorization.');
     [$status, $body] = requestProof('http://' . $address . '/api/me', 'GET', null, 'http://localhost:5173', 'Bearer ' . $proofTokens->issue('proof-user'));
     requireProof($status === 200 && $body === ['subject' => 'proof-user'], 'Signed token was not accepted.');
     [$status, $body] = requestProof('http://' . $address . '/api/me');
@@ -245,4 +257,4 @@ try {
 {{/if}}
 }
 if ($failure !== null) exit(1);
-echo json_encode(['php' => PHP_VERSION, 'assertions' => ['health', 'parsed-greeting', 'validation-rejection', 'malformed-json', 'oversized-body', 'missing-route', {{#if (ne phpOrm "none")}}'orm-persistence', {{/if}}{{#if (ne phpAuth "none")}}'bearer-auth', {{/if}}{{#if (ne phpCache "none")}}'cache', {{/if}}{{#if (ne phpJobQueue "none")}}'background-job', {{/if}}{{#if (ne phpEmail "none")}}'smtp-email', {{/if}}{{#if (ne phpLogging "none")}}'json-log', {{/if}}{{#if (ne phpHttpClient "none")}}'http-client', {{/if}}'cors', 'cors-allowlist', 'shutdown'], 'success' => true], JSON_THROW_ON_ERROR) . "\n";
+echo json_encode(['php' => PHP_VERSION, 'assertions' => ['health', 'parsed-greeting', 'validation-rejection', 'malformed-json', 'oversized-body', 'missing-route', {{#if (ne phpOrm "none")}}'orm-persistence', {{/if}}{{#if (ne phpAuth "none")}}'bearer-preflight', 'bearer-auth', {{/if}}{{#if (ne phpCache "none")}}'cache', {{/if}}{{#if (ne phpJobQueue "none")}}'background-job', {{/if}}{{#if (ne phpEmail "none")}}'smtp-email', {{/if}}{{#if (ne phpLogging "none")}}'json-log', {{/if}}{{#if (ne phpHttpClient "none")}}'http-client', {{/if}}'cors', 'cors-allowlist', 'shutdown'], 'success' => true], JSON_THROW_ON_ERROR) . "\n";

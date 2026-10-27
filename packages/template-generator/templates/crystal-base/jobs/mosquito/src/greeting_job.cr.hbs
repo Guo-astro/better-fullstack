@@ -1,6 +1,7 @@
 require "mosquito"
 
 Mosquito.configure do |settings|
+  settings.global_prefix = ENV["JOBS_QUEUE"]?
   settings.redis_url = ENV.fetch("REDIS_URL", "redis://localhost:6379")
 end
 
@@ -27,6 +28,6 @@ class GreetingJob < Mosquito::QueuedJob
   end
 
   def self.key(id : String) : String
-    "{{shardName}}:greeting-jobs:#{id}"
+    "{{shardName}}:#{ENV.fetch("JOBS_QUEUE", "default")}:greeting-jobs:#{id}"
   end
 end

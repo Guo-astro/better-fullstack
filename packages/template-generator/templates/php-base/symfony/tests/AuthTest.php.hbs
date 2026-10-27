@@ -41,6 +41,27 @@ final class AuthTest extends TestCase
         return $response;
     }
 
+    public function testAllowsBearerAuthorizationInPreflight(): void
+    {
+        $previous = getenv('CORS_ORIGIN');
+        putenv('CORS_ORIGIN=http://localhost:5173');
+        $kernel = new Kernel('test', false);
+        try {
+            $request = Request::create('/api/me', 'OPTIONS', server: [
+                'HTTP_ORIGIN' => 'http://localhost:5173',
+                'HTTP_ACCESS_CONTROL_REQUEST_METHOD' => 'GET',
+                'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' => 'authorization',
+            ]);
+            $response = $kernel->handle($request);
+            self::assertSame(204, $response->getStatusCode());
+            self::assertSame('http://localhost:5173', $response->headers->get('Access-Control-Allow-Origin'));
+            self::assertContains('authorization', array_map('trim', explode(',', strtolower((string) $response->headers->get('Access-Control-Allow-Headers')))));
+        } finally {
+            $kernel->shutdown();
+            putenv($previous === false ? 'CORS_ORIGIN' : 'CORS_ORIGIN=' . $previous);
+        }
+    }
+
     public function testAcceptsASignedTokenForTheConfiguredAudience(): void
     {
         $response = $this->me('Bearer ' . TokenVerifier::fromEnvironment()->issue('ada'));

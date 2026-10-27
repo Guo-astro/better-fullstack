@@ -2,13 +2,19 @@
 require "http/client"
 require "json"
 require "socket"
+{{#if (or (eq crystalOrm "avram") (eq crystalJobs "sidekiq") (eq crystalJobs "mosquito"))}}
+require "random/secure"
+{{/if}}
+{{#if (eq crystalOrm "avram")}}
+require "uri"
+{{/if}}
 
 server_env = {"HOST" => "127.0.0.1", "KEMAL_ENV" => "production", "CORS_ORIGIN" => "http://localhost:5173,http://localhost:8080"}
 {{#if (ne crystalAuth "none")}}
 server_env["AUTH_USERNAME"] = "{{#if (eq crystalAuth "marten-auth")}}proof@example.com{{else}}proof{{/if}}"
 server_env["AUTH_PASSWORD"] = "proof-password"
 {{/if}}
-{{#if (ne crystalOrm "none")}}
+{{#if (or (eq crystalOrm "crystal-db") (eq crystalOrm "marten-orm"))}}
 database_path = File.tempname("proof", ".sqlite3")
 {{/if}}
 {{#if (eq crystalCache "file")}}
@@ -25,7 +31,17 @@ raise "seed failed" unless Process.run("crystal", ["run", "manage.cr", "--", "se
 {{/if}}
 {{/if}}
 {{#if (eq crystalOrm "avram")}}
-raise "migration failed" unless Process.run("crystal", ["run", "scripts/db_migrate.cr"], output: Process::Redirect::Inherit, error: Process::Redirect::Inherit).success?
+database_uri = URI.parse(ENV.fetch("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/{{shardName}}_development"))
+database_uri.path = "/bfs_proof_#{Random::Secure.hex(8)}"
+server_env["DATABASE_URL"] = database_uri.to_s
+at_exit do
+  raise "proof database cleanup failed" unless Process.run("crystal", ["run", "scripts/db_migrate.cr", "--", "drop"], env: server_env, output: Process::Redirect::Inherit, error: Process::Redirect::Inherit).success?
+end
+raise "migration failed" unless Process.run("crystal", ["run", "scripts/db_migrate.cr"], env: server_env, output: Process::Redirect::Inherit, error: Process::Redirect::Inherit).success?
+{{/if}}
+
+{{#if (or (eq crystalJobs "sidekiq") (eq crystalJobs "mosquito"))}}
+server_env["JOBS_QUEUE"] = "bfs-proof-#{Random::Secure.hex(8)}"
 {{/if}}
 
 probe = TCPServer.new("127.0.0.1", 0)
@@ -178,7 +194,7 @@ ensure
     end
   end
 end
-{{#if (ne crystalOrm "none")}}
+{{#if (or (eq crystalOrm "crystal-db") (eq crystalOrm "marten-orm"))}}
 File.delete?(database_path)
 {{/if}}
 {{/if}}

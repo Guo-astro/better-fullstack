@@ -24,6 +24,18 @@ final class AuthTest extends TestCase
         return Application::create(tokens: $tokens)->handle($request);
     }
 
+    public function testAllowsBearerAuthorizationInPreflight(): void
+    {
+        $request = (new ServerRequestFactory())->createServerRequest('OPTIONS', '/api/me')
+            ->withHeader('Origin', 'http://localhost:5173')
+            ->withHeader('Access-Control-Request-Method', 'GET')
+            ->withHeader('Access-Control-Request-Headers', 'authorization');
+        $response = Application::create(corsOrigin: 'http://localhost:5173', tokens: new TokenVerifier(self::SECRET, 'issuer', 'api'))->handle($request);
+        self::assertSame(204, $response->getStatusCode());
+        self::assertSame('http://localhost:5173', $response->getHeaderLine('Access-Control-Allow-Origin'));
+        self::assertContains('authorization', array_map('trim', explode(',', strtolower($response->getHeaderLine('Access-Control-Allow-Headers')))));
+    }
+
     public function testAcceptsASignedTokenForTheConfiguredAudience(): void
     {
         $tokens = new TokenVerifier(self::SECRET, 'issuer', 'api');

@@ -12,7 +12,7 @@ class GreetingJob
   end
 
   def self.schedule(id : String, name : String) : Nil
-    async.perform(id, name)
+    async { |job| job.queue = ENV.fetch("JOBS_QUEUE", "default") }.perform(id, name)
   end
 
   def self.result(id : String) : String?
@@ -20,6 +20,6 @@ class GreetingJob
   end
 
   def self.key(id : String) : String
-    "{{shardName}}:greeting-jobs:#{id}"
+    "{{shardName}}:#{ENV.fetch("JOBS_QUEUE", "default")}:greeting-jobs:#{id}"
   end
 end
