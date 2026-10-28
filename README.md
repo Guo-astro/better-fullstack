@@ -11,7 +11,7 @@ npm create better-fullstack@latest
 ```
 
 <details>
-<summary><kbd>pnpm</kbd> <kbd>yarn</kbd> <kbd>bun</kbd></summary>
+<summary><a name="package-managers"><img src=".github/media/readme/pm-pills.svg" height="32" alt="pnpm, yarn, bun" align="absmiddle"></a></summary>
 
 ```sh
 pnpm create better-fullstack@latest
