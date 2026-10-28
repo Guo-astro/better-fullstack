@@ -20,6 +20,12 @@
 <picture><source media="(prefers-color-scheme: dark)" srcset=".github/media/readme-icons/dotnet-ascii-dark.png"><img src=".github/media/readme-icons/dotnet-ascii-light.png" width="44" height="44" alt=".NET" title=".NET" align="middle"></picture>
 &nbsp;&nbsp;&nbsp;
 <picture><source media="(prefers-color-scheme: dark)" srcset=".github/media/readme-icons/elixir-ascii-dark.png"><img src=".github/media/readme-icons/elixir-ascii-light.png" width="44" height="44" alt="Elixir" title="Elixir" align="middle"></picture>
+&nbsp;&nbsp;&nbsp;
+<picture><source media="(prefers-color-scheme: dark)" srcset=".github/media/readme-icons/php-ascii-dark.png"><img src=".github/media/readme-icons/php-ascii-light.png" width="44" height="44" alt="PHP" title="PHP" align="middle"></picture>
+&nbsp;&nbsp;&nbsp;
+<picture><source media="(prefers-color-scheme: dark)" srcset=".github/media/readme-icons/ruby-ascii-dark.png"><img src=".github/media/readme-icons/ruby-ascii-light.png" width="44" height="44" alt="Ruby" title="Ruby" align="middle"></picture>
+&nbsp;&nbsp;&nbsp;
+<picture><source media="(prefers-color-scheme: dark)" srcset=".github/media/readme-icons/crystal-ascii-dark.png"><img src=".github/media/readme-icons/crystal-ascii-light.png" width="44" height="44" alt="Crystal" title="Crystal" align="middle"></picture>
 </p>
 
 Scaffold fullstack projects from a catalog of Stack Parts.<br>
@@ -56,6 +62,30 @@ yarn create better-fullstack@latest
 ```
 
 The Stack Builder runs in your browser and hands you the command to copy, or a ZIP download: **[Open the App Builder →](https://better-fullstack.dev/new)**
+
+<br>
+
+## Languages and frameworks
+
+| Ecosystem | Frameworks |
+| --- | --- |
+| TypeScript | Next.js, TanStack Start, Nuxt, SvelteKit, Astro, SolidStart, Angular, and more, with Hono, Express, Fastify, Elysia, NestJS, AdonisJS, or Convex on the server |
+| React Native | Expo with bare styling, Uniwind, or Unistyles |
+| Rust | Axum, Actix Web, Rocket, Poem, Loco, Warp, Salvo, plus Leptos, Dioxus, or Yew |
+| Python | FastAPI, Django, Flask, Litestar, Starlette, aiohttp, Streamlit |
+| Go | Gin, Echo, Fiber, Chi, the standard library, go-zero, Kratos, httprouter |
+| Java and Kotlin | Spring Boot, Ktor, Quarkus, Micronaut |
+| .NET | ASP.NET Core Minimal APIs, MVC, Blazor |
+| Elixir | Phoenix, Phoenix LiveView, or a plain Mix project |
+| PHP | Slim, Laravel, Symfony |
+| Ruby | Sinatra, Rails, Roda, Grape |
+| Crystal | Kemal, Lucky, Athena, Marten |
+
+Each ecosystem adds its own choices for databases and ORMs, auth, testing, background jobs, caching, email, logging, and more. Browse the catalog from your terminal:
+
+```bash
+npx create-better-fullstack@latest search laravel
+```
 
 <br>
 

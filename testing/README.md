@@ -32,7 +32,7 @@ pnpm `catalog:` versions, so pnpm must be on `PATH`; its scripts still run throu
 
 ## Crystal native proof
 
-`bun run testing/crystal-runtime-proof.ts --output <directory>` requires Crystal 1.22.1 and Shards 0.20.0 after building core packages. Pass `--framework lucky`, `athena`, or `marten` to prove another framework; Kemal is the default. Pass `--orm crystal-db`, `avram`, or `marten-orm` to add a database layer; Avram needs a reachable PostgreSQL in `DATABASE_URL` and `TEST_DATABASE_URL`. Pass `--auth jwt`, `kemal-session`, or `marten-auth` to prove sign-in. Pass `--testing spectator`, `spec-kemal`, or `none` to change the generated test tooling; `none` skips the spec step. Pass `--validation athena-validator`, `active-model`, or `marten-schema` to validate greeting names with a library. Pass `--cache memory`, `file`, or `redis` to prove a TTL-cached route; `redis` needs a reachable server in `REDIS_URL`. Pass `--jobs sidekiq`, `mosquito`, or `tasker` to prove a background greeting job; the Redis queues also need `REDIS_URL`, and the proof starts `bin/worker` beside the server. It creates a fresh native project, installs and compiles the framework, runs specs, and checks real HTTP responses and shutdown. The output preserves the generated project, toolchain, dependency lockfile, producer identity, and results as an experimental observation, separately from the eight-recipe public receipt.
+`bun run testing/crystal-runtime-proof.ts --output <directory>` requires Crystal 1.22.1 and Shards 0.20.0 after building core packages. Pass `--framework lucky`, `athena`, or `marten` to prove another framework; Kemal is the default. Pass `--orm crystal-db`, `avram`, or `marten-orm` to add a database layer; Avram needs a reachable PostgreSQL in `DATABASE_URL` and `TEST_DATABASE_URL`. Pass `--auth jwt`, `kemal-session`, or `marten-auth` to prove sign-in. Pass `--testing spectator`, `spec-kemal`, or `none` to change the generated test tooling; `none` skips the spec step. Pass `--validation athena-validator`, `active-model`, or `marten-schema` to validate greeting names with a library. Pass `--cache memory`, `file`, or `redis` to prove a TTL-cached route; `redis` needs a reachable server in `REDIS_URL`. Pass `--jobs sidekiq`, `mosquito`, or `tasker` to prove a background greeting job; the Redis queues also need `REDIS_URL`, and the proof starts `bin/worker` beside the server. It creates a fresh native project, installs and compiles the framework, runs specs, and checks real HTTP responses and shutdown. CI and release preparation run the default Kemal recipe with no flags; other selections need their own run. The output preserves the generated project, toolchain, dependency lockfile, producer identity, and results as an experimental observation, separately from the eight-recipe public receipt.
 
 ## Prompt-free execution
 
@@ -91,7 +91,10 @@ dirty inputs, or a mismatched SHA fail proof. Native backend HTTP checks do not 
 current-runtime checks do not prove historical upgrades. See the
 [capability inventory](../docs/reference/capability-evidence-inventory.md) for recipe boundaries.
 
-The native PHP proof runs separately in CI and releases. It records its CLI hash, source revision,
+The native PHP proof runs separately in CI and releases. It needs PHP 8.5.12 and Composer 2.10.3
+with the `dom`, `filter`, `json`, `libxml`, `mbstring`, and `xmlwriter` extensions. It covers only
+Slim with no database, addons, or examples; Laravel, Symfony, ORMs, auth, and other PHP options
+need their own runtime proof before a runtime claim. It records its CLI hash, source revision,
 dirty state, toolchain versions, Composer lockfile, and native results. This observation does not
 change the versioned eight-case upgrade fixture or promote public capability evidence. Successful
 runs remove their temporary project; failed runs retain it for diagnosis.
@@ -108,7 +111,7 @@ Ruby has a separate experimental Sinatra proof. Use Ruby 3.4.11 and Bundler 4.0.
 bun run testing/ruby-runtime-proof.ts --output testing/.smoke-output/ruby-runtime-proof
 ```
 
-The runner installs the generated native service, checks syntax, runs Minitest/Rack tests, and verifies live JSON responses, invalid-input rejection, and shutdown. It records toolchains, producer identity, the generated lockfile, and step results. CI and release preparation require this separate gate. Its observation does not change the eight golden runtime recipes, historical upgrade fixtures, or public capability qualification.
+The proof covers only Sinatra with no database, addons, or examples; other Ruby frameworks and options need their own runtime proof. The runner installs the generated native service, checks syntax, runs Minitest/Rack tests, and verifies live JSON responses, invalid-input rejection, and shutdown. It records toolchains, producer identity, the generated lockfile, and step results. CI and release preparation require this separate gate. Its observation does not change the eight golden runtime recipes, historical upgrade fixtures, or public capability qualification.
 ## Elixir release proof
 
 Run `bun run test:elixir-release` with Elixir 1.17 or newer, compatible OTP, Hex, Rebar,

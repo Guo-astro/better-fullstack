@@ -16,12 +16,13 @@ See `docs/guidelines/` for deeper reference on these topics:
 - `generated-artifacts-and-sync.md` - generated-file producers, authoritative inputs, and safe regeneration in dirty worktrees
 - `telemetry-privacy-and-internal-tools.md` - telemetry allowlists, ingest privacy, aggregate access, and fail-closed internal tools
 - `public-docs-i18n-and-seo.md` - public content authority, translation fallback, schema-derived references, and agent/SEO surfaces
+- `capability-evidence-levels.md` - shared public proof levels and fail-closed claim rules
 - `stack-options-and-compatibility.md` - schema source of truth, canonical option metadata, aliases, and compatibility rules
 - `generator-change-playbook.md` - generated-output constraints, template changes, and verification
 - `web-builder-and-url-state.md` - stack builder state, URL parsing, lazy-route constraints, and preview wiring
 - `testing-release-and-upstream.md` - targeted verification commands, release guard expectations, and upstream backport workflow
 - `preview-publishing-security.md` - PR preview threat model, trusted artifact boundary, environment setup, and workflow guard
-- `adding-new-tool-options/` - **read this subfolder when adding any new library, tool, or category** to any ecosystem (TypeScript, Rust, Go, Python). Use its README for the source checklist, graph/CLI/MCP wiring, routing constraints, and verification
+- `adding-new-tool-options/` - **read this subfolder when adding any new library, tool, or category** to any ecosystem. Use its README for the source checklist, graph/CLI/MCP wiring, routing constraints, and verification
 
 ## Web UI
 

@@ -35,6 +35,8 @@ post-processing. Rebuild affected producers before testing built consumers. Foll
   generator. Verify affected auth recipes before changing them.
 - Better Auth packages, including `@better-auth/core`, form one synchronized family in the
   dependency update policy. Move them together; npm installs a second core when they split.
+- Composed native backends need their database setup and seeding in the composed setup command,
+  and must omit test commands when testing is `none`. Check `src/graph/graph-backend.ts`.
 - Existing-project updates compare against the formatted create-time scaffold baseline. Keep
   raw-template fixtures explicit so formatter changes do not masquerade as user edits.
 

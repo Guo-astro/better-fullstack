@@ -58,7 +58,8 @@ Additional focused release-facing checks:
 - `.github/workflows/release.yaml` starts after successful required CI on the exact main-branch
   release commit. It packs artifacts, runs generated-project proof, captures upgrade fixtures,
   qualifies the previous fixture, and binds the evidence into a SHA-bound release receipt before
-  publication. It does not independently rerun the root `test:release` command.
+  publication. It also runs the native Crystal, Ruby, and PHP HTTP proofs described in
+  `testing/README.md`. It does not independently rerun the root `test:release` command.
 - `.github/workflows/pr-preview-build.yaml` builds preview tarballs without secrets. Publication
   requires the protected `npm-preview` environment and its package-scoped credential. Preview and
   release workflows run published-package smoke checks after npm publication. Verify live
