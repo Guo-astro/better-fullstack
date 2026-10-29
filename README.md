@@ -10,6 +10,8 @@
 npm create better-fullstack@latest
 ```
 
+After creating a project, use the CLI's `add`, `update`, `check`, and `gen` commands to maintain it. See the [lifecycle guide](https://better-fullstack.dev/docs/getting-started/lifecycle).
+
 <details>
 <summary><a name="package-managers"><img src=".github/media/readme/pm-pills.svg" height="32" alt="pnpm, yarn, bun" align="absmiddle"></a></summary>
 
