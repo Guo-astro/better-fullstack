@@ -205,7 +205,7 @@
         "kind": "DataVisualizationNode",
         "source": {
           "kind": "HogQLQuery",
-          "query": "SELECT toStartOfDay(timestamp) AS day, event, count() AS events\nFROM events WHERE timestamp >= now() - INTERVAL 30 DAY\nGROUP BY day, event ORDER BY day DESC, events DESC LIMIT 500"
+          "query": "SELECT toStartOfDay(timestamp) AS day, event, count() AS events\nFROM events WHERE timestamp >= now() - INTERVAL 30 DAY\nGROUP BY day, event ORDER BY day DESC, events DESC LIMIT 10000"
         },
         "display": "ActionsTable"
       },
